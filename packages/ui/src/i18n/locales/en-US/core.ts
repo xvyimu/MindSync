@@ -3,6 +3,7 @@ const messages = {
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
+    "stop": "Stop",
     "confirm": "Confirm",
     "retry": "Retry",
     "delete": "Delete",
@@ -278,7 +279,8 @@ const messages = {
       "optimizationModeAutoSwitched": "Automatically switched to {mode} prompt optimization mode",
       "switchedToImageMode": "Automatically switched to image mode",
       "switchedToFunctionMode": "Automatically switched to {mode} mode",
-      "multiTurnOptimizationPrompt": "Multi-turn conversation optimization ({count} messages)"
+      "multiTurnOptimizationPrompt": "Multi-turn conversation optimization ({count} messages)",
+      "optimizeCancelled": "Generation stopped"
     }
   },
   "log": {

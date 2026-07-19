@@ -220,8 +220,19 @@
                     >
                         {{ analyzeLoading ? $t('promptOptimizer.analyzing') : $t('promptOptimizer.analyze') }}
                     </NButton>
+                    <!-- 停止按钮：流式生成中可立即停 UI -->
+                    <NButton
+                        v-if="loading && allowCancel"
+                        type="error"
+                        size="medium"
+                        :data-testid="`${testIdPrefix}-cancel-button`"
+                        @click="$emit('cancel')"
+                    >
+                        {{ cancelText || $t('common.stop') }}
+                    </NButton>
                     <!-- 优化按钮 -->
                     <NButton
+                        v-else
                         type="primary"
                         size="medium"
                         :data-testid="`${testIdPrefix}-optimize-button`"
@@ -297,6 +308,10 @@ interface Props {
     loadingText: string;
     /** 是否正在加载 */
     loading?: boolean;
+    /** 加载中是否允许取消（显示停止按钮） */
+    allowCancel?: boolean;
+    /** 停止按钮文案 */
+    cancelText?: string;
     /** 是否禁用 */
     disabled?: boolean;
     /** 是否显示预览按钮 */
@@ -337,6 +352,8 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "",
     templateLabel: "",
     loading: false,
+    allowCancel: true,
+    cancelText: '',
     disabled: false,
     showPreview: false,
     helpText: "",
@@ -358,6 +375,7 @@ const emit = defineEmits<{
     "update:modelValue": [value: string];
     "update:selectedModel": [value: string];
     submit: [];
+    cancel: [];
     analyze: [];
     configModel: [];
     "open-preview": [];
@@ -395,3 +413,27 @@ const handleAddMissingVariable = (varName: string) => {
     emit("add-missing-variable", varName);
 };
 </script>
+
+<style>
+/* Paper theme: cancel button uses CTA orange; primary submit stays blue.
+ * Non-scoped so Naive UI's internal button root sees these overrides. */
+html[data-app-theme='paper'] .n-button--error-type[data-testid$='-cancel-button'] {
+  --n-color: #F97316;
+  --n-color-hover: #EA580C;
+  --n-color-pressed: #C2410C;
+  --n-color-focus: #F97316;
+  --n-border: 1px solid #F97316;
+  --n-border-hover: 1px solid #EA580C;
+  --n-border-pressed: 1px solid #C2410C;
+  --n-border-focus: 1px solid #F97316;
+  --n-text-color: #FFFFFF;
+  --n-text-color-hover: #FFFFFF;
+  --n-text-color-pressed: #FFFFFF;
+  --n-text-color-focus: #FFFFFF;
+  --n-ripple-color: rgba(249, 115, 22, 0.35);
+}
+
+html[data-app-theme='paper'] .n-button:focus-visible {
+  box-shadow: var(--paper-focus-ring, 0 0 0 2px rgba(59, 130, 246, 0.22));
+}
+</style>

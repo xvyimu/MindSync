@@ -538,4 +538,28 @@ export function getClassifiedErrorText(
   return classified.kind
 }
 
+/**
+ * 便捷封装：对任意错误分类后返回可读文案，通过全局 i18n 实例翻译。
+ * 若分类为 'unknown'（没有可识别的传输层特征），返回 fallback，避免遮盖上层更具体的业务错误。
+ * 用于 optimize / iterate / test 等流式回调的 onError。
+ */
+export function getTransportErrorMessage(error: unknown, fallback: string): string {
+  // 用户主动取消不应弹错误 toast。
+  if (isRecord(error) && error.code === 'IPC_STREAM_CANCELLED') {
+    return fallback
+  }
+  const classified = classifyLlmTransportError(error)
+  if (classified.kind === 'aborted') {
+    return fallback
+  }
+  if (classified.kind === 'unknown') {
+    return fallback
+  }
+  return getClassifiedErrorText(
+    classified,
+    (key) => i18n.global.t(key),
+    (key) => i18n.global.te(key)
+  )
+}
+
 

@@ -36,6 +36,7 @@ const {
   buildAppMenuTemplate,
   getPageZoomShortcutAction,
 } = require('./config/app-menu');
+const { createStreamRegistry } = require('./config/stream-registry');
 const {
   DEFAULT_PAGE_ZOOM_LEVEL,
   VISUAL_ZOOM_LIMITS,
@@ -145,6 +146,8 @@ async function convertImageInputWithElectronNativeImage(input) {
 }
 
 let mainWindow;
+// 流任务注册表：按 sender 校验所有权、限制并发并支持取消（AbortController）。
+const streamRegistry = createStreamRegistry();
 let modelManager, templateManager, historyManager, llmService, promptService, templateLanguageService, preferenceService, dataManager, contextRepo, favoriteManager;
 let imageModelManager, imageService;
 let imageAdapterRegistry; // 全局引用以供 IPC 处理器使用
@@ -950,9 +953,21 @@ function setupIPC() {
     }
   });
 
+  // 流取消：由 renderer 主动请求，按所有权校验后触发对应 AbortSignal。
+  ipcMain.handle('stream-cancel', async (event, streamId) => {
+    try {
+      streamRegistry.cancel(event.sender, streamId);
+      return createSuccessResponse(true);
+    } catch (error) {
+      return createErrorResponse(error);
+    }
+  });
+
   // Streaming handler - more complex due to callbacks
   ipcMain.handle('llm-sendMessageStream', async (event, messages, provider, streamId) => {
+    let stream;
     try {
+      stream = streamRegistry.register(event.sender, streamId);
       // 使用符合 StreamHandlers 接口的回调名称
       const callbacks = {
         onToken: (token) => {
@@ -977,16 +992,24 @@ function setupIPC() {
         }
       };
 
-      await llmService.sendMessageStream(messages, provider, callbacks);
+      await llmService.sendMessageStream(messages, provider, callbacks, { signal: stream.signal });
       return createSuccessResponse(null);
     } catch (error) {
       return createErrorResponse(error);
+    } finally {
+      try {
+        streamRegistry.complete(event.sender, streamId);
+      } catch {
+        // Stream may already be cancelled; ignore cleanup races.
+      }
     }
   });
 
   // Streaming handler with tools - supports tool-call events
   ipcMain.handle('llm-sendMessageStreamWithTools', async (event, messages, provider, tools, streamId) => {
+    let stream;
     try {
+      stream = streamRegistry.register(event.sender, streamId);
       const callbacks = {
         onToken: (token) => {
           if (mainWindow && !mainWindow.isDestroyed()) {
@@ -1015,10 +1038,16 @@ function setupIPC() {
         }
       };
 
-      await llmService.sendMessageStreamWithTools(messages, provider, tools, callbacks);
+      await llmService.sendMessageStreamWithTools(messages, provider, tools, callbacks, { signal: stream.signal });
       return createSuccessResponse(null);
     } catch (error) {
       return createErrorResponse(error);
+    } finally {
+      try {
+        streamRegistry.complete(event.sender, streamId);
+      } catch {
+        // Stream may already be cancelled; ignore cleanup races.
+      }
     }
   });
 
@@ -1110,44 +1139,81 @@ function setupIPC() {
   ipcMain.handle('prompt-optimizePromptStream', async (event, request, streamId) => {
     const streamHandlers = createIpcStreamHandlers(mainWindow, streamId);
     try {
-      await promptService.optimizePromptStream(request, streamHandlers);
+      const stream = streamRegistry.register(event.sender, streamId);
+      await promptService.optimizePromptStream(request, streamHandlers, { signal: stream.signal });
       return createSuccessResponse(null);
     } catch (error) {
       streamHandlers.onError(error);
       return createErrorResponse(error);
+    } finally {
+      try {
+        streamRegistry.complete(event.sender, streamId);
+      } catch {
+        // Stream may already be cancelled; ignore cleanup races.
+      }
     }
   });
 
   ipcMain.handle('prompt-optimizeMessageStream', async (event, request, streamId) => {
     const streamHandlers = createIpcStreamHandlers(mainWindow, streamId);
     try {
-      await promptService.optimizeMessageStream(request, streamHandlers);
+      const stream = streamRegistry.register(event.sender, streamId);
+      await promptService.optimizeMessageStream(request, streamHandlers, { signal: stream.signal });
       return createSuccessResponse(null);
     } catch (error) {
       streamHandlers.onError(error);
       return createErrorResponse(error);
+    } finally {
+      try {
+        streamRegistry.complete(event.sender, streamId);
+      } catch {
+        // Stream may already be cancelled; ignore cleanup races.
+      }
     }
   });
 
   ipcMain.handle('prompt-iteratePromptStream', async (event, originalPrompt, lastOptimizedPrompt, iterateInput, modelKey, templateId, streamId, contextData) => {
     const streamHandlers = createIpcStreamHandlers(mainWindow, streamId);
     try {
-      await promptService.iteratePromptStream(originalPrompt, lastOptimizedPrompt, iterateInput, modelKey, streamHandlers, templateId, contextData);
+      const stream = streamRegistry.register(event.sender, streamId);
+      await promptService.iteratePromptStream(
+        originalPrompt,
+        lastOptimizedPrompt,
+        iterateInput,
+        modelKey,
+        streamHandlers,
+        templateId,
+        contextData,
+        { signal: stream.signal },
+      );
       return createSuccessResponse(null);
     } catch (error) {
       streamHandlers.onError(error);
       return createErrorResponse(error);
+    } finally {
+      try {
+        streamRegistry.complete(event.sender, streamId);
+      } catch {
+        // Stream may already be cancelled; ignore cleanup races.
+      }
     }
   });
 
   ipcMain.handle('prompt-testPromptStream', async (event, systemPrompt, userPrompt, modelKey, streamId) => {
     const streamHandlers = createIpcStreamHandlers(mainWindow, streamId);
     try {
-      await promptService.testPromptStream(systemPrompt, userPrompt, modelKey, streamHandlers);
+      const stream = streamRegistry.register(event.sender, streamId);
+      await promptService.testPromptStream(systemPrompt, userPrompt, modelKey, streamHandlers, { signal: stream.signal });
       return createSuccessResponse(null);
     } catch (error) {
       streamHandlers.onError(error);
       return createErrorResponse(error);
+    } finally {
+      try {
+        streamRegistry.complete(event.sender, streamId);
+      } catch {
+        // Stream may already be cancelled; ignore cleanup races.
+      }
     }
   });
 
@@ -1174,11 +1240,18 @@ function setupIPC() {
   ipcMain.handle('prompt-testCustomConversationStream', async (event, request, streamId) => {
     const streamHandlers = createIpcStreamHandlers(mainWindow, streamId);
     try {
-      await promptService.testCustomConversationStream(request, streamHandlers);
+      const stream = streamRegistry.register(event.sender, streamId);
+      await promptService.testCustomConversationStream(request, streamHandlers, { signal: stream.signal });
       return createSuccessResponse(null);
     } catch (error) {
       streamHandlers.onError(error);
       return createErrorResponse(error);
+    } finally {
+      try {
+        streamRegistry.complete(event.sender, streamId);
+      } catch {
+        // Stream may already be cancelled; ignore cleanup races.
+      }
     }
   });
 

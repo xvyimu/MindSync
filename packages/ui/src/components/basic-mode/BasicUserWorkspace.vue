@@ -84,7 +84,10 @@
                         :show-preview="false"
                         :show-analyze-button="true"
                         :analyze-loading="analyzing"
+                        :allow-cancel="true"
+                        :cancel-text="t('common.stop')"
                         @submit="logic.handleOptimize"
+                        @cancel="logic.handleCancelOptimization"
                         @analyze="handleAnalyze"
                         @configModel="handleOpenModelManager"
                     >

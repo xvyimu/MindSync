@@ -444,7 +444,8 @@ describe('PromptService Enhanced Features', () => {
           { role: 'user', content: 'user prompt' }
         ],
         'test-model',
-        callbacks
+        callbacks,
+        undefined
       )
     })
   })

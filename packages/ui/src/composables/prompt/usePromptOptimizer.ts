@@ -2,7 +2,7 @@ import { ref, nextTick, computed, reactive, type Ref, type ComputedRef } from 'v
 
 import { useToast } from '../ui/useToast'
 import { useI18n } from 'vue-i18n'
-import { getI18nErrorMessage } from '../../utils/error'
+import { getI18nErrorMessage, getTransportErrorMessage } from '../../utils/error'
 
 import { v4 as uuidv4 } from 'uuid'
 import type {
@@ -201,19 +201,19 @@ export function usePromptOptimizer(
           },
           onError: (error: Error) => {
             console.error(t('toast.error.optimizeProcessFailed'), error)
-            toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
+            toast.error(getTransportErrorMessage(error, getI18nErrorMessage(error, t('toast.error.optimizeFailed'))))
             state.isOptimizing = false
           }
         }
       )
     } catch (error: unknown) {
       console.error(t('toast.error.optimizeFailed'), error)
-      toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
+      toast.error(getTransportErrorMessage(error, getI18nErrorMessage(error, t('toast.error.optimizeFailed'))))
     } finally {
       state.isOptimizing = false
     }
   }
-  
+
   // 带上下文的优化提示词
   state.handleOptimizePromptWithContext = async (advancedContext: AdvancedContextPayload) => {
     // 对于系统模式，检查消息而不是prompt
@@ -340,19 +340,19 @@ export function usePromptOptimizer(
           },
           onError: (error: Error) => {
             console.error(t('toast.error.optimizeProcessFailed'), error)
-            toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
+            toast.error(getTransportErrorMessage(error, getI18nErrorMessage(error, t('toast.error.optimizeFailed'))))
             state.isOptimizing = false
           }
         }
       )
     } catch (error: unknown) {
       console.error(t('toast.error.optimizeFailed'), error)
-      toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
+      toast.error(getTransportErrorMessage(error, getI18nErrorMessage(error, t('toast.error.optimizeFailed'))))
     } finally {
       state.isOptimizing = false
     }
   }
-  
+
   // 迭代优化
   state.handleIteratePrompt = async ({ originalPrompt, optimizedPrompt: lastOptimizedPrompt, iterateInput }: { originalPrompt: string, optimizedPrompt: string, iterateInput: string }) => {
     // 🔧 修复：迭代模板实际上不需要 originalPrompt，只需要 lastOptimizedPrompt 和 iterateInput
@@ -418,7 +418,7 @@ export function usePromptOptimizer(
           },
           onError: (error: Error) => {
             console.error('[Iterate] Iteration failed:', error)
-            toast.error(t('toast.error.iterateFailed'))
+            toast.error(getTransportErrorMessage(error, getI18nErrorMessage(error, t('toast.error.iterateFailed'))))
             state.isIterating = false
           }
         },
@@ -426,7 +426,7 @@ export function usePromptOptimizer(
       )
     } catch (error: unknown) {
       console.error('[Iterate] Iteration failed:', error)
-      toast.error(t('toast.error.iterateFailed'))
+      toast.error(getTransportErrorMessage(error, getI18nErrorMessage(error, t('toast.error.iterateFailed'))))
       state.isIterating = false
     }
   }
