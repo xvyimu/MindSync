@@ -53,14 +53,18 @@ describe('ModelManager Import/Export', () => {
       expect(exportedTestModel?.enabled).toBe(true);
     });
 
-    it('should include built-in models in export', async () => {
+    it('should NOT export suppressed vendor presets, but should export the custom preset', async () => {
+      // 需求变更（钢铁铲除）：预设不生成、不残留，因此也不出现在导出中。
       const exportedData = await modelManager.exportData();
 
-      // 应该包含内置模型
-      const builtinModels = exportedData.filter(model =>
-        ['openai', 'anthropic', 'gemini'].includes(model.id)
+      const suppressed = exportedData.filter(model =>
+        ['openai', 'anthropic', 'gemini', 'deepseek', 'cloudflare', 'grok', 'chrome-built-in'].includes(model.id)
       );
-      expect(builtinModels.length).toBeGreaterThan(0);
+      expect(suppressed.length).toBe(0);
+
+      // custom 预设不在抑制集合内，应正常导出。
+      const custom = exportedData.find(model => model.id === 'custom');
+      expect(custom).toBeDefined();
     });
 
     it('should handle export error gracefully', async () => {

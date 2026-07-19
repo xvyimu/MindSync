@@ -118,111 +118,65 @@ describe('ModelManager', () => {
   });
 
   describe('initialization behavior', () => {
-    it('should backfill missing builtin apiKey when env key becomes available for an enabled model', async () => {
-      const originalGeminiKey = process.env.VITE_GEMINI_API_KEY
-      process.env.VITE_GEMINI_API_KEY = 'env_gemini_key'
+    // 需求变更（钢铁铲除）：15 个厂商预设在 init 早期被无条件 purge，
+    // 因此「预设专属」的回填 / cloudflare 自动启用 / DeepSeek 预设迁移路径已不可达，
+    // 相关测试删除。以下保留对「通用引擎」的覆盖——它们对 custom / 用户自建条目仍然有效。
 
-      try {
-        const existing = await modelManager.getModel('gemini')
-        expect(existing).toBeDefined()
+    it('should NOT purge the custom builtin (not in suppressed set) on init', async () => {
+      // custom 不在抑制集合内：即使 apiKey 为空、enabled，也应存活，绝不被 purge。
+      const existing = await modelManager.getModel('custom')
+      expect(existing).toBeDefined()
 
-        const storedGemini: TextModelConfig = {
-          ...existing!,
-          enabled: true,
-          connectionConfig: {
-            ...existing!.connectionConfig,
-            apiKey: ''
-          }
-        }
-
-        await storageProvider.setItem('models', JSON.stringify({ gemini: storedGemini }))
-
-        const reloadedManager = new ModelManager(storageProvider, new TextAdapterRegistry())
-        const reloaded = await reloadedManager.getModel('gemini')
-
-        expect(reloaded?.enabled).toBe(true)
-        expect(reloaded?.connectionConfig.apiKey).toBe('env_gemini_key')
-      } finally {
-        if (originalGeminiKey === undefined) {
-          delete process.env.VITE_GEMINI_API_KEY
-        } else {
-          process.env.VITE_GEMINI_API_KEY = originalGeminiKey
+      const storedCustom: TextModelConfig = {
+        ...existing!,
+        enabled: true,
+        connectionConfig: {
+          ...existing!.connectionConfig,
+          apiKey: 'user-custom-key'
         }
       }
+
+      await storageProvider.setItem('models', JSON.stringify({ custom: storedCustom }))
+
+      const reloadedManager = new ModelManager(storageProvider, new TextAdapterRegistry())
+      const reloaded = await reloadedManager.getModel('custom')
+
+      expect(reloaded).toBeDefined()
+      expect(reloaded?.connectionConfig.apiKey).toBe('user-custom-key')
     })
 
-    it('should auto-enable cloudflare when missing required connection fields become available from env', async () => {
-      const originalCloudflareToken = process.env.VITE_CF_API_TOKEN
-      const originalCloudflareAccountId = process.env.VITE_CF_ACCOUNT_ID
-      process.env.VITE_CF_API_TOKEN = 'env_cloudflare_token'
-      process.env.VITE_CF_ACCOUNT_ID = 'env_cloudflare_account'
+    it('should purge suppressed vendor presets from storage on init', async () => {
+      // 存入一个带 key 且 enabled 的 openai 预设——钢铁契约下仍应被无条件铲除。
+      const storedOpenai = createTextModelConfig('openai', 'OpenAI', true, 'sk-should-be-purged', 'openai')
+      await storageProvider.setItem('models', JSON.stringify({ openai: storedOpenai }))
 
-      try {
-        const existing = await modelManager.getModel('cloudflare')
-        expect(existing).toBeDefined()
+      const reloadedManager = new ModelManager(storageProvider, new TextAdapterRegistry())
+      const reloaded = await reloadedManager.getModel('openai')
 
-        const storedCloudflare: TextModelConfig = {
-          ...existing!,
-          enabled: false,
-          connectionConfig: {
-            ...existing!.connectionConfig,
-            apiKey: '',
-            accountId: ''
-          }
-        }
+      expect(reloaded).toBeUndefined()
 
-        await storageProvider.setItem('models', JSON.stringify({ cloudflare: storedCloudflare }))
-
-        const reloadedManager = new ModelManager(storageProvider, new TextAdapterRegistry())
-        const reloaded = await reloadedManager.getModel('cloudflare')
-
-        expect(reloaded?.enabled).toBe(true)
-        expect(reloaded?.connectionConfig.apiKey).toBe('env_cloudflare_token')
-        expect(reloaded?.connectionConfig.accountId).toBe('env_cloudflare_account')
-      } finally {
-        if (originalCloudflareToken === undefined) {
-          delete process.env.VITE_CF_API_TOKEN
-        } else {
-          process.env.VITE_CF_API_TOKEN = originalCloudflareToken
-        }
-
-        if (originalCloudflareAccountId === undefined) {
-          delete process.env.VITE_CF_ACCOUNT_ID
-        } else {
-          process.env.VITE_CF_ACCOUNT_ID = originalCloudflareAccountId
-        }
-      }
+      const rawAfter = await storageProvider.getItem('models')
+      const parsedAfter = JSON.parse(rawAfter!)
+      expect(parsedAfter.openai).toBeUndefined()
     })
 
-    it('should not overwrite existing model metadata or connection settings when reinitialized', async () => {
-      const targetId = 'openai';
+    it('should not overwrite existing user-built model metadata or connection settings when reinitialized', async () => {
+      // 使用非预设的用户自建 id，避免被 purge；验证 updateModel 持久化后重载不被默认值覆盖。
+      const targetId = 'user-openai-compatible';
+      const seed = createTextModelConfig(targetId, 'User Model', true, 'user-key', 'openai-compatible');
+      await modelManager.addModel(targetId, seed);
+
       const existing = await modelManager.getModel(targetId);
       expect(existing).toBeDefined();
 
-      const customProviderMeta = {
-        ...existing!.providerMeta,
-        name: 'Custom Provider Name'
-      };
-
-      const customModelMeta = {
-        ...existing!.modelMeta,
-        id: 'custom-openai-model',
-        name: 'Custom OpenAI Model'
-      };
-
       const customBaseURL = 'https://custom-openai.example.com/v1';
-
       await modelManager.updateModel(targetId, {
-        providerMeta: customProviderMeta,
-        modelMeta: customModelMeta,
-        connectionConfig: {
-          ...existing!.connectionConfig,
-          baseURL: customBaseURL
-        }
+        providerMeta: { ...existing!.providerMeta, name: 'Custom Provider Name' },
+        modelMeta: { ...existing!.modelMeta, id: 'custom-openai-model', name: 'Custom OpenAI Model' },
+        connectionConfig: { ...existing!.connectionConfig, baseURL: customBaseURL }
       });
 
-      const secondRegistry = new TextAdapterRegistry();
-      const reloadedManager = new ModelManager(storageProvider, secondRegistry);
+      const reloadedManager = new ModelManager(storageProvider, new TextAdapterRegistry());
       const reloaded = await reloadedManager.getModel(targetId);
 
       expect(reloaded?.providerMeta.name).toBe('Custom Provider Name');
@@ -231,74 +185,16 @@ describe('ModelManager', () => {
       expect(reloaded?.connectionConfig.baseURL).toBe(customBaseURL);
     });
 
-    it('should migrate builtin DeepSeek chat config to V4 Flash with thinking disabled', async () => {
-      const existing = await modelManager.getModel('deepseek')
-      expect(existing).toBeDefined()
-
-      const legacyDeepseek: TextModelConfig = {
-        ...existing!,
-        modelMeta: {
-          ...existing!.modelMeta,
-          id: 'deepseek-chat',
-          name: 'DeepSeek Chat',
-          defaultParameterValues: {}
-        },
-        paramOverrides: {
-          temperature: 0.3
-        }
-      }
-
-      await storageProvider.setItem('models', JSON.stringify({ deepseek: legacyDeepseek }))
-
-      const reloadedManager = new ModelManager(storageProvider, new TextAdapterRegistry())
-      const reloaded = await reloadedManager.getModel('deepseek')
-
-      expect(reloaded?.modelMeta.id).toBe('deepseek-v4-flash')
-      expect(reloaded?.paramOverrides).toEqual({
-        temperature: 0.3,
-        thinking_type: 'disabled'
-      })
-      expect(reloaded?.modelMeta.parameterDefinitions.map((definition) => definition.name)).toContain('thinking_type')
-    })
-
-    it('should migrate builtin DeepSeek reasoner config to V4 Pro with thinking enabled', async () => {
-      const existing = await modelManager.getModel('deepseek')
-      expect(existing).toBeDefined()
-
-      const legacyDeepseekReasoner: TextModelConfig = {
-        ...existing!,
-        modelMeta: {
-          ...existing!.modelMeta,
-          id: 'deepseek-reasoner',
-          name: 'DeepSeek Reasoner',
-          defaultParameterValues: {}
-        },
-        paramOverrides: {}
-      }
-
-      await storageProvider.setItem('models', JSON.stringify({ deepseek: legacyDeepseekReasoner }))
-
-      const reloadedManager = new ModelManager(storageProvider, new TextAdapterRegistry())
-      const reloaded = await reloadedManager.getModel('deepseek')
-
-      expect(reloaded?.modelMeta.id).toBe('deepseek-v4-pro')
-      expect(reloaded?.paramOverrides).toEqual({
-        thinking_type: 'enabled',
-        reasoning_effort: 'high'
-      })
-    })
-
-    it('should preserve custom DeepSeek model id while patching DeepSeek parameters', async () => {
-      const existing = await modelManager.getModel('deepseek')
-      expect(existing).toBeDefined()
-
+    it('should still patch DeepSeek parameters for a user-built model with deepseek providerId', async () => {
+      // DeepSeek 参数补丁引擎按 providerId==='deepseek' 触发，与 key 无关。
+      // 用户自建（非预设 id）的 deepseek 模型仍应被补丁，此覆盖保留。
+      const base = createTextModelConfig('custom-deepseek', 'Custom DeepSeek', true, 'ds-key', 'deepseek');
       const customDeepseek: TextModelConfig = {
-        ...existing!,
+        ...base,
         id: 'custom-deepseek',
-        name: 'Custom DeepSeek',
         modelId: 'custom-deepseek-model',
         modelMeta: {
-          ...existing!.modelMeta,
+          ...base.modelMeta,
           id: 'custom-deepseek-model',
           name: 'Custom DeepSeek Model',
           parameterDefinitions: [],

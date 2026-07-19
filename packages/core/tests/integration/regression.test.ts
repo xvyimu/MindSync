@@ -73,9 +73,10 @@ describe('架构重构回归测试', () => {
     });
 
     it('应该支持新TextModelConfig格式', async () => {
+      // 使用非预设 storage key，避免被钢铁 purge。
       const adapter = registry.getAdapter('openai');
       const newConfig: TextModelConfig = {
-        id: 'openai',
+        id: 'user-openai',
         name: 'OpenAI',
         enabled: true,
         providerMeta: adapter.getProvider(),
@@ -87,13 +88,13 @@ describe('架构重构回归测试', () => {
         paramOverrides: {}
       };
 
-      const modelsData = { openai: newConfig };
+      const modelsData = { 'user-openai': newConfig };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
-      
 
-      const config = await modelManager.getModel('openai') as TextModelConfig;
+
+      const config = await modelManager.getModel('user-openai') as TextModelConfig;
       expect(config).toBeDefined();
       expect(config.providerMeta).toBeDefined();
       expect(config.modelMeta).toBeDefined();
@@ -112,7 +113,7 @@ describe('架构重构回归测试', () => {
 
       const adapter = registry.getAdapter('gemini');
       const newConfig: TextModelConfig = {
-        id: 'gemini',
+        id: 'user-gemini',
         name: 'Gemini',
         enabled: true,
         providerMeta: adapter.getProvider(),
@@ -123,17 +124,18 @@ describe('架构重构回归测试', () => {
         paramOverrides: {}
       };
 
+      // 均使用非预设 storage key，避免被钢铁 purge。
       const modelsData = {
         legacy: legacyConfig,
-        gemini: newConfig
+        'user-gemini': newConfig
       };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
-      
+
 
       const legacyResult = await modelManager.getModel('legacy');
-      const newResult = await modelManager.getModel('gemini');
+      const newResult = await modelManager.getModel('user-gemini');
 
       expect(legacyResult).toBeDefined();
       expect(newResult).toBeDefined();
@@ -350,6 +352,7 @@ describe('架构重构回归测试', () => {
     });
 
     it('应该为OpenAI兼容Provider加载对应Adapter', async () => {
+      // provider 字段驱动 adapter 解析；storage key 用非预设 id（user-*）避免被钢铁 purge。
       const providerExpectations = [
         ['deepseek', 'deepseek'],
         ['zhipu', 'zhipu'],
@@ -358,6 +361,7 @@ describe('架构重构回归测试', () => {
       ] as const;
 
       for (const [provider, expectedProviderId] of providerExpectations) {
+        const storageKey = `user-${provider}`;
         const legacyConfig: ModelConfig = {
           name: `${provider} Model`,
           provider: provider,
@@ -368,13 +372,13 @@ describe('架构重构回归测试', () => {
           enabled: true
         };
 
-        const modelsData = { [provider]: legacyConfig };
+        const modelsData = { [storageKey]: legacyConfig };
         await storage.setItem('models', JSON.stringify(modelsData));
 
         const modelManager = new ModelManager(storage, registry);
-        
 
-        const config = await modelManager.getModel(provider) as TextModelConfig;
+
+        const config = await modelManager.getModel(storageKey) as TextModelConfig;
         expect(config).toBeDefined();
         expect(config.providerMeta.id).toBe(expectedProviderId);
         expect(config.connectionConfig.baseURL).toBe(`https://${provider}.com/v1`);

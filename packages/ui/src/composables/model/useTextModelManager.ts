@@ -13,6 +13,7 @@ import {
   type TextProvider,
   checkChromeBuiltInAvailability,
   getBuiltinModelIds,
+  SUPPRESSED_BUILTIN_PRESET_IDS,
   markChromeBuiltInUserConfigured,
   normalizeCustomRequestHeaders,
   prepareChromeBuiltInModel,
@@ -410,19 +411,11 @@ export function useTextModelManager() {
     }
   }
 
-  // 判断是否为「未配置」的内置默认模型：内置ID + 未启用 + 无 apiKey/accountId 等连接凭证。
-  // 这类条目仅是默认模板，用户从未配置过，在列表中隐藏以减少视觉噪音。
-  // 一旦用户填入 apiKey 或手动启用，会因 hasCredential=true 或 enabled=true 而自动显示。
-  const isUnconfiguredBuiltin = (model: TextModelConfig): boolean => {
-    if (!isDefaultModel(model.id)) return false
-    if (model.enabled) return false
-    const conn = (model.connectionConfig || {}) as Record<string, unknown>
-    const hasCredential = Object.entries(conn).some(([key, value]) => {
-      if (key === 'baseURL' || key === 'requestStyle') return false
-      if (typeof value === 'string') return value.trim().length > 0
-      return value != null && value !== ''
-    })
-    return !hasCredential
+  // 钢铁硬隐藏：被抑制的厂商预设一律不进列表，无视 apiKey / enabled / 数据状态。
+  // 作为数据层铲除的 UI 兜底——即使某处回填或迁移遗漏，用户也永远看不到这些预设。
+  // custom 及用户自建条目（ls / lsgpt 等）不在此列表，照常显示。
+  const isSuppressedPreset = (model: TextModelConfig): boolean => {
+    return SUPPRESSED_BUILTIN_PRESET_IDS.has(model.id)
   }
 
   const loadModels = async () => {
@@ -430,7 +423,7 @@ export function useTextModelManager() {
     try {
       const all = await modelManager.getAllModels()
       models.value = all
-        .filter((model: TextModelConfig) => !isUnconfiguredBuiltin(model))
+        .filter((model: TextModelConfig) => !isSuppressedPreset(model))
         .map((model: TextModelConfig) => ({ ...model }))
         .sort((a: TextModelConfig, b: TextModelConfig) => {
           if (a.enabled !== b.enabled) {
