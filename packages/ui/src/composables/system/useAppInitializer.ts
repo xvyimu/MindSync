@@ -97,13 +97,16 @@ export function useAppInitializer(): {
   isInitializing: Ref<boolean>;
   error: Ref<Error | null>;
   startupRepairReport: Ref<StartupRepairReport | null>;
+  retry: () => Promise<void>;
 } {
   const services = shallowRef<AppServices | null>(null);
   const isInitializing = ref(true);
   const error = ref<Error | null>(null);
   const startupRepairReport = ref<StartupRepairReport | null>(null);
 
-  onMounted(async () => {
+  const runInit = async () => {
+    isInitializing.value = true;
+    error.value = null;
     try {
       console.log('[AppInitializer] Starting application initialization...');
 
@@ -526,7 +529,18 @@ export function useAppInitializer(): {
       isInitializing.value = false;
       console.log('[AppInitializer] Application initialization complete');
     }
+  };
+
+  onMounted(() => {
+    void runInit();
   });
 
-  return { services, isInitializing, error, startupRepairReport };
+  const retry = async () => {
+    if (isInitializing.value) return;
+    services.value = null;
+    startupRepairReport.value = null;
+    await runInit();
+  };
+
+  return { services, isInitializing, error, startupRepairReport, retry };
 } 

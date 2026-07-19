@@ -481,14 +481,20 @@ function createWindow() {
     applyPageZoomAction(targetWebContents, action);
   };
 
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate(
-      buildAppMenuTemplate({
-        isMac: process.platform === 'darwin',
-        onPageZoomAction: handlePageZoomAction,
-      })
-    )
-  );
+  const applyAppMenu = () => {
+    Menu.setApplicationMenu(
+      Menu.buildFromTemplate(
+        buildAppMenuTemplate({
+          isMac: process.platform === 'darwin',
+          onPageZoomAction: handlePageZoomAction,
+          locale: getCurrentUiLocale(),
+        })
+      )
+    );
+  };
+  applyAppMenu();
+  // Expose rebuild hook so locale changes take effect immediately.
+  mainWindow.__applyAppMenu = applyAppMenu;
   mainWindow.webContents.setZoomLevel(DEFAULT_PAGE_ZOOM_LEVEL);
   void mainWindow.webContents
     .setVisualZoomLevelLimits(VISUAL_ZOOM_LIMITS.minimum, VISUAL_ZOOM_LIMITS.maximum)
@@ -2263,6 +2269,10 @@ function setupIPC() {
   ipcMain.handle('app-set-locale', (_event, locale) => {
     try {
       uiLocale = normalizeUiLocale(locale) || 'en-US';
+      // Rebuild native app menu so File/Edit/View labels follow the UI locale.
+      if (mainWindow && !mainWindow.isDestroyed() && typeof mainWindow.__applyAppMenu === 'function') {
+        mainWindow.__applyAppMenu();
+      }
       return createSuccessResponse(null);
     } catch (error) {
       return createErrorResponse(error);

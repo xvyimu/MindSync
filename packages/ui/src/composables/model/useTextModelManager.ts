@@ -19,7 +19,12 @@ import {
   resolveTextModelMetadata,
   validateCustomRequestHeaders
 } from '@prompt-optimizer/core'
-import { formatErrorSummary, getI18nErrorMessage } from '../../utils/error'
+import {
+  classifyLlmTransportError,
+  formatErrorSummary,
+  getClassifiedErrorText,
+  getI18nErrorMessage,
+} from '../../utils/error'
 import { useModelAdvancedParameters } from './useModelAdvancedParameters'
 import { computeConnectionConfig } from './useConnectionConfig'
 import type { AppServices } from '../../types/services'
@@ -59,7 +64,7 @@ const generateTextModelId = (providerId: string, nonce?: number) => {
 }
 
 export function useTextModelManager() {
-  const { t } = useI18n()
+  const { t, te } = useI18n()
   const toast = useToast()
 
   const getErrorDetail = (error: unknown, fallback = t('common.error')) => {
@@ -405,11 +410,27 @@ export function useTextModelManager() {
     }
   }
 
+  // 判断是否为「未配置」的内置默认模型：内置ID + 未启用 + 无 apiKey/accountId 等连接凭证。
+  // 这类条目仅是默认模板，用户从未配置过，在列表中隐藏以减少视觉噪音。
+  // 一旦用户填入 apiKey 或手动启用，会因 hasCredential=true 或 enabled=true 而自动显示。
+  const isUnconfiguredBuiltin = (model: TextModelConfig): boolean => {
+    if (!isDefaultModel(model.id)) return false
+    if (model.enabled) return false
+    const conn = (model.connectionConfig || {}) as Record<string, unknown>
+    const hasCredential = Object.entries(conn).some(([key, value]) => {
+      if (key === 'baseURL' || key === 'requestStyle') return false
+      if (typeof value === 'string') return value.trim().length > 0
+      return value != null && value !== ''
+    })
+    return !hasCredential
+  }
+
   const loadModels = async () => {
     loadingModels.value = true
     try {
       const all = await modelManager.getAllModels()
       models.value = all
+        .filter((model: TextModelConfig) => !isUnconfiguredBuiltin(model))
         .map((model: TextModelConfig) => ({ ...model }))
         .sort((a: TextModelConfig, b: TextModelConfig) => {
           if (a.enabled !== b.enabled) {
@@ -757,9 +778,14 @@ export function useTextModelManager() {
     } catch (error: unknown) {
       console.error('Failed to fetch model list:', error)
 
-      // Keep UX consistent: if dynamic fetch fails, fall back to static models
-      // but surface the failure to avoid a misleading "success" toast.
-      const errorMessage = getErrorDetail(error, t('modelManager.loadFailed'))
+      // 使用统一的传输层错误分类，避免直接把 provider raw message 抛给用户。
+      const classified = classifyLlmTransportError(error, { origin: providerTemplateId })
+      const humanMessage = getClassifiedErrorText(
+        classified,
+        (key) => t(key),
+        (key) => te(key)
+      )
+      const fallbackDetail = humanMessage || getErrorDetail(error, t('modelManager.loadFailed'))
 
       let staticCount: number
       try {
@@ -772,9 +798,19 @@ export function useTextModelManager() {
       loadStaticModelsForProvider(providerTemplateId)
 
       if (staticCount > 0) {
-        toast.warning(t('modelManager.fetchModelsFallback', { error: errorMessage, count: staticCount }))
+        // 403 / 401 / permission 类错误不需要 error 级 toast，用 info/warning 降噪即可。
+        const isSoftDegradation = classified.kind === 'permission' || classified.kind === 'auth' || classified.kind === 'not_found'
+        const message = t('modelManager.fetchModelsFallback', {
+          error: fallbackDetail,
+          count: staticCount,
+        })
+        if (isSoftDegradation) {
+          toast.info(message)
+        } else {
+          toast.warning(message)
+        }
       } else {
-        toast.error(t('modelManager.fetchModelsFailed', { error: errorMessage }))
+        toast.error(t('modelManager.fetchModelsFailed', { error: fallbackDetail }))
       }
     } finally {
       isLoadingModelOptions.value = false

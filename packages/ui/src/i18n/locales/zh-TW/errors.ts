@@ -136,6 +136,20 @@ const messages = {
     },
     "core": {
       "ipc_serialization_failed": "IPC 序列化失敗: {details}"
+    },
+    "transport": {
+      "offline": "網路已中斷，請確認連線後重試",
+      "network": "網路連線異常，請稍後重試",
+      "timeout": "請求逾時，請稍後重試",
+      "aborted": "已取消",
+      "auth": "身份驗證失敗，請檢查 API Key",
+      "permission": "無存取權限（403），請檢查 API Key 或模型是否可用",
+      "rateLimit": "請求過於頻繁（429），請稍後重試",
+      "server": "伺服器異常，請稍後重試",
+      "notFound": "資源不存在（404）",
+      "invalidRequest": "請求參數有誤，請檢查設定",
+      "modelUnavailable": "模型不可用，請更換模型或稍後重試",
+      "unknown": "請求失敗，請稍後重試"
     }
   }
 } as const;

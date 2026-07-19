@@ -21,7 +21,21 @@
             <NText depth="2">{{ t("log.info.initializing") }}</NText>
         </div>
         <div v-else-if="!services" class="loading-container error">
-            <NResult status="error" :title="t('toast.error.appInitFailed')" />
+            <NResult
+                status="error"
+                :title="t('toast.error.appInitFailed')"
+                :description="initError?.message || ''"
+            >
+                <template #footer>
+                    <NButton
+                        type="primary"
+                        :loading="isRetryingInit"
+                        @click="handleRetryInit"
+                    >
+                        {{ t('common.retry') }}
+                    </NButton>
+                </template>
+            </NResult>
         </div>
         <div v-else-if="!isReady" class="loading-container">
             <NSpin size="medium" />
@@ -251,6 +265,7 @@ import { openExternalUrl } from '../../utils/open-external-url'
 import { registerOptionalIntegrations } from '../../integrations/registerOptionalIntegrations';
 import { useI18n } from "vue-i18n";
 import {
+    NButton,
     NConfigProvider,
     NGlobalStyle,
     NResult,
@@ -418,7 +433,23 @@ const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
 };
 
 // 2. 初始化应用服务
-const { services, isInitializing, startupRepairReport } = useAppInitializer();
+const {
+  services,
+  isInitializing,
+  error: initError,
+  startupRepairReport,
+  retry: retryInit,
+} = useAppInitializer();
+const isRetryingInit = ref(false);
+const handleRetryInit = async () => {
+  if (isRetryingInit.value) return;
+  isRetryingInit.value = true;
+  try {
+    await retryInit();
+  } finally {
+    isRetryingInit.value = false;
+  }
+};
 
 const hasShownStartupRepairToast = ref(false)
 
