@@ -9,7 +9,7 @@
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
 | **日期** | 2026-07-20 |
 | **分支** | `develop` |
-| **远端 tip（写文档时）** | `a1e1a71` — 以 `git log -1` 为准 |
+| **远端 tip（写文档时）** | `cb13121`（文档体系 C）— 以 `git log -1` 为准 |
 | **Fork** | https://github.com/xvyimu/prompt-optimizer |
 | **策略** | **fork-only**（默认不向上游开 PR） |
 | **上游 remote** | `upstream` → `linshenkx/prompt-optimizer`（可拉取，不默认贡献） |
