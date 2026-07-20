@@ -601,6 +601,7 @@ const decodeRemotePathSegment = (segment: string): string => {
 export const normalizeObjectPath = (path: string): string => {
   const raw = String(path || '')
   // Align with desktop/remote-storage.js: backslash + C0 controls + DEL
+  // eslint-disable-next-line no-control-regex -- reject C0 controls and DEL
   if (/[\\\u0000-\u001f\u007f]/.test(raw)) {
     throw new Error('Remote storage path contains invalid characters')
   }
@@ -608,6 +609,7 @@ export const normalizeObjectPath = (path: string): string => {
   const segments = raw.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean)
   for (const segment of segments) {
     const decoded = decodeRemotePathSegment(segment)
+    // eslint-disable-next-line no-control-regex -- reject C0 controls and DEL
     if (decoded === '.' || decoded === '..' || /[\\/\u0000-\u001f\u007f]/.test(decoded)) {
       throw new Error('Remote storage path contains an unsafe segment')
     }

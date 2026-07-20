@@ -180,6 +180,13 @@
                         @apply-patch="handleApplyPatch"
                         @save-local-edit="handleSaveLocalEdit"
                     />
+                    <PostOptimizeActions
+                        :show="showPostOptimizeCta"
+                        @test="handlePostOptimizeTest"
+                        @evaluate="handlePostOptimizeEvaluate"
+                        @favorite="handleSaveFavorite"
+                        @dismiss="showPostOptimizeCta = false"
+                    />
                 </TestSourceLinkedCard>
                 </NFlex>
             </div>
