@@ -7,6 +7,9 @@ const {
   getUpdateDeliveryPolicy,
   isManualReleaseDelivery,
 } = require('../update-delivery-policy');
+const {
+  resolveUpdateRepositoryConfig,
+} = require('../update-config');
 
 function createUpdateHandlers(ctx) {
   const {
