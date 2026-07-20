@@ -225,7 +225,10 @@
                         v-if="loading && allowCancel"
                         type="error"
                         size="medium"
+                        strong
+                        class="input-panel-cancel-btn"
                         :data-testid="`${testIdPrefix}-cancel-button`"
+                        :title="cancelText || $t('common.stop')"
                         @click="$emit('cancel')"
                     >
                         {{ cancelText || $t('common.stop') }}
@@ -245,6 +248,15 @@
                 </NSpace>
             </NGridItem>
         </NGrid>
+        <!-- 优化进行中状态提示：>300ms 异步操作必须可见反馈 -->
+        <NText
+            v-if="loading"
+            depth="3"
+            class="input-panel-status"
+            :data-testid="`${testIdPrefix}-optimizing-status`"
+        >
+            {{ loadingText }}
+        </NText>
     </NSpace>
 
     <!-- 全屏弹窗 -->
@@ -415,9 +427,21 @@ const handleAddMissingVariable = (varName: string) => {
 </script>
 
 <style>
-/* Paper theme: cancel button uses CTA orange; primary submit stays blue.
- * Non-scoped so Naive UI's internal button root sees these overrides. */
-html[data-app-theme='paper'] .n-button--error-type[data-testid$='-cancel-button'] {
+/* 默认主题：停止按钮保持高可见；paper 主题用 CTA 橙（吸收令牌 #F97316） */
+.input-panel-cancel-btn {
+  cursor: pointer;
+  min-width: 4.5rem;
+}
+
+.input-panel-status {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+html[data-app-theme='paper'] .n-button--error-type[data-testid$='-cancel-button'],
+html[data-app-theme='paper'] .input-panel-cancel-btn.n-button--error-type {
   --n-color: #F97316;
   --n-color-hover: #EA580C;
   --n-color-pressed: #C2410C;
@@ -435,5 +459,11 @@ html[data-app-theme='paper'] .n-button--error-type[data-testid$='-cancel-button'
 
 html[data-app-theme='paper'] .n-button:focus-visible {
   box-shadow: var(--paper-focus-ring, 0 0 0 2px rgba(59, 130, 246, 0.22));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input-panel-cancel-btn {
+    transition: none;
+  }
 }
 </style>

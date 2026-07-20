@@ -9,17 +9,21 @@
   >
     <template #empty>
       <slot name="empty">
-        <NSpace vertical align="center" style="padding: 12px 0;">
+        <NSpace vertical align="center" class="swc-empty">
           <NText depth="3">{{ emptyText || t('model.select.noAvailableModels') }}</NText>
           <NButton
             v-if="shouldShowEmptyConfigCTA"
             type="tertiary"
             size="small"
             ghost
+            class="swc-config-btn"
             @click="emitConfig()"
           >
             <template #icon>
-              <span>⚙️</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="swc-icon" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </template>
             {{ configText || t('model.select.configure') }}
           </NButton>
@@ -29,10 +33,13 @@
 
     <template #action>
       <slot name="action">
-        <div v-if="shouldShowConfigAction" style="padding: 8px 12px;">
-          <NButton quaternary size="small" @click="emitConfig()">
+        <div v-if="shouldShowConfigAction" class="swc-action">
+          <NButton quaternary size="small" class="swc-config-btn" @click="emitConfig()">
             <template #icon>
-              <span>⚙️</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="swc-icon" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </template>
             {{ configText || t('model.select.configure') }}
           </NButton>
@@ -74,8 +81,9 @@ const props = withDefaults(defineProps<Props>(), {
   options: () => [],
   getSecondary: undefined,
   selectedTooltip: true,
-  showConfigAction: false,
-  showEmptyConfigCTA: false,
+  // 默认开启：模型/模板下拉应始终可见配置入口与空态 CTA（与 2026-07-19 UX 整包一致）
+  showConfigAction: true,
+  showEmptyConfigCTA: true,
   configText: undefined,
   emptyText: undefined,
   multiple: false
@@ -191,6 +199,8 @@ const emitConfig = () => emit('config')
 .swc-opt {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  width: 100%;
 }
 .swc-primary {
   font-weight: 500;
@@ -202,6 +212,19 @@ const emitConfig = () => emit('config')
   line-height: 1.3;
   white-space: normal;
 }
+.swc-empty {
+  padding: 12px 0;
+}
+.swc-action {
+  padding: 8px 12px;
+}
+.swc-config-btn {
+  cursor: pointer;
+}
+.swc-icon {
+  width: 14px;
+  height: 14px;
+}
 </style>
 
 <style>
@@ -210,27 +233,31 @@ const emitConfig = () => emit('config')
   white-space: normal;
   line-height: 1.35;
   display: block;
+  width: 100%;
 }
 .swc-select-menu .n-base-select-option {
   align-items: flex-start;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 8px;
+  transition: background-color 150ms ease, opacity 150ms ease;
 }
 .swc-select-menu .swc-opt {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+  gap: 2px;
 }
 .swc-select-menu .swc-primary {
   font-weight: 600;
   line-height: 1.35;
-  margin-bottom: 2px;
+  margin-bottom: 0;
 }
 .swc-select-menu .swc-secondary {
   font-size: 12px;
-  opacity: 0.65;
-  line-height: 1.25;
+  opacity: 0.68;
+  line-height: 1.3;
   white-space: normal;
   word-break: break-word;
 }
@@ -238,5 +265,11 @@ const emitConfig = () => emit('config')
 .swc-select .n-base-selection .swc-secondary,
 .swc-select .n-base-selection-label .swc-secondary {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swc-select-menu .n-base-select-option {
+    transition: none;
+  }
 }
 </style>

@@ -33,18 +33,23 @@ export class DataTransformer {
 
   /**
    * 将模板配置转换为选择器选项
+   * secondary 为模板描述，配合 SelectWithConfig 两行卡片展示
    * @param templates 模板配置数组
    * @returns 标准化的模板选择选项
    */
   static templatesToSelectOptions(templates: Template[]): TemplateSelectOption[] {
-    return templates.map(template => ({
-      primary: template.name || '',
-      secondary: template.metadata?.description || '',
-      value: template.id,
-      raw: template,
-      // 保持向后兼容性
-      label: template.name || ''
-    }))
+    return templates.map(template => {
+      const name = template.name || ''
+      const description = template.metadata?.description || ''
+      return {
+        primary: name,
+        secondary: description,
+        value: template.id,
+        raw: template,
+        // 保持向后兼容性
+        label: name
+      }
+    })
   }
 
   /**
