@@ -5,6 +5,9 @@ import { ITemplateManager } from '../template/types';
 import { IPreferenceService } from '../preference/types';
 import { ContextRepo } from '../context/types';
 import type { IFavoriteManager } from '../favorite/types';
+import { CORE_SERVICE_KEYS } from '../../constants/storage-keys';
+import type { EvalCaseSet } from '../evaluation/eval-case-types';
+import { isEvalCaseSet } from '../evaluation/eval-case-repository';
 import {
   DataExportFailedError,
   DataImportPartialFailedError,
@@ -16,6 +19,9 @@ import {
   redactExportDataObject,
   type ExportAllDataOptions,
 } from './export-secrets';
+
+/** 全量导出中的可复现用例集键（Cut-R1 / F2） */
+export const EXPORT_DATA_KEY_EVAL_CASE_SETS = 'evalCaseSets' as const;
 
 /**
  * 数据导入导出管理器
@@ -73,6 +79,61 @@ export class DataManager implements IDataManager {
     this.favoriteManager = favoriteManager;
   }
 
+  /**
+   * 从 preference 读取 EvalCaseSet（UI 与 Cut-1 同一键）。
+   * 无效或缺失时返回 null，不抛错，避免阻断全量导出。
+   */
+  private async loadEvalCaseSetForExport(): Promise<EvalCaseSet | null> {
+    try {
+      const raw = await this.preferenceService.get<EvalCaseSet | string | null>(
+        CORE_SERVICE_KEYS.EVAL_CASE_SET,
+        null,
+      );
+      if (raw == null) return null;
+      const parsed: unknown = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!isEvalCaseSet(parsed)) {
+        console.warn(
+          '[DataManager] Stored eval case set is invalid; skipping export of evalCaseSets',
+        );
+        return null;
+      }
+      return parsed;
+    } catch (error) {
+      console.warn('[DataManager] Failed to load eval case set for export:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 导入 EvalCaseSet 到 preference 存储键。
+   * 无效 payload：skip + warn，不记入 errors（不阻断其它域）。
+   * 写入失败：记入 errors。
+   */
+  private async importEvalCaseSet(
+    payload: unknown,
+    errors: string[],
+  ): Promise<void> {
+    if (payload === undefined) return;
+    try {
+      const parsed: unknown =
+        typeof payload === 'string' ? JSON.parse(payload) : payload;
+      if (!isEvalCaseSet(parsed)) {
+        console.warn(
+          '[DataManager] Invalid evalCaseSets payload on import; skipped',
+        );
+        return;
+      }
+      await this.preferenceService.set(CORE_SERVICE_KEYS.EVAL_CASE_SET, parsed);
+      console.log('Successfully imported evalCaseSets');
+    } catch (error) {
+      const errorMessage = `Failed to import evalCaseSets: ${
+        error instanceof Error ? error.message : String(error)
+      }`;
+      errors.push(errorMessage);
+      console.error(errorMessage, error);
+    }
+  }
+
   async exportAllData(options: ExportAllDataOptions = {}): Promise<string> {
     const data: Record<string, any> = {};
 
@@ -89,6 +150,11 @@ export class DataManager implements IDataManager {
       if (this.favoriteManager) {
         data['favorites'] = await this.favoriteManager.exportData();
       }
+      // F2：可复现用例集进入全量导出（与 preference 键同源）
+      const evalCaseSet = await this.loadEvalCaseSetForExport();
+      if (evalCaseSet) {
+        data[EXPORT_DATA_KEY_EVAL_CASE_SETS] = evalCaseSet;
+      }
     } catch (error) {
       console.error('Failed to export data:', error);
       if (typeof (error as any)?.code === 'string') {
@@ -98,6 +164,7 @@ export class DataManager implements IDataManager {
     }
 
     // 默认脱敏 models / imageModels 中的 apiKey 等（B4 配套）
+    // evalCaseSets 不含密钥，脱敏逻辑不会改动它
     const safeData = redactExportDataObject(data, options);
 
     const exportFormat = {
@@ -136,7 +203,17 @@ export class DataManager implements IDataManager {
       dataToImport = exportData.data;
     }
     // Old format: direct data object { history: [...], models: [...], ... }
-    else if (exportData.history || exportData.models || exportData.imageModels || exportData.userTemplates || exportData.userSettings || exportData.contexts || exportData.favorites) {
+    else if (
+      exportData.history ||
+      exportData.models ||
+      exportData.imageModels ||
+      exportData.userTemplates ||
+      exportData.userSettings ||
+      exportData.contexts ||
+      exportData.favorites ||
+      exportData[EXPORT_DATA_KEY_EVAL_CASE_SETS] ||
+      exportData[CORE_SERVICE_KEYS.EVAL_CASE_SET]
+    ) {
       dataToImport = exportData;
     }
     else {
@@ -167,6 +244,14 @@ export class DataManager implements IDataManager {
           console.error(errorMessage, error);
         }
       }
+    }
+
+    // F2：用例集（导出键 evalCaseSets，或兼容 storage 原键）
+    const evalPayload =
+      dataToImport[EXPORT_DATA_KEY_EVAL_CASE_SETS] ??
+      dataToImport[CORE_SERVICE_KEYS.EVAL_CASE_SET];
+    if (evalPayload !== undefined) {
+      await this.importEvalCaseSet(evalPayload, errors);
     }
 
     if (errors.length > 0) {

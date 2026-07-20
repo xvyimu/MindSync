@@ -168,6 +168,7 @@ describe('DataManager', () => {
       (mockTemplateManager.exportData as vi.Mock).mockResolvedValue(templates.filter(t => !t.isBuiltin));
       (mockHistoryManager.exportData as vi.Mock).mockResolvedValue(history as any);
       (mockPreferenceService.exportData as vi.Mock).mockResolvedValue({});
+      (mockPreferenceService.get as vi.Mock).mockResolvedValue(null);
 
       const jsonString = await dataManager.exportAllData();
       const data = JSON.parse(jsonString);
@@ -177,6 +178,51 @@ describe('DataManager', () => {
       expect(data.data.imageModels).toEqual(imageModels);
       expect(data.data.userTemplates).toEqual(templates.filter(t => !t.isBuiltin));
       expect(data.data.history).toEqual(history);
+      expect(data.data.evalCaseSets).toBeUndefined();
+    });
+
+    it('should include evalCaseSets from preference when valid (F2)', async () => {
+      const caseSet = {
+        id: 'default',
+        name: 'Default case set',
+        version: 1 as const,
+        updatedAt: 1700000000000,
+        cases: [
+          {
+            id: 'case-1',
+            name: 'hello',
+            input: 'Say hi',
+            assertions: [{ type: 'contains' as const, value: 'hi' }],
+          },
+        ],
+      };
+      (mockModelManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockImageModelManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockTemplateManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockHistoryManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockPreferenceService.exportData as vi.Mock).mockResolvedValue({});
+      (mockPreferenceService.get as vi.Mock).mockResolvedValue(caseSet);
+
+      const jsonString = await dataManager.exportAllData();
+      const data = JSON.parse(jsonString);
+
+      expect(mockPreferenceService.get).toHaveBeenCalledWith('eval.caseSets.v1', null);
+      expect(data.data.evalCaseSets).toEqual(caseSet);
+      // 脱敏元数据存在且默认不含 secrets
+      expect(data.meta.secretsIncluded).toBe(false);
+    });
+
+    it('should skip invalid eval case set on export', async () => {
+      (mockModelManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockImageModelManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockTemplateManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockHistoryManager.exportData as vi.Mock).mockResolvedValue([]);
+      (mockPreferenceService.exportData as vi.Mock).mockResolvedValue({});
+      (mockPreferenceService.get as vi.Mock).mockResolvedValue({ broken: true });
+
+      const jsonString = await dataManager.exportAllData();
+      const data = JSON.parse(jsonString);
+      expect(data.data.evalCaseSets).toBeUndefined();
     });
   });
 
@@ -254,6 +300,38 @@ describe('DataManager', () => {
         await expect(dataManager.importAllData(JSON.stringify(partialData))).resolves.not.toThrow();
         expect(mockModelManager.importData).toHaveBeenCalled();
         expect(mockTemplateManager.importData).not.toHaveBeenCalled();
+    });
+
+    it('should import evalCaseSets into preference storage key (F2)', async () => {
+      const caseSet = {
+        id: 'default',
+        name: 'Imported set',
+        version: 1 as const,
+        updatedAt: 1700000000000,
+        cases: [
+          {
+            id: 'c1',
+            name: 'n',
+            input: 'i',
+            assertions: [{ type: 'contains' as const, value: 'x' }],
+          },
+        ],
+      };
+      await dataManager.importAllData(
+        JSON.stringify({ version: 1, data: { evalCaseSets: caseSet } }),
+      );
+      expect(mockPreferenceService.set).toHaveBeenCalledWith('eval.caseSets.v1', caseSet);
+    });
+
+    it('should not call preference.set for invalid evalCaseSets', async () => {
+      await dataManager.importAllData(
+        JSON.stringify({ version: 1, data: { evalCaseSets: { nope: true } } }),
+      );
+      // set may be used only if valid; invalid should not set eval key
+      const setCalls = (mockPreferenceService.set as vi.Mock).mock.calls.filter(
+        (c) => c[0] === 'eval.caseSets.v1',
+      );
+      expect(setCalls).toHaveLength(0);
     });
 
     it('should only import whitelisted UI settings', async () => {

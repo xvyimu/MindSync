@@ -61,10 +61,12 @@ MCP HTTP：Bearer +（非 loopback 时）强制 token；health 仅最小 `{ok}` 
 
 ## 4. 数据与导出
 
-- 全量导出必须覆盖：history、models、（imageModels）、userTemplates、userSettings、contexts、**favorites**。  
+- 全量导出必须覆盖：history、models、（imageModels）、userTemplates、userSettings、contexts、**favorites**；**EvalCaseSet 应进入导出（F2）**。  
 - 历史可截断，但必须**可配置或可感知**，禁止无提示丢数据。  
 - 远程路径规范化：禁止 `..`、控制字符、反斜杠（Web/Desktop 规则一致）。  
-- Desktop 密钥中长期目标：OS 级安全存储（safeStorage）；禁止日志打印 Key。  
+- Desktop 密钥：OS 级安全存储（safeStorage）；禁止日志打印 Key。  
+- **导出默认脱敏**模型 API Key；包含密钥须显式用户选择。  
+- **UI 禁止依赖 `@aws-sdk` 等浏览器侧对象存储 SDK**；S3/R2/WebDAV 仅 Desktop main/IPC。  
 
 ---
 

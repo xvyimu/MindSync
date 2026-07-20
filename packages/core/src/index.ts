@@ -171,7 +171,11 @@ export * from './services/compare/types'
 export * from './services/compare/errors'
 
 // 导出数据管理相关
-export { DataManager, createDataManager } from './services/data/manager'
+export {
+  DataManager,
+  createDataManager,
+  EXPORT_DATA_KEY_EVAL_CASE_SETS,
+} from './services/data/manager'
 export type { IDataManager } from './services/data/manager'
 export {
   redactModelConfigSecrets,
