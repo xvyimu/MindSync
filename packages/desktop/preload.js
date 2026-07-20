@@ -250,9 +250,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       const thinkingListener = (event, thinking) => {
         if (callbacks.onThinking) callbacks.onThinking(thinking);
       };
-      const finishListener = (event) => {
+      const finishListener = (event, payload) => {
         cleanup();
-        if (callbacks.onFinish) callbacks.onFinish();
+        if (callbacks.onFinish) callbacks.onFinish(payload ?? { content: '' });
       };
       const errorListener = (event, error) => {
         cleanup();
@@ -310,9 +310,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       const toolCallListener = (event, toolCall) => {
         if (callbacks.onToolCall) callbacks.onToolCall(toolCall);
       };
-      const finishListener = (event) => {
+      const finishListener = (event, payload) => {
         cleanup();
-        if (callbacks.onFinish) callbacks.onFinish();
+        if (callbacks.onFinish) callbacks.onFinish(payload ?? { content: '' });
       };
       const errorListener = (event, error) => {
         cleanup();
@@ -1019,9 +1019,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       const reasoningListener = (event, token) => {
         if (callbacks?.onReasoningToken) callbacks.onReasoningToken(token);
       };
-      const finishListener = () => {
+      const finishListener = (event, payload) => {
         cleanup();
-        if (callbacks?.onComplete) callbacks.onComplete();
+        if (callbacks?.onComplete) callbacks.onComplete(payload ?? { content: '' });
       };
       const errorListener = (event, error) => {
         cleanup();
@@ -1070,9 +1070,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       const reasoningListener = (event, token) => {
         if (callbacks?.onReasoningToken) callbacks.onReasoningToken(token);
       };
-      const finishListener = () => {
+      const finishListener = (event, payload) => {
         cleanup();
-        if (callbacks?.onComplete) callbacks.onComplete();
+        if (callbacks?.onComplete) callbacks.onComplete(payload ?? { content: '' });
       };
       const errorListener = (event, error) => {
         cleanup();
@@ -1121,9 +1121,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       const reasoningListener = (event, token) => {
         if (callbacks?.onReasoningToken) callbacks.onReasoningToken(token);
       };
-      const finishListener = () => {
+      const finishListener = (event, payload) => {
         cleanup();
-        if (callbacks?.onComplete) callbacks.onComplete();
+        if (callbacks?.onComplete) callbacks.onComplete(payload ?? { content: '' });
       };
       const errorListener = (event, error) => {
         cleanup();
@@ -1181,9 +1181,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       const reasoningListener = (event, token) => {
         if (callbacks?.onReasoningToken) callbacks.onReasoningToken(token);
       };
-      const finishListener = () => {
+      const finishListener = (event, payload) => {
         cleanup();
-        if (callbacks?.onComplete) callbacks.onComplete();
+        if (callbacks?.onComplete) callbacks.onComplete(payload ?? { content: '' });
       };
       const errorListener = (event, error) => {
         cleanup();
@@ -1242,9 +1242,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       const toolCallListener = (event, toolCall) => {
         if (callbacks?.onToolCall) callbacks.onToolCall(toolCall);
       };
-      const finishListener = () => {
+      const finishListener = (event, payload) => {
         cleanup();
-        if (callbacks?.onComplete) callbacks.onComplete();
+        if (callbacks?.onComplete) callbacks.onComplete(payload ?? { content: '' });
       };
       const errorListener = (event, error) => {
         cleanup();

@@ -258,8 +258,12 @@ const renderMarkdown = () => {
         // 处理HTML
         const processedHtml = processHTML(rawHtml);
 
-        // 使用DOMPurify清理HTML
-        const cleanHtml = DOMPurify.sanitize(processedHtml);
+        // 使用DOMPurify清理HTML（显式白名单，避免默认配置过宽）
+        const cleanHtml = DOMPurify.sanitize(processedHtml, {
+            USE_PROFILES: { html: true },
+            FORBID_TAGS: ["script", "iframe", "object", "embed", "form", "input", "button"],
+            FORBID_ATTR: ["onerror", "onload", "onclick", "onmouseover", "onfocus", "onblur"],
+        });
 
         if (markdownContainer.value) {
             markdownContainer.value.innerHTML = cleanHtml;
@@ -271,8 +275,13 @@ const renderMarkdown = () => {
         }
     } catch (error) {
         handleError(error, "rendering");
+        // 错误分支禁止 innerHTML 拼接：renderError 可能含不可信内容
         if (markdownContainer.value) {
-            markdownContainer.value.innerHTML = `<p class="text-red-500">Error rendering markdown: ${renderError.value}</p>`;
+            markdownContainer.value.replaceChildren();
+            const p = document.createElement("p");
+            p.className = "text-red-500";
+            p.textContent = `Error rendering markdown: ${renderError.value || "unknown error"}`;
+            markdownContainer.value.appendChild(p);
         }
     }
 };

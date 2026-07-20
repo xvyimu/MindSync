@@ -77,17 +77,7 @@ describe('MCP health route', () => {
     const response = await fetch(running.url);
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({
-      initialized: true,
-      services: {
-        modelManager: true,
-        llmService: true,
-        languageService: true,
-        templateManager: true,
-        historyManager: true,
-        promptService: true
-      }
-    });
+    expect(await response.json()).toEqual({ ok: true });
   });
 
   it('returns 503 when any required service is unhealthy', async () => {
@@ -107,13 +97,7 @@ describe('MCP health route', () => {
     const response = await fetch(running.url);
 
     expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({
-      initialized: true,
-      services: {
-        modelManager: true,
-        llmService: false
-      }
-    });
+    expect(await response.json()).toEqual({ ok: false });
   });
 
   it('returns 503 when the health provider throws', async () => {
@@ -127,10 +111,6 @@ describe('MCP health route', () => {
     const response = await fetch(running.url);
 
     expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({
-      initialized: false,
-      services: {},
-      error: 'boom'
-    });
+    expect(await response.json()).toEqual({ ok: false });
   });
 });

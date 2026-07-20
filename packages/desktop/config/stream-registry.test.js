@@ -66,9 +66,11 @@ test('stream completion sends only to the registered sender and clears ownership
     channels: { finish: 'stream-finish', error: 'stream-error' },
   });
 
-  handlers.onComplete();
+  handlers.onComplete({ content: 'done', reasoning: 'why' });
 
-  assert.deepEqual(owner.sent, [['stream-finish-stream_complete']]);
+  assert.deepEqual(owner.sent, [
+    ['stream-finish-stream_complete', { content: 'done', reasoning: 'why' }],
+  ]);
   assert.deepEqual(unrelatedWindow.sent, []);
   assert.equal(registry.has('stream_complete'), false);
 });

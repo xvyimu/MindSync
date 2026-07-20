@@ -151,8 +151,8 @@ export class LLMService implements ILLMService {
 
     } catch (error) {
       console.error('Stream request failed:', error);
+      // 仅走 onError 通道，避免调用方 catch 再 toast 导致双提示
       callbacks.onError(error instanceof Error ? error : new Error(String(error)));
-      throw error;
     }
   }
 
@@ -188,8 +188,8 @@ export class LLMService implements ILLMService {
 
     } catch (error) {
       console.error('Stream request with tools failed:', error);
+      // 仅走 onError 通道，避免调用方 catch 再 toast 导致双提示
       callbacks.onError(error instanceof Error ? error : new Error(String(error)));
-      throw error;
     }
   }
 

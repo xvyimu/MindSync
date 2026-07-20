@@ -11,11 +11,13 @@ function isHealthyStatus(healthStatus: MCPHealthStatus): boolean {
 
 export function buildHealthzResponse(healthStatus: MCPHealthStatus): {
   statusCode: number;
-  body: MCPHealthStatus;
+  // 对外只返回 ok 布尔，避免泄露 initialized/services 内部状态
+  body: { ok: boolean };
 } {
+  const ok = isHealthyStatus(healthStatus);
   return {
-    statusCode: isHealthyStatus(healthStatus) ? 200 : 503,
-    body: healthStatus
+    statusCode: ok ? 200 : 503,
+    body: { ok }
   };
 }
 
@@ -25,12 +27,8 @@ export function registerHealthzRoute(app: Express, healthProvider: HealthStatusP
       const healthStatus = await healthProvider.getHealthStatus();
       const { statusCode, body } = buildHealthzResponse(healthStatus);
       res.status(statusCode).json(body);
-    } catch (error) {
-      res.status(503).json({
-        initialized: false,
-        services: {},
-        error: error instanceof Error ? error.message : 'Health check failed'
-      });
+    } catch {
+      res.status(503).json({ ok: false });
     }
   });
 }

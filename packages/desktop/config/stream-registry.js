@@ -164,8 +164,9 @@ function createOwnedStreamHandlers({ registry, sender, streamId, channels }) {
     onToken: (token) => send(channels.token, token),
     onReasoningToken: (token) => send(channels.reasoning, token),
     onToolCall: (toolCall) => send(channels.toolCall, toolCall),
-    onComplete: () => {
-      if (sendOwned(channels.finish)) {
+    // 透传 LLMResponse（content/reasoning/toolCalls），供 renderer 完成回调校验
+    onComplete: (response) => {
+      if (sendOwned(channels.finish, response ?? null)) {
         registry.complete(sender, streamId);
       }
     },

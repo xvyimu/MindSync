@@ -1201,18 +1201,14 @@ export class PromptService implements IPromptService {
         errorMessage,
       );
 
-      // 通过回调传递错误
-      if (callbacks.onError) {
-        callbacks.onError(
-          new Error(`Custom conversation test failed: ${errorMessage}`),
-        );
-        } else {
-          throw new TestError(
-            "",
-            "",
-            `Custom conversation test failed: ${errorMessage}`,
-          );
-        }
+      const wrapped = new TestError(
+        "",
+        "",
+        `Custom conversation test failed: ${errorMessage}`,
+      );
+      // 回调通知 + 重新抛出，避免 await 方误以为成功
+      callbacks.onError?.(wrapped);
+      throw wrapped;
     }
   }
 }

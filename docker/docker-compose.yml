@@ -37,9 +37,10 @@ services:
 
 
 
-      # Basic auth (optional). Leave ACCESS_PASSWORD empty to disable.
-      # Do NOT ship a default password — set a strong value for any exposed host.
+      # Basic auth — required for any compose-based deploy (local open access: set a password
+      # you control, or run with a reverse proxy that terminates auth elsewhere).
+      # Empty password used to silently disable auth; that is unsafe for exposed hosts.
       - ACCESS_USERNAME=${ACCESS_USERNAME:-admin}
-      - ACCESS_PASSWORD=${ACCESS_PASSWORD:-}
+      - ACCESS_PASSWORD=${ACCESS_PASSWORD:?ACCESS_PASSWORD is required — set a strong value for any exposed host}
     security_opt:
       - no-new-privileges:true

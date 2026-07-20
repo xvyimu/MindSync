@@ -43,10 +43,12 @@ export class ElectronLLMProxy implements ILLMService {
     const safeMessages = safeSerializeForIPC(messages);
 
     // 适配回调接口：StreamHandlers 使用 onToken，而 preload 期望的是 onContent
+    // onFinish 必须透传 payload，否则桌面端 onComplete(response) 永远拿不到结构化响应
     const adaptedCallbacks = {
       onContent: callbacks.onToken,  // 映射 onToken -> onContent
       onThinking: callbacks.onReasoningToken || (() => {}),  // 映射推理流
-      onFinish: () => callbacks.onComplete(),  // 映射完成回调
+      onFinish: (payload?: LLMResponse) =>
+        callbacks.onComplete(payload ?? { content: '' }),
       onError: callbacks.onError
     };
 
@@ -69,7 +71,8 @@ export class ElectronLLMProxy implements ILLMService {
       onContent: callbacks.onToken,  // 映射 onToken -> onContent
       onThinking: callbacks.onReasoningToken || (() => {}),  // 映射推理流
       onToolCall: callbacks.onToolCall || (() => {}),  // 🆕 映射工具调用回调
-      onFinish: () => callbacks.onComplete(),  // 映射完成回调
+      onFinish: (payload?: LLMResponse) =>
+        callbacks.onComplete(payload ?? { content: '' }),
       onError: callbacks.onError
     };
 

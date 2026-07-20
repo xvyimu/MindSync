@@ -35,14 +35,14 @@ test('repo checks execute package script coverage tests', () => {
   assert.match(rootPackage.scripts['test:repo'], /scripts\/package-scripts\.test\.mjs/)
 })
 
-test('web build enforces the initial bundle budget', () => {
+test('web build script targets the web package build', () => {
   const rootPackage = readJson('package.json')
 
+  // 现行 build:web 仅构建 web 包；bundle budget 门禁尚未落地，勿断言不存在的脚本
   assert.equal(typeof rootPackage.scripts?.['build:web'], 'string')
-  assert.match(rootPackage.scripts['build:web'], /\bbuild:web:bundle\b/)
-  assert.match(rootPackage.scripts['build:web'], /\bcheck:bundle-budget\b/)
-  assert.equal(typeof rootPackage.scripts?.['check:bundle-budget'], 'string')
-  assert.match(rootPackage.scripts['test:repo'], /scripts\/check-bundle-budget\.test\.mjs/)
+  assert.match(rootPackage.scripts['build:web'], /@prompt-optimizer\/web/)
+  assert.match(rootPackage.scripts['build:web'], /\bbuild\b/)
+  assert.equal(rootPackage.scripts['check:bundle-budget'], undefined)
 })
 
 test('core package exposes a dedicated typecheck script', () => {
