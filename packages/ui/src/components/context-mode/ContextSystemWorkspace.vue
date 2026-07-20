@@ -104,15 +104,35 @@
                             </NFlex>
 
                             <NButton
+                                v-if="displayAdapter.displayedIsOptimizing.value"
+                                type="error"
+                                strong
+                                class="input-panel-cancel-btn"
+                                @click="conversationOptimization.cancel"
+                                block
+                                data-testid="pro-multi-cancel-button"
+                                :title="$t('common.stop')"
+                            >
+                                {{ $t('common.stop') }}
+                            </NButton>
+                            <NButton
+                                v-else
                                 type="primary"
-                                :loading="displayAdapter.displayedIsOptimizing.value"
-                                :disabled="displayAdapter.displayedIsOptimizing.value || !selectedMessageId"
+                                :disabled="!selectedMessageId"
                                 @click="handleOptimizeClick"
                                 block
                                 data-testid="pro-multi-optimize-button"
                             >
-                                {{ displayAdapter.displayedIsOptimizing.value ? $t('prompt.optimizing') : $t('promptOptimizer.optimize') }}
+                                {{ $t('promptOptimizer.optimize') }}
                             </NButton>
+                            <NText
+                                v-if="displayAdapter.displayedIsOptimizing.value"
+                                depth="3"
+                                class="input-panel-status"
+                                data-testid="pro-multi-optimizing-status"
+                            >
+                                {{ $t('prompt.optimizing') }}
+                            </NText>
                         </NFlex>
                     </NCard>
 
@@ -2385,4 +2405,5 @@ defineExpose({
 .tool-calls-section {
     flex: 0 0 auto;
 }
+
 </style>
