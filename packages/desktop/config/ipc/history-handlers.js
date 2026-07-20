@@ -63,6 +63,18 @@ function registerHistoryIpcHandlers({
     const safeData = safeSerialize(data);
     return historyManager.validateData(safeData);
   });
+
+  // B3：历史上限可感知 / 可配置
+  registerSensitiveIpc('history-getUsage', async () => historyManager.getUsage());
+
+  registerSensitiveIpc('history-getMaxRecords', async () => historyManager.getMaxRecords());
+
+  registerSensitiveIpc('history-setMaxRecords', async (_event, max) => {
+    if (typeof max !== 'number' || !Number.isFinite(max)) {
+      throw new Error('max must be a finite number');
+    }
+    return historyManager.setMaxRecords(max);
+  });
 }
 
 module.exports = {

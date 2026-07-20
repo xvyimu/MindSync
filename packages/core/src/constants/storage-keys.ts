@@ -11,6 +11,8 @@ export const CORE_SERVICE_KEYS = {
   IMAGE_MODELS: "image-models", // 图像模型配置存储键
   USER_TEMPLATES: "user-templates", // 用户模板存储键
   PROMPT_HISTORY: "prompt_history", // 提示词历史记录存储键
+  /** 历史记录条数上限（可配置；缺省见 HistoryManager 默认值） */
+  HISTORY_MAX_RECORDS: "history.maxRecords",
   /** 默认可复现评估用例集（Cut-1：单用户单套） */
   EVAL_CASE_SET: "eval.caseSets.v1",
 } as const;

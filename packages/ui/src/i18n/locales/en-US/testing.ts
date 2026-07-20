@@ -9,7 +9,15 @@ const messages = {
     "cleared": "History cleared",
     "chainDeleted": "History record deleted",
     "useThisVersion": "Use This Version",
-    "noHistory": "No history records"
+    "noHistory": "No history records",
+    "usage": "Records {count} / max {max}",
+    "nearLimit": "History is near the limit ({count}/{max}). Older records will be removed when new ones are added.",
+    "fullLimit": "History is at the limit ({max}). New saves drop the oldest records. Raise the limit or clear history.",
+    "maxLabel": "Record limit",
+    "applyMax": "Apply limit",
+    "maxApplied": "History limit set to {max}",
+    "maxDropped": "Removed {dropped} oldest record(s)",
+    "maxInvalid": "Limit must be between {min} and {max}"
   },
   "test": {
     "title": "Test",

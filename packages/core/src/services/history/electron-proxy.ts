@@ -1,4 +1,9 @@
-import type { IHistoryManager, PromptRecord, PromptRecordChain } from './types';
+import type {
+  HistoryStorageUsage,
+  IHistoryManager,
+  PromptRecord,
+  PromptRecordChain,
+} from './types';
 import { safeSerializeForIPC } from '../../utils/ipc-serialization';
 import { HistoryStorageError, RecordNotFoundError } from './errors';
 
@@ -74,6 +79,18 @@ export class ElectronHistoryManagerProxy implements IHistoryManager {
 
   async deleteChain(chainId: string): Promise<void> {
     return this.electronAPI.history.deleteChain(chainId);
+  }
+
+  async getUsage(): Promise<HistoryStorageUsage> {
+    return this.electronAPI.history.getUsage();
+  }
+
+  async getMaxRecords(): Promise<number> {
+    return this.electronAPI.history.getMaxRecords();
+  }
+
+  async setMaxRecords(max: number): Promise<{ max: number; dropped: number }> {
+    return this.electronAPI.history.setMaxRecords(max);
   }
 
   // 实现 IImportExportable 接口

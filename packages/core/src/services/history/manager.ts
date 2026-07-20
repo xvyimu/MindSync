@@ -1,4 +1,9 @@
-import { IHistoryManager, PromptRecord, PromptRecordChain } from './types';
+import {
+  IHistoryManager,
+  PromptRecord,
+  PromptRecordChain,
+  type HistoryStorageUsage,
+} from './types';
 import { IStorageProvider } from '../storage/types';
 import { StorageAdapter } from '../storage/adapter';
 import { RecordNotFoundError, RecordValidationError, HistoryStorageError, HistoryError } from './errors';
@@ -8,18 +13,86 @@ import { CORE_SERVICE_KEYS } from '../../constants/storage-keys';
 import { HISTORY_ERROR_CODES, IMPORT_EXPORT_ERROR_CODES } from '../../constants/error-codes';
 import { ImportExportError } from '../../interfaces/import-export';
 
+/** 默认历史上限（B3 可配置） */
+export const DEFAULT_HISTORY_MAX_RECORDS = 50;
+/** 允许的最小 / 最大上限 */
+export const HISTORY_MAX_RECORDS_MIN = 10;
+export const HISTORY_MAX_RECORDS_MAX = 500;
+/** 达到该比例时 warningLevel=near */
+export const HISTORY_NEAR_LIMIT_RATIO = 0.8;
+
 /**
  * History Manager implementation
  */
 export class HistoryManager implements IHistoryManager {
   private readonly storageKey = CORE_SERVICE_KEYS.PROMPT_HISTORY;
-  private readonly maxRecords = 50; // Maximum 50 records
+  private readonly maxRecordsKey = CORE_SERVICE_KEYS.HISTORY_MAX_RECORDS;
   private readonly storage: StorageAdapter;
   private readonly modelManager: IModelManager;
+  /** 进程内缓存；null 表示尚未从存储加载 */
+  private maxRecordsCache: number | null = null;
 
   constructor(storageProvider: IStorageProvider, modelManager: IModelManager) {
     this.storage = new StorageAdapter(storageProvider);
     this.modelManager = modelManager;
+  }
+
+  private clampMaxRecords(value: number): number {
+    if (!Number.isFinite(value)) {
+      return DEFAULT_HISTORY_MAX_RECORDS;
+    }
+    const n = Math.floor(value);
+    return Math.min(HISTORY_MAX_RECORDS_MAX, Math.max(HISTORY_MAX_RECORDS_MIN, n));
+  }
+
+  private async loadMaxRecords(): Promise<number> {
+    if (this.maxRecordsCache != null) {
+      return this.maxRecordsCache;
+    }
+    try {
+      const raw = await this.storage.getItem(this.maxRecordsKey);
+      if (raw != null && raw !== '') {
+        const parsed = Number(JSON.parse(raw));
+        this.maxRecordsCache = this.clampMaxRecords(parsed);
+        return this.maxRecordsCache;
+      }
+    } catch {
+      // fall through to default
+    }
+    this.maxRecordsCache = DEFAULT_HISTORY_MAX_RECORDS;
+    return this.maxRecordsCache;
+  }
+
+  async getMaxRecords(): Promise<number> {
+    return this.loadMaxRecords();
+  }
+
+  async setMaxRecords(max: number): Promise<{ max: number; dropped: number }> {
+    const next = this.clampMaxRecords(max);
+    this.maxRecordsCache = next;
+    await this.storage.setItem(this.maxRecordsKey, JSON.stringify(next));
+
+    const records = await this.getRecords();
+    let dropped = 0;
+    if (records.length > next) {
+      dropped = records.length - next;
+      // 与 add 路径一致：数组头部是较新记录，截断尾部最旧
+      await this.saveToStorage(records.slice(0, next));
+    }
+    return { max: next, dropped };
+  }
+
+  async getUsage(): Promise<HistoryStorageUsage> {
+    const [records, max] = await Promise.all([this.getRecords(), this.loadMaxRecords()]);
+    const count = records.length;
+    const nearThreshold = Math.max(1, Math.floor(max * HISTORY_NEAR_LIMIT_RATIO));
+    let warningLevel: HistoryStorageUsage['warningLevel'] = 'ok';
+    if (count >= max) {
+      warningLevel = 'full';
+    } else if (count >= nearThreshold) {
+      warningLevel = 'near';
+    }
+    return { count, max, nearThreshold, warningLevel };
   }
 
   /**
@@ -51,13 +124,16 @@ export class HistoryManager implements IHistoryManager {
       if (!record.modelName && record.modelKey) {
         record.modelName = await this.getModelNameByKey(record.modelKey);
       }
-      
+
+      // 截断前先解析可配置上限（写入缓存，供 updateData 同步闭包使用）
+      const max = await this.loadMaxRecords();
+
       // Use updateData to handle concurrent modifications
       await this.storage.updateData<PromptRecord[]>(
         this.storageKey,
         (existingRecords: PromptRecord[] | null) => {
           const records = existingRecords || [];
-          
+
           // Ensure record ID is unique
           if (records.some((r: PromptRecord) => r.id === record.id)) {
             throw new HistoryError(
@@ -66,12 +142,10 @@ export class HistoryManager implements IHistoryManager {
               `Record with ID ${record.id} already exists`
             );
           }
-          
+
           // Add record to existing records (at the beginning)
           const updatedRecords = [record, ...records];
-          
-          // Ensure we don't exceed maxRecords
-          return updatedRecords.slice(0, this.maxRecords);
+          return updatedRecords.slice(0, max);
         }
       );
     } catch (err: any) {
@@ -180,7 +254,9 @@ export class HistoryManager implements IHistoryManager {
    * @param records Records to save
    */
   private async saveToStorage(records: PromptRecord[]): Promise<void> {
-    await this.storage.setItem(this.storageKey, JSON.stringify(records));
+    const max = await this.loadMaxRecords();
+    const trimmed = records.length > max ? records.slice(0, max) : records;
+    await this.storage.setItem(this.storageKey, JSON.stringify(trimmed));
   }
 
   /**

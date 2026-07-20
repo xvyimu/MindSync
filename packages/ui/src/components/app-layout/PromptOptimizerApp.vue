@@ -117,9 +117,11 @@
                 v-if="isReady"
                 v-model:show="historyManager.showHistory"
                 :history="promptHistory.history"
+                :usage="promptHistory.usage"
                 @reuse="handleHistoryReuse"
                 @clear="promptHistory.handleClearHistory"
                 @deleteChain="promptHistory.handleDeleteChain"
+                @setMaxRecords="promptHistory.handleSetMaxRecords"
             />
             <DataManagerUI
                 v-if="isReady"

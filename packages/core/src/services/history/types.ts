@@ -79,6 +79,19 @@ export interface PromptRecordChain {
 
 import { IImportExportable } from '../../interfaces/import-export';
 
+/** 历史上限使用情况（B3：可感知截断） */
+export type HistoryLimitWarningLevel = 'ok' | 'near' | 'full';
+
+export interface HistoryStorageUsage {
+  /** 当前记录条数（非 chain 数） */
+  count: number;
+  /** 生效中的上限 */
+  max: number;
+  /** 接近阈值（默认 80%） */
+  nearThreshold: number;
+  warningLevel: HistoryLimitWarningLevel;
+}
+
 /**
  * 历史记录管理器接口
  */
@@ -113,4 +126,13 @@ export interface IHistoryManager extends IImportExportable {
   }): Promise<PromptRecordChain>;
   /** 删除指定ID的记录链 */
   deleteChain(chainId: string): Promise<void>;
+  /** 当前历史上限与占用（B3） */
+  getUsage(): Promise<HistoryStorageUsage>;
+  /** 读取历史上限 */
+  getMaxRecords(): Promise<number>;
+  /**
+   * 设置历史上限（持久化）。
+   * 若当前条数超过新上限，会截断最旧记录并返回 dropped。
+   */
+  setMaxRecords(max: number): Promise<{ max: number; dropped: number }>;
 } 

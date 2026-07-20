@@ -68,6 +68,8 @@
 - **2026-07-21 加固批**：流式 finish payload、XSS、CI lint/mcp、Docker 密码门闩、vite define 白名单、sandbox、favorites 进全量备份、包边界（web/extension 直依 core；UI 不再 re-export 工厂）  
 - **Cut-1 可复现评估用例**：`EvalCaseSet` 本地存取 + `contains` 批跑 + 证据 JSON 导出（Basic System 工作区入口）；手测修补：失败不丢表单、错误区、max cases  
 - **Cut+1 Desktop safeStorage**：`models` / `image-models` 的 `apiKey` 等字段落盘为 `__enc:v1:` + OS 级加密；业务层仍见明文；Web 透传  
+- **B3 历史上限可感知**：默认 50 可配置（10–500）；History 抽屉显示占用与 near/full 警告；`setMaxRecords` 可截断最旧  
+- **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
 - **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`（本地优先工作台定位，非 LLMOps 平台）  
 
 ---

@@ -1,10 +1,13 @@
-import { ref, watch, computed, reactive, type Ref } from 'vue'
+import { watch, computed, reactive, type Ref } from 'vue'
 
 import { useToast } from '../ui/useToast'
 import { useI18n } from 'vue-i18n'
 
-import { v4 as uuidv4 } from 'uuid'
-import type { IHistoryManager, PromptRecordChain, PromptRecord } from '@prompt-optimizer/core'
+import type {
+  HistoryStorageUsage,
+  PromptRecordChain,
+  PromptRecord,
+} from '@prompt-optimizer/core'
 import type { AppServices } from '../../types/services'
 
 type PromptChain = PromptRecordChain
@@ -13,6 +16,13 @@ interface HistorySelectionContext {
   record: PromptRecord
   chainId: string
   rootPrompt: string
+}
+
+const DEFAULT_USAGE: HistoryStorageUsage = {
+  count: 0,
+  max: 50,
+  nearThreshold: 40,
+  warningLevel: 'ok',
 }
 
 /**
@@ -35,7 +45,7 @@ export function usePromptHistory(
 ) {
   const toast = useToast()
   const { t } = useI18n()
-  
+
   // 历史记录管理器引用
   const historyManager = computed(() => services.value?.historyManager)
 
@@ -43,7 +53,8 @@ export function usePromptHistory(
   const state = reactive({
     history: [] as PromptChain[],
     showHistory: false,
-    
+    usage: { ...DEFAULT_USAGE } as HistoryStorageUsage,
+
     handleSelectHistory: async (context: HistorySelectionContext) => {
       try {
         const { record, chainId, rootPrompt } = context
@@ -73,16 +84,17 @@ export function usePromptHistory(
     handleClearHistory: async () => {
     try {
       await historyManager.value!.clearHistory()
-      
+
       // 清空当前显示的内容
       prompt.value = '';
       optimizedPrompt.value = '';
       currentChainId.value = '';
       currentVersions.value = [];
       currentVersionId.value = '';
-      
+
       // 立即更新历史记录，确保UI能够反映最新状态
         state.history = []
+      await refreshUsage()
       toast.success(t('toast.success.historyClear'))
     } catch (error) {
       console.error(t('toast.error.clearHistoryFailed'), error)
@@ -95,13 +107,13 @@ export function usePromptHistory(
       // 获取链中的所有记录
       const allChains = await historyManager.value!.getAllChains()
       const chain = allChains.find((c) => c.chainId === chainId)
-      
+
       if (chain) {
         // 删除链中的所有记录
         for (const record of chain.versions) {
           await historyManager.value!.deleteRecord(record.id)
         }
-        
+
         // 如果当前正在查看的是被删除的链，则清空当前显示
         if (currentChainId.value === chainId) {
           prompt.value = '';
@@ -110,16 +122,36 @@ export function usePromptHistory(
           currentVersions.value = [];
           currentVersionId.value = '';
         }
-        
+
         // 立即更新历史记录，确保UI能够反映最新状态
         const updatedChains = await historyManager.value!.getAllChains()
           state.history = [...updatedChains]
+        await refreshUsage()
         toast.success(t('toast.success.historyChainDeleted'))
       }
     } catch (error) {
       console.error(t('toast.error.historyChainDeleteFailed'), error)
       toast.error(t('toast.error.historyChainDeleteFailed'))
     }
+    },
+
+    handleSetMaxRecords: async (max: number) => {
+      try {
+        const mgr = historyManager.value
+        if (!mgr?.setMaxRecords) {
+          toast.error(t('toast.error.historyUnavailable'))
+          return
+        }
+        const result = await mgr.setMaxRecords(max)
+        await refreshHistory()
+        toast.success(t('history.maxApplied', { max: result.max }))
+        if (result.dropped > 0) {
+          toast.warning(t('history.maxDropped', { dropped: result.dropped }))
+        }
+      } catch (error) {
+        console.error('[History] Failed to set max records:', error)
+        toast.error(error instanceof Error ? error.message : String(error))
+      }
     },
 
     initHistory: async () => {
@@ -132,10 +164,25 @@ export function usePromptHistory(
   }
   })
 
+  const refreshUsage = async () => {
+    const mgr = historyManager.value
+    if (!mgr?.getUsage) {
+      Object.assign(state.usage, DEFAULT_USAGE)
+      return
+    }
+    try {
+      const usage = await mgr.getUsage()
+      Object.assign(state.usage, usage)
+    } catch (error) {
+      console.warn('[History] Failed to load usage:', error)
+    }
+  }
+
   // 添加一个刷新历史记录的函数
   const refreshHistory = async () => {
     const chains = await historyManager.value!.getAllChains()
     state.history.splice(0, state.history.length, ...chains)
+    await refreshUsage()
   }
 
   // Watch history display state
@@ -146,7 +193,7 @@ export function usePromptHistory(
   })
 
   // Watch version and chain changes, update history
-  watch([currentVersions, currentChainId], async (newValues, oldValues) => {
+  watch([currentVersions, currentChainId], async () => {
     await refreshHistory()
   })
 
@@ -158,4 +205,4 @@ export function usePromptHistory(
   }, { immediate: true })
 
   return state
-} 
+}

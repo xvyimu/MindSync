@@ -903,7 +903,32 @@ contextBridge.exposeInMainWorld('electronAPI', {
         throw createIpcError(result.error);
       }
       return result.data;
-    }
+    },
+
+    // B3: history capacity
+    getUsage: async () => {
+      const result = await ipcRenderer.invoke('history-getUsage');
+      if (!result.success) {
+        throw createIpcError(result.error);
+      }
+      return result.data;
+    },
+
+    getMaxRecords: async () => {
+      const result = await ipcRenderer.invoke('history-getMaxRecords');
+      if (!result.success) {
+        throw createIpcError(result.error);
+      }
+      return result.data;
+    },
+
+    setMaxRecords: async (max) => {
+      const result = await ipcRenderer.invoke('history-setMaxRecords', max);
+      if (!result.success) {
+        throw createIpcError(result.error);
+      }
+      return result.data;
+    },
   },
 
   // Favorite Manager interface

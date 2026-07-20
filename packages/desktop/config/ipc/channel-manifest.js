@@ -101,6 +101,9 @@ const HISTORY_CHANNELS = Object.freeze([
   'history-importData',
   'history-getDataType',
   'history-validateData',
+  'history-getUsage',
+  'history-getMaxRecords',
+  'history-setMaxRecords',
 ]);
 
 /** 会话上下文 channel。 */

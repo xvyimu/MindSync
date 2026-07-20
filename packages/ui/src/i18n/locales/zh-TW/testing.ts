@@ -9,7 +9,15 @@ const messages = {
     "cleared": "歷史紀錄已清空",
     "chainDeleted": "歷史紀錄已刪除",
     "useThisVersion": "使用此版本",
-    "noHistory": "暫無歷史紀錄"
+    "noHistory": "暫無歷史紀錄",
+    "usage": "紀錄 {count} / 上限 {max}",
+    "nearLimit": "歷史紀錄接近上限（{count}/{max}）。繼續新增將自動刪除最舊紀錄。",
+    "fullLimit": "歷史紀錄已達上限（{max} 條）。新增時會丟棄最舊紀錄，可提高上限或清理歷史。",
+    "maxLabel": "條數上限",
+    "applyMax": "套用上限",
+    "maxApplied": "歷史上限已設為 {max}",
+    "maxDropped": "已刪除最舊的 {dropped} 條紀錄",
+    "maxInvalid": "上限需在 {min}–{max} 之間"
   },
   "test": {
     "title": "測試",

@@ -11,6 +11,9 @@
   >
     <template #header-extra>
       <NSpace align="center" :size="12">
+        <NText depth="3" style="font-size: 12px;" data-testid="history-usage">
+          {{ t('history.usage', { count: usage.count, max: usage.max }) }}
+        </NText>
         <NInput
           v-model:value="searchQuery"
           :placeholder="t('history.searchPlaceholder')"
@@ -33,7 +36,48 @@
       </NSpace>
     </template>
 
-    <NScrollbar style="max-height: 65vh;">
+    <NSpace vertical :size="12">
+      <NAlert
+        v-if="usage.warningLevel === 'full'"
+        type="warning"
+        :bordered="false"
+        data-testid="history-limit-full"
+      >
+        {{ t('history.fullLimit', { max: usage.max }) }}
+      </NAlert>
+      <NAlert
+        v-else-if="usage.warningLevel === 'near'"
+        type="info"
+        :bordered="false"
+        data-testid="history-limit-near"
+      >
+        {{ t('history.nearLimit', { count: usage.count, max: usage.max }) }}
+      </NAlert>
+
+      <NSpace align="center" :size="8" data-testid="history-max-controls">
+        <NText depth="3">{{ t('history.maxLabel') }}</NText>
+        <NInputNumber
+          v-model:value="draftMax"
+          :min="HISTORY_MAX_RECORDS_MIN"
+          :max="HISTORY_MAX_RECORDS_MAX"
+          size="small"
+          style="width: 120px"
+          data-testid="history-max-input"
+        />
+        <NButton
+          size="small"
+          type="primary"
+          secondary
+          :loading="isSavingMax"
+          :disabled="draftMax == null || draftMax === usage.max"
+          data-testid="history-max-apply"
+          @click="handleApplyMax"
+        >
+          {{ t('history.applyMax') }}
+        </NButton>
+      </NSpace>
+
+    <NScrollbar style="max-height: 55vh;">
       <NSpace vertical :size="16" v-if="sortedHistory && sortedHistory.length > 0">
         <NCard
           v-for="chain in filteredHistory"
@@ -215,6 +259,7 @@
         </template>
       </NEmpty>
     </NScrollbar>
+    </NSpace>
   </NModal>
 </template>
 
@@ -223,10 +268,16 @@ import { ref, watch, computed, type PropType } from 'vue'
 
 import { useI18n } from 'vue-i18n'
 import {
-  NModal, NScrollbar, NSpace, NCard, NText, NTag, NButton, 
-  NDivider, NCollapse, NCollapseItem, NEmpty, NInput
+  NModal, NScrollbar, NSpace, NCard, NText, NTag, NButton,
+  NDivider, NCollapse, NCollapseItem, NEmpty, NInput, NAlert, NInputNumber
 } from 'naive-ui'
-import type { PromptRecord, PromptRecordChain } from '@prompt-optimizer/core'
+import {
+  HISTORY_MAX_RECORDS_MAX,
+  HISTORY_MAX_RECORDS_MIN,
+  type HistoryStorageUsage,
+  type PromptRecord,
+  type PromptRecordChain,
+} from '@prompt-optimizer/core'
 import { useConfirmDialog } from '../composables/ui/useConfirmDialog'
 import { useToast } from '../composables/ui/useToast'
 import SourceAssetBadge from './source/SourceAssetBadge.vue'
@@ -238,7 +289,16 @@ const props = defineProps({
   history: {
     type: Array as PropType<PromptRecordChain[]>,
     default: () => []
-  }
+  },
+  usage: {
+    type: Object as PropType<HistoryStorageUsage>,
+    default: () => ({
+      count: 0,
+      max: 50,
+      nearThreshold: 40,
+      warningLevel: 'ok' as const,
+    }),
+  },
 })
 
 const { t } = useI18n()
@@ -253,6 +313,7 @@ const emit = defineEmits<{
   }): void
   (e: 'clear'): void
   (e: 'deleteChain', chainId: string): void
+  (e: 'setMaxRecords', max: number): void
 }>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -260,6 +321,41 @@ const _toast = useToast()
 const confirmDialog = useConfirmDialog()
 const expandedVersions = ref<Record<string, boolean>>({})
 const searchQuery = ref('')
+const draftMax = ref<number | null>(props.usage.max)
+const isSavingMax = ref(false)
+
+watch(
+  () => props.usage.max,
+  (max) => {
+    draftMax.value = max
+  },
+  { immediate: true },
+)
+
+const handleApplyMax = () => {
+  if (draftMax.value == null) return
+  if (
+    draftMax.value < HISTORY_MAX_RECORDS_MIN ||
+    draftMax.value > HISTORY_MAX_RECORDS_MAX
+  ) {
+    _toast.error(
+      t('history.maxInvalid', {
+        min: HISTORY_MAX_RECORDS_MIN,
+        max: HISTORY_MAX_RECORDS_MAX,
+      }),
+    )
+    return
+  }
+  isSavingMax.value = true
+  try {
+    emit('setMaxRecords', draftMax.value)
+  } finally {
+    // parent 异步完成后会刷新 usage；此处不长期卡住按钮
+    window.setTimeout(() => {
+      isSavingMax.value = false
+    }, 300)
+  }
+}
 
 // --- Close Logic ---
 const close = () => {

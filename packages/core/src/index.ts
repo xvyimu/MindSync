@@ -28,7 +28,14 @@ export * from './services/template/errors'
 export { ALL_TEMPLATES } from './services/template/default-templates'
 
 // 导出历史记录相关
-export { HistoryManager, createHistoryManager } from './services/history/manager'
+export {
+  HistoryManager,
+  createHistoryManager,
+  DEFAULT_HISTORY_MAX_RECORDS,
+  HISTORY_MAX_RECORDS_MIN,
+  HISTORY_MAX_RECORDS_MAX,
+  HISTORY_NEAR_LIMIT_RATIO,
+} from './services/history/manager'
 export * from './services/history/types'
 export * from './services/history/errors'
 
