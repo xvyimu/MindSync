@@ -67,8 +67,6 @@ const { createUpdateHandlers } = require('./config/ipc/update-handlers');
 const { setupRemoteStorageHandlers } = require('./remote-storage');
 const path = require('path');
 
-const streamRegistry = createStreamRegistry();
-
 function getIpcSenderOptions() {
   return {
     isDevelopment: process.env.NODE_ENV === 'development',
@@ -176,6 +174,8 @@ async function convertImageInputWithElectronNativeImage(input) {
 }
 
 let mainWindow;
+// 流任务注册表：按 sender 校验所有权、限制并发并支持取消（AbortController）。
+const streamRegistry = createStreamRegistry();
 let modelManager, templateManager, historyManager, llmService, promptService, templateLanguageService, preferenceService, dataManager, contextRepo, favoriteManager;
 let imageModelManager, imageService, imageUnderstandingService;
 let imageAdapterRegistry; // 全局引用以供 IPC 处理器使用
@@ -420,14 +420,20 @@ function createWindow() {
     applyPageZoomAction(targetWebContents, action);
   };
 
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate(
-      buildAppMenuTemplate({
-        isMac: process.platform === 'darwin',
-        onPageZoomAction: handlePageZoomAction,
-      })
-    )
-  );
+  const applyAppMenu = () => {
+    Menu.setApplicationMenu(
+      Menu.buildFromTemplate(
+        buildAppMenuTemplate({
+          isMac: process.platform === 'darwin',
+          onPageZoomAction: handlePageZoomAction,
+          locale: getCurrentUiLocale(),
+        })
+      )
+    );
+  };
+  applyAppMenu();
+  // Expose rebuild hook so locale changes take effect immediately.
+  mainWindow.__applyAppMenu = applyAppMenu;
   mainWindow.webContents.setZoomLevel(DEFAULT_PAGE_ZOOM_LEVEL);
   void mainWindow.webContents
     .setVisualZoomLevelLimits(VISUAL_ZOOM_LIMITS.minimum, VISUAL_ZOOM_LIMITS.maximum)

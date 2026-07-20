@@ -24,7 +24,7 @@ import type {
 import { v4 as uuidv4 } from 'uuid'
 import { useToast } from '../ui/useToast'
 import { useI18n } from 'vue-i18n'
-import { getI18nErrorMessage } from '../../utils/error'
+import { getI18nErrorMessage, getTransportErrorMessage } from '../../utils/error'
 import type { IteratePayload } from '../../types/workspace'
 import { withHistorySourceBindingMetadata } from '../../utils/history-source-binding'
 
@@ -83,6 +83,11 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
   // 过程态状态
   const isOptimizing = ref(false)
   const isIterating = ref(false)
+  /** Bumped on cancel so late stream tokens from a previous run are ignored. */
+  let optimizeGeneration = 0
+  let iterateGeneration = 0
+  let activeOptimizeController: AbortController | null = null
+  let activeIterateController: AbortController | null = null
 
   // 历史管理专用 ref（不写入 session store）
   const currentChainId = ref('')
@@ -160,6 +165,19 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
   /**
    * 1. 优化提示词
    */
+  const handleCancelOptimization = () => {
+    if (!isOptimizing.value && !isIterating.value) return
+    optimizeGeneration += 1
+    iterateGeneration += 1
+    activeOptimizeController?.abort()
+    activeIterateController?.abort()
+    activeOptimizeController = null
+    activeIterateController = null
+    isOptimizing.value = false
+    isIterating.value = false
+    toast.info(t('toast.info.optimizeCancelled'))
+  }
+
   const handleOptimize = async () => {
     if (!prompt.value?.trim() || isOptimizing.value) return
 
@@ -181,6 +199,9 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
       return
     }
 
+    const generation = ++optimizeGeneration
+    const controller = new AbortController()
+    activeOptimizeController = controller
     isOptimizing.value = true
 
     // 新优化会重置当前历史链，但保留 session 的来源资产坐标，供新历史链回溯收藏来源。
@@ -201,12 +222,15 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
 
       await promptService.optimizePromptStream(request, {
         onToken: (token: string) => {
+          if (generation !== optimizeGeneration) return
           optimizedPrompt.value += token
         },
         onReasoningToken: (token: string) => {
+          if (generation !== optimizeGeneration) return
           optimizedReasoning.value += token
         },
         onComplete: async () => {
+          if (generation !== optimizeGeneration) return
           const historyManager = services.value?.historyManager
           if (historyManager) {
             try {
@@ -225,6 +249,7 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
               }
 
               const chain = await historyManager.createNewChain(recordData)
+              if (generation !== optimizeGeneration) return
               currentChainId.value = chain.chainId
               currentVersions.value = chain.versions
               currentVersionId.value = chain.currentRecord.id
@@ -240,6 +265,7 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
               onOptimizeComplete?.(chain)
               toast.success(t('toast.success.optimizeSuccess'))
             } catch (error) {
+              if (generation !== optimizeGeneration) return
               console.error('[useBasicWorkspaceLogic] Failed to create the history record:', error)
               currentVersions.value = []
               currentChainId.value = ''
@@ -254,6 +280,7 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
               toast.warning(t('toast.warning.optimizeCompleteButHistoryFailed'))
             }
           } else {
+            if (generation !== optimizeGeneration) return
             currentVersions.value = []
             currentChainId.value = ''
             currentVersionId.value = ''
@@ -268,19 +295,33 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
           }
         },
         onError: (error: Error) => {
+          if (generation !== optimizeGeneration) return
           throw error
         }
-      })
+      }, { signal: controller.signal })
     } catch (error) {
+      if (generation !== optimizeGeneration) return
+      // Cancelled streams are expected; do not surface as optimize failures.
+      const code = typeof (error as { code?: unknown })?.code === 'string'
+        ? String((error as { code?: string }).code)
+        : ''
+      if (code === 'IPC_STREAM_CANCELLED' || controller.signal.aborted) {
+        return
+      }
       const fallback = t('toast.error.optimizeFailed')
-      const detail = getI18nErrorMessage(error, fallback)
+      const detail = getTransportErrorMessage(error, getI18nErrorMessage(error, fallback))
       if (detail === fallback) {
         toast.error(fallback)
       } else {
         toast.error(`${fallback}: ${detail}`)
       }
     } finally {
-      isOptimizing.value = false
+      if (activeOptimizeController === controller) {
+        activeOptimizeController = null
+      }
+      if (generation === optimizeGeneration) {
+        isOptimizing.value = false
+      }
     }
   }
 
@@ -313,6 +354,9 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
       return
     }
 
+    const generation = ++iterateGeneration
+    const controller = new AbortController()
+    activeIterateController = controller
     isIterating.value = true
     const originalPromptValue = payload.originalPrompt || prompt.value
     const lastOptimizedPrompt = payload.optimizedPrompt || optimizedPrompt.value
@@ -327,12 +371,15 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
         modelKey,
         {
         onToken: (token: string) => {
+          if (generation !== iterateGeneration) return
           optimizedPrompt.value += token
         },
         onReasoningToken: (token: string) => {
+          if (generation !== iterateGeneration) return
           optimizedReasoning.value += token
         },
         onComplete: async () => {
+          if (generation !== iterateGeneration) return
           const historyManager = services.value?.historyManager
           if (historyManager) {
             try {
@@ -359,6 +406,7 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
                     metadata: withHistorySourceBindingMetadata({ optimizationMode, functionMode: 'basic' }, sessionStore),
                   })
 
+              if (generation !== iterateGeneration) return
               currentChainId.value = chain.chainId
               currentVersions.value = chain.versions
               currentVersionId.value = chain.currentRecord.id
@@ -374,6 +422,7 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
               onIterateComplete?.(chain)
               toast.success(t('toast.success.iterateComplete'))
             } catch (error) {
+              if (generation !== iterateGeneration) return
               console.error('[useBasicWorkspaceLogic] Failed to save the iteration record:', error)
               currentVersions.value = []
               currentChainId.value = ''
@@ -387,6 +436,7 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
               toast.warning(t('toast.warning.iterateCompleteButHistoryFailed'))
             }
           } else {
+            if (generation !== iterateGeneration) return
             currentVersions.value = []
             currentChainId.value = ''
             currentVersionId.value = ''
@@ -400,21 +450,36 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
           }
         },
         onError: (error: Error) => {
+          if (generation !== iterateGeneration) return
           throw error
         }
         },
         iterateTemplateId,
+        undefined,
+        { signal: controller.signal },
       )
     } catch (error) {
+      if (generation !== iterateGeneration) return
+      const code = typeof (error as { code?: unknown })?.code === 'string'
+        ? String((error as { code?: string }).code)
+        : ''
+      if (code === 'IPC_STREAM_CANCELLED' || controller.signal.aborted) {
+        return
+      }
       const fallback = t('toast.error.iterateFailed')
-      const detail = getI18nErrorMessage(error, fallback)
+      const detail = getTransportErrorMessage(error, getI18nErrorMessage(error, fallback))
       if (detail === fallback) {
         toast.error(fallback)
       } else {
         toast.error(`${fallback}: ${detail}`)
       }
     } finally {
-      isIterating.value = false
+      if (activeIterateController === controller) {
+        activeIterateController = null
+      }
+      if (generation === iterateGeneration) {
+        isIterating.value = false
+      }
     }
   }
 
@@ -653,6 +718,7 @@ export function useBasicWorkspaceLogic(options: UseBasicWorkspaceLogicOptions) {
 
     // 业务逻辑
     handleOptimize,
+    handleCancelOptimization,
     handleIterate,
     handleSaveLocalEdit,
     handleSwitchVersion,

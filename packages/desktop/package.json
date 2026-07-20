@@ -58,7 +58,8 @@
         "zip"
       ],
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-      "icon": "icons/app-icon.ico"
+      "icon": "icons/app-icon.ico",
+      "signAndEditExecutable": false
     },
     "mac": {
       "target": [

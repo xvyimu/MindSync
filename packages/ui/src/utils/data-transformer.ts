@@ -32,19 +32,24 @@ export class DataTransformer {
   }
 
   /**
-   * 将模板配置转换为选择器选项
-   * @param templates 模板配置数组
-   * @returns 标准化的模板选择选项
+   * Convert Template records into select options.
+   * `secondary` renders the template description in the SelectWithConfig two-line card layout.
+   * @param templates - Template config array
+   * @returns Standardized template select options
    */
   static templatesToSelectOptions(templates: Template[]): TemplateSelectOption[] {
-    return templates.map(template => ({
-      primary: template.name || '',
-      secondary: template.metadata?.description || '',
-      value: template.id,
-      raw: template,
-      // 保持向后兼容性
-      label: template.name || ''
-    }))
+    return templates.map(template => {
+      const name = template.name || ''
+      const description = template.metadata?.description || ''
+      return {
+        primary: name,
+        secondary: description,
+        value: template.id,
+        raw: template,
+        // 保持向后兼容性
+        label: name
+      }
+    })
   }
 
   /**

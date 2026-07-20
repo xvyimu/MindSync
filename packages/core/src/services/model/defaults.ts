@@ -64,10 +64,27 @@ function shouldEnableFromRequiredFields(
 /**
  * 获取所有内置模型的 ID 列表
  * 包括 PROVIDER_ENV_KEYS 中的所有 Provider 和 'custom'
+ *
+ * 说明：此列表用于「身份识别」（回填/隐藏判定），与是否「默认生成」无关。
+ * 即使某个厂商预设不再默认生成，它仍算内置 ID。
  */
 export function getBuiltinModelIds(): string[] {
   return [...Object.keys(PROVIDER_ENV_KEYS), CHROME_BUILT_IN_PROVIDER_ID, 'custom'];
 }
+
+/**
+ * 默认「不再生成」的厂商预设 ID 集合。
+ *
+ * 需求：彻底铲掉这些预设——它们不进默认配置、不被初始化补齐、不在 UI 出现。
+ * 仅保留 `custom`（用户自建 OpenAI 兼容端点的模板）与用户已建条目（如 ls / lsgpt）。
+ *
+ * 注意：这些 ID 仍属于 getBuiltinModelIds()（身份识别用），
+ * 但 getDefaultTextModels() 不会为它们产出任何默认配置。
+ */
+export const SUPPRESSED_BUILTIN_PRESET_IDS: ReadonlySet<string> = new Set([
+  ...Object.keys(PROVIDER_ENV_KEYS),
+  CHROME_BUILT_IN_PROVIDER_ID,
+]);
 
 /**
  * 创建文本模型的默认配置（TextModelConfig格式）
@@ -84,6 +101,10 @@ export function getDefaultTextModels(registry?: ITextAdapterRegistry): Record<st
 
   // 批量生成标准 Provider 配置
   for (const [providerId, envKeys] of Object.entries(PROVIDER_ENV_KEYS)) {
+    // 被抑制的厂商预设不再默认生成（彻底铲除，不进默认配置）。
+    if (SUPPRESSED_BUILTIN_PRESET_IDS.has(providerId)) {
+      continue;
+    }
     const adapter = adapterRegistry.getAdapter(providerId);
     const provider = adapter.getProvider();
     const models = adapter.getModels();
@@ -177,25 +198,28 @@ export function getDefaultTextModels(registry?: ITextAdapterRegistry): Record<st
     customParamOverrides: {}
   };
 
-  const chromeBuiltInAdapter = adapterRegistry.getAdapter(CHROME_BUILT_IN_PROVIDER_ID);
-  const chromeBuiltInProvider = chromeBuiltInAdapter.getProvider();
-  const chromeBuiltInModel = chromeBuiltInAdapter.getModels()[0] || chromeBuiltInAdapter.buildDefaultModel('gemini-nano');
+  // chrome-built-in 也属于被抑制的预设：默认不生成。
+  if (!SUPPRESSED_BUILTIN_PRESET_IDS.has(CHROME_BUILT_IN_PROVIDER_ID)) {
+    const chromeBuiltInAdapter = adapterRegistry.getAdapter(CHROME_BUILT_IN_PROVIDER_ID);
+    const chromeBuiltInProvider = chromeBuiltInAdapter.getProvider();
+    const chromeBuiltInModel = chromeBuiltInAdapter.getModels()[0] || chromeBuiltInAdapter.buildDefaultModel('gemini-nano');
 
-  result[CHROME_BUILT_IN_PROVIDER_ID] = {
-    id: CHROME_BUILT_IN_PROVIDER_ID,
-    name: chromeBuiltInProvider.name,
-    enabled: false,
-    activationState: {
-      userConfigured: false
-    },
-    providerId: chromeBuiltInProvider.id,
-    modelId: chromeBuiltInModel.id,
-    providerMeta: chromeBuiltInProvider,
-    modelMeta: chromeBuiltInModel,
-    connectionConfig: {},
-    paramOverrides: { ...(chromeBuiltInModel.defaultParameterValues || {}) },
-    customParamOverrides: {}
-  };
+    result[CHROME_BUILT_IN_PROVIDER_ID] = {
+      id: CHROME_BUILT_IN_PROVIDER_ID,
+      name: chromeBuiltInProvider.name,
+      enabled: false,
+      activationState: {
+        userConfigured: false
+      },
+      providerId: chromeBuiltInProvider.id,
+      modelId: chromeBuiltInModel.id,
+      providerMeta: chromeBuiltInProvider,
+      modelMeta: chromeBuiltInModel,
+      connectionConfig: {},
+      paramOverrides: { ...(chromeBuiltInModel.defaultParameterValues || {}) },
+      customParamOverrides: {}
+    };
+  }
 
   return result;
 }

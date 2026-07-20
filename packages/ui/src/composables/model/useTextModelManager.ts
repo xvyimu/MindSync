@@ -13,13 +13,19 @@ import {
   type TextProvider,
   checkChromeBuiltInAvailability,
   getBuiltinModelIds,
+  SUPPRESSED_BUILTIN_PRESET_IDS,
   markChromeBuiltInUserConfigured,
   normalizeCustomRequestHeaders,
   prepareChromeBuiltInModel,
   resolveTextModelMetadata,
   validateCustomRequestHeaders
 } from '@prompt-optimizer/core'
-import { formatErrorSummary, getI18nErrorMessage } from '../../utils/error'
+import {
+  classifyLlmTransportError,
+  formatErrorSummary,
+  getClassifiedErrorText,
+  getI18nErrorMessage,
+} from '../../utils/error'
 import { useModelAdvancedParameters } from './useModelAdvancedParameters'
 import { computeConnectionConfig } from './useConnectionConfig'
 import type { AppServices } from '../../types/services'
@@ -59,7 +65,7 @@ const generateTextModelId = (providerId: string, nonce?: number) => {
 }
 
 export function useTextModelManager() {
-  const { t } = useI18n()
+  const { t, te } = useI18n()
   const toast = useToast()
 
   const getErrorDetail = (error: unknown, fallback = t('common.error')) => {
@@ -405,11 +411,19 @@ export function useTextModelManager() {
     }
   }
 
+  // 钢铁硬隐藏：被抑制的厂商预设一律不进列表，无视 apiKey / enabled / 数据状态。
+  // 作为数据层铲除的 UI 兜底——即使某处回填或迁移遗漏，用户也永远看不到这些预设。
+  // custom 及用户自建条目（ls / lsgpt 等）不在此列表，照常显示。
+  const isSuppressedPreset = (model: TextModelConfig): boolean => {
+    return SUPPRESSED_BUILTIN_PRESET_IDS.has(model.id)
+  }
+
   const loadModels = async () => {
     loadingModels.value = true
     try {
       const all = await modelManager.getAllModels()
       models.value = all
+        .filter((model: TextModelConfig) => !isSuppressedPreset(model))
         .map((model: TextModelConfig) => ({ ...model }))
         .sort((a: TextModelConfig, b: TextModelConfig) => {
           if (a.enabled !== b.enabled) {
@@ -757,9 +771,14 @@ export function useTextModelManager() {
     } catch (error: unknown) {
       console.error('Failed to fetch model list:', error)
 
-      // Keep UX consistent: if dynamic fetch fails, fall back to static models
-      // but surface the failure to avoid a misleading "success" toast.
-      const errorMessage = getErrorDetail(error, t('modelManager.loadFailed'))
+      // 使用统一的传输层错误分类，避免直接把 provider raw message 抛给用户。
+      const classified = classifyLlmTransportError(error, { origin: providerTemplateId })
+      const humanMessage = getClassifiedErrorText(
+        classified,
+        (key) => t(key),
+        (key) => te(key)
+      )
+      const fallbackDetail = humanMessage || getErrorDetail(error, t('modelManager.loadFailed'))
 
       let staticCount: number
       try {
@@ -772,9 +791,19 @@ export function useTextModelManager() {
       loadStaticModelsForProvider(providerTemplateId)
 
       if (staticCount > 0) {
-        toast.warning(t('modelManager.fetchModelsFallback', { error: errorMessage, count: staticCount }))
+        // 403 / 401 / permission 类错误不需要 error 级 toast，用 info/warning 降噪即可。
+        const isSoftDegradation = classified.kind === 'permission' || classified.kind === 'auth' || classified.kind === 'not_found'
+        const message = t('modelManager.fetchModelsFallback', {
+          error: fallbackDetail,
+          count: staticCount,
+        })
+        if (isSoftDegradation) {
+          toast.info(message)
+        } else {
+          toast.warning(message)
+        }
       } else {
-        toast.error(t('modelManager.fetchModelsFailed', { error: errorMessage }))
+        toast.error(t('modelManager.fetchModelsFailed', { error: fallbackDetail }))
       }
     } finally {
       isLoadingModelOptions.value = false

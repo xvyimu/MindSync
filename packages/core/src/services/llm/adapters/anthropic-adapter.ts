@@ -510,6 +510,10 @@ export class AnthropicAdapter extends AbstractTextProviderAdapter {
   /**
    * 发送流式消息（真正的 SSE 流）
    */
+
+  /**
+   * Convert optional AbortSignal into Anthropic SDK stream request options.
+   */
   protected async doSendMessageStream(
     messages: Message[],
     config: TextModelConfig,

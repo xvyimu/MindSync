@@ -346,4 +346,220 @@ export const errorMessages = {
   INCOMPLETE_TEST_INFO: 'Please fill in the complete test information.',
   LOAD_TEMPLATE_FAILED: 'Failed to load template.',
   CLEAR_HISTORY_FAILED: 'Failed to clear history.'
-} as const 
+} as const
+
+// ---------------------------------------------------------------------------
+// LLM / 网络传输错误统一分类
+// 目标：UI 层不再直接把 raw error message 抛给用户，避免出现 "Failed to fetch"
+// / 空对象序列化 / provider-specific 的英文栈；改为通过 kind 映射到 i18n key。
+// ---------------------------------------------------------------------------
+
+export type LlmTransportErrorKind =
+  | 'offline'
+  | 'network'
+  | 'timeout'
+  | 'aborted'
+  | 'auth'
+  | 'permission'
+  | 'rate_limit'
+  | 'server'
+  | 'not_found'
+  | 'invalid_request'
+  | 'model_unavailable'
+  | 'unknown'
+
+export interface ClassifiedLlmTransportError {
+  kind: LlmTransportErrorKind
+  status?: number
+  message: string
+  retriable: boolean
+  origin?: string
+}
+
+const NETWORK_MESSAGE_HINTS = [
+  'network error',
+  'failed to fetch',
+  'network request failed',
+  'econnreset',
+  'econnrefused',
+  'enotfound',
+  'etimedout',
+  'socket hang up',
+  'load failed',
+]
+
+const OFFLINE_MESSAGE_HINTS = [
+  'offline',
+  'no internet',
+  'dns_probe',
+  'net::err_internet_disconnected',
+]
+
+const TIMEOUT_MESSAGE_HINTS = [
+  'timeout',
+  'timed out',
+  'etimedout',
+]
+
+const ABORT_MESSAGE_HINTS = [
+  'abort',
+  'canceled',
+  'cancelled',
+]
+
+function toLowerSafe(value: unknown): string {
+  if (typeof value !== 'string') return ''
+  return value.toLowerCase()
+}
+
+function extractStatus(err: unknown): number | undefined {
+  if (!err || typeof err !== 'object') return undefined
+  const anyErr = err as Record<string, unknown>
+  if (typeof anyErr.status === 'number') return anyErr.status as number
+  if (typeof anyErr.statusCode === 'number') return anyErr.statusCode as number
+  const response = anyErr.response as Record<string, unknown> | undefined
+  if (response && typeof response === 'object' && typeof (response as { status?: unknown }).status === 'number') {
+    return (response as { status: number }).status
+  }
+  const msg = typeof anyErr.message === 'string' ? (anyErr.message as string) : ''
+  const match = msg.match(/\b(4\d{2}|5\d{2})\b/)
+  if (match) {
+    const parsed = Number(match[1])
+    if (Number.isFinite(parsed)) return parsed
+  }
+  return undefined
+}
+
+function isOfflineLike(_err: unknown, lowerMessage: string): boolean {
+  if (typeof navigator !== 'undefined' && navigator && (navigator as Navigator).onLine === false) {
+    return true
+  }
+  return OFFLINE_MESSAGE_HINTS.some((hint) => lowerMessage.includes(hint))
+}
+
+function isAbortLike(err: unknown, lowerMessage: string): boolean {
+  if (!err) return false
+  if (err instanceof Error && err.name === 'AbortError') return true
+  if (typeof err === 'object' && err && (err as { name?: unknown }).name === 'AbortError') return true
+  return ABORT_MESSAGE_HINTS.some((hint) => lowerMessage.includes(hint))
+}
+
+/**
+ * 将任意底层错误分类为 UI 可读的传输层错误。
+ * provider 无关：无论是 fetch/axios 抛出的 Error，还是 adapter 组装出的错误对象，都能得到一致结构。
+ */
+export function classifyLlmTransportError(err: unknown, options: { origin?: string } = {}): ClassifiedLlmTransportError {
+  const rawMessage = getErrorMessage(err, '')
+  const message = rawMessage.trim() || 'Unknown error'
+  const lower = toLowerSafe(message)
+  const status = extractStatus(err)
+
+  if (isAbortLike(err, lower)) {
+    return { kind: 'aborted', status, message, retriable: false, origin: options.origin }
+  }
+
+  if (isOfflineLike(err, lower)) {
+    return { kind: 'offline', status, message, retriable: true, origin: options.origin }
+  }
+
+  if (TIMEOUT_MESSAGE_HINTS.some((hint) => lower.includes(hint))) {
+    return { kind: 'timeout', status, message, retriable: true, origin: options.origin }
+  }
+
+  if (status !== undefined) {
+    if (status === 401) return { kind: 'auth', status, message, retriable: false, origin: options.origin }
+    if (status === 403) return { kind: 'permission', status, message, retriable: false, origin: options.origin }
+    if (status === 404) return { kind: 'not_found', status, message, retriable: false, origin: options.origin }
+    if (status === 429) return { kind: 'rate_limit', status, message, retriable: true, origin: options.origin }
+    if (status >= 500) return { kind: 'server', status, message, retriable: true, origin: options.origin }
+    if (status >= 400) {
+      if (/model.*(unavailable|not.?exist|not.?found|no.?such)/.test(lower)) {
+        return { kind: 'model_unavailable', status, message, retriable: false, origin: options.origin }
+      }
+      return { kind: 'invalid_request', status, message, retriable: false, origin: options.origin }
+    }
+  }
+
+  if (NETWORK_MESSAGE_HINTS.some((hint) => lower.includes(hint))) {
+    return { kind: 'network', status, message, retriable: true, origin: options.origin }
+  }
+
+  if (/api\s*key|apikey|unauthorized|invalid.*key/.test(lower)) {
+    return { kind: 'auth', status, message, retriable: false, origin: options.origin }
+  }
+
+  if (/quota|rate.?limit|too.?many.?requests/.test(lower)) {
+    return { kind: 'rate_limit', status, message, retriable: true, origin: options.origin }
+  }
+
+  if (/model.*(unavailable|not.?exist|not.?found|no.?such|deprecated)/.test(lower)) {
+    return { kind: 'model_unavailable', status, message, retriable: false, origin: options.origin }
+  }
+
+  return { kind: 'unknown', status, message, retriable: false, origin: options.origin }
+}
+
+/**
+ * kind -> i18n key，缺失翻译时可以回退到 message。
+ */
+export const LLM_TRANSPORT_ERROR_I18N_KEYS: Record<LlmTransportErrorKind, string> = {
+  offline: 'error.transport.offline',
+  network: 'error.transport.network',
+  timeout: 'error.transport.timeout',
+  aborted: 'error.transport.aborted',
+  auth: 'error.transport.auth',
+  permission: 'error.transport.permission',
+  rate_limit: 'error.transport.rateLimit',
+  server: 'error.transport.server',
+  not_found: 'error.transport.notFound',
+  invalid_request: 'error.transport.invalidRequest',
+  model_unavailable: 'error.transport.modelUnavailable',
+  unknown: 'error.transport.unknown',
+}
+
+/**
+ * 拿到分类后适合直接展示的中文/英文文案。
+ * 顺序：i18n（存在时）→ 原始 message（有意义时）→ 兜底 kind。
+ */
+export function getClassifiedErrorText(
+  classified: ClassifiedLlmTransportError,
+  translate: (key: string) => string,
+  hasKey?: (key: string) => boolean
+): string {
+  const key = LLM_TRANSPORT_ERROR_I18N_KEYS[classified.kind]
+  const isKeyPresent = typeof hasKey === 'function' ? hasKey(key) : true
+  if (isKeyPresent) {
+    const translated = translate(key)
+    if (translated && translated !== key) return translated
+  }
+  if (classified.message && classified.message.trim().length > 0) {
+    return classified.message
+  }
+  return classified.kind
+}
+
+/**
+ * 便捷封装：对任意错误分类后返回可读文案，通过全局 i18n 实例翻译。
+ * 若分类为 'unknown'（没有可识别的传输层特征），返回 fallback，避免遮盖上层更具体的业务错误。
+ * 用于 optimize / iterate / test 等流式回调的 onError。
+ */
+export function getTransportErrorMessage(error: unknown, fallback: string): string {
+  // 用户主动取消不应弹错误 toast。
+  if (isRecord(error) && error.code === 'IPC_STREAM_CANCELLED') {
+    return fallback
+  }
+  const classified = classifyLlmTransportError(error)
+  if (classified.kind === 'aborted') {
+    return fallback
+  }
+  if (classified.kind === 'unknown') {
+    return fallback
+  }
+  return getClassifiedErrorText(
+    classified,
+    (key) => i18n.global.t(key),
+    (key) => i18n.global.te(key)
+  )
+}
+
+

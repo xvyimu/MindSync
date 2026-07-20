@@ -87,13 +87,16 @@
                     :model-label="t('promptOptimizer.optimizeModel')"
                     :template-label="t('promptOptimizer.templateLabel')"
                     :button-text="t('promptOptimizer.optimize')"
-                    :loading-text="t('common.loading')"
+                    :loading-text="t('prompt.optimizing')"
                     :loading="contextUserOptimization.isOptimizing"
                     :disabled="contextUserOptimization.isOptimizing"
+                    :allow-cancel="true"
+                    :cancel-text="t('common.stop')"
                      :show-preview="true"
                      :show-analyze-button="true"
                      :analyze-loading="isAnalyzing"
                       @submit="handleOptimize"
+                      @cancel="handleCancelOptimization"
                       @analyze="handleAnalyze"
                       @configModel="handleOpenModelManager"
                       @open-preview="handleOpenInputPreview"
@@ -2162,6 +2165,10 @@ const handleClearTemporaryVariables = () => {
 const handleOptimize = () => {
     if (isAnalyzing.value) return;
     contextUserOptimization.optimize();
+};
+
+const handleCancelOptimization = () => {
+    contextUserOptimization.cancel();
 };
 
 /**

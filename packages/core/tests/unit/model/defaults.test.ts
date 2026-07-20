@@ -112,89 +112,44 @@ describe('model defaults provider env mapping', () => {
     }
   })
 
-  it('should include anthropic in builtin model ids', () => {
+  // 需求变更（钢铁铲除）：15 个厂商预设不再默认生成。
+  // 它们仍出现在 getBuiltinModelIds()（身份识别用），但 getDefaultTextModels() 不再产出配置。
+  const SUPPRESSED_PRESET_IDS = [
+    'openai', 'gemini', 'anthropic', 'deepseek', 'siliconflow', 'zhipu',
+    'dashscope', 'openrouter', 'modelscope', 'ollama', 'minimax',
+    'cloudflare', 'grok', 'xiaomi-mimo-token-plan', 'chrome-built-in',
+  ] as const
+
+  it('should still list suppressed presets in builtin model ids (identity only)', () => {
     const builtinModelIds = getBuiltinModelIds()
-    expect(builtinModelIds).toContain('anthropic')
+    for (const id of SUPPRESSED_PRESET_IDS) {
+      expect(builtinModelIds).toContain(id)
+    }
   })
 
-  it('should include anthropic config and keep it disabled when api key is empty', () => {
+  it('should NOT generate any suppressed vendor preset by default', () => {
     const models = getDefaultTextModels()
-
-    expect(models.anthropic).toBeDefined()
-    expect(models.anthropic.providerMeta.id).toBe('anthropic')
-    expect(models.anthropic.enabled).toBe(false)
+    for (const id of SUPPRESSED_PRESET_IDS) {
+      expect(models[id]).toBeUndefined()
+    }
   })
 
-  it('should enable anthropic when VITE_ANTHROPIC_API_KEY is provided', () => {
+  it('should NOT generate anthropic even when VITE_ANTHROPIC_API_KEY is provided', () => {
     process.env.VITE_ANTHROPIC_API_KEY = 'test-anthropic-key'
-
     const models = getDefaultTextModels()
-
-    expect(models.anthropic.enabled).toBe(true)
-    expect(models.anthropic.connectionConfig.apiKey).toBe('test-anthropic-key')
+    expect(models.anthropic).toBeUndefined()
   })
 
-  it('should include cloudflare in builtin model ids', () => {
-    const builtinModelIds = getBuiltinModelIds()
-    expect(builtinModelIds).toContain('cloudflare')
-  })
-
-  it('should include ollama but keep it disabled without explicit user configuration', () => {
-    const builtinModelIds = getBuiltinModelIds()
-    const models = getDefaultTextModels()
-
-    expect(builtinModelIds).toContain('ollama')
-    expect(models.ollama).toBeDefined()
-    expect(models.ollama.providerMeta.id).toBe('ollama')
-    expect(models.ollama.providerMeta.requiresApiKey).toBe(false)
-    expect(models.ollama.connectionConfig.apiKey).toBe('')
-    expect(models.ollama.connectionConfig.baseURL).toBe('http://localhost:11434/v1')
-    expect(models.ollama.enabled).toBe(false)
-  })
-
-  it('should include Chrome built-in AI but keep it disabled until the user opts in', () => {
-    const builtinModelIds = getBuiltinModelIds()
-    const models = getDefaultTextModels()
-
-    expect(builtinModelIds).toContain('chrome-built-in')
-    expect(models['chrome-built-in']).toBeDefined()
-    expect(models['chrome-built-in'].providerMeta.id).toBe('chrome-built-in')
-    expect(models['chrome-built-in'].providerMeta.requiresApiKey).toBe(false)
-    expect(models['chrome-built-in'].modelMeta.id).toBe('gemini-nano')
-    expect(models['chrome-built-in'].enabled).toBe(false)
-    expect(models['chrome-built-in'].activationState).toEqual({ userConfigured: false })
-  })
-
-  it('should include cloudflare config and keep it disabled when credentials are empty', () => {
-    const models = getDefaultTextModels()
-
-    expect(models.cloudflare).toBeDefined()
-    expect(models.cloudflare.providerMeta.id).toBe('cloudflare')
-    expect(models.cloudflare.enabled).toBe(false)
-  })
-
-  it('should enable cloudflare when VITE_CF_API_TOKEN and VITE_CF_ACCOUNT_ID are provided', () => {
+  it('should NOT generate cloudflare even when VITE_CF_* credentials are provided', () => {
     process.env.VITE_CF_API_TOKEN = 'test-cloudflare-token'
     process.env.VITE_CF_ACCOUNT_ID = 'test-cloudflare-account'
-
     const models = getDefaultTextModels()
-
-    expect(models.cloudflare.enabled).toBe(true)
-    expect(models.cloudflare.providerMeta.corsRestricted).toBe(true)
-    expect(models.cloudflare.connectionConfig.apiKey).toBe('test-cloudflare-token')
-    expect(models.cloudflare.connectionConfig.accountId).toBe('test-cloudflare-account')
-    expect(models.cloudflare.modelMeta.id).toBe('@cf/qwen/qwen3-30b-a3b-fp8')
+    expect(models.cloudflare).toBeUndefined()
   })
 
-  it('should keep cloudflare disabled when only legacy CF_* variables are provided', () => {
-    process.env.CF_API_TOKEN = 'legacy-cloudflare-token'
-    process.env.CF_ACCOUNT_ID = 'legacy-cloudflare-account'
-
+  it('should only generate the custom preset (plus any dynamic custom models)', () => {
     const models = getDefaultTextModels()
-
-    expect(models.cloudflare.enabled).toBe(false)
-    expect(models.cloudflare.connectionConfig.apiKey).toBe('')
-    expect(models.cloudflare.connectionConfig.accountId).toBe('')
+    expect(Object.keys(models)).toEqual(['custom'])
   })
 
   it('should expose the custom preset as OpenAI-compatible with chat completions but keep it disabled by default', () => {
@@ -227,60 +182,22 @@ describe('model defaults provider env mapping', () => {
     })
   })
 
-  it('should use DeepSeek V4 Flash with thinking disabled by default', () => {
+  // 需求变更（钢铁铲除）：deepseek / grok / xiaomi-mimo-token-plan 均属被抑制预设，不再默认生成。
+  it('should NOT generate deepseek preset by default', () => {
     const models = getDefaultTextModels()
-
-    expect(models.deepseek).toBeDefined()
-    expect(models.deepseek.providerMeta.id).toBe('deepseek')
-    expect(models.deepseek.modelMeta.id).toBe('deepseek-v4-flash')
-    expect(models.deepseek.modelMeta.parameterDefinitions.map((definition) => definition.name)).toContain('thinking_type')
-    expect(models.deepseek.paramOverrides).toEqual({
-      thinking_type: 'disabled'
-    })
+    expect(models.deepseek).toBeUndefined()
   })
 
-  it('should include Grok with reasoning disabled by default', () => {
-    const models = getDefaultTextModels()
-
-    expect(models.grok).toBeDefined()
-    expect(models.grok.providerMeta.id).toBe('grok')
-    expect(models.grok.modelMeta.id).toBe('grok-4.3')
-    expect(models.grok.enabled).toBe(false)
-    expect(models.grok.paramOverrides).toEqual({
-      reasoning_effort: 'none'
-    })
-  })
-
-  it('should enable Grok when VITE_XAI_API_KEY is provided', () => {
+  it('should NOT generate grok preset even when VITE_XAI_API_KEY is provided', () => {
     process.env.VITE_XAI_API_KEY = 'test-xai-key'
-
     const models = getDefaultTextModels()
-
-    expect(models.grok.enabled).toBe(true)
-    expect(models.grok.connectionConfig.apiKey).toBe('test-xai-key')
+    expect(models.grok).toBeUndefined()
   })
 
-  it('should include Xiaomi MiMo Token Plan with MiMo 2.5 Pro and China endpoint by default', () => {
-    const builtinModelIds = getBuiltinModelIds()
-    const models = getDefaultTextModels()
-
-    expect(builtinModelIds).toContain('xiaomi-mimo-token-plan')
-    expect(models['xiaomi-mimo']).toBeUndefined()
-    expect(models['xiaomi-mimo-token-plan']).toBeDefined()
-    expect(models['xiaomi-mimo-token-plan'].providerMeta.id).toBe('xiaomi-mimo-token-plan')
-    expect(models['xiaomi-mimo-token-plan'].modelMeta.id).toBe('mimo-v2.5-pro')
-    expect(models['xiaomi-mimo-token-plan'].connectionConfig.baseURL).toBe('https://token-plan-cn.xiaomimimo.com/v1')
-    expect(models['xiaomi-mimo-token-plan'].enabled).toBe(false)
-  })
-
-  it('should enable Xiaomi MiMo Token Plan from Token Plan env keys only', () => {
+  it('should NOT generate xiaomi-mimo-token-plan preset even with Token Plan env keys', () => {
     process.env.VITE_MIMO_TOKEN_PLAN_API_KEY = 'tp-test-key'
     process.env.VITE_MIMO_TOKEN_PLAN_API_BASE_URL = 'https://token-plan-sgp.xiaomimimo.com/v1'
-
     const models = getDefaultTextModels()
-
-    expect(models['xiaomi-mimo-token-plan'].enabled).toBe(true)
-    expect(models['xiaomi-mimo-token-plan'].connectionConfig.apiKey).toBe('tp-test-key')
-    expect(models['xiaomi-mimo-token-plan'].connectionConfig.baseURL).toBe('https://token-plan-sgp.xiaomimimo.com/v1')
+    expect(models['xiaomi-mimo-token-plan']).toBeUndefined()
   })
 })

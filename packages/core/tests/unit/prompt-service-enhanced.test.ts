@@ -245,6 +245,7 @@ describe('PromptService Enhanced Features', () => {
         'test user prompt',
         'test-model',
         callbacks,
+        undefined,
         { signal: controller.signal },
       )
 

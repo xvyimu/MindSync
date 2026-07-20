@@ -508,9 +508,9 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
 
       // 构建配置（包含系统指令）
       const generationConfig = this.buildGenerationConfig(
-        config.paramOverrides || {},
-        systemInstruction
-      )
+          config.paramOverrides || {},
+          systemInstruction
+        )
 
       // 格式化消息
       const contents = this.formatMessages(conversationMessages)
@@ -733,6 +733,10 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
    * @param config 模型配置
    * @param callbacks 流式响应回调
    * @throws SDK原始错误（保留完整堆栈）
+   */
+
+  /**
+   * Attach optional AbortSignal to Gemini generation config.
    */
   protected async doSendMessageStream(
     messages: Message[],

@@ -3,6 +3,7 @@ const messages = {
     "loading": "載入中...",
     "save": "儲存",
     "cancel": "取消",
+    "stop": "停止",
     "confirm": "確認",
     "retry": "重試",
     "delete": "刪除",
@@ -278,7 +279,8 @@ const messages = {
       "optimizationModeAutoSwitched": "已自動切換到{mode}提示詞優化模式",
       "switchedToImageMode": "已自動切換到圖片模式",
       "switchedToFunctionMode": "已自動切換到{mode}模式",
-      "multiTurnOptimizationPrompt": "多輪對話優化（{count}條訊息）"
+      "multiTurnOptimizationPrompt": "多輪對話優化（{count}條訊息）",
+      "optimizeCancelled": "已停止生成"
     }
   },
   "log": {

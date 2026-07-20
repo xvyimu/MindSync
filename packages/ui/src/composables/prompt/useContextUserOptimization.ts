@@ -55,6 +55,7 @@ export interface UseContextUserOptimization {
   // 方法
   optimize: () => Promise<void>
   iterate: (payload: { originalPrompt: string, optimizedPrompt: string, iterateInput: string }) => Promise<void>
+  cancel: () => void
   switchVersion: (version: PromptChain['versions'][number]) => Promise<void>
   switchToV0: (version: PromptChain['versions'][number]) => Promise<void>  // 🆕 V0 切换
   loadFromHistory: (payload: { rootPrompt?: string, chain: PromptChain, record: PromptRecord }) => void
@@ -124,6 +125,12 @@ export function useContextUserOptimization(
     }
   }
 
+  // 流式任务取消：generation 屏障 + AbortController（与 basic workspace 同构）
+  let optimizeGeneration = 0
+  let iterateGeneration = 0
+  let activeOptimizeController: AbortController | null = null
+  let activeIterateController: AbortController | null = null
+
   // 使用 reactive 创建响应式状态对象
   const state = reactive({
     // 状态
@@ -139,6 +146,19 @@ export function useContextUserOptimization(
     currentVersionId: boundCurrentVersionId,
 
     // 方法
+    cancel: () => {
+      if (!state.isOptimizing && !state.isIterating) return
+      optimizeGeneration += 1
+      iterateGeneration += 1
+      activeOptimizeController?.abort()
+      activeIterateController?.abort()
+      activeOptimizeController = null
+      activeIterateController = null
+      state.isOptimizing = false
+      state.isIterating = false
+      toast.info(t('toast.info.optimizeCancelled'))
+    },
+
     optimize: async () => {
       if (!state.prompt.trim() || state.isOptimizing) return
 
@@ -151,6 +171,10 @@ export function useContextUserOptimization(
         toast.error(t('toast.error.noOptimizeModel'))
         return
       }
+
+      const generation = ++optimizeGeneration
+      const controller = new AbortController()
+      activeOptimizeController = controller
 
       // 在开始优化前立即清空状态
       state.isOptimizing = true
@@ -174,12 +198,15 @@ export function useContextUserOptimization(
           request,
           {
             onToken: (token: string) => {
+              if (generation !== optimizeGeneration) return
               state.optimizedPrompt += token
             },
             onReasoningToken: (reasoningToken: string) => {
+              if (generation !== optimizeGeneration) return
               state.optimizedReasoning += reasoningToken
             },
             onComplete: async () => {
+              if (generation !== optimizeGeneration) return
               if (!selectedTemplate.value) return
 
               try {
@@ -210,21 +237,33 @@ export function useContextUserOptimization(
                 console.error('Failed to create history record:', error)
                 toast.warning(t('toast.warning.saveHistoryFailed'))
               } finally {
-                state.isOptimizing = false
+                if (generation === optimizeGeneration) {
+                  state.isOptimizing = false
+                  activeOptimizeController = null
+                }
               }
             },
             onError: (error: Error) => {
+              if (generation !== optimizeGeneration) return
               console.error(t('toast.error.optimizeProcessFailed'), error)
               toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
               state.isOptimizing = false
+              activeOptimizeController = null
             }
-          }
+          },
+          { signal: controller.signal }
         )
       } catch (error: unknown) {
+        if (generation !== optimizeGeneration || controller.signal.aborted) {
+          return
+        }
         console.error(t('toast.error.optimizeFailed'), error)
         toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
       } finally {
-        state.isOptimizing = false
+        if (generation === optimizeGeneration) {
+          state.isOptimizing = false
+          activeOptimizeController = null
+        }
       }
     },
 
@@ -250,6 +289,10 @@ export function useContextUserOptimization(
         return
       }
 
+      const generation = ++iterateGeneration
+      const controller = new AbortController()
+      activeIterateController = controller
+
       // 在开始迭代前立即清空状态
       state.isIterating = true
       state.optimizedPrompt = ''
@@ -266,12 +309,15 @@ export function useContextUserOptimization(
           selectedOptimizeModel.value,
           {
             onToken: (token: string) => {
+              if (generation !== iterateGeneration) return
               state.optimizedPrompt += token
             },
             onReasoningToken: (reasoningToken: string) => {
+              if (generation !== iterateGeneration) return
               state.optimizedReasoning += reasoningToken
             },
             onComplete: async () => {
+              if (generation !== iterateGeneration) return
               if (!selectedIterateTemplate.value) {
                 state.isIterating = false
                 return
@@ -323,21 +369,32 @@ export function useContextUserOptimization(
                 console.error('[History] Failed to save the iteration record:', error)
                 toast.warning(t('toast.warning.saveHistoryFailed'))
               } finally {
-                state.isIterating = false
+                if (generation === iterateGeneration) {
+                  state.isIterating = false
+                  activeIterateController = null
+                }
               }
             },
             onError: (error: Error) => {
+              if (generation !== iterateGeneration) return
               console.error('[Iterate] Iteration failed:', error)
               toast.error(t('toast.error.iterateFailed'))
               state.isIterating = false
+              activeIterateController = null
             }
           },
           selectedIterateTemplate.value.id,
+          undefined,
+          { signal: controller.signal },
         )
       } catch (error: unknown) {
+        if (generation !== iterateGeneration || controller.signal.aborted) {
+          return
+        }
         console.error('[Iterate] Iteration failed:', error)
         toast.error(t('toast.error.iterateFailed'))
         state.isIterating = false
+        activeIterateController = null
       }
     },
 

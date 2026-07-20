@@ -21,6 +21,8 @@ const IPC_EVENTS = {
 };
 
 const REMOTE_STORAGE_CHANNEL = 'remote-storage:invoke';
+// 记录每个 channel 上「前端回调 -> 包装监听器」的映射，
+// 保证 off() 能用同一函数引用移除，避免 removeListener 失效导致内存泄漏。
 const ipcListenerWrappers = new Map();
 
 // 简单的超时包装器，避免过度设计
@@ -240,7 +242,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
           message: 'IPC stream was cancelled',
         });
       }
-      
+
       // Set up event listeners for streaming responses
       const contentListener = (event, content) => {
         if (callbacks.onContent) callbacks.onContent(content);

@@ -136,6 +136,20 @@ const messages = {
     },
     "core": {
       "ipc_serialization_failed": "IPC serialization failed: {details}"
+    },
+    "transport": {
+      "offline": "You appear to be offline. Please check your connection and retry.",
+      "network": "Network error, please retry.",
+      "timeout": "Request timed out, please retry.",
+      "aborted": "Cancelled.",
+      "auth": "Authentication failed. Please verify your API key.",
+      "permission": "Access denied (403). Verify API key or model availability.",
+      "rateLimit": "Rate limited (429). Please retry later.",
+      "server": "Server error. Please retry later.",
+      "notFound": "Resource not found (404).",
+      "invalidRequest": "Invalid request. Please review the configuration.",
+      "modelUnavailable": "Model unavailable. Try another model or retry later.",
+      "unknown": "Request failed. Please retry."
     }
   }
 } as const;

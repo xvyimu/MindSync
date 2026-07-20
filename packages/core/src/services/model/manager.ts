@@ -1,7 +1,7 @@
 import { IModelManager, ModelConfig, TextModel, TextModelConfig, TextProvider } from './types';
 import { IStorageProvider } from '../storage/types';
 import { StorageAdapter } from '../storage/adapter';
-import { getAllModels, getBuiltinModelIds } from './defaults';
+import { getAllModels, getBuiltinModelIds, SUPPRESSED_BUILTIN_PRESET_IDS } from './defaults';
 import { ModelConfigError } from '../llm/errors';
 import { validateOverrides } from './parameter-utils';
 import { ElectronConfigManager, isElectronRenderer } from './electron-config';
@@ -98,9 +98,21 @@ export class ModelManager implements IModelManager {
           const storedModels = JSON.parse(storedData);
           console.log('[ModelManager] Loaded existing models from storage');
 
+          // 迁移：钢铁铲除被抑制的厂商预设（见交付确认：彻底消失、永不回来）。
+          // id 命中抑制集合一律删除，无视 enabled / apiKey / 数据状态。
+          // 抑制集合仅含 15 个厂商预设 id；custom 与用户自建条目（ls / lsgpt 等）不在其中，绝不受影响。
+          // 与「默认不再生成」+「UI 钢铁硬隐藏」形成三重闭环：预设不生成、不残留、不显示。
+          let purgedPreset = false;
+          for (const key of Object.keys(storedModels)) {
+            if (!SUPPRESSED_BUILTIN_PRESET_IDS.has(key)) continue;
+            delete storedModels[key];
+            purgedPreset = true;
+            console.log(`[ModelManager] Purged suppressed builtin preset from storage: ${key}`);
+          }
+
           // 确保所有默认模型都存在，但保留用户的自定义配置
           const defaults = this.getDefaultModels();
-          let hasUpdates = false;
+          let hasUpdates = purgedPreset;
           const updatedModels = { ...storedModels };
 
           for (const [key, defaultConfig] of Object.entries(defaults)) {

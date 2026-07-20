@@ -15,6 +15,9 @@ describe('配置迁移集成测试', () => {
     await storage.clearAll();
   });
 
+  // 需求变更（钢铁铲除）：storage key 命中 15 个厂商预设 id 的条目在 init 早期被无条件 purge。
+  // legacy→新格式的转换引擎按 config.provider 字段工作，与 storage key 无关，因此仍完全可用。
+  // 下列用例改用「非预设 storage key」承载 legacy 配置，既避开 purge，又保住转换引擎覆盖。
   describe('传统配置自动转换', () => {
     it('应该自动转换OpenAI传统配置', async () => {
       // 准备传统配置
@@ -32,29 +35,29 @@ describe('配置迁移集成测试', () => {
         }
       };
 
-      // 写入Storage
+      // 写入Storage（使用非预设 key，避免被钢铁 purge）
       const modelsData = {
-        openai: legacyConfig
+        'user-openai': legacyConfig
       };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       // 验证写入的是传统格式
       const storedRaw = await storage.getItem('models');
       const storedModels = JSON.parse(storedRaw!);
-      expect(isLegacyConfig(storedModels.openai)).toBe(true);
+      expect(isLegacyConfig(storedModels['user-openai'])).toBe(true);
 
       // 初始化ModelManager（会触发自动转换）
       const modelManager = new ModelManager(storage, registry);
-      
+
 
       // 验证转换后的配置
-      const convertedConfig = await modelManager.getModel('openai') as TextModelConfig;
+      const convertedConfig = await modelManager.getModel('user-openai') as TextModelConfig;
       expect(convertedConfig).toBeDefined();
       expect(isTextModelConfig(convertedConfig)).toBe(true);
       expect(isLegacyConfig(convertedConfig)).toBe(false);
 
       // 验证字段映射正确
-      expect(convertedConfig.id).toBe('openai');
+      expect(convertedConfig.id).toBe('user-openai');
       expect(convertedConfig.name).toBe('OpenAI');
       expect(convertedConfig.enabled).toBe(true);
       expect(convertedConfig.providerMeta.id).toBe('openai');
@@ -85,13 +88,13 @@ describe('配置迁移集成测试', () => {
         }
       };
 
-      const modelsData = { gemini: legacyConfig };
+      const modelsData = { 'user-gemini': legacyConfig };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
-      
 
-      const convertedConfig = await modelManager.getModel('gemini') as TextModelConfig;
+
+      const convertedConfig = await modelManager.getModel('user-gemini') as TextModelConfig;
       expect(isTextModelConfig(convertedConfig)).toBe(true);
       expect(convertedConfig.providerMeta.id).toBe('gemini');
       expect(convertedConfig.modelMeta.id).toBe('gemini-2.0-flash-exp');
@@ -111,13 +114,13 @@ describe('配置迁移集成测试', () => {
         enabled: true
       };
 
-      const modelsData = { anthropic: legacyConfig };
+      const modelsData = { 'user-anthropic': legacyConfig };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
-      
 
-      const convertedConfig = await modelManager.getModel('anthropic') as TextModelConfig;
+
+      const convertedConfig = await modelManager.getModel('user-anthropic') as TextModelConfig;
       expect(isTextModelConfig(convertedConfig)).toBe(true);
       expect(convertedConfig.providerMeta.id).toBe('anthropic');
       expect(convertedConfig.modelMeta.providerId).toBe('anthropic');
@@ -134,13 +137,13 @@ describe('配置迁移集成测试', () => {
         enabled: true
       };
 
-      const modelsData = { deepseek: legacyConfig };
+      const modelsData = { 'user-deepseek': legacyConfig };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
-      
 
-      const convertedConfig = await modelManager.getModel('deepseek') as TextModelConfig;
+
+      const convertedConfig = await modelManager.getModel('user-deepseek') as TextModelConfig;
       expect(isTextModelConfig(convertedConfig)).toBe(true);
       expect(convertedConfig.providerMeta.id).toBe('deepseek');
       expect(convertedConfig.modelMeta.providerId).toBe('deepseek');
@@ -158,13 +161,13 @@ describe('配置迁移集成测试', () => {
         enabled: true
       };
 
-      const modelsData = { zhipu: legacyConfig };
+      const modelsData = { 'user-zhipu': legacyConfig };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
-      
 
-      const convertedConfig = await modelManager.getModel('zhipu') as TextModelConfig;
+
+      const convertedConfig = await modelManager.getModel('user-zhipu') as TextModelConfig;
       expect(isTextModelConfig(convertedConfig)).toBe(true);
       expect(convertedConfig.providerMeta.id).toBe('zhipu');
       expect(convertedConfig.modelMeta.providerId).toBe('zhipu');
@@ -205,7 +208,10 @@ describe('配置迁移集成测试', () => {
         enabled: true
       };
 
-      const modelsData = { openai: legacyConfig };
+      // 注意：init 只对「存在于 defaults 的 key」执行转换并写回存储。
+      // 预设已全部铲除，唯一存活的 default key 是 custom，故持久化测试用 custom 承载 legacy 配置。
+      const legacyCustom: ModelConfig = { ...legacyConfig, provider: 'custom' };
+      const modelsData = { custom: legacyCustom };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       // 第一次初始化 - 触发转换
@@ -215,9 +221,9 @@ describe('配置迁移集成测试', () => {
       // 验证Storage中的数据已更新
       const storedRaw = await storage.getItem('models');
       const storedModels = JSON.parse(storedRaw!);
-      expect(isTextModelConfig(storedModels.openai)).toBe(true);
-      expect(storedModels.openai.providerMeta).toBeDefined();
-      expect(storedModels.openai.modelMeta).toBeDefined();
+      expect(isTextModelConfig(storedModels.custom)).toBe(true);
+      expect(storedModels.custom.providerMeta).toBeDefined();
+      expect(storedModels.custom.modelMeta).toBeDefined();
     });
 
     it('应该确保转换幂等性（第二次加载不再转换）', async () => {
@@ -231,18 +237,20 @@ describe('配置迁移集成测试', () => {
         enabled: true
       };
 
-      const modelsData = { openai: legacyConfig };
+      // 幂等性用 custom 承载（唯一存活的 default key，init 会写回存储）。
+      const legacyCustom: ModelConfig = { ...legacyConfig, provider: 'custom' };
+      const modelsData = { custom: legacyCustom };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       // 第一次初始化
       const modelManager1 = new ModelManager(storage, registry);
-      
-      const config1 = await modelManager1.getModel('openai') as TextModelConfig;
+
+      const config1 = await modelManager1.getModel('custom') as TextModelConfig;
 
       // 第二次初始化（重新加载）
       const modelManager2 = new ModelManager(storage, registry);
-      
-      const config2 = await modelManager2.getModel('openai') as TextModelConfig;
+
+      const config2 = await modelManager2.getModel('custom') as TextModelConfig;
 
       // 验证两次加载结果一致
       expect(config1).toMatchObject({
@@ -257,7 +265,7 @@ describe('配置迁移集成测试', () => {
       // 验证Storage中是新格式
       const storedRaw = await storage.getItem('models');
       const storedModels = JSON.parse(storedRaw!);
-      expect(isTextModelConfig(storedModels.openai)).toBe(true);
+      expect(isTextModelConfig(storedModels.custom)).toBe(true);
     });
   });
 
@@ -273,13 +281,13 @@ describe('配置迁移集成测试', () => {
         enabled: true
       };
 
-      const modelsData = { openai: legacyConfig };
+      const modelsData = { 'user-openai': legacyConfig };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
-      
 
-      const convertedConfig = await modelManager.getModel('openai') as TextModelConfig;
+
+      const convertedConfig = await modelManager.getModel('user-openai') as TextModelConfig;
       expect(isTextModelConfig(convertedConfig)).toBe(true);
       expect(convertedConfig.modelMeta.id).toBe('unknown-gpt-model-xyz');
       expect(convertedConfig.modelMeta.providerId).toBe('openai');
@@ -295,7 +303,7 @@ describe('配置迁移集成测试', () => {
       const model = adapter.getModels().find(m => m.id === 'gpt-5-mini')!;
 
       const newConfig: TextModelConfig = {
-        id: 'openai',
+        id: 'user-openai',
         name: 'OpenAI',
         enabled: true,
         providerMeta: adapter.getProvider(),
@@ -307,13 +315,13 @@ describe('配置迁移集成测试', () => {
         paramOverrides: {}
       };
 
-      const modelsData = { openai: newConfig };
+      const modelsData = { 'user-openai': newConfig };
       await storage.setItem('models', JSON.stringify(modelsData));
 
       const modelManager = new ModelManager(storage, registry);
 
 
-      const loadedConfig = await modelManager.getModel('openai') as TextModelConfig;
+      const loadedConfig = await modelManager.getModel('user-openai') as TextModelConfig;
       expect(isTextModelConfig(loadedConfig)).toBe(true);
       // 使用toMatchObject允许adapter更新元数据字段
       expect(loadedConfig).toMatchObject({
@@ -327,7 +335,7 @@ describe('配置迁移集成测试', () => {
       // 验证Storage中是新格式
       const storedRaw2 = await storage.getItem('models');
       const storedModels2 = JSON.parse(storedRaw2!);
-      expect(isTextModelConfig(storedModels2.openai)).toBe(true);
+      expect(isTextModelConfig(storedModels2['user-openai'])).toBe(true);
     });
   });
 });
