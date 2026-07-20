@@ -51,6 +51,7 @@
 - **Paper / 纸感**主题（离线字体）  
 - 打包含 `icons/**`；安装为 **app.asar**  
 - **P0 安全**：Docker `config.js` 仅 public `VITE_*`；Vercel HMAC 会话 Cookie（非明文密码）  
+- **UI `build:types` / `vue-tsc`**：TemplateSelect 与 Naive `SelectFilter` 对齐（watch 软降级）  
 
 ---
 

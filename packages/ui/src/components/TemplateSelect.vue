@@ -57,7 +57,14 @@
 import { ref, computed, watch, inject, h, type Ref, type VNode } from 'vue'
 
 import { useI18n } from 'vue-i18n'
-import { NSelect, NButton, NSpace, NText, type SelectOption as NaiveSelectOption } from 'naive-ui'
+import {
+  NSelect,
+  NButton,
+  NSpace,
+  NText,
+  type SelectFilter,
+  type SelectOption as NaiveSelectOption,
+} from 'naive-ui'
 import type { OptimizationMode, Template, TemplateMetadata } from '@prompt-optimizer/core'
 import type { AppServices } from '../types/services'
 
@@ -65,10 +72,12 @@ const { t } = useI18n()
 
 type TemplateType = TemplateMetadata['templateType'];
 
+/** Menu option shape. Keep compatible with Naive SelectBaseOption for filter/render-label. */
 interface TemplateSelectOption extends NaiveSelectOption {
   value: string
   label: string
-  type: 'template' | 'config'
+  /** Present on our mapped options; not required by Naive's SelectFilter input. */
+  type?: 'template' | 'config'
   template?: Template
   isBuiltin?: boolean
   description?: string
@@ -138,16 +147,17 @@ const selectOptions = computed<TemplateSelectOption[]>(() => {
   })
 })
 
-const renderOptionLabel = (option: TemplateSelectOption, selected: boolean): VNode => {
-  const primary = option.primary || option.label || ''
-  const secondary = option.secondary || option.description || ''
+const renderOptionLabel = (option: NaiveSelectOption, selected: boolean): VNode => {
+  const opt = option as TemplateSelectOption
+  const primary = String(opt.primary || opt.label || '')
+  const secondary = String(opt.secondary || opt.description || '')
   const title = secondary ? `${primary} · ${secondary}` : primary
 
   return h('div', {
     class: [
       'template-select-opt',
       selected ? 'template-select-opt--selected' : null,
-      option.isBuiltin ? 'template-select-opt--builtin' : 'template-select-opt--custom'
+      opt.isBuiltin ? 'template-select-opt--builtin' : 'template-select-opt--custom'
     ],
     title
   }, [
@@ -158,14 +168,15 @@ const renderOptionLabel = (option: TemplateSelectOption, selected: boolean): VNo
   ])
 }
 
-const filterOption = (pattern: string, option: TemplateSelectOption): boolean => {
+// Match SelectWithConfig: implement against our fields, expose as Naive SelectFilter.
+const filterOption = ((pattern: string, option: TemplateSelectOption): boolean => {
   const p = (pattern || '').toLowerCase()
   if (!p) return true
   return (
-    (option.primary || option.label || '').toLowerCase().includes(p) ||
+    (option.primary || String(option.label || '')).toLowerCase().includes(p) ||
     (option.secondary || option.description || '').toLowerCase().includes(p)
   )
-}
+}) as SelectFilter
 
 const handleTemplateSelect = (value: string | null) => {
   if (value === '__config__') {
@@ -196,11 +207,18 @@ const templates = ref<Template[]>([])
 
 const loadTemplatesByType = async () => {
   if (!isReady.value || !templateManager.value) {
-    throw new Error('Template manager is not ready or not available')
+    // Soft-fail: empty list rather than hard-throw from watchers (typecheck + UX).
+    templates.value.splice(0, templates.value.length)
+    return
   }
 
-  const typeTemplates = await templateManager.value.listTemplatesByType(props.type)
-  templates.value.splice(0, templates.value.length, ...typeTemplates)
+  try {
+    const typeTemplates = await templateManager.value.listTemplatesByType(props.type)
+    templates.value.splice(0, templates.value.length, ...typeTemplates)
+  } catch (error) {
+    console.error('[TemplateSelect] Failed to load templates:', error)
+    templates.value.splice(0, templates.value.length)
+  }
 }
 
 watch(
@@ -212,7 +230,7 @@ watch(
     } else {
       isReady.value = false
       templates.value.splice(0, templates.value.length)
-      throw new Error('[TemplateSelect] Template manager is not available')
+      // Do not throw from watch — leave empty until services recover.
     }
   },
   { immediate: true, deep: true }
@@ -223,8 +241,6 @@ watch(
   async () => {
     if (isReady.value) {
       await loadTemplatesByType()
-    } else {
-      throw new Error('[TemplateSelect] Cannot load templates: manager not ready')
     }
   }
 )
