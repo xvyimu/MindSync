@@ -5,7 +5,7 @@
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/linshenkx/prompt-optimizer.git"
+    "url": "https://github.com/xvyimu/prompt-optimizer.git"
   },
   "scripts": {
     "build": "pnpm run build:web && pnpm run package",
@@ -48,7 +48,7 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "linshenkx",
+      "owner": "xvyimu",
       "repo": "prompt-optimizer",
       "private": false
     },

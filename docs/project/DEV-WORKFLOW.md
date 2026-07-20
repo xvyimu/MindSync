@@ -1,7 +1,8 @@
 # Prompt Optimizer · 开发工作流（整合版）
 
 > 目标：把 Orca 运行时、Claude Code 技能、本 monorepo 约定合成**一条默认可执行路径**。  
-> 日期：2026-07-20 · 仓库：`D:\PromtOptimizer\src\prompt-optimizer` · fork：`xvyimu/prompt-optimizer`
+> 日期：2026-07-20 · 仓库：`D:\PromtOptimizer\src\prompt-optimizer` · **主战场：fork `xvyimu/prompt-optimizer`（fork-only）**  
+> 上游 `linshenkx/prompt-optimizer` 贡献默认暂停；除非用户明确要求，不向 upstream 开 PR。
 
 ---
 
@@ -13,10 +14,10 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 → 合入 develop（先解冲突）→ stacked PR retarget/rebase → 可选 smoke → 合
 ```
 
-**当前推进焦点（2026-07-20）：**  
-1. 解 **PR #3** 与 `develop` 的 merge conflict（`mergeable: CONFLICTING`）  
-2. 保持 **PR #4** 叠在 #3 上；#3 合入后 retarget/rebase #4  
-3. 文档与记忆同步；不自动合 PR、不自动发版
+**当前推进焦点（2026-07-20 · fork-only）：**  
+1. UX #3/#4 已合入 fork `develop`  
+2. 上游贡献暂停（#325–#330 / #332–#337 均已关闭，不重开）  
+3. 桌面发布配置指向 `xvyimu/prompt-optimizer`；用最新 develop 打 NSIS 并按 smoke 清单自测
 
 ---
 
@@ -97,35 +98,17 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 
 ---
 
-## 3. 当前 PR 栈与最佳合入方案
+## 3. 当前交付状态（fork-only）
 
-| PR | URL | base → head | 状态 | 最佳下一步 |
-|----|-----|-------------|------|------------|
-| **#3** | https://github.com/xvyimu/prompt-optimizer/pull/3 | `develop` ← `feat/ux-2026-07-20` | OPEN · **CONFLICTING** | **先 merge develop 解冲突并 push** |
-| **#4** | https://github.com/xvyimu/prompt-optimizer/pull/4 | `feat/ux-2026-07-20` ← `feat/ux-2026-07-21-cancel-parity` | OPEN · MERGEABLE | #3 冲突清掉且合入后，retarget base→develop 或 rebase |
+| 项 | 状态 |
+|----|------|
+| Fork UX #3 / #4 | **已合** `develop` |
+| 上游贡献 | **暂停**（#325–#330 / #332–#337 已关） |
+| 桌面 publish | `xvyimu/prompt-optimizer` |
+| 下一动作 | 最新 develop 打 NSIS + smoke 清单 |
 
-### #3 内容摘要
-- 推理增强模板（model-agnostic）  
-- TemplateSelect / SelectWithConfig 卡片化  
-- InputPanel 进度 + Stop；ContextUser 真取消  
-- i18n `prompt.optimizing`；standards follow-up（文件名、SelectWithConfig defaults 注释）
+历史冲突解法仍见 git 历史 `bf2c26d`（#3 vs develop）。
 
-### #4 内容摘要
-- ContextSystem 真取消 + Stop 按钮  
-- Image T2I/I2I `prompt.optimizing`  
-- cancel CSS 抽到 `styles/common.css`（simplify）
-
-### 冲突面（#3 vs develop，已知）
-- LLM adapters（stream cancel / signal）  
-- prompt service / types / electron-proxy  
-- desktop：`ipc-security`、`stream-registry`、`main.js`、`preload.js`  
-- 测试：`prompt-service-enhanced.test.ts`  
-
-**解冲突原则：**
-- **保留两边能力**：develop 的 desktop hardening + image-understanding **与** 本分支 stream cancel / UX  
-- adapter / prompt：统一 `StreamRequestOptions.signal` 路径  
-- desktop：ownership-guarded stream registry + IPC 安全以 develop 结构为底，合入本分支 cancel 契约  
-- 解完后 Node 22 跑 core 全量单测
 
 ---
 
@@ -174,7 +157,7 @@ git push --force-with-lease   # 仅 rebase 后需要，且已授权时
 - 自动 merge PR 到 develop  
 - 未要求时的 NSIS / 安装包  
 - unsuppress 15 vendor presets  
-- 上游 `linshenkx/prompt-optimizer` #325–#330 整包推进（另开会话）  
+- 上游 `linshenkx/prompt-optimizer` 默认不投 PR（fork-only；用户明确要求再开）  
 - 把 shared stream-cancel helper 强塞进当前 parity PR  
 
 ---
