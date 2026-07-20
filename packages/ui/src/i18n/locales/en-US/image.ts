@@ -329,6 +329,13 @@ const messages = {
     "devEnvironment": "Development Environment: Update checking is disabled",
     "clickToCheck": "Click to check for updates",
     "viewOnGitHub": "View on GitHub",
+    "manualUpdateTitle": "macOS currently requires a manual update",
+    "manualUpdateDescription": "The current macOS build is not signed with an Apple Developer ID, so it cannot be installed through the in-app updater. Open the release page, download the DMG for this Mac, quit the app, then drag it into Applications and choose Replace. If macOS blocks the first launch, allow it in System Settings → Privacy & Security.",
+    "updatePolicyUnavailableTitle": "A manual update is currently required",
+    "updatePolicyUnavailableDescription": "The app could not confirm whether this build supports in-app installation. To avoid a failed update, open the release page and install the package manually.",
+    "openReleasePage": "Open GitHub Release",
+    "openReleaseFailed": "Could not open the release page. Please try again later.",
+    "releasePageUnavailable": "The release page address is unavailable. Check for updates again and retry.",
     "noReleasesFound": "No releases found. This project may not have published any versions yet.",
     "noStableReleasesFound": "No stable releases found. Only prerelease versions may be available."
   }

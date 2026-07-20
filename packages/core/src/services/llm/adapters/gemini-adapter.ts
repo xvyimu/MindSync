@@ -1,5 +1,6 @@
-import { GoogleGenAI } from '@google/genai'
+import type { GoogleGenAI } from '@google/genai'
 import { AbstractTextProviderAdapter } from './abstract-adapter'
+import { loadGoogleGenAISdk } from './sdk-loaders'
 import type {
   TextProvider,
   TextModel,
@@ -138,6 +139,7 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
       const apiKey = config.connectionConfig.apiKey || ''
 
       const customBaseURL = config.connectionConfig.baseURL
+      const GoogleGenAI = await loadGoogleGenAISdk()
       const genAI = new GoogleGenAI(
         customBaseURL
           ? {
@@ -309,11 +311,12 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
    * @param config 模型配置
    * @returns GoogleGenAI实例
    */
-  private async createClient(config: TextModelConfig): Promise<GoogleGenAI >{
+  private async createClient(config: TextModelConfig): Promise<GoogleGenAI> {
     const apiKey = config.connectionConfig.apiKey || ''
 
     const customBaseURL = config.connectionConfig.baseURL
 
+    const GoogleGenAI = await loadGoogleGenAISdk()
     return new GoogleGenAI(
       customBaseURL
         ? {
@@ -501,7 +504,7 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
     }
 
     try {
-      const client = await this.createClient(config)
+    const client = await this.createClient(config)
 
       // 构建配置（包含系统指令）
       const generationConfig = this.buildGenerationConfig(
@@ -530,7 +533,7 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
     config: TextModelConfig
   ): Promise<LLMResponse> {
     try {
-      const client = await this.createClient(config)
+    const client = await this.createClient(config)
       const mergedParams = {
         ...(config.paramOverrides || {}),
         ...(request.paramOverrides || {})
@@ -573,6 +576,19 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
     }
   }
 
+  /**
+   * 将可选 AbortSignal 写入 Gemini generation config，使 SDK 可中止底层请求。
+   */
+  private attachAbortSignal(
+    generationConfig: GenerateContentConfig,
+    options?: StreamRequestOptions
+  ): GenerateContentConfig {
+    if (options?.signal) {
+      ;(generationConfig as any).abortSignal = options.signal
+    }
+    return generationConfig
+  }
+
   protected async doSendImageUnderstandingStream(
     request: ImageUnderstandingRequest,
     config: TextModelConfig,
@@ -580,7 +596,7 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
     options?: StreamRequestOptions
   ): Promise<void> {
     try {
-      const client = await this.createClient(config)
+    const client = await this.createClient(config)
       const mergedParams = {
         ...(config.paramOverrides || {}),
         ...(request.paramOverrides || {})
@@ -722,13 +738,6 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
   /**
    * Attach optional AbortSignal to Gemini generation config.
    */
-  private attachAbortSignal(generationConfig: any, options?: StreamRequestOptions) {
-    if (options?.signal) {
-      ;(generationConfig as any).abortSignal = options.signal
-    }
-    return generationConfig
-  }
-
   protected async doSendMessageStream(
     messages: Message[],
     config: TextModelConfig,
@@ -757,9 +766,9 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
     }
 
     try {
-      const client = await this.createClient(config)
+    const client = await this.createClient(config)
 
-      // 构建配置（包含系统指令）
+      // 构建配置（包含系统指令与可选取消信号）
       const generationConfig = this.attachAbortSignal(
         this.buildGenerationConfig(
           config.paramOverrides || {},
@@ -868,7 +877,7 @@ export class GeminiAdapter extends AbstractTextProviderAdapter {
     }
 
     try {
-      const client = await this.createClient(config)
+    const client = await this.createClient(config)
 
       // 构建配置（包含系统指令和工具）
       const generationConfig = this.attachAbortSignal(

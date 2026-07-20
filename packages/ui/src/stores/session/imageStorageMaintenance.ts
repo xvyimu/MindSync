@@ -1,6 +1,7 @@
 import type { IImageStorageService, IPreferenceService } from '@prompt-optimizer/core'
 
 // Session snapshot keys (single source of truth)
+export const BASIC_SYSTEM_SESSION_KEY = 'session/v1/basic-system'
 export const IMAGE_TEXT2IMAGE_SESSION_KEY = 'session/v1/image-text2image'
 export const IMAGE_IMAGE2IMAGE_SESSION_KEY = 'session/v1/image-image2image'
 export const IMAGE_MULTIIMAGE_SESSION_KEY = 'session/v1/image-multiimage'
@@ -155,23 +156,38 @@ function collectMultiImageInputAssetIds(value: unknown, out: Set<string>) {
   }
 }
 
+function collectBasicSystemTestImageAssetId(value: unknown, out: Set<string>) {
+  if (!value || typeof value !== 'object') return
+
+  const assetId = (value as Record<string, unknown>)['testImageAssetId']
+  if (typeof assetId === 'string' && assetId.trim()) {
+    out.add(assetId.trim())
+  }
+}
+
 async function collectReferencedImageIds(
   preferenceService: IPreferenceService,
   getFavoritesPayload?: FavoritesPayloadProvider | null,
 ): Promise<Set<string>> {
   const referenced = new Set<string>()
 
-  const [rawText2Image, rawImage2Image, rawMultiImage, rawFavorites] = await Promise.all([
+  const [rawBasicSystem, rawText2Image, rawImage2Image, rawMultiImage, rawFavorites] = await Promise.all([
+    preferenceService.get<unknown>(BASIC_SYSTEM_SESSION_KEY, null),
     preferenceService.get<unknown>(IMAGE_TEXT2IMAGE_SESSION_KEY, null),
     preferenceService.get<unknown>(IMAGE_IMAGE2IMAGE_SESSION_KEY, null),
     preferenceService.get<unknown>(IMAGE_MULTIIMAGE_SESSION_KEY, null),
     preferenceService.get<unknown>(FAVORITES_STORAGE_KEY, null),
   ])
 
+  const basicSystem = parseSnapshot(rawBasicSystem)
   const text2Image = parseSnapshot(rawText2Image)
   const image2Image = parseSnapshot(rawImage2Image)
   const multiImage = parseSnapshot(rawMultiImage)
   const favorites = parseStoredValue(rawFavorites)
+
+  if (basicSystem) {
+    collectBasicSystemTestImageAssetId(basicSystem, referenced)
+  }
 
   if (text2Image) {
     collectImageRefIds(text2Image, referenced)

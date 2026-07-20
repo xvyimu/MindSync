@@ -1,5 +1,6 @@
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 import { AbstractTextProviderAdapter } from './abstract-adapter'
+import { loadOpenAISdk } from './sdk-loaders'
 import { APIError } from '../errors'
 import { normalizeCustomRequestHeaders } from '../../../utils/custom-request-headers'
 import type {
@@ -457,6 +458,10 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
     return this.parseResponsesResponse(response, config.modelMeta.id)
   }
 
+  /**
+   * 将可选 AbortSignal 转为 OpenAI SDK 第二参 request options。
+   * 取消时 SDK 会中止底层网络请求，而不仅是停止上层转发。
+   */
   private async sendResponsesMessageStream(
     openai: OpenAI,
     messages: Message[],
@@ -478,10 +483,10 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
       responsesConfig.tools = tools
     }
 
-    const requestOptions = this.buildOpenAIRequestOptions(options)
-      const stream = requestOptions
-        ? await openai.responses.create(responsesConfig, requestOptions)
-        : await openai.responses.create(responsesConfig)
+    const stream = await openai.responses.create(
+      responsesConfig,
+      this.buildOpenAIRequestOptions(options)
+    )
     let accumulatedContent = ''
     let accumulatedReasoning = ''
     const thinkState = { isInThinkMode: false, buffer: '' }
@@ -585,6 +590,7 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
       }
     })
   }
+
 
   private extractResponsesText(outputItems: any[] | undefined): string {
     if (!Array.isArray(outputItems)) {
@@ -818,7 +824,10 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
    */
   // NOTE: protected so OpenAI-compatible providers (e.g. Ollama) can tweak auth/baseURL
   // without re-implementing the whole chat/stream/tool plumbing.
-  protected createOpenAIInstance(config: TextModelConfig, isStream: boolean = false): OpenAI {
+  protected async createOpenAIInstance(
+    config: TextModelConfig,
+    isStream: boolean = false
+  ): Promise<OpenAI> {
     const apiKey = config.connectionConfig.apiKey || ''
     const hasApiKey = typeof apiKey === 'string' && apiKey.trim().length > 0
 
@@ -887,6 +896,7 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
       console.log('[OpenAIAdapter] Browser environment detected. Setting dangerouslyAllowBrowser=true.')
     }
 
+    const OpenAI = await loadOpenAISdk()
     const instance = new OpenAI(sdkConfig)
 
     return instance
@@ -1015,7 +1025,7 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
     options?: StreamRequestOptions
   ): Promise<void> {
     try {
-      const openai = await this.createOpenAIInstance(config, true)
+    const openai = await this.createOpenAIInstance(config, true)
       const mergedParams = {
         ...(config.paramOverrides || {}),
         ...(request.paramOverrides || {})
@@ -1077,10 +1087,10 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
         ...restParams
       }
 
-      const requestOptions = this.buildOpenAIRequestOptions(options)
-      const stream = requestOptions
-        ? await openai.chat.completions.create(completionConfig, requestOptions)
-        : await openai.chat.completions.create(completionConfig)
+      const stream = await openai.chat.completions.create(
+        completionConfig,
+        this.buildOpenAIRequestOptions(options)
+      )
 
       let accumulatedReasoning = ''
       let accumulatedContent = ''
@@ -1361,11 +1371,11 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
         ...restParams // 用户自定义参数
       }
 
-      // 直接使用流式响应
-      const requestOptions = this.buildOpenAIRequestOptions(options)
-      const stream = requestOptions
-        ? await openai.chat.completions.create(completionConfig, requestOptions)
-        : await openai.chat.completions.create(completionConfig)
+      // 直接使用流式响应；第二参 signal 负责中止底层 HTTP
+      const stream = await openai.chat.completions.create(
+        completionConfig,
+        this.buildOpenAIRequestOptions(options)
+      )
 
       // 累积内容
       let accumulatedReasoning = ''
@@ -1462,10 +1472,10 @@ export class OpenAIAdapter extends AbstractTextProviderAdapter {
         ...restParams
       }
 
-      const requestOptions = this.buildOpenAIRequestOptions(options)
-      const stream = requestOptions
-        ? await openai.chat.completions.create(completionConfig, requestOptions)
-        : await openai.chat.completions.create(completionConfig)
+      const stream = await openai.chat.completions.create(
+        completionConfig,
+        this.buildOpenAIRequestOptions(options)
+      )
 
       let accumulatedReasoning = ''
       let accumulatedContent = ''

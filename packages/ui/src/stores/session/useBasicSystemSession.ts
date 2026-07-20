@@ -18,7 +18,13 @@ import { ref } from 'vue'
 import { getPiniaServices } from '../../plugins/pinia'
 import { TEMPLATE_SELECTION_KEYS, type PromptAssetBinding, type PromptSessionOrigin } from '@prompt-optimizer/core'
 import { coerceTestPanelVersionValue } from '../../utils/testPanelVersion'
+import { persistImagePayloadAsAssetId } from '../../utils/image-asset-storage'
 import { createSessionAssetBindingState } from './sessionAssetBinding'
+import {
+  BASIC_SYSTEM_SESSION_KEY,
+  queueImageStorageMaintenance,
+  scheduleImageStorageGc,
+} from './imageStorageMaintenance'
 import {
   createDefaultCompareSnapshotRoles,
   createDefaultCompareSnapshotRoleSignatures,
@@ -81,6 +87,11 @@ export interface BasicSystemSessionState {
   // 测试区域内容（system 模式必填，用于测试区输入框）
   testContent: string
 
+  // 测试区域可选单图。base64 仅运行时持有，不进入 session 快照。
+  testImageB64: string | null
+  testImageMimeType: string
+  testImageAssetId: string | null
+
   // 测试布局与列配置（basic-system 专用：最多 4 列）
   layout: BasicSystemLayoutConfig
   testVariants: TestVariantConfig[]
@@ -121,6 +132,9 @@ const createDefaultState = (): BasicSystemSessionState => ({
   chainId: '',
   versionId: '',
   testContent: '',
+  testImageB64: null,
+  testImageMimeType: '',
+  testImageAssetId: null,
   layout: { mainSplitLeftPct: 50, testColumnCount: 2 },
   testVariants: [
     { id: 'a', version: 0, modelKey: '' },
@@ -167,6 +181,9 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
 
   // 测试区域内容
   const testContent = ref('')
+  const testImageB64 = ref<string | null>(null)
+  const testImageMimeType = ref('')
+  const testImageAssetId = ref<string | null>(null)
 
   // 测试布局与列配置（最多 4 列）
   const layout = ref<BasicSystemLayoutConfig>({ mainSplitLeftPct: 50, testColumnCount: 2 })
@@ -269,6 +286,34 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
     if (testContent.value === content) return
     testContent.value = content
     lastActiveAt.value = Date.now()
+  }
+
+  /**
+   * 同步更新测试图片运行时状态，并 best-effort 持久化。
+   * 普通新增/替换不传 assetId，因此会立即清除旧引用；删除会清空全部图片字段。
+   */
+  const updateTestImage = (
+    b64: string | null,
+    mimeType: string = '',
+    assetId?: string | null,
+  ) => {
+    const nextB64 = typeof b64 === 'string' && b64.trim() ? b64 : null
+    const nextMimeType = nextB64 ? (mimeType.trim() || 'image/png') : ''
+    const nextAssetId = nextB64 && typeof assetId === 'string' && assetId.trim()
+      ? assetId.trim()
+      : null
+
+    const changed =
+      testImageB64.value !== nextB64 ||
+      testImageMimeType.value !== nextMimeType ||
+      testImageAssetId.value !== nextAssetId
+    if (!changed) return
+
+    testImageB64.value = nextB64
+    testImageMimeType.value = nextMimeType
+    testImageAssetId.value = nextAssetId
+    lastActiveAt.value = Date.now()
+    void saveSession()
   }
 
   /**
@@ -388,6 +433,9 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
     chainId.value = defaultState.chainId
     versionId.value = defaultState.versionId
     testContent.value = defaultState.testContent
+    testImageB64.value = defaultState.testImageB64
+    testImageMimeType.value = defaultState.testImageMimeType
+    testImageAssetId.value = defaultState.testImageAssetId
     testVariantResults.value = defaultState.testVariantResults
     testVariantLastRunFingerprint.value = defaultState.testVariantLastRunFingerprint
     evaluationResults.value = defaultState.evaluationResults
@@ -413,6 +461,9 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
     chainId.value = defaultState.chainId
     versionId.value = defaultState.versionId
     testContent.value = defaultState.testContent
+    testImageB64.value = defaultState.testImageB64
+    testImageMimeType.value = defaultState.testImageMimeType
+    testImageAssetId.value = defaultState.testImageAssetId
     layout.value = defaultState.layout
     testVariants.value = defaultState.testVariants
     testVariantResults.value = defaultState.testVariantResults
@@ -434,42 +485,87 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
    * 使用 PreferenceService（Codex 要求）
    */
   const saveSession = async () => {
-    const $services = getPiniaServices()
-    if (!$services?.preferenceService) {
-      console.warn('[BasicSystemSession] PreferenceService is unavailable; cannot save session')
-      return
+    const imageSnapshot = {
+      b64: testImageB64.value,
+      mimeType: testImageMimeType.value,
+      assetId: testImageAssetId.value,
     }
 
-    try {
-      const sessionState = {
-        prompt: prompt.value,
-        optimizedPrompt: optimizedPrompt.value,
-        reasoning: reasoning.value,
-        chainId: chainId.value,
-        versionId: versionId.value,
-        testContent: testContent.value,
-        layout: layout.value,
-        testVariants: testVariants.value,
-        testVariantResults: testVariantResults.value,
-        testVariantLastRunFingerprint: testVariantLastRunFingerprint.value,
-        evaluationResults: evaluationResults.value,
-        compareSnapshotRoles: compareSnapshotRoles.value,
-        compareSnapshotRoleSignatures: compareSnapshotRoleSignatures.value,
-        selectedOptimizeModelKey: selectedOptimizeModelKey.value,
-        selectedTestModelKey: selectedTestModelKey.value,
-        selectedTemplateId: selectedTemplateId.value,
-        selectedIterateTemplateId: selectedIterateTemplateId.value,
-        isCompareMode: isCompareMode.value,
-        lastActiveAt: lastActiveAt.value,
-        ...assetBindingState.persistedAssetBinding(),
+    return await queueImageStorageMaintenance(async () => {
+      const $services = getPiniaServices()
+      if (!$services?.preferenceService) {
+        console.warn('[BasicSystemSession] PreferenceService is unavailable; cannot save session')
+        return
       }
-      await $services.preferenceService.set(
-        'session/v1/basic-system',
-        sessionState
-      )
-    } catch (error) {
-      console.error('[BasicSystemSession] Failed to save session:', error)
-    }
+
+      try {
+        let imageAssetIdToSave = imageSnapshot.assetId
+        const imageMimeTypeToSave = imageSnapshot.b64 || imageSnapshot.assetId
+          ? (imageSnapshot.mimeType || 'image/png')
+          : ''
+
+        if (imageSnapshot.b64 && !imageAssetIdToSave) {
+          if (!$services.imageStorageService) {
+            throw new Error(
+              '[BasicSystemSession] ImageStorageService is unavailable; cannot save test image',
+            )
+          }
+
+          imageAssetIdToSave = await persistImagePayloadAsAssetId({
+            payload: {
+              b64: imageSnapshot.b64,
+              mimeType: imageMimeTypeToSave,
+            },
+            storageService: $services.imageStorageService,
+            sourceType: 'uploaded',
+          })
+
+          if (!imageAssetIdToSave) {
+            throw new Error('[BasicSystemSession] Failed to persist test image')
+          }
+
+          if (
+            testImageB64.value === imageSnapshot.b64 &&
+            testImageMimeType.value === imageSnapshot.mimeType &&
+            !testImageAssetId.value
+          ) {
+            testImageAssetId.value = imageAssetIdToSave
+          }
+        }
+
+        const sessionState = {
+          prompt: prompt.value,
+          optimizedPrompt: optimizedPrompt.value,
+          reasoning: reasoning.value,
+          chainId: chainId.value,
+          versionId: versionId.value,
+          testContent: testContent.value,
+          testImageAssetId: imageAssetIdToSave,
+          testImageMimeType: imageMimeTypeToSave,
+          layout: layout.value,
+          testVariants: testVariants.value,
+          testVariantResults: testVariantResults.value,
+          testVariantLastRunFingerprint: testVariantLastRunFingerprint.value,
+          evaluationResults: evaluationResults.value,
+          compareSnapshotRoles: compareSnapshotRoles.value,
+          compareSnapshotRoleSignatures: compareSnapshotRoleSignatures.value,
+          selectedOptimizeModelKey: selectedOptimizeModelKey.value,
+          selectedTestModelKey: selectedTestModelKey.value,
+          selectedTemplateId: selectedTemplateId.value,
+          selectedIterateTemplateId: selectedIterateTemplateId.value,
+          isCompareMode: isCompareMode.value,
+          lastActiveAt: lastActiveAt.value,
+          ...assetBindingState.persistedAssetBinding(),
+        }
+        await $services.preferenceService.set(BASIC_SYSTEM_SESSION_KEY, sessionState)
+
+        if ($services.imageStorageService) {
+          scheduleImageStorageGc($services.preferenceService, $services.imageStorageService)
+        }
+      } catch (error) {
+        console.error('[BasicSystemSession] Failed to save session:', error)
+      }
+    })
   }
 
   /**
@@ -484,8 +580,9 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
     }
 
     try {
+      let shouldRepairMissingTestImage = false
       const saved = await $services.preferenceService.get<unknown>(
-        'session/v1/basic-system',
+        BASIC_SYSTEM_SESSION_KEY,
         null
       )
 
@@ -494,12 +591,54 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
           typeof saved === 'string'
             ? (JSON.parse(saved) as BasicSystemSessionState)
             : (saved as BasicSystemSessionState)
+
+        const savedTestImageAssetId = typeof parsed.testImageAssetId === 'string' && parsed.testImageAssetId.trim()
+          ? parsed.testImageAssetId.trim()
+          : null
+        let restoredTestImageAssetId = savedTestImageAssetId
+        let restoredTestImageB64: string | null = null
+        let restoredTestImageMimeType = typeof parsed.testImageMimeType === 'string'
+          ? parsed.testImageMimeType
+          : ''
+
+        if (savedTestImageAssetId) {
+          try {
+            if (!$services.imageStorageService) {
+              throw new Error(
+                '[BasicSystemSession] ImageStorageService is unavailable; cannot restore test image',
+              )
+            }
+
+            const storedImage = await $services.imageStorageService.getImage(savedTestImageAssetId)
+            if (!storedImage?.data?.trim()) {
+              console.info('[BasicSystemSession] Test image asset is missing; restoring session without it')
+              restoredTestImageAssetId = null
+              restoredTestImageMimeType = ''
+              shouldRepairMissingTestImage = true
+            } else {
+              restoredTestImageB64 = storedImage.data
+              restoredTestImageMimeType = storedImage.metadata?.mimeType || restoredTestImageMimeType || 'image/png'
+            }
+          } catch (error) {
+            console.warn(
+              '[BasicSystemSession] Failed to restore test image; restoring text session without it:',
+              error,
+            )
+            restoredTestImageAssetId = null
+            restoredTestImageB64 = null
+            restoredTestImageMimeType = ''
+          }
+        }
+
         prompt.value = parsed.prompt
         optimizedPrompt.value = parsed.optimizedPrompt
         reasoning.value = parsed.reasoning
         chainId.value = parsed.chainId
         versionId.value = parsed.versionId
         testContent.value = parsed.testContent
+        testImageB64.value = restoredTestImageB64
+        testImageMimeType.value = restoredTestImageAssetId ? restoredTestImageMimeType : ''
+        testImageAssetId.value = restoredTestImageAssetId
 
         const defaultState = createDefaultState()
         const coerceVersionValue = (value: unknown): TestPanelVersionValue | null => {
@@ -611,10 +750,13 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
           selectedIterateTemplateId.value = legacyIterateTemplateId
         }
       }
+
+      if (shouldRepairMissingTestImage) {
+        await saveSession()
+      }
     } catch (error) {
-      console.error('[BasicSystemSession] Failed to restore session:', error)
-      // 恢复失败时保持当前状态或重置为默认
       reset()
+      console.error('[BasicSystemSession] Failed to restore session:', error)
     }
   }
 
@@ -626,6 +768,9 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
     chainId,
     versionId,
     testContent,
+    testImageB64,
+    testImageMimeType,
+    testImageAssetId,
     layout,
     testVariants,
     testVariantResults,
@@ -646,6 +791,7 @@ export const useBasicSystemSession = defineStore('basicSystemSession', () => {
     updatePrompt,
     updateOptimizedResult,
     updateTestContent,
+    updateTestImage,
     updateOptimizeModel,
     updateTestModel,
     updateTemplate,

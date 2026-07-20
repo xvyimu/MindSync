@@ -119,13 +119,10 @@ interface Props {
   originalContent?: string;
   /** 按钮大小 */
   size?: 'tiny' | 'small' | 'medium' | 'large';
-  /** 是否显示加载状态 */
-  loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   size: 'medium',
-  loading: false
 });
 
 const emit = defineEmits<{

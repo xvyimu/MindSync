@@ -329,6 +329,13 @@ const messages = {
     "viewOnGitHub": "在 GitHub 上檢視",
     "devEnvironment": "開發環境：更新檢查已停用",
     "clickToCheck": "點選檢查更新",
+    "manualUpdateTitle": "macOS 目前需要手動更新",
+    "manualUpdateDescription": "目前的 macOS 發布套件未使用 Apple Developer ID 簽署，無法在應用程式內完成安裝。請前往版本發布頁下載適用於本機的 DMG，結束應用程式後將其拖入「應用程式」並選擇取代。若首次開啟遭到阻擋，請在「系統設定 → 隱私權與安全性」中允許開啟。",
+    "updatePolicyUnavailableTitle": "目前只能手動更新",
+    "updatePolicyUnavailableDescription": "無法確認目前的建置是否支援應用程式內安裝。為避免更新失敗，請前往版本發布頁手動下載安裝套件。",
+    "openReleasePage": "開啟 GitHub Release",
+    "openReleaseFailed": "無法開啟版本發布頁，請稍後再試。",
+    "releasePageUnavailable": "目前未取得版本發布頁位址，請重新檢查更新後再試。",
     "noReleasesFound": "未找到發布版本。此專案可能尚未發布任何版本。",
     "noStableReleasesFound": "未找到穩定版本。可能只有預發布版本可用。"
   }

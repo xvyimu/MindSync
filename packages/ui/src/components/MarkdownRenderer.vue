@@ -536,7 +536,7 @@ onMounted(renderMarkdown);
 /* 水平线样式 */
 .markdown-content hr {
     height: 0.25em;
-    border: 1;
+    border: none;
     margin: 1em 0;
 }
 

@@ -130,7 +130,7 @@ export function useAutoScroll<T extends HTMLElement>(options: {
     // 添加和移除滚动事件监听器
     onMounted(() => {
         if (elementRef.value) {
-            elementRef.value.addEventListener('scroll', handleScroll)
+            elementRef.value.addEventListener('scroll', handleScroll, { passive: true })
         }
     })
 
@@ -140,7 +140,7 @@ export function useAutoScroll<T extends HTMLElement>(options: {
             oldEl.removeEventListener('scroll', handleScroll)
         }
         if (newEl) {
-            newEl.addEventListener('scroll', handleScroll)
+            newEl.addEventListener('scroll', handleScroll, { passive: true })
         }
     })
 

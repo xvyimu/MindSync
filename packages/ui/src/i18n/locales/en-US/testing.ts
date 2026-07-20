@@ -25,6 +25,17 @@ const messages = {
       "placeholder": "Enter content to test...",
       "help": ""
     },
+    "image": {
+      "attach": "Attach test image",
+      "replace": "Replace test image",
+      "remove": "Remove test image",
+      "previewAlt": "Attached test image",
+      "unsupportedFormat": "Only PNG or JPEG images are supported",
+      "tooLarge": "Image must not exceed 5 MiB",
+      "readFailed": "Could not read the selected image",
+      "visionHint": "The selected model must support image input",
+      "evaluationLabel": "Test image"
+    },
     "model": "Test Model",
     "startTest": "Test",
     "startCompare": "Test",

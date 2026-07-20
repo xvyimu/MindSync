@@ -59,29 +59,42 @@ const imageInputItemsFromMultiImageSession = (
 const buildTextSnapshot = (
   subModeKey: 'basic-system' | 'basic-user',
   session: BasicSystemSessionApi | BasicUserSessionApi,
-): LegacyPromptSessionSnapshot => ({
-  subModeKey,
-  prompt: session.prompt,
-  optimizedPrompt: session.optimizedPrompt,
-  reasoning: session.reasoning,
-  chainId: session.chainId,
-  versionId: session.versionId,
-  testContent: session.testContent,
-  testVariants: session.testVariants,
-  testVariantResults: session.testVariantResults,
-  testVariantLastRunFingerprint: session.testVariantLastRunFingerprint,
-  selectedOptimizeModelKey: session.selectedOptimizeModelKey,
-  selectedTestModelKey: session.selectedTestModelKey,
-  selectedTemplateId: session.selectedTemplateId,
-  selectedIterateTemplateId: session.selectedIterateTemplateId,
-  isCompareMode: session.isCompareMode,
-  lastActiveAt: session.lastActiveAt,
-  assetBinding: session.assetBinding,
-  origin: session.origin,
-  ui: {
-    layout: session.layout,
-  },
-})
+): LegacyPromptSessionSnapshot => {
+  const snapshot: LegacyPromptSessionSnapshot = {
+    subModeKey,
+    prompt: session.prompt,
+    optimizedPrompt: session.optimizedPrompt,
+    reasoning: session.reasoning,
+    chainId: session.chainId,
+    versionId: session.versionId,
+    testContent: session.testContent,
+    testVariants: session.testVariants,
+    testVariantResults: session.testVariantResults,
+    testVariantLastRunFingerprint: session.testVariantLastRunFingerprint,
+    selectedOptimizeModelKey: session.selectedOptimizeModelKey,
+    selectedTestModelKey: session.selectedTestModelKey,
+    selectedTemplateId: session.selectedTemplateId,
+    selectedIterateTemplateId: session.selectedIterateTemplateId,
+    isCompareMode: session.isCompareMode,
+    lastActiveAt: session.lastActiveAt,
+    assetBinding: session.assetBinding,
+    origin: session.origin,
+    ui: {
+      layout: session.layout,
+    },
+  }
+
+  if (subModeKey !== 'basic-system') {
+    return snapshot
+  }
+
+  const assetId = toTrimmedString((session as BasicSystemSessionApi).testImageAssetId)
+  return {
+    ...snapshot,
+    inputImageId: assetId ?? null,
+    inputImages: assetId ? [{ _type: 'image-ref', id: assetId }] : [],
+  }
+}
 
 const buildProVariableSnapshot = (
   session: ProVariableSessionApi,

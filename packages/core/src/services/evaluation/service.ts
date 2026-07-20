@@ -173,10 +173,10 @@ interface EvaluationServiceDependencies {
 interface ResolvedEvaluationMedia {
   label: string;
   role: string;
-  snapshotId: string;
-  snapshotLabel: string;
+  snapshotId?: string;
+  snapshotLabel?: string;
   blockLabel: string;
-  promptRefKind: EvaluationSnapshot['promptRef']['kind'];
+  promptRefKind?: EvaluationSnapshot['promptRef']['kind'];
   testCaseLabel: string;
   description: string;
   b64: string;
@@ -664,12 +664,23 @@ export class EvaluationService implements IEvaluationService {
   private shouldForceGenericCompare(
     request: Extract<EvaluationRequest, { type: 'compare' }>
   ): boolean {
-    return this.isImageText2ImageMode(request);
+    return (
+      this.isImageText2ImageMode(request) ||
+      this.hasBasicSystemTestCaseInputMedia(request)
+    );
   }
 
   private shouldUseMultimodalEvaluation(
     request: EvaluationRequest
   ): request is Extract<EvaluationRequest, { type: 'result' | 'compare' }> {
+    if (request.type !== 'result' && request.type !== 'compare') {
+      return false;
+    }
+
+    if (this.hasBasicSystemTestCaseInputMedia(request)) {
+      return true;
+    }
+
     if (!this.isImageText2ImageMode(request)) {
       return false;
     }
@@ -753,11 +764,42 @@ export class EvaluationService implements IEvaluationService {
         ? new Map(request.testCases.map((testCase) => [testCase.id.trim(), testCase.label?.trim() || '']))
         : new Map([[request.testCase.id.trim(), request.testCase.label?.trim() || '']]);
 
+    const resolvedMedia: ResolvedEvaluationMedia[] = [];
+
+    if (this.isBasicSystemMode(request)) {
+      const inputMediaKeys = new Set<string>();
+      const testCases = request.type === 'compare' ? request.testCases : [request.testCase];
+
+      for (const testCase of testCases) {
+        const block = testCase.input;
+        if (!block.media?.length) {
+          continue;
+        }
+
+        for (const mediaItem of block.media) {
+          const identity = this.buildEvaluationMediaIdentity(mediaItem);
+          if (inputMediaKeys.has(identity)) {
+            continue;
+          }
+          inputMediaKeys.add(identity);
+
+          const media = await this.resolveEvaluationMediaItem(mediaItem);
+          resolvedMedia.push({
+            label: mediaItem.label.trim(),
+            role: 'test-case-input-image',
+            blockLabel: block.label.trim(),
+            testCaseLabel: testCase.label?.trim() || testCase.id.trim(),
+            description: block.content.trim(),
+            b64: media.b64,
+            mimeType: media.mimeType,
+          });
+        }
+      }
+    }
+
     const snapshots = request.type === 'compare'
       ? request.snapshots.filter((snapshot) => this.hasSnapshotOutputMedia(snapshot))
       : [request.snapshot];
-
-    const resolvedMedia: ResolvedEvaluationMedia[] = [];
 
     for (const snapshot of snapshots) {
       const block = snapshot.outputBlock;
@@ -830,6 +872,15 @@ export class EvaluationService implements IEvaluationService {
     };
   }
 
+  private buildEvaluationMediaIdentity(mediaItem: EvaluationMediaItem): string {
+    const assetId = mediaItem.assetId?.trim() || '';
+    if (assetId) {
+      return `asset:${assetId}`;
+    }
+
+    return `inline:${mediaItem.mimeType?.trim() || 'image/png'}:${mediaItem.b64?.trim() || ''}`;
+  }
+
   private buildImageEvidenceManifest(mediaItems: ResolvedEvaluationMedia[]): string {
     const lines = [
       '## Image Evidence Manifest',
@@ -837,8 +888,15 @@ export class EvaluationService implements IEvaluationService {
     ];
 
     mediaItems.forEach((item, index) => {
+      if (item.snapshotId) {
+        lines.push(
+          `${index + 1}. role=${item.role}; snapshot=${item.snapshotLabel} (${item.snapshotId}); testCase=${item.testCaseLabel}; promptRef=${item.promptRefKind}; block=${item.blockLabel}; media=${item.label}; description=${item.description}`
+        );
+        return;
+      }
+
       lines.push(
-        `${index + 1}. role=${item.role}; snapshot=${item.snapshotLabel} (${item.snapshotId}); testCase=${item.testCaseLabel}; promptRef=${item.promptRefKind}; block=${item.blockLabel}; media=${item.label}; description=${item.description}`
+        `${index + 1}. role=${item.role}; testCase=${item.testCaseLabel}; block=${item.blockLabel}; media=${item.label}; description=${item.description}`
       );
     });
 
@@ -1575,6 +1633,26 @@ export class EvaluationService implements IEvaluationService {
 
   private hasBlockMedia(block: EvaluationContentBlock | null | undefined): boolean {
     return Array.isArray(block?.media) && block.media.some((item) => this.hasMediaPayload(item));
+  }
+
+  private isBasicSystemMode(request: Pick<EvaluationRequest, 'mode'>): boolean {
+    return request.mode.functionMode === 'basic' && request.mode.subMode === 'system';
+  }
+
+  private hasBasicSystemTestCaseInputMedia(request: EvaluationRequest): boolean {
+    if (!this.isBasicSystemMode(request)) {
+      return false;
+    }
+
+    if (request.type === 'result') {
+      return this.hasBlockMedia(request.testCase.input);
+    }
+
+    if (request.type === 'compare') {
+      return request.testCases.some((testCase) => this.hasBlockMedia(testCase.input));
+    }
+
+    return false;
   }
 
   private hasSnapshotOutputMedia(snapshot: EvaluationSnapshot | null | undefined): boolean {

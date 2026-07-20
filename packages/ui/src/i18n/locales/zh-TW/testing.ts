@@ -25,6 +25,17 @@ const messages = {
       "placeholder": "輸入要測試的內容...",
       "help": ""
     },
+    "image": {
+      "attach": "新增測試圖片",
+      "replace": "替換測試圖片",
+      "remove": "刪除測試圖片",
+      "previewAlt": "已附加的測試圖片",
+      "unsupportedFormat": "僅支援 PNG 或 JPEG 圖片",
+      "tooLarge": "圖片不能超過 5 MiB",
+      "readFailed": "無法讀取所選圖片",
+      "visionHint": "所選模型需支援圖片輸入",
+      "evaluationLabel": "測試圖片"
+    },
     "model": "測試模型",
     "startTest": "測試",
     "startCompare": "測試",

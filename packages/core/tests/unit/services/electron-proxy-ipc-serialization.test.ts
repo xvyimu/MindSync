@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { readFileSync, readdirSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { readFileSync, readdirSync, existsSync } from 'node:fs'
+import { dirname, join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const servicesDir = join(process.cwd(), 'src', 'services')
+/** 兼容 monorepo 根目录或 packages/core 作为 cwd 的两种启动方式。 */
+const servicesDirCandidates = [
+  join(dirname(fileURLToPath(import.meta.url)), '../../../src/services'),
+  join(process.cwd(), 'src', 'services'),
+  join(process.cwd(), 'packages', 'core', 'src', 'services'),
+]
+const servicesDir = servicesDirCandidates.find((candidate) => existsSync(candidate))
+  ?? servicesDirCandidates[0]
 
 const findElectronProxyFiles = (dir: string): string[] => {
   const entries = readdirSync(dir, { withFileTypes: true })

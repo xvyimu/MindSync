@@ -24,6 +24,11 @@ const imageModeConfig: EvaluationModeConfig = {
   subMode: 'text2image',
 }
 
+const basicSystemModeConfig: EvaluationModeConfig = {
+  functionMode: 'basic',
+  subMode: 'system',
+}
+
 const createModelConfig = (id = 'image-recognition-model'): TextModelConfig => ({
   id,
   name: 'Image Recognition Model',
@@ -201,6 +206,85 @@ describe('EvaluationService image multimodal evaluation', () => {
     ],
     evaluationModelKey: 'image-recognition-model',
     mode: imageModeConfig,
+    ...overrides,
+  })
+
+  const createBasicSystemResultRequest = (
+    overrides: Partial<ResultEvaluationRequest> = {}
+  ): ResultEvaluationRequest => ({
+    type: 'result',
+    target: {
+      workspacePrompt: 'You are a visual support assistant.',
+      referencePrompt: 'You are a support assistant.',
+    },
+    testCase: {
+      id: 'visual-question',
+      label: '测试内容',
+      input: {
+        kind: 'text',
+        label: '测试内容',
+        content: 'What warning icon is shown in the screenshot?',
+        media: [
+          {
+            label: '问题图片',
+            b64: 'YmFzaWMtc3lzdGVtLWltYWdl',
+            mimeType: 'image/jpeg',
+          },
+        ],
+      },
+    },
+    snapshot: {
+      id: 'basic-snap-a',
+      label: 'A',
+      testCaseId: 'visual-question',
+      promptRef: { kind: 'workspace', label: '工作区' },
+      promptText: 'You are a visual support assistant.',
+      output: 'The screenshot shows a yellow warning triangle.',
+    },
+    evaluationModelKey: 'image-recognition-model',
+    mode: basicSystemModeConfig,
+    ...overrides,
+  })
+
+  const createBasicSystemCompareRequest = (
+    overrides: Partial<CompareEvaluationRequest> = {}
+  ): CompareEvaluationRequest => ({
+    type: 'compare',
+    target: {
+      workspacePrompt: 'You are a visual support assistant.',
+      referencePrompt: 'You are a support assistant.',
+    },
+    testCases: [createBasicSystemResultRequest().testCase],
+    snapshots: [
+      {
+        id: 'basic-snap-a',
+        label: 'A',
+        testCaseId: 'visual-question',
+        promptRef: { kind: 'workspace', label: '工作区' },
+        promptText: 'You are a visual support assistant.',
+        output: 'The screenshot shows a yellow warning triangle.',
+      },
+      {
+        id: 'basic-snap-b',
+        label: 'B',
+        testCaseId: 'visual-question',
+        promptRef: { kind: 'version', version: 1, label: 'v1' },
+        promptText: 'You are a support assistant.',
+        output: 'There is a warning icon.',
+      },
+    ],
+    compareHints: {
+      mode: 'structured',
+      snapshotRoles: {
+        'basic-snap-a': 'target',
+        'basic-snap-b': 'baseline',
+      },
+      hasSharedTestCases: true,
+      hasSamePromptSnapshots: false,
+      hasCrossModelComparison: false,
+    },
+    evaluationModelKey: 'image-recognition-model',
+    mode: basicSystemModeConfig,
     ...overrides,
   })
 
@@ -402,6 +486,127 @@ describe('EvaluationService image multimodal evaluation', () => {
         })
       )
     ).rejects.toThrow(EvaluationExecutionError)
+  })
+
+  it('grounds Basic/System result evaluation in inline test-case image context', async () => {
+    const service = createService()
+    const response = await service.evaluate(createBasicSystemResultRequest())
+
+    expect(response.score.overall).toBe(88)
+    expect(mockLLMService.sendMessage).not.toHaveBeenCalled()
+    expect(mockImageUnderstandingService.understand).toHaveBeenCalledTimes(1)
+
+    const multimodalRequest =
+      mockImageUnderstandingService.understand.mock.calls[0][0] as ImageUnderstandingExecutionRequest
+
+    expect(multimodalRequest.images).toEqual([
+      {
+        b64: 'YmFzaWMtc3lzdGVtLWltYWdl',
+        mimeType: 'image/jpeg',
+      },
+    ])
+    expect(multimodalRequest.userPrompt).toContain('role=test-case-input-image')
+    expect(multimodalRequest.userPrompt).toContain('问题图片')
+    expect(multimodalRequest.userPrompt).toContain(
+      'What warning icon is shown in the screenshot?'
+    )
+  })
+
+  it('resolves asset-backed Basic/System input media for streaming evaluation', async () => {
+    const service = createService()
+    mockImageStorageService.getImage.mockResolvedValue({
+      metadata: {
+        id: 'question-asset',
+        mimeType: 'image/png',
+        sizeBytes: 123,
+        createdAt: Date.now(),
+        accessedAt: Date.now(),
+        source: 'uploaded',
+      },
+      data: 'cXVlc3Rpb24tYXNzZXQtYmFzZTY0',
+    } satisfies FullImageData)
+
+    const baseRequest = createBasicSystemResultRequest()
+    const request = createBasicSystemResultRequest({
+      testCase: {
+        ...baseRequest.testCase,
+        input: {
+          ...baseRequest.testCase.input,
+          media: [
+            {
+              label: '问题图片',
+              assetId: 'question-asset',
+            },
+          ],
+        },
+      },
+    })
+    const callbacks = {
+      onToken: vi.fn(),
+      onComplete: vi.fn(),
+      onError: vi.fn(),
+    }
+
+    await service.evaluateStream(request, callbacks)
+
+    expect(mockImageStorageService.getImage).toHaveBeenCalledWith('question-asset')
+    expect(mockLLMService.sendMessageStream).not.toHaveBeenCalled()
+    expect(mockImageUnderstandingService.understand).toHaveBeenCalledTimes(1)
+    expect(callbacks.onError).not.toHaveBeenCalled()
+    expect(callbacks.onToken).toHaveBeenCalledWith(createEvaluationJson(88))
+    expect(callbacks.onComplete).toHaveBeenCalledTimes(1)
+
+    const multimodalRequest =
+      mockImageUnderstandingService.understand.mock.calls[0][0] as ImageUnderstandingExecutionRequest
+    expect(multimodalRequest.images).toEqual([
+      {
+        b64: 'cXVlc3Rpb24tYXNzZXQtYmFzZTY0',
+        mimeType: 'image/png',
+      },
+    ])
+  })
+
+  it('forces image-bearing Basic/System compare through one generic multimodal call', async () => {
+    const service = createService()
+    const response = await service.evaluate(createBasicSystemCompareRequest())
+
+    expect(response.metadata?.compareMode).toBe('generic')
+    expect(response.metadata?.snapshotRoles).toBeUndefined()
+    expect(mockLLMService.sendMessage).not.toHaveBeenCalled()
+    expect(mockImageUnderstandingService.understand).toHaveBeenCalledTimes(1)
+
+    const multimodalRequest =
+      mockImageUnderstandingService.understand.mock.calls[0][0] as ImageUnderstandingExecutionRequest
+
+    expect(multimodalRequest.images).toEqual([
+      {
+        b64: 'YmFzaWMtc3lzdGVtLWltYWdl',
+        mimeType: 'image/jpeg',
+      },
+    ])
+    expect(multimodalRequest.userPrompt.match(/role=test-case-input-image/g)).toHaveLength(1)
+  })
+
+  it('keeps image-free Basic/System structured compare on the existing text path', async () => {
+    const service = createService()
+    const baseRequest = createBasicSystemCompareRequest()
+    const response = await service.evaluate(
+      createBasicSystemCompareRequest({
+        testCases: [
+          {
+            ...baseRequest.testCases[0],
+            input: {
+              ...baseRequest.testCases[0].input,
+              media: undefined,
+            },
+          },
+        ],
+      })
+    )
+
+    expect(response.metadata?.compareMode).toBe('structured')
+    expect(mockImageUnderstandingService.understand).not.toHaveBeenCalled()
+    expect(mockLLMService.sendMessage).toHaveBeenCalledTimes(2)
   })
 
   it('keeps image prompt-only evaluation on the existing text-only llm path', async () => {

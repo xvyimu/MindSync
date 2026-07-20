@@ -5,10 +5,18 @@ import { usePreferences } from '../storage/usePreferenceManager'
 import { useI18n } from 'vue-i18n'
 import { asExtendedError } from '../../utils/error'
 // 移除过度抽象的 Hook，直接使用 window.electronAPI
-import type { DownloadProgress, UpdateInfo } from '@/types/electron'
+import type { DownloadProgress, UpdateDelivery, UpdateInfo } from '@/types/electron'
 import type { AppServices } from '../../types/services'
 
 // 类型定义现在从 @/types/electron 导入，保持统一
+
+const POLICY_UNAVAILABLE_DELIVERY: UpdateDelivery = {
+  mode: 'manual-release',
+  reason: 'policy-unavailable',
+  platform: 'unknown',
+  arch: 'unknown',
+  fallbackReleaseUrl: null,
+}
 
 export interface UpdaterState {
   hasUpdate: boolean
@@ -23,6 +31,8 @@ export interface UpdaterState {
   stableReleaseUrl: string | null
   prereleaseVersion: string | null
   prereleaseReleaseUrl: string | null
+  updateDelivery: UpdateDelivery | null
+  releasePageError: string | null
   hasStableUpdate: boolean
   hasPrereleaseUpdate: boolean
   currentVersion: string | null
@@ -35,6 +45,22 @@ export interface UpdaterState {
   isPrereleaseVersionIgnored: boolean
 }
 
+// A terminal check failure invalidates the remote-version snapshot, but must
+// not disturb an update that is already downloading or ready to install.
+export const invalidateActionableCheckState = (state: UpdaterState): void => {
+  state.hasUpdate = false
+  state.updateInfo = null
+  state.hasStableUpdate = false
+  state.hasPrereleaseUpdate = false
+  state.stableVersion = null
+  state.stableReleaseUrl = null
+  state.prereleaseVersion = null
+  state.prereleaseReleaseUrl = null
+  state.isStableVersionIgnored = false
+  state.isPrereleaseVersionIgnored = false
+  state.releasePageError = null
+}
+
 // 更新器实例类型
 interface UpdaterInstance {
   state: UpdaterState
@@ -43,7 +69,7 @@ interface UpdaterInstance {
   installUpdate: () => Promise<void>
   ignoreUpdate: (version?: string, versionType?: 'stable' | 'prerelease') => Promise<void>
   unignoreUpdate: (versionType: 'stable' | 'prerelease') => Promise<void>
-  openReleaseUrl: () => Promise<void>
+  openVersionReleaseUrl: (versionType: 'stable' | 'prerelease') => Promise<boolean>
   downloadStableVersion: () => Promise<void>
   downloadPrereleaseVersion: () => Promise<void>
 }
@@ -76,6 +102,8 @@ export function useUpdater() {
         stableReleaseUrl: null,
         prereleaseVersion: null,
         prereleaseReleaseUrl: null,
+        updateDelivery: null,
+        releasePageError: null,
         hasStableUpdate: false,
         hasPrereleaseUpdate: false,
         currentVersion: null,
@@ -91,7 +119,7 @@ export function useUpdater() {
       installUpdate: () => Promise.resolve(),
       ignoreUpdate: () => Promise.resolve(),
       unignoreUpdate: () => Promise.resolve(),
-      openReleaseUrl: () => Promise.resolve(),
+      openVersionReleaseUrl: () => Promise.resolve(false),
       downloadStableVersion: () => Promise.resolve(),
       downloadPrereleaseVersion: () => Promise.resolve()
     }
@@ -120,6 +148,8 @@ export function useUpdater() {
     stableReleaseUrl: null,
     prereleaseVersion: null,
     prereleaseReleaseUrl: null,
+    updateDelivery: null,
+    releasePageError: null,
     hasStableUpdate: false,
     hasPrereleaseUpdate: false,
     currentVersion: null,
@@ -156,6 +186,53 @@ export function useUpdater() {
       // 确保 results 存在
       if (!results) {
         throw new Error('No results returned from version check')
+      }
+
+      // A concurrent caller must not turn an in-progress response into a completed
+      // "no update" result or clear an existing download state.
+      if (results.inProgress) {
+        if (results.updateDelivery) {
+          state.updateDelivery = results.updateDelivery
+        }
+        console.log('[useUpdater] Update check is already in progress; preserving current state')
+        return
+      }
+
+      // Clear the previous download message only for an accepted, completed check.
+      state.downloadMessage = null
+
+      // Reset stale check results only after the main process accepted and completed
+      // this request. An in-progress response must leave the existing UI untouched.
+      if (!state.isDownloading) {
+        state.isDownloaded = false
+        state.downloadProgress = null
+        state.hasUpdate = false
+        state.updateInfo = null
+        state.lastCheckResult = 'none'
+        state.lastCheckMessage = ''
+        state.hasStableUpdate = false
+        state.hasPrereleaseUpdate = false
+        state.stableVersion = null
+        state.stableReleaseUrl = null
+        state.prereleaseVersion = null
+        state.prereleaseReleaseUrl = null
+        state.updateDelivery = null
+        state.releasePageError = null
+        // Keep ignore flags; they are synchronized with the main process below.
+        console.log('[useUpdater] Reset stale state for completed update check')
+      }
+
+      // Unknown/missing capability must fail closed: checking is safe, downloading is not.
+      state.updateDelivery = results.updateDelivery || POLICY_UNAVAILABLE_DELIVERY
+      state.releasePageError = null
+
+      // 手动交付模式不能保留任何应用内下载或安装状态。
+      if (state.updateDelivery.mode !== 'in-app') {
+        state.isDownloading = false
+        state.isDownloadingStable = false
+        state.isDownloadingPrerelease = false
+        state.isDownloaded = false
+        state.downloadProgress = null
       }
 
       // 保存正式版信息
@@ -244,6 +321,7 @@ export function useUpdater() {
 
     } catch (error) {
       console.error('[useUpdater] Error checking all versions:', error)
+      invalidateActionableCheckState(state)
       state.lastCheckResult = 'error'
       state.lastCheckMessage = error instanceof Error ? error.message : String(error)
     } finally {
@@ -431,33 +509,6 @@ export function useUpdater() {
 
     try {
       state.isCheckingUpdate = true
-      // 清除之前的下载消息，因为这是一个新的检查操作
-      state.downloadMessage = null
-
-      // 智能状态重置：只在没有下载进行时才重置下载相关状态
-      if (!state.isDownloading) {
-        state.isDownloaded = false
-        state.downloadProgress = null
-        state.hasUpdate = false
-        state.updateInfo = null
-        state.lastCheckResult = 'none'
-        state.lastCheckMessage = ''
-        // 重置版本更新状态，确保每次检测都能正确更新
-        state.hasStableUpdate = false
-        state.hasPrereleaseUpdate = false
-        state.stableVersion = null
-        state.stableReleaseUrl = null
-        state.prereleaseVersion = null
-        state.prereleaseReleaseUrl = null
-        // 注意：不重置忽略状态，让用户的忽略选择在新检查中保持有效
-        // state.isStableVersionIgnored 和 state.isPrereleaseVersionIgnored 保持不变
-        // 清除持久化的检测状态
-        await saveUpdateState()
-        console.log('[useUpdater] Reset states for new update check (keeping ignore states)')
-      } else {
-        console.log('[useUpdater] Download in progress, preserving download states')
-      }
-
       // 检查两种版本：正式版和预览版
       await checkBothVersions()
     } catch (error) {
@@ -514,6 +565,11 @@ export function useUpdater() {
 
   // 安装更新
   const installUpdate = async () => {
+    if (state.updateDelivery?.mode !== 'in-app') {
+      console.warn('[useUpdater] In-app installation is unavailable for this build')
+      return
+    }
+
     if (!window.electronAPI?.updater) {
       console.warn('[useUpdater] Electron updater API not available')
       return
@@ -655,12 +711,42 @@ export function useUpdater() {
 
 
 
+  const openVersionReleaseUrl = async (versionType: 'stable' | 'prerelease'): Promise<boolean> => {
+    const version = versionType === 'stable'
+      ? state.stableVersion
+      : state.prereleaseVersion
+
+    state.releasePageError = null
+
+    if (!window.electronAPI?.updater?.openReleasePage) {
+      console.warn('[useUpdater] Updater release-page API is unavailable')
+      state.releasePageError = t('updater.releasePageUnavailable')
+      return false
+    }
+
+    try {
+      await window.electronAPI.updater.openReleasePage(version || undefined)
+      console.log(`[useUpdater] Opened ${versionType} release URL successfully`)
+      return true
+    } catch (error) {
+      console.error(`[useUpdater] Failed to open ${versionType} release URL:`, error)
+      state.releasePageError = t('updater.openReleaseFailed')
+      return false
+    }
+  }
+
   // 下载正式版（使用原子操作）
   const downloadStableVersion = async () => {
     if (!state.stableVersion) {
       console.warn('[useUpdater] No stable version available for download')
       state.downloadMessage = { type: 'warning', content: t('updater.noStableVersionAvailable') }
       state.lastDownloadAttempt = 'stable'
+      return
+    }
+
+    if (state.updateDelivery?.mode !== 'in-app') {
+      state.lastDownloadAttempt = 'stable'
+      await openVersionReleaseUrl('stable')
       return
     }
 
@@ -739,6 +825,12 @@ export function useUpdater() {
       return
     }
 
+    if (state.updateDelivery?.mode !== 'in-app') {
+      state.lastDownloadAttempt = 'prerelease'
+      await openVersionReleaseUrl('prerelease')
+      return
+    }
+
     // 防止重复点击 - 检查所有下载状态
     if (state.isDownloadingStable || state.isDownloadingPrerelease || state.isDownloading) {
       console.log('[useUpdater] Download already in progress')
@@ -802,21 +894,6 @@ export function useUpdater() {
       state.downloadProgress = null
     } finally {
       state.isDownloadingPrerelease = false
-    }
-  }
-
-  // 打开发布页面
-  const openReleaseUrl = async () => {
-    if (!state.updateInfo?.releaseUrl || !window.electronAPI?.shell) {
-      console.warn('[useUpdater] Release URL or shell API not available')
-      return
-    }
-
-    try {
-      await window.electronAPI.shell.openExternal(state.updateInfo.releaseUrl)
-      console.log('[useUpdater] Release URL opened successfully')
-    } catch (error) {
-      console.error('[useUpdater] Open release URL error:', error)
     }
   }
 
@@ -980,7 +1057,7 @@ export function useUpdater() {
     installUpdate,
     ignoreUpdate,
     unignoreUpdate,
-    openReleaseUrl,
+    openVersionReleaseUrl,
     downloadStableVersion,
     downloadPrereleaseVersion
   }

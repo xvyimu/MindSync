@@ -838,7 +838,7 @@ const processedContent = computed(() => {
 
 ### ⚠️ 代理功能已移除
 
-由于安全原因(SSRF漏洞风险，详见 [GitHub Issue #169](https://github.com/linshenkx/prompt-optimizer/issues/169))，我们已在v1.x版本中**完全移除**了Vercel和Docker内置代理功能。
+由于安全原因(SSRF漏洞风险，详见 [GitHub Issue #179](https://github.com/linshenkx/prompt-optimizer/issues/179))，我们已在v1.x版本中**完全移除**了Vercel和Docker内置代理功能。
 
 ### 推荐解决方案
 

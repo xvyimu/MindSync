@@ -224,6 +224,35 @@ describe('PromptService Enhanced Features', () => {
     })
   })
 
+  describe('stream cancellation', () => {
+    it('forwards AbortSignal from PromptService to LLMService', async () => {
+      const controller = new AbortController()
+      const callbacks = {
+        onToken: vi.fn(),
+        onComplete: vi.fn(),
+        onError: vi.fn(),
+      }
+
+      mockLLMService.sendMessageStream.mockImplementation(
+        async (_messages: unknown, _modelKey: string, handlers: any, options: any) => {
+          expect(options?.signal).toBe(controller.signal)
+          handlers.onComplete({ content: 'ok' })
+        },
+      )
+
+      await promptService.testPromptStream(
+        '',
+        'test user prompt',
+        'test-model',
+        callbacks,
+        undefined,
+        { signal: controller.signal },
+      )
+
+      expect(mockLLMService.sendMessageStream).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe('testPrompt', () => {
     it('should test prompts with proper context', async () => {
       const result = await promptService.testPrompt(
@@ -444,8 +473,12 @@ describe('PromptService Enhanced Features', () => {
           { role: 'user', content: 'user prompt' }
         ],
         'test-model',
-        callbacks,
-        undefined
+        expect.objectContaining({
+          onToken: callbacks.onToken,
+          onComplete: expect.any(Function),
+          onError: callbacks.onError,
+        }),
+        undefined,
       )
     })
   })

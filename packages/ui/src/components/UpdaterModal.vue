@@ -18,6 +18,28 @@
         </div>
       </NCard>
 
+      <NAlert
+        v-if="showManualUpdateGuidance"
+        type="warning"
+        :show-icon="true"
+        data-testid="macos-manual-update-guidance"
+      >
+        <NSpace vertical :size="6">
+          <NText strong>{{ manualUpdateTitle }}</NText>
+          <NText>{{ manualUpdateDescription }}</NText>
+        </NSpace>
+      </NAlert>
+
+      <NAlert
+        v-if="state.releasePageError"
+        type="error"
+        :show-icon="true"
+        closable
+        @close="state.releasePageError = null"
+      >
+        {{ state.releasePageError }}
+      </NAlert>
+
       <NCard v-if="state.stableVersion" size="small" embedded>
         <template #header>
           <div class="flex items-center justify-between gap-3">
@@ -38,7 +60,7 @@
           <NText strong>v{{ state.stableVersion }}</NText>
           <NSpace :size="8" align="center" justify="end">
             <NButton
-              v-if="state.stableReleaseUrl"
+              v-if="state.stableReleaseUrl && !isManualUpdateMode"
               size="small"
               tertiary
               @click="openStableReleaseUrl"
@@ -68,11 +90,12 @@
               v-if="state.hasStableUpdate"
               size="small"
               type="success"
-              :disabled="state.isDownloading || state.isCheckingUpdate"
-              :loading="state.isDownloadingStable"
+              :disabled="state.isCheckingUpdate || (!isManualUpdateMode && state.isDownloading)"
+              :loading="!isManualUpdateMode && state.isDownloadingStable"
+              data-testid="stable-update-primary-action"
               @click="handleDownloadStable"
             >
-              {{ state.isDownloadingStable ? t('updater.downloadingShort') : t('updater.download') }}
+              {{ stablePrimaryActionLabel }}
             </NButton>
           </NSpace>
         </div>
@@ -98,7 +121,7 @@
           <NText strong>v{{ state.prereleaseVersion }}</NText>
           <NSpace :size="8" align="center" justify="end">
             <NButton
-              v-if="state.prereleaseReleaseUrl"
+              v-if="state.prereleaseReleaseUrl && !isManualUpdateMode"
               size="small"
               tertiary
               @click="openPrereleaseReleaseUrl"
@@ -128,11 +151,12 @@
               v-if="state.hasPrereleaseUpdate"
               size="small"
               type="warning"
-              :disabled="state.isDownloading || state.isCheckingUpdate"
-              :loading="state.isDownloadingPrerelease"
+              :disabled="state.isCheckingUpdate || (!isManualUpdateMode && state.isDownloading)"
+              :loading="!isManualUpdateMode && state.isDownloadingPrerelease"
+              data-testid="prerelease-update-primary-action"
               @click="handleDownloadPrerelease"
             >
-              {{ state.isDownloadingPrerelease ? t('updater.downloadingShort') : t('updater.download') }}
+              {{ prereleasePrimaryActionLabel }}
             </NButton>
           </NSpace>
         </div>
@@ -189,7 +213,7 @@
         </template>
       </NSpin>
 
-      <div v-if="state.isDownloading" class="space-y-2">
+      <div v-if="state.isDownloading && !isManualUpdateMode" class="space-y-2">
         <NText depth="3">{{ t('updater.downloading') }}</NText>
         <div v-if="state.downloadProgress" class="space-y-2">
           <NProgress
@@ -205,7 +229,7 @@
         </div>
       </div>
 
-      <NAlert v-if="state.isDownloaded" type="success" :show-icon="true">
+      <NAlert v-if="state.isDownloaded && !isManualUpdateMode" type="success" :show-icon="true">
         <div class="flex flex-col gap-2">
           <NText strong>{{ t('updater.downloadComplete') }}</NText>
           <NText depth="3">{{ t('updater.clickInstallToRestart') }}</NText>
@@ -241,7 +265,6 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NAlert, NButton, NCard, NProgress, NSpace, NSpin, NTag, NText } from 'naive-ui'
-import { isRunningInElectron } from '@prompt-optimizer/core'
 import { useUpdater } from '../composables/system/useUpdater'
 import Modal from './Modal.vue'
 
@@ -264,9 +287,42 @@ const {
   installUpdate,
   ignoreUpdate,
   unignoreUpdate,
+  openVersionReleaseUrl,
   downloadStableVersion,
   downloadPrereleaseVersion
 } = useUpdater()
+
+const isManualUpdateMode = computed(() => state.updateDelivery?.mode !== 'in-app')
+
+const showManualUpdateGuidance = computed(() => (
+  isManualUpdateMode.value && (state.hasStableUpdate || state.hasPrereleaseUpdate)
+))
+
+const isUpdatePolicyUnavailable = computed(() => (
+  !state.updateDelivery || state.updateDelivery.reason === 'policy-unavailable'
+))
+
+const manualUpdateTitle = computed(() => (
+  isUpdatePolicyUnavailable.value
+    ? t('updater.updatePolicyUnavailableTitle')
+    : t('updater.manualUpdateTitle')
+))
+
+const manualUpdateDescription = computed(() => (
+  isUpdatePolicyUnavailable.value
+    ? t('updater.updatePolicyUnavailableDescription')
+    : t('updater.manualUpdateDescription')
+))
+
+const stablePrimaryActionLabel = computed(() => {
+  if (isManualUpdateMode.value) return t('updater.openReleasePage')
+  return state.isDownloadingStable ? t('updater.downloadingShort') : t('updater.download')
+})
+
+const prereleasePrimaryActionLabel = computed(() => {
+  if (isManualUpdateMode.value) return t('updater.openReleasePage')
+  return state.isDownloadingPrerelease ? t('updater.downloadingShort') : t('updater.download')
+})
 
 const downloadMessageAlertType = computed(() => {
   const type = state.downloadMessage?.type
@@ -297,30 +353,26 @@ const handleInstallUpdate = async () => {
 
 
 const openStableReleaseUrl = async () => {
-  if (!state.stableReleaseUrl || !isRunningInElectron() || !window.electronAPI?.shell) return
-
-  try {
-    await window.electronAPI.shell.openExternal(state.stableReleaseUrl)
-  } catch (error) {
-    console.error('[UpdaterModal] Open stable release URL error:', error)
-  }
+  await openVersionReleaseUrl('stable')
 }
 
 const openPrereleaseReleaseUrl = async () => {
-  if (!state.prereleaseReleaseUrl || !isRunningInElectron() || !window.electronAPI?.shell) return
-
-  try {
-    await window.electronAPI.shell.openExternal(state.prereleaseReleaseUrl)
-  } catch (error) {
-    console.error('[UpdaterModal] Open prerelease release URL error:', error)
-  }
+  await openVersionReleaseUrl('prerelease')
 }
 
 const handleDownloadStable = async () => {
+  if (isManualUpdateMode.value) {
+    await openStableReleaseUrl()
+    return
+  }
   await downloadStableVersion()
 }
 
 const handleDownloadPrerelease = async () => {
+  if (isManualUpdateMode.value) {
+    await openPrereleaseReleaseUrl()
+    return
+  }
   await downloadPrereleaseVersion()
 }
 

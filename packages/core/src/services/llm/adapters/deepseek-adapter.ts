@@ -246,7 +246,7 @@ export class DeepseekAdapter extends OpenAIAdapter {
       messages,
       this.normalizeDeepseekConfig(config),
       callbacks,
-      options,
+      options
     )
   }
 
@@ -262,7 +262,7 @@ export class DeepseekAdapter extends OpenAIAdapter {
       this.normalizeDeepseekConfig(config),
       tools,
       callbacks,
-      options,
+      options
     )
   }
 
@@ -279,12 +279,14 @@ export class DeepseekAdapter extends OpenAIAdapter {
   protected async doSendImageUnderstandingStream(
     request: ImageUnderstandingRequest,
     config: TextModelConfig,
-    callbacks: StreamHandlers
+    callbacks: StreamHandlers,
+    options?: StreamRequestOptions
   ): Promise<void> {
     await super.doSendImageUnderstandingStream(
       this.normalizeDeepseekImageRequest(request),
       this.normalizeDeepseekConfig(config),
-      callbacks
+      callbacks,
+      options
     )
   }
 

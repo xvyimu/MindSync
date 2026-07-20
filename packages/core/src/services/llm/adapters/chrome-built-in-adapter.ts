@@ -84,10 +84,9 @@ export class ChromeBuiltInAdapter extends AbstractTextProviderAdapter {
     let content = ''
 
     try {
+      // 将 AbortSignal 交给 Prompt API；结束/取消后都销毁 session 释放本地资源
       const streamOptions = options?.signal ? { signal: options.signal } : undefined
-      const stream = streamOptions
-        ? await (session as any).promptStreaming(prompt, streamOptions)
-        : await session.promptStreaming(prompt)
+      const stream = await session.promptStreaming(prompt, streamOptions)
       for await (const token of stream) {
         content += token
         callbacks.onToken(token)

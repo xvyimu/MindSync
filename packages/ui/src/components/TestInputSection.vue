@@ -3,26 +3,32 @@
     <NSpace vertical :size="8">
       <!-- 标题和控制区域 -->
       <NFlex justify="space-between" align="center" :wrap="false">
-        <NText :depth="2" style="font-size: 14px; font-weight: 500;">
+        <NText :depth="2" class="test-input-section__label">
           {{ label }}
         </NText>
-        <NButton
-          v-if="enableFullscreen"
-          type="tertiary"
-          size="small"
-          @click="openFullscreen"
-          :title="t('common.expand')"
-          ghost
-          round
+        <div
+          v-if="$slots['header-actions'] || enableFullscreen"
+          class="test-input-section__header-actions"
         >
-          <template #icon>
-            <NIcon>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-              </svg>
-            </NIcon>
-          </template>
-        </NButton>
+          <slot name="header-actions" />
+          <NButton
+            v-if="enableFullscreen"
+            type="tertiary"
+            size="small"
+            @click="openFullscreen"
+            :title="t('common.expand')"
+            ghost
+            round
+          >
+            <template #icon>
+              <NIcon>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              </NIcon>
+            </template>
+          </NButton>
+        </div>
       </NFlex>
 
       <!-- 输入区域 -->
@@ -118,3 +124,19 @@ const { isFullscreen, fullscreenValue, openFullscreen } = useFullscreen(
   (value) => emit('update:modelValue', value)
 )
 </script>
+
+<style scoped>
+.test-input-section__label {
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.test-input-section__header-actions {
+  display: inline-flex;
+  min-width: 0;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+</style>

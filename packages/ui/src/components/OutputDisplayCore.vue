@@ -1,7 +1,7 @@
 <template>
   <NCard
     :bordered="false"
-    class="output-display-core h-full  max-height: 100% "
+    class="output-display-core h-full"
     content-style="padding: 0; height: 100%; max-height: 100%; display: flex; flex-direction: column; overflow: hidden;"
     :data-testid="testId"
   >

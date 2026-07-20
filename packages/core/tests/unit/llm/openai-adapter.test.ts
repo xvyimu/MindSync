@@ -590,7 +590,8 @@ describe('OpenAIAdapter', () => {
           model: 'gpt-5-mini',
           input: [{ role: 'user', content: 'Hello, world!' }],
           stream: true
-        })
+        }),
+        undefined,
       );
       expect(callbacks.onToken).toHaveBeenCalledWith('Hello');
       expect(callbacks.onToken).toHaveBeenCalledWith(' Responses');
@@ -716,7 +717,8 @@ describe('OpenAIAdapter', () => {
           input: [{ role: 'user', content: 'Hello, world!' }],
           stream: true,
           tools
-        })
+        }),
+        undefined,
       );
       expect(callbacks.onToolCall).toHaveBeenCalledWith({
         id: 'call_123',
@@ -810,7 +812,8 @@ describe('OpenAIAdapter', () => {
               ])
             })
           ])
-        })
+        }),
+        undefined,
       );
       expect(callbacks.onToken).toHaveBeenCalledWith('视觉');
       expect(callbacks.onToken).toHaveBeenCalledWith('结果');

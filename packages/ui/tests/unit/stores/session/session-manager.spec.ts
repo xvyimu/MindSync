@@ -107,6 +107,72 @@ describe('SessionManager', () => {
     )
   })
 
+  it('repairs a Basic/System snapshot whose optional test image asset is missing', async () => {
+    const deleteMock = vi.fn(async () => {})
+    const setMock = vi.fn(async () => {})
+    const getMock = vi.fn(async <T,>(key: string, defaultValue: T) => {
+      if (key === 'session/v1/basic-system') {
+        return {
+          prompt: 'preserved system prompt',
+          optimizedPrompt: 'preserved optimized prompt',
+          reasoning: 'preserved reasoning',
+          chainId: 'preserved-chain',
+          versionId: 'preserved-version',
+          testContent: 'preserved test content',
+          testImageAssetId: 'missing-basic-test-image',
+          testImageMimeType: 'image/png',
+          selectedOptimizeModelKey: 'opt-model',
+          selectedTestModelKey: 'test-model',
+          selectedTemplateId: 'template',
+          selectedIterateTemplateId: 'iterate-template',
+          isCompareMode: true,
+        } as T
+      }
+      return defaultValue
+    })
+    const { pinia, services } = createTestPinia({
+      preferenceService: createPreferenceServiceStub({
+        get: getMock,
+        set: setMock,
+        delete: deleteMock,
+      }),
+      imageStorageService: {
+        getImage: vi.fn(async () => null),
+        listAllMetadata: vi.fn(async () => []),
+        deleteImages: vi.fn(async () => {}),
+      } as any,
+    })
+    const manager = useSessionManager(pinia)
+
+    await manager.restoreSubModeSession('basic-system')
+
+    expect(services.imageStorageService?.getImage).toHaveBeenCalledWith(
+      'missing-basic-test-image',
+    )
+    expect(deleteMock).not.toHaveBeenCalled()
+
+    const restored = useBasicSystemSession(pinia)
+    expect(restored.prompt).toBe('preserved system prompt')
+    expect(restored.optimizedPrompt).toBe('preserved optimized prompt')
+    expect(restored.reasoning).toBe('preserved reasoning')
+    expect(restored.chainId).toBe('preserved-chain')
+    expect(restored.versionId).toBe('preserved-version')
+    expect(restored.testContent).toBe('preserved test content')
+    expect(restored.testImageB64).toBeNull()
+    expect(restored.testImageMimeType).toBe('')
+    expect(restored.testImageAssetId).toBeNull()
+
+    expect(setMock).toHaveBeenCalledWith(
+      'session/v1/basic-system',
+      expect.objectContaining({
+        prompt: 'preserved system prompt',
+        optimizedPrompt: 'preserved optimized prompt',
+        testImageAssetId: null,
+        testImageMimeType: '',
+      }),
+    )
+  })
+
   it('exposes normalized prompt session views without changing existing stores', () => {
     const { pinia } = createTestPinia()
     const manager = useSessionManager(pinia)
@@ -133,6 +199,9 @@ describe('SessionManager', () => {
       metadata: { title: 'Basic favorite' },
     }
     basicSystem.testContent = 'User test input'
+    basicSystem.testImageB64 = 'must-not-be-projected'
+    basicSystem.testImageMimeType = 'image/png'
+    basicSystem.testImageAssetId = 'input-basic-asset'
     basicSystem.testVariants = [
       { id: 'a', version: 0, modelKey: 'model-a' },
       { id: 'b', version: 'workspace', modelKey: 'model-b' },
@@ -232,7 +301,10 @@ describe('SessionManager', () => {
     expect(basicSession.testRuns[0].runs).toHaveLength(2)
     expect(basicSession.testRuns[0].runs[0]).toMatchObject({
       revision: { kind: 'root', chainId: 'basic-chain' },
-      input: { text: 'User test input' },
+      input: {
+        text: 'User test input',
+        images: [{ kind: 'asset', assetId: 'input-basic-asset' }],
+      },
       output: {
         text: 'Original result',
         metadata: { reasoning: 'Original reasoning' },
@@ -500,5 +572,35 @@ describe('SessionManager', () => {
         images: [{ kind: 'asset', assetId: 'output-asset' }],
       },
     })
+  })
+
+  it('does not project unsaved Basic/System base64 when no persisted asset id exists', () => {
+    const { pinia } = createTestPinia()
+    const manager = useSessionManager(pinia)
+    const basicSystem = useBasicSystemSession(pinia)
+
+    basicSystem.prompt = 'System prompt'
+    basicSystem.testContent = 'Question'
+    basicSystem.testImageB64 = 'UNSAVED_BASIC_IMAGE'
+    basicSystem.testImageMimeType = 'image/jpeg'
+    basicSystem.testImageAssetId = null
+    basicSystem.testVariants = [
+      { id: 'a', version: 0, modelKey: 'model-a' },
+      { id: 'b', version: 'workspace', modelKey: '' },
+      { id: 'c', version: 'workspace', modelKey: '' },
+      { id: 'd', version: 'workspace', modelKey: '' },
+    ]
+    basicSystem.testVariantResults = {
+      a: { result: 'Answer', reasoning: '' },
+      b: { result: '', reasoning: '' },
+      c: { result: '', reasoning: '' },
+      d: { result: '', reasoning: '' },
+    }
+
+    const session = manager.getPromptSession('basic-system')
+
+    expect(session.testRuns[0].runs[0].input).toEqual({ text: 'Question' })
+    expect(JSON.stringify(session)).not.toContain('UNSAVED_BASIC_IMAGE')
+    expect(JSON.stringify(session)).not.toContain('data:image/')
   })
 })

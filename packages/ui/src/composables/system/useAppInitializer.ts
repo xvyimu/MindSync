@@ -14,19 +14,10 @@ import {
   createContextRepo,
   createEvaluationService,
   createImageUnderstandingService,
+  ElectronImageUnderstandingServiceProxy,
   createVariableExtractionService,
   createVariableValueGenerationService,
-  ElectronContextRepoProxy,
-  ElectronModelManagerProxy,
-  ElectronTemplateManagerProxy,
-  ElectronHistoryManagerProxy,
-  ElectronDataManagerProxy,
-  ElectronLLMProxy,
-  ElectronPromptServiceProxy,
-  ElectronTemplateLanguageServiceProxy,
   isRunningInElectron,
-  waitForElectronApi,
-  ElectronPreferenceServiceProxy,
   createPreferenceService,
   FavoriteManager,
   createImageModelManager,
@@ -131,6 +122,22 @@ export function useAppInitializer(): {
 
       if (isRunningInElectron()) {
         console.log('[AppInitializer] Electron environment detected; waiting for API readiness...');
+
+        const {
+          ElectronContextRepoProxy,
+          ElectronDataManagerProxy,
+          ElectronHistoryManagerProxy,
+          ElectronImageModelManagerProxy,
+          ElectronImageServiceProxy,
+          ElectronLLMProxy,
+          ElectronModelManagerProxy,
+          ElectronPreferenceServiceProxy,
+          ElectronPromptServiceProxy,
+          ElectronTemplateLanguageServiceProxy,
+          ElectronTemplateManagerProxy,
+          FavoriteManagerElectronProxy,
+          waitForElectronApi,
+        } = await import('@prompt-optimizer/core/electron')
         
         // 等待 Electron API 完全就绪
         const apiReady = await waitForElectronApi();
@@ -156,7 +163,6 @@ export function useAppInitializer(): {
         textAdapterRegistryInstance = createTextAdapterRegistry();
 
         // 图像相关（Electron 渲染进程代理）
-        const { ElectronImageModelManagerProxy, ElectronImageServiceProxy } = await import('@prompt-optimizer/core')
         imageAdapterRegistryInstance = createImageAdapterRegistry();
         imageModelManager = new ElectronImageModelManagerProxy();
         imageService = new ElectronImageServiceProxy();
@@ -193,7 +199,6 @@ export function useAppInitializer(): {
         const contextRepo = new ElectronContextRepoProxy();
 
         // 创建收藏管理器代理
-        const { FavoriteManagerElectronProxy } = await import('@prompt-optimizer/core')
         favoriteManager = new FavoriteManagerElectronProxy();
         favoriteManager = attachFavoriteAssetGc(favoriteManager, favoriteImageStorageService)
 
@@ -215,9 +220,7 @@ export function useAppInitializer(): {
         // 🆕 创建评估服务（使用代理的 llmService, modelManager, templateManager）
         evaluationService = createEvaluationService(llmService, modelManager, templateManager, {
           imageStorageService,
-          imageUnderstandingService: createImageUnderstandingService({
-            registry: textAdapterRegistryInstance,
-          }),
+          imageUnderstandingService: new ElectronImageUnderstandingServiceProxy(),
         });
 
         // 🆕 创建变量提取服务（使用代理的 llmService, modelManager, templateManager）
