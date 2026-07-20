@@ -18,20 +18,36 @@
 - VSCode (推荐)
 
 ### 开发环境设置
-```bash
-# 1. 克隆项目
-git clone https://github.com/linshenkx/prompt-optimizer.git
-cd prompt-optimizer
 
-# 2. 安装依赖
+**本 fork 维护者**推荐直接使用本机源码树（不必再 clone）：
+
+```text
+D:\PromtOptimizer\src\prompt-optimizer
+```
+
+从 GitHub 拉取时：
+
+```bash
+# fork（维护/推送）
+git clone https://github.com/xvyimu/prompt-optimizer.git
+cd prompt-optimizer
+git checkout develop
+
+# 仅跟踪上游（只读 remote 可另加）
+# git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
+
+# 安装依赖（Node 22.x + pnpm）
 pnpm install
 
-# 3. 启动开发服务
-pnpm dev               # Web开发：构建core/ui并运行web应用
-pnpm dev:fresh         # Web开发（完整重置）：清理+重装+启动
-pnpm dev:desktop       # Desktop开发：构建core/ui，同时运行web和desktop
-pnpm dev:desktop:fresh # Desktop开发（完整重置）：清理+重装+启动
+# 启动开发服务
+pnpm dev               # Web：构建 core/ui 并运行 web
+pnpm dev:fresh         # Web 完整重置
+pnpm dev:desktop       # Desktop：web + electron
+pnpm dev:desktop:fresh # Desktop 完整重置
 ```
+
+现行版本与本机安装路径：见 [`../project/CURRENT.md`](../project/CURRENT.md)。  
+策略 **fork-only**：默认不向上游开 PR。
 
 ## Docker开发和部署
 

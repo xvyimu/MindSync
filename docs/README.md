@@ -1,113 +1,78 @@
 # 项目文档索引
 
-欢迎来到Prompt Optimizer项目文档！本文档采用分级分类的组织方式，便于不同角色的用户快速找到所需信息。
-
-## 📚 文档分类
-
-### 👥 [用户文档](./user/)
-面向最终用户的使用指南、部署说明和常见问题
-- 桌面版用户手册
-- Web版使用指南
-- 部署指南（Vercel等）
-- 常见问题解答
-
-### 👨‍💻 [开发者文档](./developer/)
-面向开发者的技术文档、API参考和故障排查
-- 技术开发指南
-- 项目结构说明
-- API文档
-- 架构设计
-- 故障排查清单
-
-### 📋 [项目管理文档](./project/)
-面向项目管理的需求文档、状态跟踪和规划
-- 产品需求文档
-- 项目状态和进度
-- 版本管理策略
-- 功能规划
-
-### 📦 [开发过程归档](./archives/)
-按功能点归档的开发记录，用于跟踪和排错
-- 101-singleton-refactor - 单例模式重构 ✅
-- 102-web-architecture-refactor - Web架构重构 ✅
-- 103-desktop-architecture - 桌面端架构 🔄
-- 104-test-panel-refactor - 测试面板重构 📋
-- 105-output-display-v2 - 输出显示v2 📋
-- 106-template-management - 模板管理功能 🔄
-
-### 🛠️ [开发工作区](./workspace/)
-当前开发阶段的临时文档和开发笔记
-- 开发笔记和临时记录
-- 待办事项
-- 实验性设计
-## 🚀 快速导航
-
-### 我是用户
-- 想了解如何使用 → [用户文档](./user/)
-- 需要部署应用 → [部署指南](./user/deployment/)
-- 遇到使用问题 → [故障排查](./developer/troubleshooting/)
-
-### 我是开发者
-- 想参与开发 → [开发者文档](./developer/)
-- 需要了解架构 → [技术开发指南](./developer/technical-development-guide.md)
-- 遇到开发问题 → [故障排查](./developer/troubleshooting/)
-- 想了解历史 → [开发过程归档](./archives/)
-
-### 我是项目管理者
-- 了解项目状态 → [项目管理文档](./project/)
-- 查看功能规划 → [产品需求文档](./project/prd.md)
-- 跟踪开发进度 → [项目状态](./project/project-status.md)
-
-## 📖 重要文档
-
-### 核心文档
-- [项目总体介绍](../README.md) - 项目概述和快速开始
-- [技术开发指南](./developer/technical-development-guide.md) - 完整的技术栈和开发规范
-- [项目结构](./developer/project-structure.md) - 文件和目录组织说明
-- [产品需求文档](./project/prd.md) - 产品功能需求和规格
-
-### 专项文档
-- [LLM参数配置指南](./developer/llm-params-guide.md) - LLM参数配置详细说明
-- [AI开发流程规范](./developer/ai-development-workflow.md) - AI辅助开发的标准化流程
-
-## 📋 使用指南
-
-### 新成员入职
-1. 阅读[项目总体介绍](../README.md)了解项目概况
-2. 查看[项目结构](./developer/project-structure.md)了解代码组织
-3. 参考[技术开发指南](./developer/technical-development-guide.md)了解开发规范
-4. 根据角色查看对应的文档分类
-
-### 日常开发
-1. 遵循[技术开发指南](./developer/technical-development-guide.md)中的开发规范
-2. 遇到问题查看[故障排查](./developer/troubleshooting/)
-3. 了解历史背景查看[开发过程归档](./archives/)
-
-### 项目管理
-1. 通过[项目状态](./project/project-status.md)了解当前进度
-2. 查看[产品需求文档](./project/prd.md)了解功能规划
-
-## 🔄 文档维护
-
-### 维护原则
-1. **分类明确**：按目标受众和用途分类存放
-2. **及时更新**：代码变更时同步更新相关文档
-3. **定期整理**：定期清理过期内容，整理工作区文档
-4. **交叉引用**：在相关文档间建立引用关系
-
-### 文档规范
-- 使用Markdown格式
-- 统一的标题层级结构
-- 代码示例使用语法高亮
-- 文档末尾标注更新时间
-
-### 归档流程
-- **新功能开发**：在archives/中创建新的功能点目录（从107开始编号）
-- **重要经验**：及时从workspace/转移到archives/对应功能点
-- **通用指南**：从临时记录整理为正式的developer/文档
+> **文档体系：方案 C — 双层真相源 + 冻结噪音**  
+> 规划全文：`D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`  
+> **现行版本/路径一页纸：** [`project/CURRENT.md`](./project/CURRENT.md)
 
 ---
 
-**文档重构完成时间**：2025-07-01
-**最近同步更新**：2026-05-03（同步至 v2.10.0）
-**下一次整理计划**：根据开发进度定期更新
+## 30 秒入口（先读这里）
+
+| 你是… | 你想… | 打开 |
+|--------|--------|------|
+| 本机使用者 | 启动软件 / 安装在哪 | `D:\PromtOptimizer\README.md` |
+| 开发维护者 | 改代码 / 测试 / 模块 | [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md) |
+| 审计 / 排障 | 边界、安全、模块全景 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
+| 任何人 | 当前版本与策略 | [`project/CURRENT.md`](./project/CURRENT.md) |
+
+---
+
+## 文档分层
+
+| 层 | 含义 | 目录 |
+|----|------|------|
+| **L0 入口** | 必须正确，短 | `PROJECT_HANDOFF.md` · 安装侧 `README.md` |
+| **L1 活文档** | 改代码时应更新 | `project/` · `developer/` · `user/` · `architecture/`（白名单）· `testing/` |
+| **L2 冻文档** | **默认只读** · 非现行规范 | `archives/` · `workspace/` · 仓库 `.pipeline/` · 安装侧 `CLOSEOUT.md` |
+
+**规则摘要**
+
+1. 版本号权威：只在 [`project/CURRENT.md`](./project/CURRENT.md)  
+2. 禁止在 `workspace/` 沉淀正式结论（应升到 L1）  
+3. `archives/` 仅历史排障，不代表当前行为  
+4. 用户文档（`user/`）不要写本机绝对路径  
+
+---
+
+## 分类导航
+
+### 用户 · [`user/`](./user/)
+
+使用与部署（Vercel / Docker / MCP 等）。
+
+- 安全相关：访问密码为 **会话 Cookie**（[`user/deployment/vercel.md`](./user/deployment/vercel.md)）
+- Docker 运行时：[`user/deployment/docker-runtime-security.md`](./user/deployment/docker-runtime-security.md)（**不会**把模型 API Key 注入浏览器 `config.js`）
+- 策略：[`DOCS_POLICY.md`](./DOCS_POLICY.md)
+
+### 开发者 · [`developer/`](./developer/)
+
+环境、结构、排障。日常命令以 HANDOFF 与 [`project/DEV-WORKFLOW.md`](./project/DEV-WORKFLOW.md) 为准。
+
+### 项目 · [`project/`](./project/)
+
+- [`CURRENT.md`](./project/CURRENT.md) — **现行快照**  
+- [`prd.md`](./project/prd.md) — 产品范围  
+- [`DEV-WORKFLOW.md`](./project/DEV-WORKFLOW.md) · 冒烟清单等  
+
+### 架构 · [`architecture/`](./architecture/)
+
+仅 [`architecture/README.md`](./architecture/README.md) **白名单**篇视为现行；其余可能过期。
+
+### 测试 · [`testing/`](./testing/)
+
+测试说明与场景（L1，按需更新）。
+
+### 归档 · [`archives/`](./archives/) · 工作区 · [`workspace/`](./workspace/)
+
+**L2 冻结。** 新结论不要写在这里。
+
+---
+
+## 维护
+
+| 变更类型 | 更新 |
+|----------|------|
+| 发版 / 安装路径 | `CURRENT.md` → 安装 README → HANDOFF §0 |
+| 安全/部署行为 | `user/deployment/*` + FULL-AUDIT 或新审计 |
+| 领域架构 | `architecture/` 白名单篇 + architecture/README |
+| 过程实验 | `.pipeline/` 或个人笔记 — **不**当 SSOT |

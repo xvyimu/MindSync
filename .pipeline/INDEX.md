@@ -1,8 +1,9 @@
 # .pipeline 文档索引
 
-本目录存放 **Ship / 优化 / 验证** 过程产物。正式交接请读：
+> **L2 过程产物 · 非产品规范 / 非现行 API 真相。**  
+> 正式交接与现行事实：[`docs/PROJECT_HANDOFF.md`](../docs/PROJECT_HANDOFF.md) · [`docs/project/CURRENT.md`](../docs/project/CURRENT.md)
 
-→ [`docs/PROJECT_HANDOFF.md`](../docs/PROJECT_HANDOFF.md)
+本目录存放 **Ship / 优化 / 验证** 过程产物。
 
 ## 必读
 

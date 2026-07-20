@@ -1,10 +1,23 @@
 # Prompt Optimizer 产品需求文档
 
+> **L1 活文档（范围基线）。** 现行版本/安装路径见 [`CURRENT.md`](./CURRENT.md)。  
+> fork 维护策略：**fork-only**（默认不向上游开 PR）。
+
 ## 1. 产品概述
 
 Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编写更好的 AI 提示词，提升 AI 输出质量。通过集成多个 LLM 模型，为用户提供专业的提示词优化建议、测试验证和结果评估。
 
 产品采用纯前端架构，所有数据存储在浏览器本地，保障用户隐私和安全。
+
+### 1.1 fork 增量（2.11.x，相对上游基线）
+
+| 能力 | 说明 |
+|------|------|
+| **Paper / 纸感主题** | 离线字体栈；`data-app-theme=paper`；取消按钮 CTA token |
+| **流式可停止** | Basic/Pro 文本路径 AbortSignal + Stop UI（图像出图取消仍为债务） |
+| **Desktop 安全硬化** | IPC 域拆分、sender 校验、stream 所有权取消 |
+| **部署安全** | Docker 不向浏览器注入模型 API Key；Vercel 访问门为 HMAC 会话 Cookie |
+| **明确不做** | 中心化托管对话、默认企业云协作、默认真钥预置到公开前端 |
 
 ## 2. 目标用户
 

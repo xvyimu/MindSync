@@ -2,14 +2,16 @@
 
 > 单一真相入口。更新代码后优先改本文相关章节；安装侧见 `D:\PromtOptimizer\README.md`。
 
-**最后更新：** 2026-07-20 全面检查 / 产品态收口  
-**产品版本：** Desktop 2.11.7  
-**维护分支：** fork `develop`（tip 见 git log；Paper + UX + icons 打包）  
+**最后更新：** 2026-07-20 文档体系方案 C + 产品态收口  
+**产品版本：** Desktop **2.11.7**（权威快照：[`project/CURRENT.md`](./project/CURRENT.md)）  
+**维护分支：** fork **`develop`**（tip 以 `git log -1` 为准）  
 **Fork：** https://github.com/xvyimu/prompt-optimizer  
-**上游：** https://github.com/linshenkx/prompt-optimizer（`upstream`，默认 `develop`）  
-**贡献策略：** **fork-only**（上游 #324/#325–#330 已关闭，默认不重开）  
-**本机收口：** `D:\PromtOptimizer\CLOSEOUT.md`（历史）+ `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md`（现行）  
-**本机安装：** `D:\PromtOptimizer\app\PromptOptimizer.exe`
+**上游：** https://github.com/linshenkx/prompt-optimizer（`upstream`）  
+**贡献策略：** **fork-only**（默认不重开上游 PR）  
+**文档分层：** L0 本文 + 安装 README · L1 CURRENT/AUDIT/user · L2 archives/workspace/.pipeline  
+**本机安装：** `D:\PromtOptimizer\app\PromptOptimizer.exe`  
+**全面检查：** `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md`  
+**文档规划：** `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`
 
 ---
 
@@ -17,15 +19,17 @@
 
 | 你想… | 去哪里 |
 |--------|--------|
-| 改代码 | `D:\PromtOptimizer\src\prompt-optimizer` |
+| **现行版本/路径一页纸** | [`project/CURRENT.md`](./project/CURRENT.md) |
+| 改代码 | `D:\PromtOptimizer\src\prompt-optimizer`（本文后续章节） |
 | 打开软件 | `D:\PromtOptimizer\app\PromptOptimizer.exe` |
-| 安装包 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` 或 `nsis-2026-07-20-develop-ux\` |
-| 全面检查报告 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
-| 看历史 hardening | §2 + `.pipeline/` + `D:\PromtOptimizer\CLOSEOUT.md` |
-| 跑测试 | §5；Desktop 契约见报告 §8 |
-| 推送到 GitHub | §6（fork-only） |
-| 清理垃圾 | §7 |
-| 优化债务 | `.pipeline/OPTIMIZATION_PLAN.md`（多已完成）+ 报告 §10 |
+| 安装侧入口 | `D:\PromtOptimizer\README.md` |
+| 安装包 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` 等 |
+| 全面检查 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
+| 文档怎么分层 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` · [`docs/README.md`](./README.md) |
+| 历史 hardening / ship | §2 + `.pipeline/`（**非规范**）+ `CLOSEOUT.md` |
+| 跑测试 | §5；Desktop 契约见 FULL-AUDIT §8 |
+| 推送到 GitHub | §6（fork-only · 默认 `develop`） |
+| 优化债务 | FULL-AUDIT §10 · CURRENT |
 
 ---
 
@@ -76,27 +80,25 @@ D:\PromtOptimizer\
 | origin | https://github.com/xvyimu/prompt-optimizer.git | 你的 fork |
 | upstream | https://github.com/linshenkx/prompt-optimizer.git | 官方 |
 
-- 开发分支：`work/desktop-hardening-on-develop`
-- 集成分支：fork `develop`（已含 hardening + upstream merge）
+- **日常分支：`develop`**（功能用 `feat/*` 再合入）
+- 历史工作分支名 `work/desktop-hardening*` 仅作考古，不再作为主路径
 - 勿 force 推 `develop`/`main`
-- 本机 GitHub 代理常用 `http://127.0.0.1:7890`（7897 常关）
+- 本机 GitHub 代理常用 `http://127.0.0.1:7890`
 
 ```powershell
 $env:HTTP_PROXY='http://127.0.0.1:7890'; $env:HTTPS_PROXY='http://127.0.0.1:7890'
-git push origin work/desktop-hardening-on-develop
 git push origin develop
 ```
 
 ### 1.4 提交历史（关键）
 
-| Commit | 说明 |
-|--------|------|
-| `38da09d4` | merge upstream develop：image-understanding + macOS update policy |
-| `f6747be8` | fork develop 同步 work 分支 |
-| `8770419f` | desktop smoke 冷启动轮询至 30s |
-| `eeb7708d` | Playwright 允许复用本地 webServer |
+以 `git log -8 --oneline` 为准。近年要点：
 
-以 `git log -5 --oneline` 为准。
+| 主题 | 说明 |
+|------|------|
+| Paper 主题 / icons 打包 | UI 纸感 + desktop `files` 含 icons |
+| P0 安全 | Docker public config 过滤；Vercel HMAC 会话 |
+| Desktop hardening | stream cancel、IPC 域拆分、更新源 fork |
 
 ---
 
@@ -134,11 +136,12 @@ git push origin develop
 - WebDAV 路径校验
 - preload listener 精确解绑
 
-### 2.4 安装形态
+### 2.4 安装形态（现行）
 
-- 加载路径：`resources/app`（**无** `app.asar`）
+- **安装根：** `D:\PromtOptimizer\app`
+- **加载：** `resources/app.asar`（NSIS；含 web-dist + icons）
 - 缺 API key 时仅警告，可启动
-- icons 已补：`resources/app/icons/app-icon.ico`
+- 打包清单含 `icons/**/*`；主题可选 **纸感 Paper**
 
 ---
 
@@ -158,30 +161,30 @@ git push origin develop
 
 ## 4. 日常开发路径
 
-### 4.1 改 Core / Desktop
+### 4.1 改 Core / Desktop（推荐）
 
-1. 在源码 worktree 改  
-2. Core rebuild（Node24 直调 tsup）：
+1. 在 `D:\PromtOptimizer\src\prompt-optimizer` 改代码  
+2. 使用 **Node 22**（portable：`D:\PromtOptimizer\tools`）  
+3. 构建并重装：
 
 ```powershell
-cd packages/core
-node ../../node_modules/tsup/dist/cli-default.js src/index.ts src/electron.ts --format cjs,esm --dts
+pnpm -F @prompt-optimizer/core build
+pnpm -F @prompt-optimizer/ui build:bundle   # 若 vue-tsc 失败可跳过 types
+pnpm -F @prompt-optimizer/desktop build:ci
+# 安装生成的 NSIS 到 D:\PromtOptimizer\app
 ```
 
-3. 同步安装版 app（热替换）：
+4. 契约抽测：
 
-```text
-复制 main.js / preload.js / remote-storage.js / config/ / core dist / package.json / icons
-→ D:\PromtOptimizer\PromptOptimizer\resources\app\
+```powershell
+node --test packages/desktop/config/*.test.js
+node --test scripts/desktop-ipc-handlers.test.mjs
 ```
-
-4. 或解压 `PromptOptimizer-app-overlay.zip` 覆盖 `resources\app`
 
 ### 4.2 环境
 
-- 本机常见 Node **24**；engines 写 `^22`  
-- 优先：**直调 node 入口**，少依赖 `pnpm -F` lifecycle  
-- 不装新依赖、不 Docker（当前约束）
+- engines：Node `^22`；推荐 portable 22，避免系统 Node 24 踩 engines  
+- fork-only；高风险 push/删除先确认
 
 ---
 
