@@ -2,7 +2,7 @@
 
 Date: 2026-07-20  
 Target: local `develop` after UX #3/#4 merges  
-Binary (if installed): `D:\PromtOptimizerpp\PromptOptimizer.exe`  
+Binary (if installed): `D:\PromtOptimizer\app\PromptOptimizer.exe`  
 Source run: portable Node 22 + pnpm desktop package
 
 ## Preflight
