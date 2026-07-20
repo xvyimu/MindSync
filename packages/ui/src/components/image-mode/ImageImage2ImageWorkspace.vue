@@ -346,7 +346,7 @@
                                     depth="3"
                                     style="padding: 0; font-size: 14px"
                                 >
-                                    {{ t("common.loading") }}
+                                    {{ t("prompt.optimizing") }}
                                 </NText>
                             </NSpace>
                         </NGridItem>
@@ -389,7 +389,7 @@
                                 >
                                     {{
                                         isOptimizing
-                                            ? t("common.loading")
+                                            ? t("prompt.optimizing")
                                             : t("promptOptimizer.optimize")
                                     }}
                                 </NButton>

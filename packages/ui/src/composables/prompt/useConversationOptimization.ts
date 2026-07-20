@@ -40,6 +40,7 @@ export interface UseConversationOptimization {
   switchToV0: (version: PromptRecordChain['versions'][number]) => Promise<void>  // 🆕 V0 切换
   applyToConversation: (messageId: string, content: string) => void
   applyCurrentVersion: () => Promise<void>
+  cancel: () => void
   clearContent: () => void
   cleanupDeletedMessageMapping: (messageId: string, options?: { keepSelection?: boolean }) => void
   saveLocalEdit: (payload: { optimizedPrompt: string; note?: string; source?: 'patch' | 'manual' }) => Promise<void>
@@ -229,6 +230,24 @@ export function useConversationOptimization(
 
   const currentVersions = ref<PromptRecordChain['versions']>([])
   const isOptimizing = ref<boolean>(false)
+
+  // Stream cancel: generation barriers + AbortController (mirrors basic / ContextUser workspaces)
+  let optimizeGeneration = 0
+  let iterateGeneration = 0
+  let activeOptimizeController: AbortController | null = null
+  let activeIterateController: AbortController | null = null
+
+  const cancel = () => {
+    if (!isOptimizing.value) return
+    optimizeGeneration += 1
+    iterateGeneration += 1
+    activeOptimizeController?.abort()
+    activeIterateController?.abort()
+    activeOptimizeController = null
+    activeIterateController = null
+    isOptimizing.value = false
+    toast.info(t('toast.info.optimizeCancelled'))
+  }
 
   // ========== Session Store 同步逻辑 ==========
 
@@ -426,6 +445,10 @@ export function useConversationOptimization(
     }
 
     // 强制重置状态，开始新的优化链
+    const generation = ++optimizeGeneration
+    const controller = new AbortController()
+    activeOptimizeController = controller
+
     isOptimizing.value = true
     optimizedPrompt.value = ''
     optimizedReasoning.value = ''
@@ -453,12 +476,18 @@ export function useConversationOptimization(
         request,
         {
           onToken: (token: string) => {
+            if (generation !== optimizeGeneration) return
+            if (controller.signal.aborted) return
             optimizedPrompt.value += token
           },
           onReasoningToken: (reasoningToken: string) => {
+            if (generation !== optimizeGeneration) return
+            if (controller.signal.aborted) return
             optimizedReasoning.value += reasoningToken
           },
           onComplete: async () => {
+            if (generation !== optimizeGeneration) return
+            if (controller.signal.aborted) return
             try {
               // 判断是首次优化还是后续优化
               if (!historyManager.value) {
@@ -545,20 +574,31 @@ export function useConversationOptimization(
               toast.warning(t('toast.warning.saveHistoryFailed'))
               // 优化结果仍然可用，但未保存历史
             } finally {
-              isOptimizing.value = false
+              if (generation === optimizeGeneration) {
+                isOptimizing.value = false
+                activeOptimizeController = null
+              }
             }
           },
           onError: (error: Error) => {
+            if (generation !== optimizeGeneration) return
+            if (controller.signal.aborted) return
             console.error('[ConversationOptimization] Optimization failed:', error)
             toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
             isOptimizing.value = false
+            activeOptimizeController = null
           }
-        }
+        },
+        { signal: controller.signal }
       )
     } catch (error) {
+      if (generation !== optimizeGeneration || controller.signal.aborted) {
+        return
+      }
       console.error('[ConversationOptimization] Optimization failed:', error)
       toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
       isOptimizing.value = false
+      activeOptimizeController = null
     }
   }
 
@@ -594,6 +634,10 @@ export function useConversationOptimization(
       return
     }
 
+    const generation = ++iterateGeneration
+    const controller = new AbortController()
+    activeIterateController = controller
+
     isOptimizing.value = true
     optimizedPrompt.value = ''  // 🔧 清空旧内容，避免累加
     optimizedReasoning.value = ''
@@ -610,12 +654,18 @@ export function useConversationOptimization(
         selectedOptimizeModel.value,
         {
           onToken: (token: string) => {
+            if (generation !== iterateGeneration) return
+            if (controller.signal.aborted) return
             optimizedPrompt.value += token
           },
           onReasoningToken: (reasoningToken: string) => {
+            if (generation !== iterateGeneration) return
+            if (controller.signal.aborted) return
             optimizedReasoning.value += reasoningToken
           },
           onComplete: async () => {
+             if (generation !== iterateGeneration) return
+             if (controller.signal.aborted) return
              try {
                 if (!historyManager.value) throw new Error('History service unavailable')
 
@@ -692,13 +742,19 @@ export function useConversationOptimization(
                console.error('[ConversationOptimization] Failed to save iteration history:', error)
                toast.warning(t('toast.warning.saveHistoryFailed'))
              } finally {
-               isOptimizing.value = false
+               if (generation === iterateGeneration) {
+                 isOptimizing.value = false
+                 activeIterateController = null
+               }
              }
           },
           onError: (error: Error) => {
+            if (generation !== iterateGeneration) return
+            if (controller.signal.aborted) return
             console.error('[ConversationOptimization] Iteration failed:', error)
             toast.error(getI18nErrorMessage(error, t('toast.error.iterateFailed')))
             isOptimizing.value = false
+            activeIterateController = null
           }
         },
         templateId,
@@ -708,11 +764,16 @@ export function useConversationOptimization(
           variables: {}, // 暂无变量支持
           tools: [] // 暂无工具支持
         },
+        { signal: controller.signal },
       )
     } catch (error) {
+      if (generation !== iterateGeneration || controller.signal.aborted) {
+        return
+      }
       console.error('[ConversationOptimization] Iteration failed:', error)
       toast.error(getI18nErrorMessage(error, t('toast.error.iterateFailed')))
       isOptimizing.value = false
+      activeIterateController = null
     }
   }
 
@@ -936,6 +997,7 @@ export function useConversationOptimization(
     switchToV0,  // 🆕 V0 切换方法
     applyToConversation,
     applyCurrentVersion,
+    cancel,      // Stream cancel (mirrors basic / ContextUser)
     clearContent,
     cleanupDeletedMessageMapping,
     saveLocalEdit,

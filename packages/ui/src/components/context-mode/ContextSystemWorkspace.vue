@@ -104,15 +104,35 @@
                             </NFlex>
 
                             <NButton
+                                v-if="displayAdapter.displayedIsOptimizing.value"
+                                type="error"
+                                strong
+                                class="pro-multi-cancel-btn"
+                                @click="handleCancelOptimization"
+                                block
+                                data-testid="pro-multi-cancel-button"
+                                :title="$t('common.stop')"
+                            >
+                                {{ $t('common.stop') }}
+                            </NButton>
+                            <NButton
+                                v-else
                                 type="primary"
-                                :loading="displayAdapter.displayedIsOptimizing.value"
-                                :disabled="displayAdapter.displayedIsOptimizing.value || !selectedMessageId"
+                                :disabled="!selectedMessageId"
                                 @click="handleOptimizeClick"
                                 block
                                 data-testid="pro-multi-optimize-button"
                             >
-                                {{ displayAdapter.displayedIsOptimizing.value ? $t('prompt.optimizing') : $t('promptOptimizer.optimize') }}
+                                {{ $t('promptOptimizer.optimize') }}
                             </NButton>
+                            <NText
+                                v-if="displayAdapter.displayedIsOptimizing.value"
+                                depth="3"
+                                class="pro-multi-optimizing-status"
+                                data-testid="pro-multi-optimizing-status"
+                            >
+                                {{ $t('prompt.optimizing') }}
+                            </NText>
                         </NFlex>
                     </NCard>
 
@@ -2032,6 +2052,16 @@ const handleOptimizeClick = () => {
     conversationOptimization.optimizeMessage()
 }
 
+// Cancel in-flight optimize/iterate stream (mirrors basic / ContextUser workspaces).
+const handleCancelOptimization = () => {
+    conversationOptimization.cancel()
+}
+
+// 处理取消优化事件
+const handleCancelOptimization = () => {
+    conversationOptimization.cancel()
+}
+
 // 🆕 ConversationTestPanel 引用
 const testAreaPanelRef = ref<TestAreaPanelInstance | null>(null);
 
@@ -2384,5 +2414,43 @@ defineExpose({
 
 .tool-calls-section {
     flex: 0 0 auto;
+}
+
+.pro-multi-cancel-btn {
+    cursor: pointer;
+}
+
+.pro-multi-optimizing-status {
+    display: block;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+}
+</style>
+
+<style>
+/* Paper theme: cancel button uses CTA orange, mirroring InputPanel. */
+html[data-app-theme='paper'] .n-button--error-type[data-testid='pro-multi-cancel-button'],
+html[data-app-theme='paper'] .pro-multi-cancel-btn.n-button--error-type {
+    --n-color: #F97316;
+    --n-color-hover: #EA580C;
+    --n-color-pressed: #C2410C;
+    --n-color-focus: #EA580C;
+    --n-color-disabled: #FED7AA;
+    --n-border: 1px solid #F97316;
+    --n-border-hover: 1px solid #EA580C;
+    --n-border-pressed: 1px solid #C2410C;
+    --n-border-focus: 1px solid #EA580C;
+    --n-text-color: #FFFFFF;
+    --n-text-color-hover: #FFFFFF;
+    --n-text-color-pressed: #FFFFFF;
+    --n-text-color-focus: #FFFFFF;
+    --n-text-color-disabled: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pro-multi-cancel-btn {
+        transition: none;
+    }
 }
 </style>
