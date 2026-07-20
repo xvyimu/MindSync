@@ -95,6 +95,11 @@ export interface ImageRequest {
   inputImages?: ImageInputRef[]            // 多图输入（V1）
   count?: number                           // 生成数量，默认 1
   paramOverrides?: Record<string, unknown> // 临时参数覆盖，不影响保存的配置
+  /**
+   * Optional abort signal for cooperative cancellation (Web fetch + Desktop IPC).
+   * Not persisted; must not be serialized to storage or history.
+   */
+  signal?: AbortSignal
 }
 
 // === 显式模式请求类型（避免用 inputImage 的存在与否隐式推断） ===

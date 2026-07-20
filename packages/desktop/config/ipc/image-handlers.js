@@ -2,6 +2,9 @@
  * 注册图像模型配置与图像生成相关的 Desktop IPC interface。
  * 保持现有 channel、位置参数和响应信封不变，仅从 main.js 拆出领域实现。
  *
+ * Generation channels accept an optional trailing streamId for cancel via
+ * stream-registry + existing stream-cancel IPC (AbortSignal attached on main).
+ *
  * @param {object} dependencies 图像领域注册依赖。
  * @param {Electron.IpcMain} dependencies.ipcMain Electron IPC 主进程对象。
  * @param {object} dependencies.imageModelManager 图像模型配置管理器。
@@ -11,6 +14,8 @@
  * @param {Function} dependencies.createSuccessResponse 统一成功响应信封。
  * @param {Function} dependencies.createErrorResponse 统一失败响应信封。
  * @param {Function} dependencies.createStructuredErrorResponse 图像生成失败时的结构化错误信封。
+ * @param {object} [dependencies.streamRegistry] 可选：流注册表（取消生成）。
+ * @param {Function} [dependencies.assertValidStreamId] 可选：streamId 校验。
  */
 function registerImageIpcHandlers({
   ipcMain,
@@ -21,7 +26,42 @@ function registerImageIpcHandlers({
   createSuccessResponse,
   createErrorResponse,
   createStructuredErrorResponse,
+  streamRegistry,
+  assertValidStreamId,
 }) {
+  const runCancelableGenerate = async (event, streamId, request, operate) => {
+    const safeReq = safeSerialize(request) || {};
+    if (streamId && streamRegistry && typeof assertValidStreamId === 'function') {
+      assertValidStreamId(streamId);
+      const stream = streamRegistry.register(event.sender, streamId);
+      try {
+        safeReq.signal = stream.signal;
+        const res = await operate(safeReq);
+        return createSuccessResponse(res);
+      } catch (error) {
+        if (error?.name === 'AbortError' || stream.signal.aborted) {
+          return createStructuredErrorResponse({
+            code: 'IPC_STREAM_CANCELLED',
+            message: 'IPC stream was cancelled',
+          });
+        }
+        return createStructuredErrorResponse(error);
+      } finally {
+        try {
+          streamRegistry.complete(event.sender, streamId);
+        } catch {
+          // ignore complete races after cancel
+        }
+      }
+    }
+
+    try {
+      const res = await operate(safeReq);
+      return createSuccessResponse(res);
+    } catch (error) {
+      return createStructuredErrorResponse(error);
+    }
+  };
   // ===== Image Model handlers (Config-centric) =====
   ipcMain.handle('image-model-ensureInitialized', async () => {
     try {
@@ -136,45 +176,21 @@ function registerImageIpcHandlers({
   });
 
   // ===== Image Service handlers =====
-  ipcMain.handle('image-generate', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.generate(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  // Optional trailing streamId enables cancel via existing stream-cancel channel.
+  ipcMain.handle('image-generate', async (event, request, streamId) => {
+    return runCancelableGenerate(event, streamId, request, (req) => imageService.generate(req));
   });
 
-  // 显式模式：避免根据 inputImage 是否存在隐式推断
-  ipcMain.handle('image-generateText2Image', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.generateText2Image(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  ipcMain.handle('image-generateText2Image', async (event, request, streamId) => {
+    return runCancelableGenerate(event, streamId, request, (req) => imageService.generateText2Image(req));
   });
 
-  ipcMain.handle('image-generateImage2Image', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.generateImage2Image(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  ipcMain.handle('image-generateImage2Image', async (event, request, streamId) => {
+    return runCancelableGenerate(event, streamId, request, (req) => imageService.generateImage2Image(req));
   });
 
-  ipcMain.handle('image-generateMultiImage', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.generateMultiImage(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  ipcMain.handle('image-generateMultiImage', async (event, request, streamId) => {
+    return runCancelableGenerate(event, streamId, request, (req) => imageService.generateMultiImage(req));
   });
 
   ipcMain.handle('image-validateRequest', async (_event, request) => {

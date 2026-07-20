@@ -274,7 +274,8 @@ export class SeedreamImageAdapter extends AbstractImageProviderAdapter {
         'Authorization': `Bearer ${config.connectionConfig?.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: request.signal,
     })
 
     const data = response

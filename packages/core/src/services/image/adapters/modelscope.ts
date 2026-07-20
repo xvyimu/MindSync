@@ -151,7 +151,8 @@ export class ModelScopeImageAdapter extends AbstractImageProviderAdapter {
         'Content-Type': 'application/json',
         'X-ModelScope-Async-Mode': 'true' // 异步模式
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: request.signal,
     })
 
     if (!response.ok) {
@@ -175,7 +176,7 @@ export class ModelScopeImageAdapter extends AbstractImageProviderAdapter {
     }
 
     // 轮询任务状态
-    return await this.pollTaskResult(taskId, config, 120, 3000)
+    return await this.pollTaskResult(taskId, config, 120, 3000, request.signal)
   }
 
   /**
@@ -185,19 +186,36 @@ export class ModelScopeImageAdapter extends AbstractImageProviderAdapter {
     taskId: string,
     config: ImageModelConfig,
     maxAttempts: number = 60,
-    intervalMs: number = 2000
+    intervalMs: number = 2000,
+    signal?: AbortSignal,
   ): Promise<ImageResult> {
     const taskUrl = this.resolveEndpointUrl(config, `/tasks/${taskId}`)
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      await new Promise(resolve => setTimeout(resolve, intervalMs))
+      if (signal?.aborted) {
+        const err = new Error('Image generation was cancelled')
+        err.name = 'AbortError'
+        throw err
+      }
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(resolve, intervalMs)
+        if (!signal) return
+        const onAbort = () => {
+          clearTimeout(timer)
+          const err = new Error('Image generation was cancelled')
+          err.name = 'AbortError'
+          reject(err)
+        }
+        signal.addEventListener('abort', onAbort, { once: true })
+      })
 
       const response = await fetch(taskUrl, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${config.connectionConfig?.apiKey}`,
           'X-ModelScope-Task-Type': 'image_generation'
-        }
+        },
+        signal,
       })
 
       if (!response.ok) {

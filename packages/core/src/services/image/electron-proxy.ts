@@ -17,10 +17,10 @@ import { safeSerializeForIPC } from '../../utils/ipc-serialization'
 
 type ElectronAPI = {
   image: {
-    generate: (request: ImageRequest) => Promise<ImageResult>
-    generateText2Image: (request: Text2ImageRequest) => Promise<ImageResult>
-    generateImage2Image: (request: Image2ImageRequest) => Promise<ImageResult>
-    generateMultiImage: (request: MultiImageGenerationRequest) => Promise<ImageResult>
+    generate: (request: ImageRequest, signal?: AbortSignal) => Promise<ImageResult>
+    generateText2Image: (request: Text2ImageRequest, signal?: AbortSignal) => Promise<ImageResult>
+    generateImage2Image: (request: Image2ImageRequest, signal?: AbortSignal) => Promise<ImageResult>
+    generateMultiImage: (request: MultiImageGenerationRequest, signal?: AbortSignal) => Promise<ImageResult>
     validateRequest: (request: ImageRequest) => Promise<void>
     validateText2ImageRequest: (request: Text2ImageRequest) => Promise<void>
     validateImage2ImageRequest: (request: Image2ImageRequest) => Promise<void>
@@ -55,23 +55,27 @@ export class ElectronImageServiceProxy implements IImageService {
   }
 
   async generate(request: ImageRequest): Promise<ImageResult> {
-    const safeReq = safeSerializeForIPC(request)
-    return await this.electronAPI.image.generate(safeReq)
+    const { signal, ...rest } = request
+    const safeReq = safeSerializeForIPC(rest) as ImageRequest
+    return await this.electronAPI.image.generate(safeReq, signal)
   }
 
   async generateText2Image(request: Text2ImageRequest): Promise<ImageResult> {
-    const safeReq = safeSerializeForIPC(request)
-    return await this.electronAPI.image.generateText2Image(safeReq)
+    const { signal, ...rest } = request
+    const safeReq = safeSerializeForIPC(rest) as Text2ImageRequest
+    return await this.electronAPI.image.generateText2Image(safeReq, signal)
   }
 
   async generateImage2Image(request: Image2ImageRequest): Promise<ImageResult> {
-    const safeReq = safeSerializeForIPC(request)
-    return await this.electronAPI.image.generateImage2Image(safeReq)
+    const { signal, ...rest } = request
+    const safeReq = safeSerializeForIPC(rest) as Image2ImageRequest
+    return await this.electronAPI.image.generateImage2Image(safeReq, signal)
   }
 
   async generateMultiImage(request: MultiImageGenerationRequest): Promise<ImageResult> {
-    const safeReq = safeSerializeForIPC(request)
-    return await this.electronAPI.image.generateMultiImage(safeReq)
+    const { signal, ...rest } = request
+    const safeReq = safeSerializeForIPC(rest) as MultiImageGenerationRequest
+    return await this.electronAPI.image.generateMultiImage(safeReq, signal)
   }
 
   async validateRequest(request: ImageRequest): Promise<void> {

@@ -48,6 +48,7 @@ const { installMainFrameNavigationGuard, isSafeExternalUrl } = require('./config
 const {
   createIpcError,
   registerSecureIpcHandler,
+  assertValidStreamId,
 } = require('./config/ipc-security');
 const { createStreamRegistry } = require('./config/stream-registry');
 const { createOwnedStreamRunner } = require('./config/ipc/owned-stream-runner');
@@ -930,6 +931,8 @@ function setupIPC() {
     createSuccessResponse,
     createErrorResponse,
     createStructuredErrorResponse,
+    streamRegistry,
+    assertValidStreamId,
   });
 
   // 将模板管理 IPC 委托给独立后端 module。

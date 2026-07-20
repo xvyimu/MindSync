@@ -572,6 +572,16 @@
 
                             <NFlex align="center" justify="end" :size="8" :wrap="false">
                                 <NButton
+                                    v-if="isAnyVariantRunning"
+                                    type="warning"
+                                    size="small"
+                                    secondary
+                                    @click="cancelImageGeneration"
+                                    :data-testid="'image-text2image-test-stop'"
+                                >
+                                    {{ t('common.stop') }}
+                                </NButton>
+                                <NButton
                                     type="primary"
                                     size="small"
                                     :loading="isAnyVariantRunning"
@@ -1136,6 +1146,7 @@ const {
     generateText2Image,
     validateText2ImageRequest,
     loadImageModels,
+    cancel: cancelImageGeneration,
 } = useImageGeneration()
 
 // 服务引用
@@ -2210,6 +2221,15 @@ const runVariant = async (
         }
         return true
     } catch (error) {
+        const isAbort =
+            (error instanceof Error && error.name === 'AbortError') ||
+            (typeof error === 'object' && error && (error as { code?: string }).code === 'IPC_STREAM_CANCELLED')
+        if (isAbort) {
+            if (!opts?.silentError) {
+                toast.info(t('toast.info.optimizeCancelled'))
+            }
+            return false
+        }
         if (!opts?.silentError) {
             toast.error(getI18nErrorMessage(error, t('imageWorkspace.generation.generateFailed')))
         }

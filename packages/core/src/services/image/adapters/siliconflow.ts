@@ -291,7 +291,8 @@ export class SiliconFlowImageAdapter extends AbstractImageProviderAdapter {
         ...(request.inputImage?.b64 && {
           image: `data:${request.inputImage.mimeType || 'image/png'};base64,${request.inputImage.b64}`
         })
-      })
+      }),
+      signal: request.signal,
     })
 
     return {
@@ -314,7 +315,7 @@ export class SiliconFlowImageAdapter extends AbstractImageProviderAdapter {
 
   private async apiCall(config: ImageModelConfig, endpoint: string, options: any) {
     const url = this.resolveEndpointUrl(config, endpoint)
-    const response = await fetch(url, options)
+    const response = await fetch(url, options) // callers pass signal via options
     if (!response.ok) {
       let bodyText = ''
       try {

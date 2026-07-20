@@ -57,6 +57,13 @@ export abstract class AbstractImageProviderAdapter implements IImageProviderAdap
     request: ImageRequest,
     config: ImageModelConfig
   ): Promise<ImageResult> {
+    // Cooperative cancel: fail fast before network work when already aborted.
+    if (request.signal?.aborted) {
+      const err = new Error('Image generation was cancelled')
+      err.name = 'AbortError'
+      throw err
+    }
+
     // 1. 验证请求合法性
     this.validateRequest(request, config)
 
@@ -65,6 +72,18 @@ export abstract class AbstractImageProviderAdapter implements IImageProviderAdap
 
     // 3. 调用具体实现（让具体适配器处理模型相关逻辑）
     return await this.doGenerate(request, config)
+  }
+
+  /** Merge AbortSignal into fetch init without clobbering an explicit signal. */
+  protected withRequestSignal(
+    options: RequestInit | undefined,
+    request: ImageRequest,
+  ): RequestInit {
+    const base = options ? { ...options } : {}
+    if (request.signal && !base.signal) {
+      base.signal = request.signal
+    }
+    return base
   }
 
   // ===== 统一的 URL 解析与代理封装 =====

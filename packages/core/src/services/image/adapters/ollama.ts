@@ -162,7 +162,8 @@ export class OllamaImageAdapter extends AbstractImageProviderAdapter {
     const response = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: request.signal,
     })
 
     if (!response.ok) {

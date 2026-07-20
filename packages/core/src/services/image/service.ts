@@ -239,6 +239,12 @@ export class ImageService implements IImageService {
   }
 
   private async generateInternal(request: ImageRequest): Promise<ImageResult> {
+    if (request.signal?.aborted) {
+      const err = new Error('Image generation was cancelled')
+      err.name = 'AbortError'
+      throw err
+    }
+
     // 获取配置
     const config = await this.imageModelManager.getConfig(request.configId)
     if (!config) {
@@ -249,6 +255,10 @@ export class ImageService implements IImageService {
     const adapter = this.registry.getAdapter(config.providerId)
     const runtimeConfig = this.prepareRuntimeConfig(config)
     const runtimeRequest = await this.prepareRuntimeRequest(request, runtimeConfig)
+    // Preserve abort signal (prepareRuntimeRequest may clone fields without it).
+    if (request.signal && !runtimeRequest.signal) {
+      runtimeRequest.signal = request.signal
+    }
 
     try {
       // 调用适配器生成
@@ -322,6 +332,9 @@ export class ImageService implements IImageService {
     }
 
     const runtimeRequest = await this.prepareRuntimeRequest(request, runtimeConfig)
+    if (request.signal && !runtimeRequest.signal) {
+      runtimeRequest.signal = request.signal
+    }
     // 直接调用适配器，绕过 imageModelManager 的存储查找
     try {
       return await adapter.generate(runtimeRequest, runtimeConfig)

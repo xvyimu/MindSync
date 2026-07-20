@@ -120,9 +120,14 @@ export class CloudflareImageAdapter extends AbstractImageProviderAdapter {
           headers: {
             Authorization: `Bearer ${config.connectionConfig?.apiKey}`
           },
-          body: formData
+          body: formData,
+          signal: request.signal,
         })
       } catch (error) {
+        // Do not retry cancellations.
+        if (error instanceof Error && error.name === 'AbortError') {
+          throw error
+        }
         lastTransportError = error
         if (attempt < MAX_RETRY_ATTEMPTS) {
           continue

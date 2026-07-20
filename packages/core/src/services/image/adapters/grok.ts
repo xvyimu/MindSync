@@ -179,7 +179,8 @@ export class GrokImageAdapter extends AbstractImageProviderAdapter {
     const response = await this.apiCall(config, '/images/generations', {
       method: 'POST',
       headers: this.getJsonHeaders(config),
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: request.signal,
     })
 
     return this.parseImageResponse(response, config)
@@ -217,7 +218,8 @@ export class GrokImageAdapter extends AbstractImageProviderAdapter {
     const response = await this.apiCall(config, '/images/edits', {
       method: 'POST',
       headers: this.getJsonHeaders(config),
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: request.signal,
     })
 
     return this.parseImageResponse(response, config)

@@ -242,7 +242,8 @@ export class OpenAIImageAdapter extends AbstractImageProviderAdapter {
         'Authorization': `Bearer ${config.connectionConfig?.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: request.signal,
     })
 
     return this.parseImageResponse(response, config)
@@ -287,7 +288,8 @@ export class OpenAIImageAdapter extends AbstractImageProviderAdapter {
         'Authorization': `Bearer ${config.connectionConfig?.apiKey}`
         // 不设置Content-Type，让浏览器自动设置multipart/form-data边界
       },
-      body: formData
+      body: formData,
+      signal: request.signal,
     })
 
     return this.parseImageResponse(response, config)

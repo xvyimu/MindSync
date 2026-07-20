@@ -532,37 +532,88 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
   },
 
-  // Image Service interface
+  // Image Service interface (optional AbortSignal for cooperative cancel)
   image: {
-     generate: async (request) => {
-       const result = await ipcRenderer.invoke('image-generate', request);
-       if (!result.success) {
-         throw createIpcError(result.error);
+     generate: async (request, signal) => {
+       const { signal: _drop, ...payload } = request || {};
+       const streamId = signal ? generateStreamId() : undefined;
+       const invokePromise = ipcRenderer.invoke('image-generate', payload, streamId);
+       if (!signal) {
+         const result = await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
        }
-       return result.data;
+       const cancellation = createStreamAbortRace(streamId, () => {}, signal);
+       try {
+         const result = cancellation.abortPromise
+           ? await Promise.race([invokePromise, cancellation.abortPromise])
+           : await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
+       } finally {
+         cancellation.dispose();
+       }
      },
- 
-     // 显式模式：避免根据 inputImage 是否存在隐式推断
-     generateText2Image: async (request) => {
-       const result = await ipcRenderer.invoke('image-generateText2Image', request);
-       if (!result.success) {
-         throw createIpcError(result.error);
+
+     generateText2Image: async (request, signal) => {
+       const { signal: _drop, ...payload } = request || {};
+       const streamId = signal ? generateStreamId() : undefined;
+       const invokePromise = ipcRenderer.invoke('image-generateText2Image', payload, streamId);
+       if (!signal) {
+         const result = await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
        }
-       return result.data;
+       const cancellation = createStreamAbortRace(streamId, () => {}, signal);
+       try {
+         const result = cancellation.abortPromise
+           ? await Promise.race([invokePromise, cancellation.abortPromise])
+           : await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
+       } finally {
+         cancellation.dispose();
+       }
      },
-     generateImage2Image: async (request) => {
-       const result = await ipcRenderer.invoke('image-generateImage2Image', request);
-       if (!result.success) {
-         throw createIpcError(result.error);
+     generateImage2Image: async (request, signal) => {
+       const { signal: _drop, ...payload } = request || {};
+       const streamId = signal ? generateStreamId() : undefined;
+       const invokePromise = ipcRenderer.invoke('image-generateImage2Image', payload, streamId);
+       if (!signal) {
+         const result = await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
        }
-       return result.data;
+       const cancellation = createStreamAbortRace(streamId, () => {}, signal);
+       try {
+         const result = cancellation.abortPromise
+           ? await Promise.race([invokePromise, cancellation.abortPromise])
+           : await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
+       } finally {
+         cancellation.dispose();
+       }
      },
-     generateMultiImage: async (request) => {
-       const result = await ipcRenderer.invoke('image-generateMultiImage', request);
-       if (!result.success) {
-         throw createIpcError(result.error);
+     generateMultiImage: async (request, signal) => {
+       const { signal: _drop, ...payload } = request || {};
+       const streamId = signal ? generateStreamId() : undefined;
+       const invokePromise = ipcRenderer.invoke('image-generateMultiImage', payload, streamId);
+       if (!signal) {
+         const result = await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
        }
-       return result.data;
+       const cancellation = createStreamAbortRace(streamId, () => {}, signal);
+       try {
+         const result = cancellation.abortPromise
+           ? await Promise.race([invokePromise, cancellation.abortPromise])
+           : await invokePromise;
+         if (!result.success) throw createIpcError(result.error);
+         return result.data;
+       } finally {
+         cancellation.dispose();
+       }
      },
  
      validateRequest: async (request) => {

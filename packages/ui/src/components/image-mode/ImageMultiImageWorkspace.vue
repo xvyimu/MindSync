@@ -374,6 +374,16 @@
               </NFlex>
 
               <NButton
+                v-if="isAnyVariantRunning"
+                type="warning"
+                size="small"
+                secondary
+                data-testid="image-multiimage-test-stop"
+                @click="cancelImageGeneration"
+              >
+                {{ t('common.stop') }}
+              </NButton>
+              <NButton
                 type="primary"
                 size="small"
                 :loading="isAnyVariantRunning"
@@ -688,7 +698,13 @@ const services = inject<Ref<AppServices | null>>('services', ref(null))
 const variableManager = inject<VariableManagerHooks | null>('variableManager', null)
 const session = useImageMultiImageSession()
 const tempVarsManager = useTemporaryVariables()
-const { imageModels, loadImageModels, generateMultiImage, validateMultiImageRequest } = useImageGeneration()
+const {
+  imageModels,
+  loadImageModels,
+  generateMultiImage,
+  validateMultiImageRequest,
+  cancel: cancelImageGeneration,
+} = useImageGeneration()
 
 interface VariantInputImageInfo {
   width?: number
@@ -1840,6 +1856,15 @@ const runVariant = async (
     }
     return true
   } catch (error) {
+    const isAbort =
+      (error instanceof Error && error.name === 'AbortError') ||
+      (typeof error === 'object' && error && (error as { code?: string }).code === 'IPC_STREAM_CANCELLED')
+    if (isAbort) {
+      if (!opts?.silentError) {
+        toast.info(t('toast.info.optimizeCancelled'))
+      }
+      return false
+    }
     if (!opts?.silentError) {
       toast.error(getI18nErrorMessage(error, t('imageWorkspace.generation.generateFailed')))
     }
