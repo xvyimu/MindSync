@@ -195,6 +195,9 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
     readText('packages/desktop/config/ipc/preference-handlers.js'),
     readText('packages/desktop/config/ipc/system-handlers.js'),
     readText('packages/desktop/config/ipc/update-handlers.js'),
+    // 仍由 main / remote-storage 直接注册的 channel（未下沉 domain 模块）
+    readText('packages/desktop/main.js'),
+    readText('packages/desktop/remote-storage.js'),
   ].join('\n')
 
   const registered = collectMatches(handlerSources, [

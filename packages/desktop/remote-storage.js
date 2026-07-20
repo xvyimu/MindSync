@@ -526,7 +526,8 @@ function setupRemoteStorageHandlers(ipcMainOrRegistrar, helpers = {}, dependenci
     : null;
 
   if (registerSensitiveIpc) {
-    registerSensitiveIpc(REMOTE_STORAGE_CHANNEL, async (_event, request) => {
+    // 字符串字面量：契约测试扫描 registerSensitiveIpc('...')；常量仍用于文档对齐
+    registerSensitiveIpc('remote-storage:invoke', async (_event, request) => {
       return handleRemoteStorageOperation(request, dependencies);
     });
     return;
