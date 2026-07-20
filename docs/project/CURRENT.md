@@ -22,11 +22,12 @@
 |------|------|
 | 源码 | `D:\PromtOptimizer\src\prompt-optimizer` |
 | **运行安装** | **`D:\PromtOptimizer\app\PromptOptimizer.exe`** |
-| 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` 等 |
-| 工具链 | `D:\PromtOptimizer\tools`（portable Node 22） |
+| 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` |
+| 工具链 | `D:\PromtOptimizer\tools`（portable Node 22，常用 `tools\node-v22.17.0-win-x64`） |
 | 用户模板 | `D:\PromtOptimizer\custom-templates\`（勿删） |
+| Desktop IPC 协议 | `packages/desktop/config/ipc/channel-manifest.js` · **1.1.0** |
 
-旧热替换树 `D:\PromtOptimizer\PromptOptimizer\` **已废弃**。
+旧热替换树 `D:\PromtOptimizer\PromptOptimizer\` **已废弃**（清理表见 [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md)）。
 
 ---
 
@@ -37,7 +38,12 @@
 | 安装/启动 | `D:\PromtOptimizer\README.md` |
 | 开发/模块/测试 | [`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) |
 | 全面检查/安全/模块审计 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
-| 文档怎么管 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` |
+| 全面扫描建议 | `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
+| 文档怎么管 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`（方案 C 已落地） |
+| **文档二期 C2** | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-C2-2026-07-20.md`（漂移清零 + 门禁硬化） |
+| **文档漂移台账** | [`DOC-DRIFT-REGISTRY.md`](./DOC-DRIFT-REGISTRY.md)（DOC-01～20 状态） |
+| 磁盘清理 | [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md) |
+| **发版一步表** | [`RELEASE-RUNBOOK.md`](./RELEASE-RUNBOOK.md) |
 | 产品范围 | [`prd.md`](./prd.md) |
 | 部署（Vercel 等） | [`../user/deployment/`](../user/deployment/) |
 | 现行架构白名单 | [`../architecture/README.md`](../architecture/README.md) |
@@ -46,7 +52,7 @@
 
 ## 本轮产品能力摘要（2.11.7 fork）
 
-- Desktop hardening：stream cancel、IPC 域拆分、sender 校验  
+- Desktop hardening：stream cancel、IPC 域拆分、**域 handler 全量 `registerSensitiveIpc` / update `secureHandle` sender 校验**  
 - UX quiet-workbench + 取消文案  
 - **Paper / 纸感**主题（离线字体）  
 - 打包含 `icons/**`；安装为 **app.asar**  

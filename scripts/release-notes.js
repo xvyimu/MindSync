@@ -600,11 +600,14 @@ function renderGitHubReleaseBody({ cwd = process.cwd(), version, repository }) {
 
 function printUsage() {
   console.log('Usage: node scripts/release-notes.js <new|check|check-entry|render-body> [version] [repository]');
-  console.log('Examples:');
+  console.log('Examples (pnpm aliases → this script):');
   console.log('  pnpm release:notes:new 2.9.0');
   console.log('  pnpm release:notes:check v2.9.0');
   console.log('  pnpm release:notes:check:entry v2.6.0');
-  console.log('  node scripts/release-notes.js render-body v2.9.0 linshenkx/prompt-optimizer');
+  console.log('  node scripts/release-notes.js new 2.9.0');
+  console.log('  node scripts/release-notes.js check v2.9.0');
+  console.log('  node scripts/release-notes.js render-body v2.9.0 xvyimu/prompt-optimizer');
+  console.log('See docs/project/RELEASE-RUNBOOK.md');
 }
 
 function main(argv = process.argv.slice(2), cwd = process.cwd()) {

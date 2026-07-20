@@ -316,15 +316,22 @@ Docker部署时通过 `-e` 参数配置环境变量：
 </details>
 
 ## 本地开发
-详细文档可查看 [开发文档](docs/developer/development.md)
+
+详细文档见 [开发文档](docs/developer/development.md)。
+
+**本仓库按 fork 维护**（[xvyimu/prompt-optimizer](https://github.com/xvyimu/prompt-optimizer)，分支 `develop`，默认 **fork-only**）。  
+维护者本机版本/安装路径权威： [docs/project/CURRENT.md](docs/project/CURRENT.md) · 交接：[docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md)。
 
 <details>
 <summary>点击查看本地开发命令</summary>
 
 ```bash
-# 1. 克隆项目
-git clone https://github.com/linshenkx/prompt-optimizer.git
+# 1. 克隆（推荐本产品线 fork）
+git clone https://github.com/xvyimu/prompt-optimizer.git
 cd prompt-optimizer
+
+# 可选：仅拉取上游（默认不向上游开 PR）
+# git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
 
 # 2. 安装依赖
 pnpm install

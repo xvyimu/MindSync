@@ -321,15 +321,22 @@ Configure environment variables through the `-e` parameter when deploying with D
 </details>
 
 ## Local Development
-For detailed documentation, see [Development Documentation](docs/developer/development.md)
+
+For detailed documentation, see [Development Documentation](docs/developer/development.md).
+
+**This repository is maintained as a fork** ([xvyimu/prompt-optimizer](https://github.com/xvyimu/prompt-optimizer), branch `develop`, **fork-only** by default).  
+Authoritative version / install paths for the maintainer workspace: [docs/project/CURRENT.md](docs/project/CURRENT.md) · handoff: [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
 
 <details>
 <summary>Click to view local development commands</summary>
 
 ```bash
-# 1. Clone the project
-git clone https://github.com/linshenkx/prompt-optimizer.git
+# 1. Clone (fork — recommended for this product line)
+git clone https://github.com/xvyimu/prompt-optimizer.git
 cd prompt-optimizer
+
+# Optional: track upstream for pulls only (do not assume PRs to upstream)
+# git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
 
 # 2. Install dependencies
 pnpm install

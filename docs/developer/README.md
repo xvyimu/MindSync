@@ -1,49 +1,56 @@
 # 开发者文档
 
-欢迎参与Prompt Optimizer的开发！这里包含了所有开发相关的技术文档。
+欢迎参与 **Prompt Optimizer** 开发。  
+**本 fork 策略：fork-only** — 默认在 [xvyimu/prompt-optimizer](https://github.com/xvyimu/prompt-optimizer) 的 `develop` 上工作，不默认向上游开 PR。  
+现行版本/路径：[`../project/CURRENT.md`](../project/CURRENT.md) · 工程交接：[`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md)
 
-## 🚀 快速开始
+## 快速开始
 
-- [开发指南](./development.md) - 开发环境搭建、Docker 开发和常用工作流
-- [技术开发指南](./technical-development-guide.md) - 完整的技术栈和开发规范
-- [项目结构](./project-structure.md) - 项目文件和目录组织说明
-- [AI开发流程规范](./ai-development-workflow.md) - AI辅助开发的标准化流程
-- [通用开发经验](./general-experience.md) - 项目开发中的通用经验与最佳实践
+- [开发指南](./development.md) — 环境、Docker、常用工作流（**clone 本 fork**）  
+- [技术开发指南](./technical-development-guide.md) — 技术栈与规范  
+- [项目结构](./project-structure.md) — 目录组织  
+- [通用开发经验](./general-experience.md) — 经验与最佳实践  
+- [开发工作流（本机）](../project/DEV-WORKFLOW.md) — Node 22 / 命令摘要  
 
-## 📱 平台开发指南
+## 平台
 
 ### 桌面端
-- [桌面开发指南](./desktop-developer-guide.md) - Electron桌面应用开发
 
-### Web端
-- Web开发指南（待创建） - Web应用开发说明
+- [桌面开发指南](./desktop-developer-guide.md)  
+- [Electron IPC 实践](./electron-ipc-best-practices.md)  
 
-### 浏览器插件
-- 插件开发指南（待创建） - Chrome扩展开发
+### Web / 扩展
 
-## 📚 API文档
+- Web：入口包 `packages/web`；命令见根 `package.json`（`pnpm dev` / `build:web`）  
+- 扩展：`packages/extension`；`pnpm dev:ext` / `build:ext`  
 
-- [核心API文档](./api/core-api.md)（待创建） - @prompt-optimizer/core包API参考
+### MCP
 
-## 🏗️ 架构文档
+- `packages/mcp-server`；`pnpm mcp:dev` / `mcp:test`  
 
-- [架构概览](./architecture/overview.md)（待创建） - 系统整体架构
-- [设计模式](./architecture/design-patterns.md)（待创建） - 项目中使用的设计模式
+## 专题
 
-## 🔧 故障排查
+- [LLM 参数配置](./llm-params-guide.md)  
+- [i18n 策略](./i18n-policy.md)  
+- [Prompt Garden 集成笔记](./prompt-garden-integration.md)  
+- [技术分析](./technical-analysis.md)  
+- [开发任务清单](./todo.md)  
 
-- [通用排查清单](./troubleshooting/general-checklist.md) - 常见问题的排查步骤
-- [排查指南索引](./troubleshooting/README.md)（待创建） - 所有排查文档的索引
+## 故障排查
 
-## 🤝 贡献指南
+- [排查指南索引](./troubleshooting/README.md)  
+- [通用排查清单](./troubleshooting/general-checklist.md)  
 
-- 贡献指南（待创建） - 如何参与项目开发
-- 代码规范（在技术开发指南中） - 编码标准和最佳实践
-- 提交规范（待创建） - Git提交消息规范
+## 发版与文档纪律
 
-## 📋 开发流程
+- 发版一步表：[`../project/RELEASE-RUNBOOK.md`](../project/RELEASE-RUNBOOK.md)  
+- 文档策略：[`../DOCS_POLICY.md`](../DOCS_POLICY.md)  
+- 漂移台账：[`../project/DOC-DRIFT-REGISTRY.md`](../project/DOC-DRIFT-REGISTRY.md)  
 
-- [开发任务清单](./todo.md) - 按功能模块和优先级组织的任务列表
-- 开发流程（待创建） - 从需求到发布的完整流程
-- 测试指南（待创建） - 单元测试和集成测试
-- 发布流程（待创建） - 版本发布和部署流程
+## 架构（现行）
+
+系统架构白名单在 [`../architecture/README.md`](../architecture/README.md)，**不在**本目录下的 `architecture/` 子树（该路径未建立）。  
+
+## 未建文档（有意）
+
+以下条目**尚未成文**（勿标「已创建」）：独立 Web 开发专篇、扩展开发专篇、`api/core-api.md`、贡献指南长文。需要时优先链到 HANDOFF / RUNBOOK / architecture 白名单，避免再造多 SSOT。  

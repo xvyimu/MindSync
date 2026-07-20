@@ -14,10 +14,12 @@ Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编�
 | 能力 | 说明 |
 |------|------|
 | **Paper / 纸感主题** | 离线字体栈；`data-app-theme=paper`；取消按钮 CTA token |
-| **流式可停止** | Basic/Pro 文本路径 AbortSignal + Stop UI（图像出图取消仍为债务） |
-| **Desktop 安全硬化** | IPC 域拆分、sender 校验、stream 所有权取消 |
+| **流式可停止（文本）** | Basic/Pro 文本路径 AbortSignal + Stop UI |
+| **图像生成可取消** | `ImageRequest.signal` → adapters `fetch`；Desktop 可选 `streamId` + `stream-cancel`；UI Stop + 取消 toast（2.11.7 fork） |
+| **Desktop 安全硬化** | IPC 域拆分、stream 所有权取消；sender 全量 secure 仍为持续债（见 FULL-SCAN S10） |
 | **部署安全** | Docker 不向浏览器注入模型 API Key；Vercel 访问门为 HMAC 会话 Cookie |
-| **明确不做** | 中心化托管对话、默认企业云协作、默认真钥预置到公开前端 |
+| **UI 类型门禁** | TemplateSelect 与 Naive `SelectFilter` 对齐（`build:types`） |
+| **明确不做** | 中心化托管对话、默认企业云协作、默认真钥预置到公开前端、默认向上游开 PR |
 
 ## 2. 目标用户
 

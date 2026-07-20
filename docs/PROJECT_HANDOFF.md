@@ -11,7 +11,8 @@
 **文档分层：** L0 本文 + 安装 README · L1 CURRENT/AUDIT/user · L2 archives/workspace/.pipeline  
 **本机安装：** `D:\PromtOptimizer\app\PromptOptimizer.exe`  
 **全面检查：** `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md`  
-**文档规划：** `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`
+**文档规划：** `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` · C2：`DOC-SYSTEM-PLAN-C2-2026-07-20.md`  
+**文档策略 / 漂移台账 / 清理：** [`DOCS_POLICY.md`](./DOCS_POLICY.md) · [`project/DOC-DRIFT-REGISTRY.md`](./project/DOC-DRIFT-REGISTRY.md) · [`project/CLEANUP-PLAYBOOK.md`](./project/CLEANUP-PLAYBOOK.md)
 
 ---
 
@@ -115,17 +116,28 @@ git push origin develop
 
 ### 2.2 Desktop IPC 领域拆分
 
-`packages/desktop/config/ipc/`：
+`packages/desktop/config/ipc/`（**以磁盘文件名为准**）：
 
-| 模块 | 职责 |
+| 文件 | 职责 |
 |------|------|
-| llm-handlers / prompt-stream / prompt-sync | LLM 与 Prompt |
-| model / image / template / history / context / favorite / data / preference / system | 各领域 |
-| update-handlers | 自动更新（createUpdateHandlers(ctx)） |
-| owned-stream-runner | 流所有权 + AbortSignal |
-| channel-manifest | 协议版本 1.1.0 + CHANNEL_META + UPDATE channels |
+| `channel-manifest.js` | 协议版本 **1.1.0** + CHANNEL_META + 域 channel 清单 |
+| `llm-handlers.js` | LLM 域（含 secure/sensitive 注册路径） |
+| `prompt-stream-handlers.js` | Prompt 流式 |
+| `prompt-sync-handlers.js` | Prompt 同步调用 |
+| `model-handlers.js` | 文本模型配置 |
+| `image-handlers.js` | 图像模型 / 生成 |
+| `template-handlers.js` | 模板 |
+| `history-handlers.js` | 历史 |
+| `context-handlers.js` | 上下文 |
+| `favorite-handlers.js` | 收藏 |
+| `data-handlers.js` | 导入导出 / 存储信息 |
+| `preference-handlers.js` | 偏好 |
+| `system-handlers.js` | 系统（日志目录等） |
+| `update-handlers.js` | 自动更新（`createUpdateHandlers(ctx)`） |
+| `owned-stream-runner.js` | 流所有权 + AbortSignal |
 
-`main.js`：composition root + 生命周期；update 通过 getter/setter 注入。
+`main.js`：composition root + 生命周期；update 通过 getter/setter 注入。  
+**IPC 安全（Wave C）：** 业务域 handler 经 `registerSensitiveIpc`（sender + 信封）；`update-handlers` 用 `secureHandle` + `assertTrustedRendererSender`（自带详细信封，避免双重包装）；`remote-storage` 经 `registerSensitiveIpc`。
 
 ### 2.3 安全边界
 
@@ -255,56 +267,37 @@ node scripts/run-e2e-group.js gate
 
 ## 6. Git 工作流
 
+**源码根（唯一）：** `D:\PromtOptimizer\src\prompt-optimizer`  
+**日常分支：** `develop`（功能用 `feat/*` 再合入）  
+**策略：** fork-only · 默认 **不**向上游开 PR  
+
 ```powershell
-cd C:\Users\yuanjia\Documents\Codex\2026-07-17\dui\work\source-extract\prompt-optimizer-develop
+cd D:\PromtOptimizer\src\prompt-optimizer
 $env:HTTP_PROXY='http://127.0.0.1:7890'; $env:HTTPS_PROXY='http://127.0.0.1:7890'
 git status -sb
 git log -5 --oneline
-git push origin work/desktop-hardening-on-develop
 git push origin develop
 ```
 
-- 上游 PR：https://github.com/linshenkx/prompt-optimizer/pull/324  
-- fork 已合 PR：#1 #2  
+- 历史分支名 `work/desktop-hardening*` **仅考古**，不要再 `push` 作主路径  
+- 上游 PR #324 等为历史记录；现行以 fork `develop` 为准  
+- fork 已合 PR：#1 #2（及后续）  
 
 ---
 
-## 7. 清理策略（允许删 / 禁止删）
+## 7. 清理策略
 
-### 7.1 允许删除（可再生 junk）
+**完整允许删 / 禁止删 / 自检表：** 只维护  
+[`docs/project/CLEANUP-PLAYBOOK.md`](./project/CLEANUP-PLAYBOOK.md)
 
-| 路径 | 说明 |
-|------|------|
-| `D:\PromtOptimizer\portable-build\` | 失败整壳拷贝 |
-| `D:\PromtOptimizer\portable-app-overlay\` | 已有 zip |
-| `.pipeline/core-unit-report.json` | 可重跑生成 |
-| `packages/desktop/dist/win-unpacked\` | builder 半成品（保留亦可） |
-| `test-results/` / `playwright-report/` | e2e 产物 |
-| `%TEMP%\po-local-e2e-*.log` | 烟测日志 |
+摘要：
 
-### 7.2 禁止删除
+| 现行安装 | `D:\PromtOptimizer\app\`（`app.asar`） |
+|----------|----------------------------------------|
+| 现行 NSIS 归档 | `nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` |
+| 已废弃 | `D:\PromtOptimizer\PromptOptimizer\` 热替换树（**不是**运行安装） |
 
-| 路径 | 说明 |
-|------|------|
-| 源码 worktree 业务代码 | 真相源 |
-| `.pipeline/*.md` / `docs/PROJECT_HANDOFF.md` | 过程与交接 |
-| `D:\PromtOptimizer\PromptOptimizer\` | 可运行安装 |
-| `D:\PromtOptimizer\nsis-2026-07-18\` | NSIS 安装包 |
-| `D:\PromtOptimizer\CLOSEOUT.md` | 收口清单 |
-| `archive-delivery-2026-07-18\` | 归档 |
-| `PromptOptimizer-app-overlay.zip` | 分发 |
-| `custom-templates\` | 用户数据 |
-| 历史 audit / PROJECT_STATUS_REPORT | 审计上下文 |
-
-### 7.3 清理后自检
-
-```powershell
-Test-Path D:\PromtOptimizer\PromptOptimizer\resources\app\main.js
-Test-Path D:\PromtOptimizer\PromptOptimizer\resources\app\config\ipc\update-handlers.js
-Test-Path D:\PromtOptimizer\PromptOptimizer\resources\app\icons\app-icon.ico
-Test-Path D:\PromtOptimizer\nsis-2026-07-18\PromptOptimizer-2.11.7-win-x64.exe
-node scripts/desktop-local-e2e-smoke.cjs
-```
+机检：`node scripts/check-docs-handoff-paths.mjs`（禁止本文再写入废弃自检路径）。
 
 ---
 
@@ -332,3 +325,20 @@ node scripts/desktop-local-e2e-smoke.cjs
 |------|------|
 | 2026-07-18 | 初版：路径/能力/测试/清理/Git 全细节交接 |
 | 2026-07-18 晚 | 收口：upstream merge、PR#324、NSIS、gate 12/12、CLOSEOUT 入口 |
+| 2026-07-20 | 文档体系方案 C：CURRENT / DOCS_POLICY / 冻结横幅 / check:docs 雏形 |
+| 2026-07-20 | **C2-A**：§6 源码路径与 `develop` push；§7 改链 CLEANUP-PLAYBOOK；§2.2 IPC 文件名对齐磁盘；漂移台账 DOC-DRIFT-REGISTRY；`check-docs-handoff-paths.mjs` |
+| 2026-07-20 | **C2-B**：RELEASE-RUNBOOK；`release:notes:*` package 别名；version-sync 双文件；pnpm-script-refs / version-sync-list / version-consistency 入 check:docs |
+| 2026-07-20 | **C2-C**：archives 索引=磁盘；developer README；README EN/ZH fork clone；PRD 图像取消；FULL-AUDIT §6.5 CURRENT SSOT；archive-index + source-readme-fork；freeze+pipeline；REGISTRY open=0 |
+
+## 11. 文档体系摘要
+
+| 文档 | 角色 |
+|------|------|
+| [`project/CURRENT.md`](./project/CURRENT.md) | 版本/路径/策略 SSOT |
+| [`DOCS_POLICY.md`](./DOCS_POLICY.md) | 写哪里 / 禁止 |
+| [`project/DOC-DRIFT-REGISTRY.md`](./project/DOC-DRIFT-REGISTRY.md) | DOC 债台账 |
+| [`project/CLEANUP-PLAYBOOK.md`](./project/CLEANUP-PLAYBOOK.md) | 磁盘清理 |
+| `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` | 方案 C |
+| `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-C2-2026-07-20.md` | 方案 C2 |
+| `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` | 深度审计 |
+| `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` | 全面扫描建议 |
