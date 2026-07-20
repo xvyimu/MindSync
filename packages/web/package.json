@@ -14,6 +14,7 @@
     "test:unit": "vitest run tests/unit"
   },
   "dependencies": {
+    "@prompt-optimizer/core": "workspace:*",
     "@prompt-optimizer/ui": "workspace:*",
     "vue": "^3.5.31"
   },

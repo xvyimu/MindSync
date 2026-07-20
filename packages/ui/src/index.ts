@@ -165,7 +165,14 @@ export { clickOutside } from "./directives/clickOutside";
 // 导出 composables
 export * from "./composables";
 
-// 从core重新导出需要的内容, 仅保留工厂函数、代理类和必要的工具/类型
+/**
+ * @deprecated Compatibility re-exports from `@prompt-optimizer/core`.
+ * App shells (web/extension/desktop renderer) and new code should import
+ * factories/proxies **directly from `@prompt-optimizer/core`** (or
+ * `@prompt-optimizer/core/electron`). These re-exports remain only so
+ * existing UI-internal deep imports and older consumers keep working.
+ * Do not add new factory re-exports here.
+ */
 export {
   StorageFactory,
   DexieStorageProvider,
@@ -185,15 +192,13 @@ export {
   createContextRepo,
   FavoriteManager,
   isRunningInElectron,
-  // 评估服务
   EvaluationService,
   createEvaluationService,
-  // 🆕 变量提取服务
   createVariableExtractionService,
-  // 🆕 变量值生成服务
   createVariableValueGenerationService,
 } from "@prompt-optimizer/core";
 
+/** @deprecated Import from `@prompt-optimizer/core/electron` instead. */
 export {
   ElectronContextRepoProxy,
   ElectronDataManagerProxy,
@@ -210,7 +215,7 @@ export {
   waitForElectronApi,
 } from "@prompt-optimizer/core/electron";
 
-// 导出类型
+// 类型 re-export：类型擦除后无运行时依赖，保留以便 UI 消费者单入口拿类型
 export type {
   OptimizationMode,
   OptimizationRequest,
@@ -230,14 +235,12 @@ export type {
   IFavoriteManager,
   FavoritePrompt,
   FavoriteCategory,
-  // 评估服务类型
   IEvaluationService,
   EvaluationType,
   EvaluationRequest,
   EvaluationResponse,
   EvaluationScore,
   EvaluationStreamHandlers,
-  // 🆕 变量提取服务类型
   IVariableExtractionService,
   VariableExtractionRequest,
   VariableExtractionResponse,
@@ -248,8 +251,9 @@ export type {
 export * from "./types";
 export * from "./services";
 
-// 导出图像模式组件与核心图像服务（转发 core 能力）
+// 导出图像模式组件
 export { default as ImageModeSelector } from "./components/image-mode/ImageModeSelector.vue";
+/** @deprecated Import image factories from `@prompt-optimizer/core` instead. */
 export {
   ImageModelManager,
   createImageModelManager,

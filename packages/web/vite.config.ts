@@ -21,7 +21,7 @@ const isSafeViteDefineKey = (key: string): boolean => {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const monorepoRoot = resolve(__dirname, '../..')
   const env = loadEnv(mode, monorepoRoot)
   const filteredEnv = Object.fromEntries(
@@ -30,6 +30,26 @@ export default defineConfig(({ mode }) => {
   const processEnv = {
     ...DEFAULT_VITE_ENV,
     ...filteredEnv,
+  }
+
+  // production build：走 workspace 包 exports（dist），强制包边界
+  // development：直指源码，保证 monorepo HMR / 未 build 也能开发
+  const isBuild = command === 'build'
+  const packageAliases: Record<string, string> = {
+    '@': resolve(__dirname, 'src'),
+    // style 始终用已构建 CSS
+    '@prompt-optimizer/ui/dist/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
+    '@prompt-optimizer/ui/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
+  }
+
+  if (!isBuild) {
+    Object.assign(packageAliases, {
+      '@prompt-optimizer/core/electron': path.resolve(__dirname, '../core/src/electron.ts'),
+      '@prompt-optimizer/core': path.resolve(__dirname, '../core/src/index.ts'),
+      '@prompt-optimizer/ui': path.resolve(__dirname, '../ui/src/index.ts'),
+      '@prompt-optimizer/web': path.resolve(__dirname, '../web'),
+      '@prompt-optimizer/extension': path.resolve(__dirname, '../extension'),
+    })
   }
 
   return {
@@ -67,19 +87,7 @@ export default defineConfig(({ mode }) => {
         '@codemirror/view',
         'codemirror'
       ],
-      alias: {
-        '@': resolve(__dirname, 'src'),
-        // Prefer source for monorepo electron/desktop builds so newly added
-        // templates and proxies ship without a stale package dist.
-        // Keep style subpath on built CSS (ui vite emits dist/style.css).
-        '@prompt-optimizer/ui/dist/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
-        '@prompt-optimizer/ui/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
-        '@prompt-optimizer/core/electron': path.resolve(__dirname, '../core/src/electron.ts'),
-        '@prompt-optimizer/core': path.resolve(__dirname, '../core/src/index.ts'),
-        '@prompt-optimizer/ui': path.resolve(__dirname, '../ui/src/index.ts'),
-        '@prompt-optimizer/web': path.resolve(__dirname, '../web'),
-        '@prompt-optimizer/extension': path.resolve(__dirname, '../extension')
-      }
+      alias: packageAliases,
     },
     define: {
       'process.env': {

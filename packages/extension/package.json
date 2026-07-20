@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@prompt-optimizer/core": "workspace:*",
     "@prompt-optimizer/ui": "workspace:*",
     "vue": "^3.5.31"
   },

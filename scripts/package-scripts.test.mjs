@@ -133,6 +133,27 @@ test('web and extension package typecheck scripts use isolated tsconfig files', 
   assert.match(extensionTypecheckConfig.include.join(' '), /\benv\.d\.ts\b/)
 })
 
+test('web and extension declare direct core dependency for package boundary', () => {
+  const webPackage = readJson(path.join('packages', 'web', 'package.json'))
+  const extensionPackage = readJson(path.join('packages', 'extension', 'package.json'))
+
+  assert.equal(webPackage.dependencies?.['@prompt-optimizer/core'], 'workspace:*')
+  assert.equal(webPackage.dependencies?.['@prompt-optimizer/ui'], 'workspace:*')
+  assert.equal(extensionPackage.dependencies?.['@prompt-optimizer/core'], 'workspace:*')
+  assert.equal(extensionPackage.dependencies?.['@prompt-optimizer/ui'], 'workspace:*')
+})
+
+test('web/extension production builds resolve packages via exports not source aliases', () => {
+  const webViteConfig = fs.readFileSync(path.join(process.cwd(), 'packages', 'web', 'vite.config.ts'), 'utf8')
+  const extensionViteConfig = fs.readFileSync(path.join(process.cwd(), 'packages', 'extension', 'vite.config.ts'), 'utf8')
+
+  // production path must not force source aliases
+  assert.match(webViteConfig, /command === ['"]build['"]|isBuild/)
+  assert.match(webViteConfig, /!isBuild/)
+  assert.match(extensionViteConfig, /isBuild|command === ['"]build['"]/)
+  assert.match(extensionViteConfig, /!isBuild/)
+})
+
 test('web dev loads root env while extension build stays isolated from root env', () => {
   const webViteConfig = fs.readFileSync(path.join(process.cwd(), 'packages', 'web', 'vite.config.ts'), 'utf8')
   const extensionViteConfig = fs.readFileSync(path.join(process.cwd(), 'packages', 'extension', 'vite.config.ts'), 'utf8')
