@@ -81,7 +81,13 @@ const props = withDefaults(defineProps<Props>(), {
   options: () => [],
   getSecondary: undefined,
   selectedTooltip: true,
-  // 默认开启：模型/模板下拉应始终可见配置入口与空态 CTA（与 2026-07-19 UX 整包一致）
+  // Defaults flipped to `true` as part of the 2026-07-19 UX baseline so model
+  // and template dropdowns always surface a config entry and an empty-state CTA.
+  // Consumer audit at flip time (2026-07-20): every in-tree caller either wires
+  // a `@config` handler (workspaces + variant selectors) or already passes both
+  // props explicitly (`FunctionModelManager`), so no caller regresses. If a new
+  // caller does not want the config affordance, pass `:show-config-action="false"`
+  // and/or `:show-empty-config-cta="false"` explicitly.
   showConfigAction: true,
   showEmptyConfigCTA: true,
   configText: undefined,

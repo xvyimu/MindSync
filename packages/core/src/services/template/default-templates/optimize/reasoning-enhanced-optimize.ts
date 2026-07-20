@@ -1,10 +1,12 @@
 import { Template } from '../../types';
 
 /**
- * 通用推理优化模板（文件名历史保留 grok-reasoning-optimize，id 同步保留以兼容已选中项）
- * 面向所有强推理/通用模型，不绑定单一厂商。
+ * Universal reasoning-enhanced optimization template.
+ * Targets any general-purpose or reasoning-capable model; not bound to a single vendor.
  */
 export const template: Template = {
+  // legacy id kept for compat: previously exposed as `grok-reasoning-optimize`
+  // (do not rename — persisted user selections reference this id).
   id: 'grok-reasoning-optimize',
   name: '推理增强优化',
   content: [

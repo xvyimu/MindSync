@@ -32,10 +32,10 @@ export class DataTransformer {
   }
 
   /**
-   * 将模板配置转换为选择器选项
-   * secondary 为模板描述，配合 SelectWithConfig 两行卡片展示
-   * @param templates 模板配置数组
-   * @returns 标准化的模板选择选项
+   * Convert Template records into select options.
+   * `secondary` renders the template description in the SelectWithConfig two-line card layout.
+   * @param templates - Template config array
+   * @returns Standardized template select options
    */
   static templatesToSelectOptions(templates: Template[]): TemplateSelectOption[] {
     return templates.map(template => {

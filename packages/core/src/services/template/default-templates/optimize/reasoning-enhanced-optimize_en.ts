@@ -1,10 +1,12 @@
 import { Template } from '../../types';
 
 /**
- * Universal reasoning optimization template.
- * Filename/id keep grok-reasoning-optimize for compatibility; content is model-agnostic.
+ * Universal reasoning-enhanced optimization template.
+ * Model-agnostic content targeting any general-purpose or reasoning-capable model.
  */
 export const template: Template = {
+  // legacy id kept for compat: previously exposed as `grok-reasoning-optimize`
+  // (do not rename — persisted user selections reference this id).
   id: 'grok-reasoning-optimize',
   name: 'Reasoning-Enhanced Optimization',
   content: [
