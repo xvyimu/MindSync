@@ -477,17 +477,14 @@ export function useConversationOptimization(
         {
           onToken: (token: string) => {
             if (generation !== optimizeGeneration) return
-            if (controller.signal.aborted) return
             optimizedPrompt.value += token
           },
           onReasoningToken: (reasoningToken: string) => {
             if (generation !== optimizeGeneration) return
-            if (controller.signal.aborted) return
             optimizedReasoning.value += reasoningToken
           },
           onComplete: async () => {
             if (generation !== optimizeGeneration) return
-            if (controller.signal.aborted) return
             try {
               // 判断是首次优化还是后续优化
               if (!historyManager.value) {
@@ -582,7 +579,6 @@ export function useConversationOptimization(
           },
           onError: (error: Error) => {
             if (generation !== optimizeGeneration) return
-            if (controller.signal.aborted) return
             console.error('[ConversationOptimization] Optimization failed:', error)
             toast.error(getI18nErrorMessage(error, t('toast.error.optimizeFailed')))
             isOptimizing.value = false
@@ -655,17 +651,14 @@ export function useConversationOptimization(
         {
           onToken: (token: string) => {
             if (generation !== iterateGeneration) return
-            if (controller.signal.aborted) return
             optimizedPrompt.value += token
           },
           onReasoningToken: (reasoningToken: string) => {
             if (generation !== iterateGeneration) return
-            if (controller.signal.aborted) return
             optimizedReasoning.value += reasoningToken
           },
           onComplete: async () => {
              if (generation !== iterateGeneration) return
-             if (controller.signal.aborted) return
              try {
                 if (!historyManager.value) throw new Error('History service unavailable')
 
@@ -750,7 +743,6 @@ export function useConversationOptimization(
           },
           onError: (error: Error) => {
             if (generation !== iterateGeneration) return
-            if (controller.signal.aborted) return
             console.error('[ConversationOptimization] Iteration failed:', error)
             toast.error(getI18nErrorMessage(error, t('toast.error.iterateFailed')))
             isOptimizing.value = false
