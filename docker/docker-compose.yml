@@ -19,14 +19,10 @@ services:
       # nginx内部端口配置
       - NGINX_PORT=${NGINX_PORT:-80}
 
-      # Web应用API配置
-      - VITE_OPENAI_API_KEY=${VITE_OPENAI_API_KEY:-}
-      - VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-}
-      - VITE_DEEPSEEK_API_KEY=${VITE_DEEPSEEK_API_KEY:-}
-      - VITE_SILICONFLOW_API_KEY=${VITE_SILICONFLOW_API_KEY:-}
-      - VITE_CUSTOM_API_KEY=${VITE_CUSTOM_API_KEY:-}
-      - VITE_CUSTOM_API_BASE_URL=${VITE_CUSTOM_API_BASE_URL:-}
-      - VITE_CUSTOM_API_MODEL=${VITE_CUSTOM_API_MODEL:-}
+      # Optional browser public config only (VITE_APP_* / VITE_PUBLIC_*).
+      # Model API keys are NOT injected into config.js anymore; users set keys in the UI.
+      # MCP server still uses its own env (MCP_*) for tool-side model calls.
+      # Legacy VITE_*_API_KEY vars are intentionally omitted from this compose file.
 
       # MCP服务器配置（Docker内部固定端口3000，不使用MCP_HTTP_PORT）
       # - MCP_HTTP_PORT=${MCP_HTTP_PORT:-3000}  # Docker中固定使用3000端口
@@ -41,8 +37,9 @@ services:
 
 
 
-      # Basic认证配置（可选）
+      # Basic auth (optional). Leave ACCESS_PASSWORD empty to disable.
+      # Do NOT ship a default password — set a strong value for any exposed host.
       - ACCESS_USERNAME=${ACCESS_USERNAME:-admin}
-      - ACCESS_PASSWORD=${ACCESS_PASSWORD:-123456}
+      - ACCESS_PASSWORD=${ACCESS_PASSWORD:-}
     security_opt:
       - no-new-privileges:true

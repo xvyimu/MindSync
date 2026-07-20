@@ -28,11 +28,11 @@ done
 
 # 验证config.js是否已生成
 if [ -f "/usr/share/nginx/html/config.js" ]; then
-    echo "✅ config.js generated successfully"
-    echo "Content preview:"
-    head -n 5 /usr/share/nginx/html/config.js
+    echo "OK config.js generated (keys only preview):"
+    # Never dump raw values — may historically have held secrets before the public filter.
+    grep -E '^\s+[A-Za-z0-9_]+:' /usr/share/nginx/html/config.js | sed 's/:.*$/: "…"/' || true
 else
-    echo "❌ ERROR: config.js was not generated!"
+    echo "ERROR: config.js was not generated!"
     echo "Attempting manual generation..."
     sh /docker-entrypoint.d/40-generate-config.sh || echo "Manual generation failed"
 fi

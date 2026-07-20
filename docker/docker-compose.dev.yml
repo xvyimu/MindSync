@@ -35,6 +35,6 @@ services:
       # - MCP_DEFAULT_LANGUAGE=${MCP_DEFAULT_LANGUAGE:-zh-CN}
       # - MCP_DEFAULT_MODEL_PROVIDER=${MCP_DEFAULT_MODEL_PROVIDER:-openai}
 
-      # Basic认证配置（可选）
+      # Basic auth (optional). Empty ACCESS_PASSWORD disables auth.
       - ACCESS_USERNAME=${ACCESS_USERNAME:-admin}
-      - ACCESS_PASSWORD=${ACCESS_PASSWORD:-123456}
+      - ACCESS_PASSWORD=${ACCESS_PASSWORD:-}
