@@ -143,6 +143,24 @@ test('web and extension declare direct core dependency for package boundary', ()
   assert.equal(extensionPackage.dependencies?.['@prompt-optimizer/ui'], 'workspace:*')
 })
 
+test('ui package index does not re-export core factories or electron proxies', () => {
+  const uiIndex = fs.readFileSync(
+    path.join(process.cwd(), 'packages', 'ui', 'src', 'index.ts'),
+    'utf8',
+  )
+
+  // Runtime factory re-exports are forbidden (types-only re-exports remain OK).
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bcreateModelManager\b/)
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bcreateLLMService\b/)
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bStorageFactory\b/)
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bFavoriteManager\b/)
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bElectronLLMProxy\b/)
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bwaitForElectronApi\b/)
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bcreateImageService\b/)
+  assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bisRunningInElectron\b/)
+  assert.match(uiIndex, /@prompt-optimizer\/core/)
+})
+
 test('web/extension production builds resolve packages via exports not source aliases', () => {
   const webViteConfig = fs.readFileSync(path.join(process.cwd(), 'packages', 'web', 'vite.config.ts'), 'utf8')
   const extensionViteConfig = fs.readFileSync(path.join(process.cwd(), 'packages', 'extension', 'vite.config.ts'), 'utf8')

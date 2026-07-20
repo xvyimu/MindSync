@@ -7,9 +7,9 @@
 | 项 | 值 |
 |----|-----|
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
-| **日期** | 2026-07-20 |
+| **日期** | 2026-07-21 |
 | **分支** | `develop` |
-| **远端 tip** | 以 `git log -1 --oneline` 为准（文档体系合入 `cb13121`+） |
+| **远端 tip** | 以 `git log -1 --oneline` 为准 |
 | **Fork** | https://github.com/xvyimu/prompt-optimizer |
 | **策略** | **fork-only**（默认不向上游开 PR） |
 | **上游 remote** | `upstream` → `linshenkx/prompt-optimizer`（可拉取，不默认贡献） |
@@ -39,6 +39,8 @@
 | 开发/模块/测试 | [`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) |
 | 全面检查/安全/模块审计 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
 | 全面扫描建议 | `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
+| **全面扫描+规划（2026-07-21）** | `D:\PromtOptimizer\docs\FULL-SCAN-PLAN-RECOMMENDATIONS-2026-07-21.md` |
+| **竞品/架构调研（万字）** | `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md` |
 | 文档怎么管 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`（方案 C 已落地） |
 | **文档二期 C2** | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-C2-2026-07-20.md`（漂移清零 + 门禁硬化） |
 | **文档漂移台账** | [`DOC-DRIFT-REGISTRY.md`](./DOC-DRIFT-REGISTRY.md)（DOC-01～20 状态） |
@@ -59,6 +61,8 @@
 - **P0 安全**：Docker `config.js` 仅 public `VITE_*`；Vercel HMAC 会话 Cookie（非明文密码）  
 - **UI `build:types` / `vue-tsc`**：TemplateSelect 与 Naive `SelectFilter` 对齐（watch 软降级）  
 - **图像生成可取消**：`ImageRequest.signal` → adapters `fetch`；Desktop 可选 `streamId` + `stream-cancel`；UI Stop + `toast.info.optimizeCancelled`  
+- **2026-07-21 加固批**：流式 finish payload、XSS、CI lint/mcp、Docker 密码门闩、vite define 白名单、sandbox、favorites 进全量备份、包边界（web/extension 直依 core；UI 不再 re-export 工厂）  
+- **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`（本地优先工作台定位，非 LLMOps 平台）  
 
 ---
 

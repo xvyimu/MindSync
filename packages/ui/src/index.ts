@@ -165,55 +165,9 @@ export { clickOutside } from "./directives/clickOutside";
 // 导出 composables
 export * from "./composables";
 
-/**
- * @deprecated Compatibility re-exports from `@prompt-optimizer/core`.
- * App shells (web/extension/desktop renderer) and new code should import
- * factories/proxies **directly from `@prompt-optimizer/core`** (or
- * `@prompt-optimizer/core/electron`). These re-exports remain only so
- * existing UI-internal deep imports and older consumers keep working.
- * Do not add new factory re-exports here.
- */
-export {
-  StorageFactory,
-  DexieStorageProvider,
-  ModelManager,
-  createModelManager,
-  TemplateManager,
-  createTemplateManager,
-  createTemplateLanguageService,
-  HistoryManager,
-  createHistoryManager,
-  DataManager,
-  createDataManager,
-  createLLMService,
-  createPromptService,
-  createPreferenceService,
-  createCompareService,
-  createContextRepo,
-  FavoriteManager,
-  isRunningInElectron,
-  EvaluationService,
-  createEvaluationService,
-  createVariableExtractionService,
-  createVariableValueGenerationService,
-} from "@prompt-optimizer/core";
-
-/** @deprecated Import from `@prompt-optimizer/core/electron` instead. */
-export {
-  ElectronContextRepoProxy,
-  ElectronDataManagerProxy,
-  ElectronHistoryManagerProxy,
-  ElectronImageModelManagerProxy,
-  ElectronImageServiceProxy,
-  ElectronLLMProxy,
-  ElectronModelManagerProxy,
-  ElectronPreferenceServiceProxy,
-  ElectronPromptServiceProxy,
-  ElectronTemplateLanguageServiceProxy,
-  ElectronTemplateManagerProxy,
-  FavoriteManagerElectronProxy,
-  waitForElectronApi,
-} from "@prompt-optimizer/core/electron";
+// 领域工厂 / Electron Proxy / 运行时检测：请直接从
+// `@prompt-optimizer/core` 或 `@prompt-optimizer/core/electron` 导入。
+// UI 包只导出组件、composable、插件与类型，不再 re-export 工厂，以保持包边界。
 
 // 类型 re-export：类型擦除后无运行时依赖，保留以便 UI 消费者单入口拿类型
 export type {
@@ -245,21 +199,18 @@ export type {
   VariableExtractionRequest,
   VariableExtractionResponse,
   ExtractedVariable,
+  // 图像相关类型（工厂请从 core 导入）
+  IImageModelManager,
+  IImageService,
+  ImageModelConfig,
 } from "@prompt-optimizer/core";
 
 // 导出新增的类型和服务
 export * from "./types";
 export * from "./services";
 
-// 导出图像模式组件
+// 导出图像模式组件（不含 core 图像工厂）
 export { default as ImageModeSelector } from "./components/image-mode/ImageModeSelector.vue";
-/** @deprecated Import image factories from `@prompt-optimizer/core` instead. */
-export {
-  ImageModelManager,
-  createImageModelManager,
-  ImageService,
-  createImageService,
-} from "@prompt-optimizer/core";
 
 // 导出数据转换工具和类型
 export { DataTransformer, OptionAccessors } from "./utils/data-transformer";
