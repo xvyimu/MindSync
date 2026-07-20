@@ -55,9 +55,11 @@ test('desktop preload IPC channels have main-process handlers', () => {
   const mainHandlers = collectMatches(main, [
     /ipcMain\.handle\(\s*['"]([^'"]+)['"]/g,
     /registerSensitiveIpc\(\s*['"]([^'"]+)['"]/g,
+    /secureHandle\(\s*['"]([^'"]+)['"]/g,
   ])
   for (const eventName of collectMatches(main, [
     /ipcMain\.handle\(\s*IPC_EVENTS\.([A-Z0-9_]+)/g,
+    /secureHandle\(\s*IPC_EVENTS\.([A-Z0-9_]+)/g,
   ])) {
     mainHandlers.add(`IPC_EVENTS.${eventName}`)
   }
@@ -122,18 +124,20 @@ test('desktop composition root delegates domain handlers to backend modules', ()
   assert.doesNotMatch(main, /async function setupUpdateHandlers/)
   assert.match(llmModule, /registerSensitiveIpc\(\s*'llm-sendMessage'/)
   assert.match(promptStreamModule, /registerSensitiveIpc\(\s*'prompt-optimizePromptStream'/)
-  assert.match(promptSyncModule, /ipcMain\.handle\(\s*'prompt-optimizePrompt'/)
-  assert.match(modelModule, /ipcMain\.handle\(\s*'model-getAllModels'/)
-  assert.match(imageModule, /ipcMain\.handle\(\s*'image-generate'/)
-  assert.match(templateModule, /ipcMain\.handle\(\s*'template-getTemplates'/)
-  assert.match(historyModule, /ipcMain\.handle\(\s*'history-getHistory'/)
-  assert.match(favoriteModule, /ipcMain\.handle\(\s*'favorite-addFavorite'/)
-  assert.match(contextModule, /ipcMain\.handle\(\s*'context-list'/)
-  assert.match(dataModule, /ipcMain\.handle\(\s*'data-exportAllData'/)
-  assert.match(preferenceModule, /ipcMain\.handle\(\s*'preference-get'/)
+  assert.match(promptSyncModule, /registerSensitiveIpc\(\s*'prompt-optimizePrompt'/)
+  assert.match(modelModule, /registerSensitiveIpc\(\s*'model-getAllModels'/)
+  assert.match(imageModule, /registerSensitiveIpc\(\s*'image-generate'/)
+  assert.match(templateModule, /registerSensitiveIpc\(\s*'template-getTemplates'/)
+  assert.match(historyModule, /registerSensitiveIpc\(\s*'history-getHistory'/)
+  assert.match(favoriteModule, /registerSensitiveIpc\(\s*'favorite-addFavorite'/)
+  assert.match(contextModule, /registerSensitiveIpc\(\s*'context-list'/)
+  assert.match(dataModule, /registerSensitiveIpc\(\s*'data-exportAllData'/)
+  assert.match(preferenceModule, /registerSensitiveIpc\(\s*'preference-get'/)
   assert.match(systemModule, /registerSensitiveIpc\(\s*'config-getEnvironmentVariables'/)
   const updateModule = readText('packages/desktop/config/ipc/update-handlers.js')
   assert.match(updateModule, /function createUpdateHandlers/)
+  assert.match(updateModule, /secureHandle\s*\(/)
+  assert.match(updateModule, /assertTrustedRendererSender/)
   assert.match(updateModule, /IPC_EVENTS\.UPDATE_CHECK|updater-check-update/)
 })
 
@@ -196,7 +200,9 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
   const registered = collectMatches(handlerSources, [
     /ipcMain\.handle\(\s*['"]([^'"]+)['"]/g,
     /registerSensitiveIpc\(\s*['"]([^'"]+)['"]/g,
+    /secureHandle\(\s*['"]([^'"]+)['"]/g,
     /ipcMain\.handle\(\s*IPC_EVENTS\.([A-Z0-9_]+)/g,
+    /secureHandle\(\s*IPC_EVENTS\.([A-Z0-9_]+)/g,
   ])
   // update handlers register via IPC_EVENTS.X; map those keys to string channels
   const { IPC_EVENTS } = require('../packages/desktop/config/constants.js')
@@ -425,6 +431,7 @@ test('desktop preference bridge exposes only registered preference handlers', ()
   const main = readText('packages/desktop/main.js')
   const preferenceHandlers = collectMatches(preferenceModule, [
     /ipcMain\.handle\(\s*['"]([^'"]+)['"]/g,
+    /registerSensitiveIpc\(\s*['"]([^'"]+)['"]/g,
   ])
 
   assert.match(main, /registerPreferenceIpcHandlers\(/)

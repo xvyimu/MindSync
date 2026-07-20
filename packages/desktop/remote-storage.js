@@ -515,7 +515,25 @@ const handleRemoteStorageOperation = async (request, dependencies = createDefaul
   throw new Error(`Unsupported remote storage operation: ${operation}`);
 };
 
-function setupRemoteStorageHandlers(ipcMain, helpers = {}, dependencies) {
+/**
+ * @param {object} ipcMainOrRegistrar - legacy: Electron ipcMain; preferred: { registerSensitiveIpc }
+ * @param {object} helpers - optional createSuccess/createError when using bare ipcMain (legacy)
+ * @param {object} dependencies - remote storage deps
+ */
+function setupRemoteStorageHandlers(ipcMainOrRegistrar, helpers = {}, dependencies) {
+  const registerSensitiveIpc = typeof ipcMainOrRegistrar?.registerSensitiveIpc === 'function'
+    ? ipcMainOrRegistrar.registerSensitiveIpc.bind(ipcMainOrRegistrar)
+    : null;
+
+  if (registerSensitiveIpc) {
+    registerSensitiveIpc(REMOTE_STORAGE_CHANNEL, async (_event, request) => {
+      return handleRemoteStorageOperation(request, dependencies);
+    });
+    return;
+  }
+
+  // Legacy path (tests / bare ipcMain)
+  const ipcMain = ipcMainOrRegistrar;
   const createSuccessResponse = helpers.createSuccessResponse || ((data) => ({ success: true, data }));
   const createErrorResponse = helpers.createErrorResponse || ((error) => ({
     success: false,

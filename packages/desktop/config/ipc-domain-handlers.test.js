@@ -93,10 +93,10 @@ test('LLM backend module registers the stable IPC interface and forwards owned s
     'provider',
     'stream_domain',
   );
-  assert.deepEqual(sender.sent, [
-    ['stream-content-stream_domain', 'token'],
-    ['stream-finish-stream_domain'],
-  ]);
+  // finish 事件必须携带结构化 payload（可为空对象），禁止仅 channel 名
+  assert.equal(sender.sent.length, 2);
+  assert.deepEqual(sender.sent[0], ['stream-content-stream_domain', 'token']);
+  assert.equal(sender.sent[1][0], 'stream-finish-stream_domain');
 });
 
 test('LLM backend module forwards the owner AbortSignal to Core', async () => {
@@ -196,10 +196,9 @@ test('Prompt backend module keeps stream channels sender-owned', async () => {
     {},
     'stream_prompt',
   );
-  assert.deepEqual(sender.sent, [
-    ['stream-token-stream_prompt', 'optimized'],
-    ['stream-finish-stream_prompt'],
-  ]);
+  assert.equal(sender.sent.length, 2);
+  assert.deepEqual(sender.sent[0], ['stream-token-stream_prompt', 'optimized']);
+  assert.equal(sender.sent[1][0], 'stream-finish-stream_prompt');
 });
 
 test('Prompt backend module forwards the owner AbortSignal to Core', async () => {
@@ -235,40 +234,8 @@ test('Prompt backend module forwards the owner AbortSignal to Core', async () =>
   assert.equal(receivedSignal instanceof AbortSignal, true);
 });
 
-/**
- * 创建与 main.js 一致的成功/失败响应信封替身。
- */
-function createEnvelopeHelpers() {
-  return {
-    safeSerialize: (value) => value,
-    createSuccessResponse: (data) => ({ success: true, data }),
-    createErrorResponse: (error) => ({
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-    }),
-    createStructuredErrorResponse: (error) => ({
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-    }),
-  };
-}
-
-/**
- * 创建可记录已注册 channel 的 ipcMain 替身。
- */
-function createIpcMainStub() {
-  const handlers = new Map();
-  return {
-    handlers,
-    handle(channel, handler) {
-      handlers.set(channel, handler);
-    },
-  };
-}
-
 test('Model backend module registers the stable model IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const calls = [];
   const modelManager = {
     getAllModels: async () => {
@@ -298,12 +265,12 @@ test('Model backend module registers the stable model IPC interface', async () =
   };
 
   registerModelIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     modelManager,
-    ...envelopes,
+    safeSerialize: (value) => value,
   });
 
-  assert.deepEqual([...ipcMain.handlers.keys()].sort(), [
+  assert.deepEqual([...registrar.handlers.keys()].sort(), [
     'model-addModel',
     'model-deleteModel',
     'model-ensureInitialized',
@@ -319,12 +286,12 @@ test('Model backend module registers the stable model IPC interface', async () =
   ]);
 
   assert.deepEqual(
-    await ipcMain.handlers.get('model-getAllModels')({}),
-    { success: true, data: [{ id: 'm1' }] },
+    await registrar.handlers.get('model-getAllModels')({}),
+    [{ id: 'm1' }],
   );
-  assert.deepEqual(
-    await ipcMain.handlers.get('model-addModel')({}, { key: 'k1', name: 'Model' }),
-    { success: true, data: null },
+  assert.equal(
+    await registrar.handlers.get('model-addModel')({}, { key: 'k1', name: 'Model' }),
+    null,
   );
   assert.deepEqual(calls, [
     'getAllModels',
@@ -333,8 +300,7 @@ test('Model backend module registers the stable model IPC interface', async () =
 });
 
 test('Image backend module registers the stable image IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const imageModelManager = {
     ensureInitialized: async () => {},
     isInitialized: async () => true,
@@ -365,31 +331,30 @@ test('Image backend module registers the stable image IPC interface', async () =
   };
 
   registerImageIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     imageModelManager,
     imageService,
     imageAdapterRegistry,
-    ...envelopes,
+    safeSerialize: (value) => value,
   });
 
-  assert.equal(ipcMain.handlers.has('image-model-getAllConfigs'), true);
-  assert.equal(ipcMain.handlers.has('image-generate'), true);
-  assert.equal(ipcMain.handlers.has('image-testConnection'), true);
-  assert.equal(ipcMain.handlers.has('image-getDynamicModels'), true);
+  assert.equal(registrar.handlers.has('image-model-getAllConfigs'), true);
+  assert.equal(registrar.handlers.has('image-generate'), true);
+  assert.equal(registrar.handlers.has('image-testConnection'), true);
+  assert.equal(registrar.handlers.has('image-getDynamicModels'), true);
 
   assert.deepEqual(
-    await ipcMain.handlers.get('image-generate')({}, { prompt: 'cat' }),
-    { success: true, data: { ok: true, request: { prompt: 'cat' } } },
+    await registrar.handlers.get('image-generate')({}, { prompt: 'cat' }),
+    { ok: true, request: { prompt: 'cat' } },
   );
   assert.deepEqual(
-    await ipcMain.handlers.get('image-getDynamicModels')({}, 'openai', { apiKey: 'x' }),
-    { success: true, data: [{ id: 'openai-dynamic' }] },
+    await registrar.handlers.get('image-getDynamicModels')({}, 'openai', { apiKey: 'x' }),
+    [{ id: 'openai-dynamic' }],
   );
 });
 
 test('Template backend module registers the stable template IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const calls = [];
   const templateManager = {
     listTemplates: async () => [{ id: 't1' }],
@@ -414,22 +379,22 @@ test('Template backend module registers the stable template IPC interface', asyn
   };
 
   registerTemplateIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     templateManager,
-    ...envelopes,
+    safeSerialize: (value) => value,
   });
 
-  assert.equal(ipcMain.handlers.has('template-getTemplates'), true);
-  assert.equal(ipcMain.handlers.has('template-updateTemplate'), true);
-  assert.equal(ipcMain.handlers.has('template-getSupportedLanguages'), true);
+  assert.equal(registrar.handlers.has('template-getTemplates'), true);
+  assert.equal(registrar.handlers.has('template-updateTemplate'), true);
+  assert.equal(registrar.handlers.has('template-getSupportedLanguages'), true);
 
   assert.deepEqual(
-    await ipcMain.handlers.get('template-getTemplates')({}),
-    { success: true, data: [{ id: 't1' }] },
+    await registrar.handlers.get('template-getTemplates')({}),
+    [{ id: 't1' }],
   );
-  assert.deepEqual(
-    await ipcMain.handlers.get('template-updateTemplate')({}, 't1', { content: 'new' }),
-    { success: true, data: null },
+  assert.equal(
+    await registrar.handlers.get('template-updateTemplate')({}, 't1', { content: 'new' }),
+    null,
   );
   assert.deepEqual(calls, [
     ['saveTemplate', { id: 't1', content: 'new' }],
@@ -437,8 +402,6 @@ test('Template backend module registers the stable template IPC interface', asyn
 });
 
 test('History backend module registers the stable history IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
   const historyManager = {
     getRecords: async () => [{ id: 'h1' }],
     addRecord: async (record) => ({ ...record, id: 'h2' }),
@@ -456,27 +419,27 @@ test('History backend module registers the stable history IPC interface', async 
     validateData: async () => true,
   };
 
+  const historyRegistrar = createRegistrar();
   registerHistoryIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: historyRegistrar.registerSensitiveIpc,
     historyManager,
-    ...envelopes,
+    safeSerialize: (value) => value,
   });
 
-  assert.equal(ipcMain.handlers.has('history-getHistory'), true);
-  assert.equal(ipcMain.handlers.has('history-addIteration'), true);
+  assert.equal(historyRegistrar.handlers.has('history-getHistory'), true);
+  assert.equal(historyRegistrar.handlers.has('history-addIteration'), true);
   assert.deepEqual(
-    await ipcMain.handlers.get('history-getHistory')({}),
-    { success: true, data: [{ id: 'h1' }] },
+    await historyRegistrar.handlers.get('history-getHistory')({}),
+    [{ id: 'h1' }],
   );
   assert.deepEqual(
-    await ipcMain.handlers.get('history-createNewChain')({}, { prompt: 'p' }),
-    { success: true, data: { chainId: 'c1', record: { prompt: 'p' } } },
+    await historyRegistrar.handlers.get('history-createNewChain')({}, { prompt: 'p' }),
+    { chainId: 'c1', record: { prompt: 'p' } },
   );
 });
 
 test('Favorite backend module registers the stable favorite IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const favoriteManager = {
     addFavorite: async (favorite) => ({ id: 'f1', ...favorite }),
     getFavorites: async () => [{ id: 'f1' }],
@@ -506,27 +469,25 @@ test('Favorite backend module registers the stable favorite IPC interface', asyn
   };
 
   registerFavoriteIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     favoriteManager,
-    safeSerialize: envelopes.safeSerialize,
-    createSuccessResponse: envelopes.createSuccessResponse,
+    safeSerialize: (value) => value,
   });
 
-  assert.equal(ipcMain.handlers.has('favorite-addFavorite'), true);
-  assert.equal(ipcMain.handlers.has('favorite-importFavorites'), true);
+  assert.equal(registrar.handlers.has('favorite-addFavorite'), true);
+  assert.equal(registrar.handlers.has('favorite-importFavorites'), true);
   assert.deepEqual(
-    await ipcMain.handlers.get('favorite-addFavorite')({}, { title: 't' }),
-    { success: true, data: { id: 'f1', title: 't' } },
+    await registrar.handlers.get('favorite-addFavorite')({}, { title: 't' }),
+    { id: 'f1', title: 't' },
   );
   assert.deepEqual(
-    await ipcMain.handlers.get('favorite-importFavorites')({}, '{"a":1}', { merge: true }),
-    { success: true, data: { imported: true, data: '{"a":1}' } },
+    await registrar.handlers.get('favorite-importFavorites')({}, '{"a":1}', { merge: true }),
+    { imported: true, data: '{"a":1}' },
   );
 });
 
 test('Context backend module registers the stable context IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const contextRepo = {
     list: async () => [{ id: 'c1' }],
     getCurrentId: async () => 'c1',
@@ -547,21 +508,20 @@ test('Context backend module registers the stable context IPC interface', async 
   };
 
   registerContextIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     contextRepo,
-    ...envelopes,
+    safeSerialize: (value) => value,
   });
 
-  assert.equal(ipcMain.handlers.has('context-list'), true);
+  assert.equal(registrar.handlers.has('context-list'), true);
   assert.deepEqual(
-    await ipcMain.handlers.get('context-create')({}, { title: 'new' }),
-    { success: true, data: { id: 'c2', title: 'new' } },
+    await registrar.handlers.get('context-create')({}, { title: 'new' }),
+    { id: 'c2', title: 'new' },
   );
 });
 
 test('Data backend module registers the stable data IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const opened = [];
   const dataManager = {
     exportAllData: async () => ({ all: true }),
@@ -578,27 +538,25 @@ test('Data backend module registers the stable data IPC interface', async () => 
   };
 
   registerDataIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     dataManager,
     app,
     shell,
-    ...envelopes,
   });
 
   assert.deepEqual(
-    await ipcMain.handlers.get('data-exportAllData')({}),
-    { success: true, data: { all: true } },
+    await registrar.handlers.get('data-exportAllData')({}),
+    { all: true },
   );
-  assert.deepEqual(
-    await ipcMain.handlers.get('data-openStorageDirectory')({}),
-    { success: true, data: true },
+  assert.equal(
+    await registrar.handlers.get('data-openStorageDirectory')({}),
+    true,
   );
   assert.deepEqual(opened, ['C:\\user-data']);
 });
 
 test('Prompt sync backend module registers non-stream prompt channels', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const promptService = {
     optimizePrompt: async () => 'optimized',
     optimizeMessage: async () => 'message',
@@ -611,26 +569,23 @@ test('Prompt sync backend module registers non-stream prompt channels', async ()
   };
 
   registerPromptSyncIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     promptService,
     historyManager,
-    createSuccessResponse: envelopes.createSuccessResponse,
-    createErrorResponse: envelopes.createErrorResponse,
   });
 
-  assert.deepEqual(
-    await ipcMain.handlers.get('prompt-optimizePrompt')({}, { target: 'x' }),
-    { success: true, data: 'optimized' },
+  assert.equal(
+    await registrar.handlers.get('prompt-optimizePrompt')({}, { target: 'x' }),
+    'optimized',
   );
   assert.deepEqual(
-    await ipcMain.handlers.get('prompt-getHistory')({}),
-    { success: true, data: [{ id: 'h1' }] },
+    await registrar.handlers.get('prompt-getHistory')({}),
+    [{ id: 'h1' }],
   );
 });
 
 test('Preference backend module registers the stable preference IPC interface', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
+  const registrar = createRegistrar();
   const preferenceService = {
     get: async (_key, defaultValue) => defaultValue,
     set: async () => {},
@@ -645,30 +600,27 @@ test('Preference backend module registers the stable preference IPC interface', 
   };
 
   registerPreferenceIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
     preferenceService,
-    ...envelopes,
+    safeSerialize: (value) => value,
   });
 
-  assert.deepEqual(
-    await ipcMain.handlers.get('preference-get')({}, 'theme', 'dark'),
-    { success: true, data: 'dark' },
+  assert.equal(
+    await registrar.handlers.get('preference-get')({}, 'theme', 'dark'),
+    'dark',
   );
   assert.deepEqual(
-    await ipcMain.handlers.get('preference-keys')({}),
-    { success: true, data: ['a'] },
+    await registrar.handlers.get('preference-keys')({}),
+    ['a'],
   );
 });
 
 test('System backend module registers config/app/log channels', async () => {
-  const ipcMain = createIpcMainStub();
-  const envelopes = createEnvelopeHelpers();
   const registrar = createRegistrar();
   const opened = [];
   let locale = null;
 
   registerSystemIpcHandlers({
-    ipcMain,
     shell: {
       openExternal: async () => {},
       openPath: async (target) => {
@@ -687,8 +639,6 @@ test('System backend module registers config/app/log channels', async () => {
       error.code = code;
       return error;
     },
-    createSuccessResponse: envelopes.createSuccessResponse,
-    createErrorResponse: envelopes.createErrorResponse,
     setUiLocale: (value) => {
       locale = value;
     },
@@ -697,14 +647,14 @@ test('System backend module registers config/app/log channels', async () => {
   });
 
   assert.equal(registrar.handlers.has('config-getEnvironmentVariables'), true);
-  assert.equal(ipcMain.handlers.has('app-get-version'), true);
-  assert.deepEqual(
-    await ipcMain.handlers.get('logs-open-directory')({}),
-    { success: true, data: true },
+  assert.equal(registrar.handlers.has('app-get-version'), true);
+  assert.equal(
+    await registrar.handlers.get('logs-open-directory')({}),
+    true,
   );
   assert.deepEqual(opened, ['C:\\logs']);
 
-  await ipcMain.handlers.get('app-set-locale')({}, 'zh-CN');
+  await registrar.handlers.get('app-set-locale')({}, 'zh-CN');
   assert.equal(locale, 'zh-CN');
 });
 

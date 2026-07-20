@@ -10,6 +10,7 @@ const {
 const {
   resolveUpdateRepositoryConfig,
 } = require('../update-config');
+const { assertTrustedRendererSender } = require('../ipc-security');
 
 function createUpdateHandlers(ctx) {
   const {
@@ -26,7 +27,36 @@ function createUpdateHandlers(ctx) {
     validateVersion,
     buildReleaseUrl,
     getRepositoryInfo,
+    getIpcSenderOptions,
   } = ctx;
+
+  /**
+   * 在保留现有 createSuccess/Error/Detailed 信封的前提下强制 sender 校验。
+   * 注意：update handlers 自行返回信封（含 createDetailedErrorResponse），
+   * 不能用 registerSensitiveIpc（会双重包装）。
+   */
+  const secureHandle = (channel, handler) => {
+    ipcMain.handle(channel, async (event, ...args) => {
+      try {
+        assertTrustedRendererSender(
+          event,
+          typeof getIpcSenderOptions === 'function'
+            ? getIpcSenderOptions()
+            : {
+                isDevelopment: process.env.NODE_ENV === 'development',
+                packagedRoot: path.join(__dirname, '../../web-dist'),
+                devServerUrl: 'http://localhost:18181',
+              },
+        );
+        return await handler(event, ...args);
+      } catch (error) {
+        if (error && error.code === 'IPC_UNTRUSTED_SENDER') {
+          return createErrorResponse(error);
+        }
+        throw error;
+      }
+    });
+  };
 
   const getIgnoredVersions = async () => {
     try {
@@ -277,7 +307,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 检查更新 - 直接返回完整结果，避免全局状态
-    ipcMain.handle(IPC_EVENTS.UPDATE_CHECK, async () => {
+    secureHandle(IPC_EVENTS.UPDATE_CHECK, async () => {
       // 检查是否已有更新检查在进行中
       if (isCheckingForUpdate) {
         console.log('[Updater] Update check already in progress, ignoring request');
@@ -400,7 +430,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 统一检查所有版本（解决并发冲突问题）
-    ipcMain.handle(IPC_EVENTS.UPDATE_CHECK_ALL_VERSIONS, async () => {
+    secureHandle(IPC_EVENTS.UPDATE_CHECK_ALL_VERSIONS, async () => {
       console.log('[Updater] Starting unified version check for all versions');
       const currentVersion = require('../../package.json').version;
     
@@ -568,7 +598,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // Open only a main-process constructed URL for an updater release page.
-    ipcMain.handle(IPC_EVENTS.UPDATE_OPEN_RELEASE_PAGE, async (event, version) => {
+    secureHandle(IPC_EVENTS.UPDATE_OPEN_RELEASE_PAGE, async (event, version) => {
       try {
         const releaseUrl = version
           ? buildReleaseUrl(version, repositoryInfo)
@@ -588,7 +618,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 开始下载更新
-    ipcMain.handle(IPC_EVENTS.UPDATE_START_DOWNLOAD, async () => {
+    secureHandle(IPC_EVENTS.UPDATE_START_DOWNLOAD, async () => {
       if (isManualReleaseDelivery(updateDelivery)) {
         return createErrorResponse(
           createManualUpdateRequiredError('start-download', updateDelivery)
@@ -619,7 +649,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 安装更新
-    ipcMain.handle(IPC_EVENTS.UPDATE_INSTALL, async () => {
+    secureHandle(IPC_EVENTS.UPDATE_INSTALL, async () => {
       if (isManualReleaseDelivery(updateDelivery)) {
         return createErrorResponse(
           createManualUpdateRequiredError('install', updateDelivery)
@@ -680,7 +710,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 获取忽略版本状态
-    ipcMain.handle(IPC_EVENTS.UPDATE_GET_IGNORED_VERSIONS, async () => {
+    secureHandle(IPC_EVENTS.UPDATE_GET_IGNORED_VERSIONS, async () => {
       try {
         const ignoredVersions = await getIgnoredVersions();
         console.log('[Updater] Retrieved ignored versions:', ignoredVersions);
@@ -692,7 +722,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 忽略版本
-    ipcMain.handle(IPC_EVENTS.UPDATE_IGNORE_VERSION, async (event, version, versionType) => {
+    secureHandle(IPC_EVENTS.UPDATE_IGNORE_VERSION, async (event, version, versionType) => {
       try {
         // 验证版本号格式
         if (!validateVersion(version)) {
@@ -723,7 +753,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 取消忽略版本
-    ipcMain.handle(IPC_EVENTS.UPDATE_UNIGNORE_VERSION, async (event, versionType) => {
+    secureHandle(IPC_EVENTS.UPDATE_UNIGNORE_VERSION, async (event, versionType) => {
       try {
         // 验证版本类型
         if (!['stable', 'prerelease'].includes(versionType)) {
@@ -749,7 +779,7 @@ function createUpdateHandlers(ctx) {
     });
 
     // 下载特定版本（原子操作）
-    ipcMain.handle(IPC_EVENTS.UPDATE_DOWNLOAD_SPECIFIC_VERSION, async (event, versionType) => {
+    secureHandle(IPC_EVENTS.UPDATE_DOWNLOAD_SPECIFIC_VERSION, async (event, versionType) => {
       if (isManualReleaseDelivery(updateDelivery)) {
         return createErrorResponse(
           createManualUpdateRequiredError('download-specific-version', updateDelivery, {

@@ -1,109 +1,48 @@
 /**
  * 注册偏好设置相关的 Desktop IPC interface。
- * 保持现有 channel、位置参数和响应信封不变。
- *
- * @param {object} dependencies 偏好设置注册依赖。
+ * 经 registerSensitiveIpc：sender 校验 + 统一错误信封。
  */
 function registerPreferenceIpcHandlers({
-  ipcMain,
+  registerSensitiveIpc,
   preferenceService,
   safeSerialize,
-  createSuccessResponse,
-  createErrorResponse,
 }) {
-  ipcMain.handle('preference-get', async (_event, key, defaultValue) => {
-    try {
-      const value = await preferenceService.get(key, defaultValue);
-      return createSuccessResponse(value);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('preference-get', async (_event, key, defaultValue) => {
+    return preferenceService.get(key, defaultValue);
   });
 
-  ipcMain.handle('preference-set', async (_event, key, value) => {
-    try {
-      await preferenceService.set(key, value);
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('preference-set', async (_event, key, value) => {
+    await preferenceService.set(key, value);
+    return null;
   });
 
-  ipcMain.handle('preference-delete', async (_event, key) => {
-    try {
-      await preferenceService.delete(key);
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('preference-delete', async (_event, key) => {
+    await preferenceService.delete(key);
+    return null;
   });
 
-  ipcMain.handle('preference-keys', async () => {
-    try {
-      const result = await preferenceService.keys();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('preference-keys', async () => preferenceService.keys());
+
+  registerSensitiveIpc('preference-clear', async () => {
+    await preferenceService.clear();
+    return null;
   });
 
-  ipcMain.handle('preference-clear', async () => {
-    try {
-      await preferenceService.clear();
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('preference-getAll', async () => preferenceService.getAll());
+
+  registerSensitiveIpc('preference-exportData', async () => preferenceService.exportData());
+
+  registerSensitiveIpc('preference-importData', async (_event, data) => {
+    const safeData = safeSerialize(data);
+    await preferenceService.importData(safeData);
+    return null;
   });
 
-  ipcMain.handle('preference-getAll', async () => {
-    try {
-      const result = await preferenceService.getAll();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
+  registerSensitiveIpc('preference-getDataType', async () => preferenceService.getDataType());
 
-  // Preference Import/Export Data handlers (for bulk operations)
-  ipcMain.handle('preference-exportData', async () => {
-    try {
-      const result = await preferenceService.exportData();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('preference-importData', async (_event, data) => {
-    try {
-      // 清理Vue响应式对象，防止IPC序列化错误
-      const safeData = safeSerialize(data);
-      await preferenceService.importData(safeData);
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('preference-getDataType', async () => {
-    try {
-      const result = preferenceService.getDataType();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('preference-validateData', async (_event, data) => {
-    try {
-      // 清理Vue响应式对象，防止IPC序列化错误
-      const safeData = safeSerialize(data);
-      const result = await preferenceService.validateData(safeData);
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('preference-validateData', async (_event, data) => {
+    const safeData = safeSerialize(data);
+    return preferenceService.validateData(safeData);
   });
 }
 

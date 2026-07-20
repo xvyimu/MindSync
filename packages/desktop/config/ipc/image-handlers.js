@@ -1,31 +1,16 @@
+const { createIpcError } = require('../ipc-security');
+
 /**
  * 注册图像模型配置与图像生成相关的 Desktop IPC interface。
- * 保持现有 channel、位置参数和响应信封不变，仅从 main.js 拆出领域实现。
- *
- * Generation channels accept an optional trailing streamId for cancel via
- * stream-registry + existing stream-cancel IPC (AbortSignal attached on main).
- *
- * @param {object} dependencies 图像领域注册依赖。
- * @param {Electron.IpcMain} dependencies.ipcMain Electron IPC 主进程对象。
- * @param {object} dependencies.imageModelManager 图像模型配置管理器。
- * @param {object} dependencies.imageService 图像生成领域服务。
- * @param {object} dependencies.imageAdapterRegistry 图像 provider 动态模型注册表。
- * @param {Function} dependencies.safeSerialize 清理 Vue 响应式对象，避免 IPC 序列化失败。
- * @param {Function} dependencies.createSuccessResponse 统一成功响应信封。
- * @param {Function} dependencies.createErrorResponse 统一失败响应信封。
- * @param {Function} dependencies.createStructuredErrorResponse 图像生成失败时的结构化错误信封。
- * @param {object} [dependencies.streamRegistry] 可选：流注册表（取消生成）。
- * @param {Function} [dependencies.assertValidStreamId] 可选：streamId 校验。
+ * 经 registerSensitiveIpc：sender 校验 + 统一错误信封。
+ * 生成通道可选 streamId → stream-registry + stream-cancel。
  */
 function registerImageIpcHandlers({
-  ipcMain,
+  registerSensitiveIpc,
   imageModelManager,
   imageService,
   imageAdapterRegistry,
   safeSerialize,
-  createSuccessResponse,
-  createErrorResponse,
-  createStructuredErrorResponse,
   streamRegistry,
   assertValidStreamId,
 }) {
@@ -36,16 +21,12 @@ function registerImageIpcHandlers({
       const stream = streamRegistry.register(event.sender, streamId);
       try {
         safeReq.signal = stream.signal;
-        const res = await operate(safeReq);
-        return createSuccessResponse(res);
+        return await operate(safeReq);
       } catch (error) {
         if (error?.name === 'AbortError' || stream.signal.aborted) {
-          return createStructuredErrorResponse({
-            code: 'IPC_STREAM_CANCELLED',
-            message: 'IPC stream was cancelled',
-          });
+          throw createIpcError('IPC_STREAM_CANCELLED', 'IPC stream was cancelled');
         }
-        return createStructuredErrorResponse(error);
+        throw error;
       } finally {
         try {
           streamRegistry.complete(event.sender, streamId);
@@ -54,208 +35,88 @@ function registerImageIpcHandlers({
         }
       }
     }
-
-    try {
-      const res = await operate(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+    return operate(safeReq);
   };
-  // ===== Image Model handlers (Config-centric) =====
-  ipcMain.handle('image-model-ensureInitialized', async () => {
-    try {
-      await imageModelManager.ensureInitialized();
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+
+  registerSensitiveIpc('image-model-ensureInitialized', async () => {
+    await imageModelManager.ensureInitialized();
+    return null;
   });
 
-  ipcMain.handle('image-model-isInitialized', async () => {
-    try {
-      const result = await imageModelManager.isInitialized();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('image-model-isInitialized', async () => imageModelManager.isInitialized());
+
+  registerSensitiveIpc('image-model-getAllConfigs', async () => imageModelManager.getAllConfigs());
+
+  registerSensitiveIpc('image-model-getConfig', async (_event, id) => imageModelManager.getConfig(id));
+
+  registerSensitiveIpc('image-model-addConfig', async (_event, config) => {
+    await imageModelManager.addConfig(safeSerialize(config));
+    return null;
   });
 
-  ipcMain.handle('image-model-getAllConfigs', async () => {
-    try {
-      const result = await imageModelManager.getAllConfigs();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('image-model-updateConfig', async (_event, id, updates) => {
+    await imageModelManager.updateConfig(id, safeSerialize(updates));
+    return null;
   });
 
-  ipcMain.handle('image-model-getConfig', async (_event, id) => {
-    try {
-      const result = await imageModelManager.getConfig(id);
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('image-model-deleteConfig', async (_event, id) => {
+    await imageModelManager.deleteConfig(id);
+    return null;
   });
 
-  ipcMain.handle('image-model-addConfig', async (_event, config) => {
-    try {
-      const safeCfg = safeSerialize(config);
-      await imageModelManager.addConfig(safeCfg);
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('image-model-getEnabledConfigs', async () => imageModelManager.getEnabledConfigs());
+
+  registerSensitiveIpc('image-model-exportData', async () => imageModelManager.exportData());
+
+  registerSensitiveIpc('image-model-importData', async (_event, data) => {
+    await imageModelManager.importData(safeSerialize(data));
+    return null;
   });
 
-  ipcMain.handle('image-model-updateConfig', async (_event, id, updates) => {
-    try {
-      const safe = safeSerialize(updates);
-      await imageModelManager.updateConfig(id, safe);
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('image-model-getDataType', async () => imageModelManager.getDataType());
+
+  registerSensitiveIpc('image-model-validateData', async (_event, data) => {
+    return imageModelManager.validateData(safeSerialize(data));
   });
 
-  ipcMain.handle('image-model-deleteConfig', async (_event, id) => {
-    try {
-      await imageModelManager.deleteConfig(id);
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('image-model-getEnabledConfigs', async () => {
-    try {
-      const result = await imageModelManager.getEnabledConfigs();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('image-model-exportData', async () => {
-    try {
-      const result = await imageModelManager.exportData();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('image-model-importData', async (_event, data) => {
-    try {
-      const safe = safeSerialize(data);
-      await imageModelManager.importData(safe);
-      return createSuccessResponse(null);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('image-model-getDataType', async () => {
-    try {
-      const result = await imageModelManager.getDataType();
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  ipcMain.handle('image-model-validateData', async (_event, data) => {
-    try {
-      const safe = safeSerialize(data);
-      const result = await imageModelManager.validateData(safe);
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
-  });
-
-  // ===== Image Service handlers =====
-  // Optional trailing streamId enables cancel via existing stream-cancel channel.
-  ipcMain.handle('image-generate', async (event, request, streamId) => {
+  registerSensitiveIpc('image-generate', async (event, request, streamId) => {
     return runCancelableGenerate(event, streamId, request, (req) => imageService.generate(req));
   });
 
-  ipcMain.handle('image-generateText2Image', async (event, request, streamId) => {
+  registerSensitiveIpc('image-generateText2Image', async (event, request, streamId) => {
     return runCancelableGenerate(event, streamId, request, (req) => imageService.generateText2Image(req));
   });
 
-  ipcMain.handle('image-generateImage2Image', async (event, request, streamId) => {
+  registerSensitiveIpc('image-generateImage2Image', async (event, request, streamId) => {
     return runCancelableGenerate(event, streamId, request, (req) => imageService.generateImage2Image(req));
   });
 
-  ipcMain.handle('image-generateMultiImage', async (event, request, streamId) => {
+  registerSensitiveIpc('image-generateMultiImage', async (event, request, streamId) => {
     return runCancelableGenerate(event, streamId, request, (req) => imageService.generateMultiImage(req));
   });
 
-  ipcMain.handle('image-validateRequest', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.validateRequest(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  registerSensitiveIpc('image-validateRequest', async (_event, request) => {
+    return imageService.validateRequest(safeSerialize(request));
   });
 
-  ipcMain.handle('image-validateText2ImageRequest', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.validateText2ImageRequest(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  registerSensitiveIpc('image-validateText2ImageRequest', async (_event, request) => {
+    return imageService.validateText2ImageRequest(safeSerialize(request));
   });
 
-  ipcMain.handle('image-validateImage2ImageRequest', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.validateImage2ImageRequest(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  registerSensitiveIpc('image-validateImage2ImageRequest', async (_event, request) => {
+    return imageService.validateImage2ImageRequest(safeSerialize(request));
   });
 
-  ipcMain.handle('image-validateMultiImageRequest', async (_event, request) => {
-    try {
-      const safeReq = safeSerialize(request);
-      const res = await imageService.validateMultiImageRequest(safeReq);
-      return createSuccessResponse(res);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  registerSensitiveIpc('image-validateMultiImageRequest', async (_event, request) => {
+    return imageService.validateMultiImageRequest(safeSerialize(request));
   });
 
-  // 连接测试在主进程执行，避免渲染端直接发起网络请求
-  ipcMain.handle('image-testConnection', async (_event, config) => {
-    try {
-      const safeCfg = safeSerialize(config);
-      // Reuse ImageService.testConnection to keep behavior consistent with Web:
-      // - merges param overrides
-      // - enforces base64-only input for image2image tests
-      const result = await imageService.testConnection(safeCfg);
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  registerSensitiveIpc('image-testConnection', async (_event, config) => {
+    return imageService.testConnection(safeSerialize(config));
   });
 
-  // 动态模型拉取在主进程执行
-  ipcMain.handle('image-getDynamicModels', async (_event, providerId, connectionConfig) => {
-    try {
-      const safeConn = safeSerialize(connectionConfig);
-      const models = await imageAdapterRegistry.getDynamicModels(providerId, safeConn);
-      return createSuccessResponse(models);
-    } catch (error) {
-      return createStructuredErrorResponse(error);
-    }
+  registerSensitiveIpc('image-getDynamicModels', async (_event, providerId, connectionConfig) => {
+    return imageAdapterRegistry.getDynamicModels(providerId, safeSerialize(connectionConfig));
   });
 }
 

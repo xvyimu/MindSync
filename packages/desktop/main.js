@@ -351,14 +351,7 @@ async function initializePreferenceService(storageProvider) {
 }
 
 function setupPreferenceHandlers() {
-  // 将偏好设置 IPC 委托给独立后端 module。
-  registerPreferenceIpcHandlers({
-    ipcMain,
-    preferenceService,
-    safeSerialize,
-    createSuccessResponse,
-    createErrorResponse,
-  });
+  // Preference IPC is registered in setupIPC after registerSensitiveIpc exists.
 }
 
 // 构建注入到渲染进程的公共运行时配置脚本（双份键：带前缀与不带前缀）。
@@ -835,16 +828,13 @@ const { setupUpdateHandlers } = createUpdateHandlers({
   validateVersion,
   buildReleaseUrl,
   getRepositoryInfo,
+  getIpcSenderOptions,
 });
 
 function setupIPC() {
   console.log('[Main Process] Setting up high-level service IPC handlers...');
   setupPreferenceHandlers();
-  setupRemoteStorageHandlers(ipcMain, {
-    createSuccessResponse,
-    createErrorResponse,
-  });
-  
+
   /** 注册需要可信 sender、参数校验和统一响应信封的 IPC handler。 */
   const registerSensitiveIpc = (channel, handler, validateArgs) => {
     registerSecureIpcHandler(ipcMain, channel, handler, {
@@ -854,6 +844,8 @@ function setupIPC() {
       createError: createErrorResponse,
     });
   };
+
+  setupRemoteStorageHandlers({ registerSensitiveIpc });
 
   // 集中执行 sender 绑定流任务，确保结束、异常和取消都会清理注册表。
   const runOwnedStream = createOwnedStreamRunner({ streamRegistry });
@@ -875,23 +867,15 @@ function setupIPC() {
 
   // 将 Prompt 同步接口委托给独立后端 module；流式接口由 prompt-stream-handlers 负责。
   registerPromptSyncIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     promptService,
     historyManager,
-    createSuccessResponse,
-    createErrorResponse,
   });
 
   // multimodal evaluation：图像理解走主进程，避免 renderer 直连供应商。
-  ipcMain.handle('image-understanding-understand', async (_event, request) => {
-    try {
-      const result = await imageUnderstandingService.understand(safeSerialize(request));
-      return createSuccessResponse(result);
-    } catch (error) {
-      return createErrorResponse(error);
-    }
+  registerSensitiveIpc('image-understanding-understand', async (_event, request) => {
+    return imageUnderstandingService.understand(safeSerialize(request));
   });
-
 
   // 在页面加载前拦截 /config.js 并注入运行时环境变量（双份键）
   try {
@@ -912,85 +896,74 @@ function setupIPC() {
     console.warn('[Main Process] Unable to register runtime config interceptor:', e);
   }
 
+  registerPreferenceIpcHandlers({
+    registerSensitiveIpc,
+    preferenceService,
+    safeSerialize,
+  });
+
   // 将文本模型管理 IPC 委托给独立后端 module。
   registerModelIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     modelManager,
     safeSerialize,
-    createSuccessResponse,
-    createErrorResponse,
   });
 
   // 将图像模型配置与图像生成 IPC 委托给独立后端 module。
   registerImageIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     imageModelManager,
     imageService,
     imageAdapterRegistry,
     safeSerialize,
-    createSuccessResponse,
-    createErrorResponse,
-    createStructuredErrorResponse,
     streamRegistry,
     assertValidStreamId,
   });
 
   // 将模板管理 IPC 委托给独立后端 module。
   registerTemplateIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     templateManager,
     safeSerialize,
-    createSuccessResponse,
-    createErrorResponse,
   });
 
   // 将历史记录 IPC 委托给独立后端 module。
   registerHistoryIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     historyManager,
     safeSerialize,
-    createSuccessResponse,
-    createErrorResponse,
   });
 
   // 将会话上下文 IPC 委托给独立后端 module。
   registerContextIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     contextRepo,
     safeSerialize,
-    createSuccessResponse,
-    createErrorResponse,
   });
 
   // 将收藏管理 IPC 委托给独立后端 module。
   registerFavoriteIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     favoriteManager,
     safeSerialize,
-    createSuccessResponse,
   });
 
   // 将数据导入导出与本地存储信息 IPC 委托给独立后端 module。
   registerDataIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     dataManager,
     app,
     shell,
-    createSuccessResponse,
-    createErrorResponse,
   });
 
   // 将运行时配置、外链、应用信息与日志 IPC 委托给独立后端 module。
   registerSystemIpcHandlers({
-    ipcMain,
+    registerSensitiveIpc,
     shell,
     consoleLogger,
-    registerSensitiveIpc,
     getPublicRuntimeConfig,
     isSafeExternalUrl,
     createIpcError,
-    createSuccessResponse,
-    createErrorResponse,
     setUiLocale: (locale) => {
       uiLocale = locale;
     },
