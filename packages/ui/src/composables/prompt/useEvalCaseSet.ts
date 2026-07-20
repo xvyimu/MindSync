@@ -7,6 +7,7 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue'
 import {
   CORE_SERVICE_KEYS,
+  EVAL_CASE_SET_MAX_CASES,
   createEmptyEvalCaseSet,
   createEvalCaseId,
   createEvalEvidenceFileName,
@@ -123,24 +124,48 @@ export function useEvalCaseSet(options: UseEvalCaseSetOptions) {
     if (idx >= 0) {
       cases[idx] = nextCase
     } else {
+      if (cases.length >= EVAL_CASE_SET_MAX_CASES) {
+        throw new Error(`Eval case set exceeds max cases (${EVAL_CASE_SET_MAX_CASES})`)
+      }
       cases.push(nextCase)
     }
 
-    caseSet.value = {
+    // 先持久化，成功后再写回本地 state，避免 UI 显示未落盘数据
+    const nextSet: EvalCaseSet = {
       ...caseSet.value,
       cases,
       updatedAt: Date.now(),
     }
-    await persist()
+    const pref = options.preferenceService.value
+    if (!pref) {
+      throw new Error('Preference service is not available')
+    }
+    if (!isEvalCaseSet({ ...nextSet, version: 1 })) {
+      throw new Error('Invalid case set')
+    }
+    const toStore: EvalCaseSet = { ...nextSet, version: 1 }
+    await pref.set(STORAGE_KEY, toStore)
+    caseSet.value = toStore
+    error.value = null
   }
 
   const removeCase = async (id: string): Promise<void> => {
-    caseSet.value = {
+    const pref = options.preferenceService.value
+    if (!pref) {
+      throw new Error('Preference service is not available')
+    }
+    const next: EvalCaseSet = {
       ...caseSet.value,
       cases: caseSet.value.cases.filter((c) => c.id !== id),
+      version: 1,
       updatedAt: Date.now(),
     }
-    await persist()
+    if (!isEvalCaseSet(next)) {
+      throw new Error('Invalid case set')
+    }
+    await pref.set(STORAGE_KEY, next)
+    caseSet.value = next
+    error.value = null
   }
 
   const runAll = async (): Promise<EvalEvidenceBundle> => {

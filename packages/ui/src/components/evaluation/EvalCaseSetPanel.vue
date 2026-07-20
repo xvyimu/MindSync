@@ -12,6 +12,15 @@
           {{ t('evalCase.hint') }}
         </NAlert>
 
+        <NAlert
+          v-if="error"
+          type="error"
+          :bordered="false"
+          data-testid="eval-case-error"
+        >
+          {{ error }}
+        </NAlert>
+
         <NCard size="small" :title="t('evalCase.addTitle')">
           <NSpace vertical :size="10">
             <NInput
@@ -41,6 +50,7 @@
             <NButton
               type="primary"
               :disabled="!canAdd"
+              :loading="isSaving"
               data-testid="eval-case-add"
               @click="handleAdd"
             >
@@ -163,6 +173,15 @@ const props = defineProps<{
   isRunning: boolean
   canRun: boolean
   lastBundle: EvalEvidenceBundle | null
+  /** 编排层错误（保存失败 / 跑批失败等） */
+  error?: string | null
+  /** 保存中（父组件 await upsert 时） */
+  isSaving?: boolean
+  /**
+   * 父组件在保存成功后递增；仅此时清空表单，
+   * 避免「emit 后立刻清空」导致失败时表单丢失。
+   */
+  saveGeneration?: number
 }>()
 
 const emit = defineEmits<{
@@ -190,18 +209,35 @@ const canAdd = computed(
   () =>
     form.name.trim().length > 0 &&
     form.input.trim().length > 0 &&
-    form.contains.trim().length > 0,
+    form.contains.trim().length > 0 &&
+    !props.isSaving,
 )
+
+const resetForm = () => {
+  editingId.value = undefined
+  form.name = ''
+  form.input = ''
+  form.systemPrompt = ''
+  form.contains = ''
+}
 
 watch(
   () => props.show,
   (open) => {
     if (!open) {
-      editingId.value = undefined
-      form.name = ''
-      form.input = ''
-      form.systemPrompt = ''
-      form.contains = ''
+      resetForm()
+    }
+  },
+)
+
+// 仅在父组件确认保存成功后清空（saveGeneration 递增）
+watch(
+  () => props.saveGeneration,
+  (gen, prev) => {
+    if (typeof gen === 'number' && typeof prev === 'number' && gen > prev) {
+      resetForm()
+    } else if (typeof gen === 'number' && prev === undefined && gen > 0) {
+      resetForm()
     }
   },
 )
@@ -225,11 +261,7 @@ const handleAdd = () => {
     systemPrompt: form.systemPrompt.trim() || undefined,
     contains: form.contains.trim(),
   })
-  editingId.value = undefined
-  form.name = ''
-  form.input = ''
-  form.systemPrompt = ''
-  form.contains = ''
+  // 不清空：等 saveGeneration 或关闭抽屉
 }
 
 const handleEdit = (item: EvalCase) => {

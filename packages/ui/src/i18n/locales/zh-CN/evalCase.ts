@@ -27,6 +27,8 @@ const messages = {
     exportDone: '证据已导出',
     needModel: '请先选择模型',
     needServices: '服务未就绪',
+    maxCases: '用例数量已达上限（{max}）',
+    exportEmpty: '暂无运行结果可导出',
   },
 }
 

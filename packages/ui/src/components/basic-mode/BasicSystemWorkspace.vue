@@ -505,6 +505,9 @@
             :is-running="evalCaseSet.isRunning.value"
             :can-run="evalCaseSet.canRun.value"
             :last-bundle="evalCaseSet.lastBundle.value"
+            :error="evalCaseSet.error.value"
+            :is-saving="evalCaseSaving"
+            :save-generation="evalCaseSaveGeneration"
             @add="handleEvalCaseAdd"
             @remove="handleEvalCaseRemove"
             @run="handleEvalCaseRun"
@@ -721,6 +724,8 @@ const evalCaseSet = useEvalCaseSet({
   modelKey: evalCaseModelKeyRef,
 })
 const evalCaseModelKey = evalCaseModelKeyRef
+const evalCaseSaving = ref(false)
+const evalCaseSaveGeneration = ref(0)
 
 const openEvalCasePanel = async () => {
   await evalCaseSet.load()
@@ -734,11 +739,21 @@ const handleEvalCaseAdd = async (payload: {
   systemPrompt?: string
   contains: string
 }) => {
+  evalCaseSaving.value = true
   try {
     await evalCaseSet.upsertCase(payload)
+    evalCaseSaveGeneration.value += 1
     toast.success(t('evalCase.saved'))
   } catch (e) {
-    toast.error(e instanceof Error ? e.message : String(e))
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    if (/max cases/i.test(message)) {
+      toast.error(t('evalCase.maxCases', { max: 20 }))
+    } else {
+      toast.error(message)
+    }
+  } finally {
+    evalCaseSaving.value = false
   }
 }
 
@@ -747,7 +762,9 @@ const handleEvalCaseRemove = async (id: string) => {
     await evalCaseSet.removeCase(id)
     toast.success(t('evalCase.removed'))
   } catch (e) {
-    toast.error(e instanceof Error ? e.message : String(e))
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    toast.error(message)
   }
 }
 
@@ -761,13 +778,17 @@ const handleEvalCaseRun = async () => {
     toast.success(t('evalCase.runDone'))
   } catch (e) {
     if (e instanceof Error && e.name === 'AbortError') return
-    toast.error(e instanceof Error ? e.message : String(e))
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    toast.error(message)
   }
 }
 
 const handleEvalCaseExport = () => {
   if (evalCaseSet.downloadEvidence()) {
     toast.success(t('evalCase.exportDone'))
+  } else {
+    toast.warning(t('evalCase.exportEmpty'))
   }
 }
 

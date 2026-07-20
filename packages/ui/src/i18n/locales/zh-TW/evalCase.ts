@@ -27,6 +27,8 @@ const messages = {
     exportDone: '證據已匯出',
     needModel: '請先選擇模型',
     needServices: '服務未就緒',
+    maxCases: '用例數量已達上限（{max}）',
+    exportEmpty: '尚無可匯出的執行結果',
   },
 }
 

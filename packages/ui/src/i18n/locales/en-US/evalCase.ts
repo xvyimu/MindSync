@@ -27,6 +27,8 @@ const messages = {
     exportDone: 'Evidence exported',
     needModel: 'Select a model first',
     needServices: 'Services not ready',
+    maxCases: 'Case limit reached ({max})',
+    exportEmpty: 'No run results to export yet',
   },
 }
 
