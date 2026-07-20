@@ -43,6 +43,7 @@
       "preload.js",
       "remote-storage.js",
       "config/**/*",
+      "icons/**/*",
       "web-dist/**/*",
       "node_modules/**/*"
     ],

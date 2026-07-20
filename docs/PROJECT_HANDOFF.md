@@ -2,13 +2,14 @@
 
 > 单一真相入口。更新代码后优先改本文相关章节；安装侧见 `D:\PromtOptimizer\README.md`。
 
-**最后更新：** 2026-07-18 收口  
+**最后更新：** 2026-07-20 全面检查 / 产品态收口  
 **产品版本：** Desktop 2.11.7  
-**维护分支：** `work/desktop-hardening-on-develop` / fork `develop` @ `f6747be8`  
+**维护分支：** fork `develop`（tip 见 git log；Paper + UX + icons 打包）  
 **Fork：** https://github.com/xvyimu/prompt-optimizer  
 **上游：** https://github.com/linshenkx/prompt-optimizer（`upstream`，默认 `develop`）  
-**上游 PR：** https://github.com/linshenkx/prompt-optimizer/pull/324  
-**本机收口：** `D:\PromtOptimizer\CLOSEOUT.md`
+**贡献策略：** **fork-only**（上游 #324/#325–#330 已关闭，默认不重开）  
+**本机收口：** `D:\PromtOptimizer\CLOSEOUT.md`（历史）+ `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md`（现行）  
+**本机安装：** `D:\PromtOptimizer\app\PromptOptimizer.exe`
 
 ---
 
@@ -16,14 +17,15 @@
 
 | 你想… | 去哪里 |
 |--------|--------|
-| 改代码 | 源码 worktree（见 §1.1） |
-| 打开软件 | `D:\PromtOptimizer\PromptOptimizer\PromptOptimizer.exe` |
-| 安装包 | `D:\PromtOptimizer\nsis-2026-07-18\PromptOptimizer-2.11.7-win-x64.exe` |
-| 看本轮改了什么 | §2 + `.pipeline/` + `D:\PromtOptimizer\CLOSEOUT.md` |
-| 跑测试 | §5 |
-| 推送到 GitHub | §6 |
+| 改代码 | `D:\PromtOptimizer\src\prompt-optimizer` |
+| 打开软件 | `D:\PromtOptimizer\app\PromptOptimizer.exe` |
+| 安装包 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` 或 `nsis-2026-07-20-develop-ux\` |
+| 全面检查报告 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
+| 看历史 hardening | §2 + `.pipeline/` + `D:\PromtOptimizer\CLOSEOUT.md` |
+| 跑测试 | §5；Desktop 契约见报告 §8 |
+| 推送到 GitHub | §6（fork-only） |
 | 清理垃圾 | §7 |
-| 优化债务 | `.pipeline/OPTIMIZATION_PLAN.md` |
+| 优化债务 | `.pipeline/OPTIMIZATION_PLAN.md`（多已完成）+ 报告 §10 |
 
 ---
 
@@ -32,46 +34,40 @@
 ### 1.1 源码工作区（真相源）
 
 ```
-C:\Users\yuanjia\Documents\Codex\2026-07-17\dui\work\source-extract\prompt-optimizer-develop\
+D:\PromtOptimizer\src\prompt-optimizer\
 ├── packages/
 │   ├── core/          # LLM/Prompt/模型领域；AbortSignal；electron 子路径
-│   ├── desktop/       # Electron main/preload；config/ipc/* 领域拆分
-│   ├── ui/            # Vue UI
+│   ├── desktop/       # Electron main/preload；config/ipc/* 领域拆分；icons/**
+│   ├── ui/            # Vue UI + Paper 主题
 │   ├── web/           # Web 入口（Desktop 用 web-dist）
 │   ├── extension/     # 浏览器扩展
 │   └── mcp-server/    # MCP
 ├── scripts/           # IPC 契约、e2e smoke、溯源
 ├── docs/              # 含本 HANDOFF
 ├── .pipeline/         # Ship/优化/验证过程文档
-├── task_plan.md       # 当前整理任务计划
-├── findings.md
-└── progress.md
+└── ...
 ```
 
 ### 1.2 本机安装（日常运行）
 
 ```
 D:\PromtOptimizer\
-├── CLOSEOUT.md                        # 收口清单（终态入口）
-├── README.md                          # 安装侧入口
-├── overview.md                        # 短状态
-├── nsis-2026-07-18\                   # NSIS 安装包（未签名）
-├── archive-delivery-2026-07-18\       # 归档（含 nsis 副本）
-├── PromptOptimizer\                   # 可执行安装树
+├── app\                               # 现行 NSIS 安装根
 │   ├── PromptOptimizer.exe
 │   └── resources\
-│       ├── app\                       # 热替换后的业务代码（无 app.asar）
-│       │   ├── main.js / preload.js / config/ipc/*
-│       │   ├── icons\ / web-dist\
-│       │   └── node_modules\@prompt-optimizer\core\dist\
+│       ├── app.asar                   # 业务 + web-dist + icons
 │       └── app-update.yml
-├── PromptOptimizer-app-overlay.zip
-├── PROJECT_STATUS_REPORT.md           # 长审计（历史）
-├── audit\                             # 历史审计
+├── docs\FULL-AUDIT-REPORT-2026-07-20.md
+├── README.md                          # 安装侧入口
+├── CLOSEOUT.md                        # 2026-07-18 历史收口
+├── nsis-2026-07-20-paper-theme\       # Paper 主题安装包
+├── nsis-2026-07-20-develop-ux\        # UX 安装包
+├── src\prompt-optimizer\              # 源码
+├── tools\                             # portable Node 等
 └── custom-templates\                  # 用户模板（勿删）
 ```
 
-**重要：** 用户曾要求删除升级备份；本机**没有** pre-upgrade / asar.bak 回滚副本。恢复靠源码/fork。
+**重要：** 旧热替换树 `PromptOptimizer\` 已不是真相源。asar 热修前可有 `app.asar.bak-pre-icons-*` 备份；完整回滚仍靠源码/fork/nsis 归档。
 
 ### 1.3 远程 Git
 

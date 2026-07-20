@@ -13,7 +13,15 @@ const os = require('node:os');
 
 const root = path.resolve(__dirname, '..');
 const useSource = process.argv.includes('--source');
-const installExe = 'D:\\PromtOptimizer\\PromptOptimizer\\PromptOptimizer.exe';
+// Prefer env override, then current NSIS install root, then legacy hot-replace tree.
+const installRoot = process.env.PROMPT_OPTIMIZER_INSTALL_ROOT
+  || 'D:\\PromtOptimizer\\app';
+const legacyInstallExe = 'D:\\PromtOptimizer\\PromptOptimizer\\PromptOptimizer.exe';
+const installExeCandidates = [
+  path.join(installRoot, 'PromptOptimizer.exe'),
+  legacyInstallExe,
+];
+const installExe = installExeCandidates.find((p) => fs.existsSync(p)) || installExeCandidates[0];
 const sourceElectronCli = path.join(root, 'packages', 'desktop', 'node_modules', 'electron', 'cli.js');
 const sourceDesktopDir = path.join(root, 'packages', 'desktop');
 
