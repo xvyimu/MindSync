@@ -121,6 +121,23 @@ export { LocalStorageProvider } from './services/storage/localStorageProvider'
 export { MemoryStorageProvider } from './services/storage/memoryStorageProvider'
 export { FileStorageProvider } from './services/storage/fileStorageProvider'
 export {
+  SECRET_FIELD_PREFIX,
+  PassthroughSecretCodec,
+  isEncryptedSecretField,
+  sealSecretField,
+  openSecretField,
+  transformModelMapSecrets,
+  sealStorageValue,
+  openStorageValue,
+  shouldProtectStorageKey,
+  SECRET_AWARE_STORAGE_KEYS,
+} from './services/storage/secret-field'
+export type { ISecretCodec } from './services/storage/secret-field'
+export {
+  SecretAwareStorageProvider,
+  createSecretAwareStorageProvider,
+} from './services/storage/secret-aware-storage'
+export {
   runStorageStartupSafetyCheck,
   writeStartupRepairReport,
   STARTUP_REPAIR_REPORT_PREFERENCE_KEY,

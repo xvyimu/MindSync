@@ -4,6 +4,8 @@
  * main 只负责环境探测、代理与 IPC 绑定。
  */
 
+const { createElectronSafeStorageCodec } = require('./safe-storage-secrets');
+
 /**
  * @param {object} deps
  * @param {() => string} deps.getUserDataPath
@@ -11,6 +13,7 @@
  * @param {Function} deps.initializePreferenceService
  * @param {Function} deps.setupGlobalProxyDispatcherFromSystem
  * @param {Function} deps.convertImageInputWithElectronNativeImage
+ * @param {import('electron').safeStorage} [deps.safeStorage] — Electron safeStorage
  * @param {(msg: string, ...args: any[]) => void} [deps.log]
  * @returns {Promise<{ ok: true, services: object } | { ok: false, error: Error }>}
  */
@@ -32,6 +35,7 @@ async function createCoreServices(deps) {
     createContextRepo,
     FavoriteManager,
     FileStorageProvider,
+    createSecretAwareStorageProvider,
     runStorageStartupSafetyCheck,
     writeStartupRepairReport,
   } = deps.core;
@@ -41,9 +45,33 @@ async function createCoreServices(deps) {
     const userDataPath = deps.getUserDataPath();
     log('[DESKTOP] Using user data directory:', userDataPath);
 
-    const storageProvider = new FileStorageProvider(userDataPath);
+    const fileStorage = new FileStorageProvider(userDataPath);
+    const secretCodec = createElectronSafeStorageCodec(deps.safeStorage);
+    const storageProvider =
+      typeof createSecretAwareStorageProvider === 'function'
+        ? createSecretAwareStorageProvider(fileStorage, secretCodec)
+        : fileStorage;
+
+    if (secretCodec.isAvailable()) {
+      log('[DESKTOP] safeStorage encryption available — wrapping models storage');
+    } else {
+      log('[DESKTOP] safeStorage unavailable — model API keys remain plaintext on disk');
+    }
+
     const startupRepairReport = await runStorageStartupSafetyCheck(storageProvider);
     await writeStartupRepairReport(storageProvider, startupRepairReport);
+
+    // 迁移：把升级前明文 apiKey 重写为密文（仅 codec 可用时）
+    if (typeof storageProvider.ensureSecretsSealed === 'function') {
+      try {
+        const { rewritten } = await storageProvider.ensureSecretsSealed();
+        if (rewritten.length > 0) {
+          log('[DESKTOP] Migrated plaintext API keys to safeStorage for:', rewritten.join(', '));
+        }
+      } catch (migrateError) {
+        console.warn('[DESKTOP] Secret migration skipped:', migrateError);
+      }
+    }
 
     await deps.initializePreferenceService(storageProvider);
     // preferenceService 由 initializePreferenceService 挂到全局/闭包；此处不重复创建

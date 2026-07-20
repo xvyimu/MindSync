@@ -22,7 +22,7 @@ const consoleLogger = new ConsoleLogger();
 // 立即设置全局错误处理器，确保任何异常都能被记录
 consoleLogger.setupGlobalErrorHandlers();
 
-const { app, BrowserWindow, ipcMain, shell, session, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, session, Menu, nativeImage, safeStorage } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const {
   buildReleaseUrl,
@@ -110,6 +110,7 @@ const {
   createContextRepo,
   FavoriteManager,
   FileStorageProvider,
+  createSecretAwareStorageProvider,
   runStorageStartupSafetyCheck,
   writeStartupRepairReport,
   // 导入共享的环境变量扫描常量
@@ -658,10 +659,12 @@ async function initializeServices() {
         createContextRepo,
         FavoriteManager,
         FileStorageProvider,
+        createSecretAwareStorageProvider,
         runStorageStartupSafetyCheck,
         writeStartupRepairReport,
       },
       getUserDataPath: () => app.getPath('userData'),
+      safeStorage,
       initializePreferenceService,
       getPreferenceService: () => preferenceService,
       setupGlobalProxyDispatcherFromSystem,

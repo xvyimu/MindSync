@@ -189,7 +189,7 @@ export interface EvalEvidenceBundle {
 
 | 刀 | 主题 | 验收一句话 |
 |----|------|------------|
-| Cut+1 | Desktop safeStorage 存 API Key | 偏好中无明文 key |
+| Cut+1 | Desktop safeStorage 存 API Key | **done**（2026-07-21）：`SecretAwareStorageProvider` + `createElectronSafeStorageCodec`；磁盘 `models`/`image-models` 无明文 apiKey；启动迁移 |
 | Cut+2 | RemoteObjectStorePort，UI 去 @aws-sdk | web 依赖树无 client-s3 |
 
 ---
