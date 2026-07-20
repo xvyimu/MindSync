@@ -2057,11 +2057,6 @@ const handleCancelOptimization = () => {
     conversationOptimization.cancel()
 }
 
-// 处理取消优化事件
-const handleCancelOptimization = () => {
-    conversationOptimization.cancel()
-}
-
 // 🆕 ConversationTestPanel 引用
 const testAreaPanelRef = ref<TestAreaPanelInstance | null>(null);
 
