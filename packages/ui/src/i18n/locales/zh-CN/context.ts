@@ -247,7 +247,10 @@ const messages = {
       "button": "导出数据",
       "success": "数据导出成功",
       "partialSuccess": "数据已导出，但有 {count} 个图片资源缺失",
-      "failed": "数据导出失败"
+      "failed": "数据导出失败",
+      "includeSecrets": "包含模型 API 密钥（不安全，默认关闭）",
+      "secretsRedactedHint": "默认导出已脱敏模型 API Key；换机后请重新填写密钥。",
+      "secretsIncludedHint": "警告：导出文件将包含明文 API 密钥，请勿分享。"
     },
     "import": {
       "title": "导入数据",

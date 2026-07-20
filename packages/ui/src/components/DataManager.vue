@@ -101,7 +101,18 @@
                   {{ $t('dataManager.sections.favoritesBundle') }}
                 </NCheckbox>
               </label>
+              <label class="local-scope-pill" v-if="exportAppData">
+                <NCheckbox v-model:checked="exportIncludeSecrets">
+                  {{ $t('dataManager.export.includeSecrets') }}
+                </NCheckbox>
+              </label>
             </div>
+            <NText v-if="exportAppData && !exportIncludeSecrets" depth="3" class="local-transfer-description" data-testid="export-secrets-hint">
+              {{ $t('dataManager.export.secretsRedactedHint') }}
+            </NText>
+            <NText v-else-if="exportAppData && exportIncludeSecrets" depth="3" class="local-transfer-description" data-testid="export-secrets-warn">
+              {{ $t('dataManager.export.secretsIncludedHint') }}
+            </NText>
             <NButton
               @click="handleExport"
               :disabled="isExporting || (!exportAppData && !exportFavorites)"
@@ -881,6 +892,7 @@ const availableImportSections = ref(new Set<DataManagerPackageSection>(allPackag
 const exportAppData = ref(true)
 const exportAppDataImages = ref(true)
 const exportFavorites = ref(true)
+const exportIncludeSecrets = ref(false)
 const importAppData = ref(true)
 const importAppDataImages = ref(true)
 const importFavorites = ref(true)
@@ -1817,6 +1829,7 @@ const handleExport = async () => {
       imageStorageService: servicesValue.imageStorageService,
       favoriteImageStorageService: servicesValue.favoriteImageStorageService,
       sections: toExportSectionSelection(),
+      includeSecrets: exportIncludeSecrets.value,
     })
     const url = URL.createObjectURL(exportPackage.blob)
     const link = document.createElement('a')

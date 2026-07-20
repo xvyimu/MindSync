@@ -515,6 +515,7 @@ import { NButton, NCard, NFlex, NIcon, NText, NRadioGroup, NRadioButton, NTag } 
 import InputPanelUI from '../InputPanel.vue'
 import PromptPanelUI from '../PromptPanel.vue'
 import WorkspaceUtilityMenu from '../common/WorkspaceUtilityMenu.vue'
+import PostOptimizeActions from '../common/PostOptimizeActions.vue'
 import ThemedTooltip from '../common/ThemedTooltip.vue'
 import { resolveSourceAssetRef } from '../../utils/source-asset'
 import OutputDisplay from '../OutputDisplay.vue'
@@ -644,6 +645,7 @@ const logic = useBasicWorkspaceLogic({
   onOptimizeComplete: (_chain) => {
     // 发送历史刷新事件
     window.dispatchEvent(new CustomEvent('prompt-optimizer:history-refresh'))
+    showPostOptimizeCta.value = true
   },
   onIterateComplete: (_chain) => {
     window.dispatchEvent(new CustomEvent('prompt-optimizer:history-refresh'))
@@ -654,6 +656,16 @@ const logic = useBasicWorkspaceLogic({
 })
 
 // 模型选择
+const showPostOptimizeCta = ref(false)
+watch(
+  () => logic.isOptimizing.value,
+  (optimizing, was) => {
+    if (optimizing && !was) {
+      showPostOptimizeCta.value = false
+    }
+  },
+)
+
 const modelSelection = useWorkspaceModelSelection(services, session)
 
 // 模板选择（templateType: 'userOptimize', iterateTemplateType: 'iterate'）
@@ -1318,6 +1330,25 @@ provideEvaluation(evaluationHandler.evaluation)
 
 // 评估状态
 const { evaluation, handleEvaluate: handleEvaluateInternal } = evaluationHandler
+
+const handlePostOptimizeTest = () => {
+  showPostOptimizeCta.value = false
+  const el = testPaneRef.value
+  if (el && typeof el.scrollIntoView === 'function') {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  void runAllVariants()
+}
+
+const handlePostOptimizeEvaluate = async () => {
+  showPostOptimizeCta.value = false
+  try {
+    await handleEvaluateInternal('prompt-only')
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : String(e))
+  }
+}
+
 const panelProps = evaluationHandler.panelProps
 const getResultEvaluationProps = (variantId: string) => evaluationHandler.getResultEvaluationProps(variantId)
 

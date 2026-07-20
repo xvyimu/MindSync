@@ -247,7 +247,10 @@ const messages = {
       "button": "Export Data",
       "success": "Data exported successfully",
       "partialSuccess": "Data exported, but {count} image resources are missing",
-      "failed": "Failed to export data"
+      "failed": "Failed to export data",
+      "includeSecrets": "Include model API keys (unsafe; off by default)",
+      "secretsRedactedHint": "API keys are redacted by default. Re-enter keys after import on another machine.",
+      "secretsIncludedHint": "Warning: the export will contain plaintext API keys. Do not share it."
     },
     "import": {
       "title": "Import Data",

@@ -12,8 +12,13 @@ function registerDataIpcHandlers({
   app,
   shell,
 }) {
-  registerSensitiveIpc('data-exportAllData', async () => {
-    return dataManager.exportAllData();
+  registerSensitiveIpc('data-exportAllData', async (_event, options) => {
+    // options 可选：{ includeSecrets?: boolean }；默认脱敏
+    const safeOptions =
+      options && typeof options === 'object' && !Array.isArray(options)
+        ? { includeSecrets: options.includeSecrets === true }
+        : {};
+    return dataManager.exportAllData(safeOptions);
   });
 
   registerSensitiveIpc('data-importAllData', async (_event, dataString) => {

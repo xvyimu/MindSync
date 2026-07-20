@@ -80,6 +80,9 @@ type ExportDataManagerResourcePackageOptions = {
   imageStorageService?: Pick<IImageStorageService, 'listAllMetadata' | 'getImage'> | null
   favoriteImageStorageService?: Pick<IImageStorageService, 'listAllMetadata' | 'getImage'> | null
   sections?: Partial<DataManagerPackageSectionSelection>
+
+  /** 默认 false：导出脱敏 API Key */
+  includeSecrets?: boolean
 }
 
 type ImportDataManagerResourcePackageOptions = {
@@ -214,7 +217,7 @@ export const createDataManagerResourcePackage = async (
 ): Promise<DataManagerResourcePackageExportResult> => {
   const sections = resolveSectionSelection(options.sections)
   const appDataJson = sections.appData
-    ? await options.dataManager.exportAllData()
+    ? await options.dataManager.exportAllData({ includeSecrets: options.includeSecrets === true })
     : EMPTY_APP_DATA_JSON
   const favoritesJson = sections.favorites && options.favoriteManager
     ? await options.favoriteManager.exportFavorites()

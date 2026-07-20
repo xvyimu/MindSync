@@ -247,7 +247,10 @@ const messages = {
       "button": "匯出資料",
       "success": "資料匯出成功",
       "partialSuccess": "資料已匯出，但有 {count} 個圖片資源缺失",
-      "failed": "資料匯出失敗"
+      "failed": "資料匯出失敗",
+      "includeSecrets": "包含模型 API 金鑰（不安全，預設關閉）",
+      "secretsRedactedHint": "預設匯出已去除模型 API Key；換機後請重新填寫金鑰。",
+      "secretsIncludedHint": "警告：匯出檔案將包含明文 API 金鑰，請勿分享。"
     },
     "import": {
       "title": "匯入資料",

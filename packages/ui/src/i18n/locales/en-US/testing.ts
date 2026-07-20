@@ -1,4 +1,12 @@
 const messages = {
+  "postOptimize": {
+    "title": "Optimization complete",
+    "hint": "Next: run a test, evaluate quality, or save a favorite.",
+    "test": "Test",
+    "evaluate": "Evaluate",
+    "favorite": "Favorite",
+    "ariaLabel": "Next actions after optimization"
+  },
   "history": {
     "title": "History",
     "iterationNote": "Iteration Note",

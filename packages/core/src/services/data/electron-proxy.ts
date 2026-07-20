@@ -21,8 +21,8 @@ export class ElectronDataManagerProxy implements IDataManager {
     this.electronAPI = (window as any).electronAPI;
   }
 
-  async exportAllData(): Promise<string> {
-    return this.electronAPI.data.exportAllData();
+  async exportAllData(options?: { includeSecrets?: boolean }): Promise<string> {
+    return this.electronAPI.data.exportAllData(options);
   }
 
   async importAllData(dataString: string): Promise<void> {

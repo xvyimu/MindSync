@@ -1354,9 +1354,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Data Manager interface
   data: {
-    // Export all data
-    exportAllData: async () => {
-      const result = await ipcRenderer.invoke('data-exportAllData');
+    // Export all data (default redacts API keys; pass { includeSecrets: true } to keep them)
+    exportAllData: async (options) => {
+      const result = await ipcRenderer.invoke('data-exportAllData', options ?? {});
       if (!result.success) {
         throw createIpcError(result.error);
       }

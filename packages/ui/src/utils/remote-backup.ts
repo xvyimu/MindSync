@@ -1,11 +1,5 @@
-import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  HeadObjectCommand,
-  ListObjectsV2Command,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3'
+// S3/WebDAV live in packages/desktop/remote-storage.js (Desktop IPC).
+// UI only keeps Google Drive (web) + DesktopIpcRemoteObjectStore.
 import { getEnvVar } from '@prompt-optimizer/core'
 
 export type RemoteBackupProviderKind =
@@ -330,8 +324,9 @@ export const getRecommendedRemoteBackupProvider = (
 export const getSupportedRemoteBackupProviders = (
   runtime: RemoteBackupRuntime,
 ): RemoteBackupProviderKind[] =>
+  // B5: Web only exposes Google Drive; S3/R2/WebDAV are Desktop-only (main process).
   runtime === 'web'
-    ? ['google-drive', 'cloudflare-r2', 's3-compatible', 'webdav']
+    ? ['google-drive']
     : ['cloudflare-r2', 's3-compatible', 'webdav']
 
 export const createDefaultRemoteBackupSettings = (
@@ -606,14 +601,14 @@ const decodeRemotePathSegment = (segment: string): string => {
 export const normalizeObjectPath = (path: string): string => {
   const raw = String(path || '')
   // Align with desktop/remote-storage.js: backslash + C0 controls + DEL
-  if (/[\\ -]/.test(raw)) {
+  if (/[\\-]/.test(raw)) {
     throw new Error('Remote storage path contains invalid characters')
   }
 
   const segments = raw.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean)
   for (const segment of segments) {
     const decoded = decodeRemotePathSegment(segment)
-    if (decoded === '.' || decoded === '..' || /[\\/ -]/.test(decoded)) {
+    if (decoded === '.' || decoded === '..' || /[\\/-]/.test(decoded)) {
       throw new Error('Remote storage path contains an unsafe segment')
     }
   }
@@ -1348,161 +1343,12 @@ const requestGoogleAccessToken = (clientId: string): Promise<GoogleAccessTokenEn
     client.requestAccessToken()
   })
 
-class WebDavRemoteObjectStore extends BaseRemoteObjectStore {
-  provider: RemoteBackupProviderKind = 'webdav'
-
-  constructor(private readonly config: Extract<RemoteBackupProviderConfig, { kind: 'webdav' }>) {
-    super()
-  }
-
-  async exists(path: string): Promise<boolean> {
-    return Boolean(await this.head(path))
-  }
-
-  async head(path: string): Promise<RemoteObjectEntry | null> {
-    const normalized = normalizeObjectPath(path)
-    const response = await fetch(this.fileUrl(normalized), {
-      method: 'HEAD',
-      headers: this.authHeaders(),
-    })
-    if (response.status === 404) return null
-    await assertOkResponse(response, 'WebDAV metadata lookup failed')
-    const sizeText = response.headers.get('Content-Length')
-    const sizeBytes = sizeText ? Number(sizeText) : undefined
-    const updatedAt = response.headers.get('Last-Modified')
-    return {
-      path: normalized,
-      sizeBytes: typeof sizeBytes === 'number' && Number.isFinite(sizeBytes) ? sizeBytes : undefined,
-      updatedAt: updatedAt ? new Date(updatedAt).toISOString() : undefined,
-      contentType: response.headers.get('Content-Type') || undefined,
-    }
-  }
-
-  async put(
-    path: string,
-    body: Blob | ArrayBuffer | Uint8Array | string,
-    options?: { contentType?: string },
-  ): Promise<RemoteObjectEntry> {
-    const normalized = normalizeObjectPath(path)
-    const bytes = await bodyToUint8Array(body)
-    const contentType = options?.contentType || JSON_MIME_TYPE
-    await this.ensureDirectoryPath(parentPathOf(normalized))
-    await assertOkResponse(await fetch(this.fileUrl(normalized), {
-      method: 'PUT',
-      headers: {
-        ...this.authHeaders(),
-        'Content-Type': contentType,
-      },
-      body: copyUint8ArrayToArrayBuffer(bytes),
-    }), 'WebDAV upload failed')
-    return {
-      path: normalized,
-      sizeBytes: bytes.byteLength,
-      updatedAt: new Date().toISOString(),
-      contentType,
-    }
-  }
-
-  async get(path: string): Promise<ArrayBuffer> {
-    const response = await assertOkResponse(await fetch(this.fileUrl(path), {
-      headers: this.authHeaders(),
-    }), 'WebDAV download failed')
-    return response.arrayBuffer()
-  }
-
-  async list(prefix: string): Promise<RemoteObjectEntry[]> {
-    await this.ensureDirectoryPath(prefix)
-    return this.listDirectoryRecursive(prefix)
-  }
-
-  async delete(path: string): Promise<void> {
-    const response = await fetch(this.fileUrl(path), {
-      method: 'DELETE',
-      headers: this.authHeaders(),
-    })
-    if (response.status === 404) return
-    await assertOkResponse(response, 'WebDAV delete failed')
-  }
-
-  private async ensureDirectoryPath(path: string): Promise<void> {
-    const segments = normalizeObjectPath(path).split('/').filter(Boolean)
-    let current = ''
-    await this.mkcol('')
-    for (const segment of segments) {
-      current = joinRemotePath(current, segment)
-      await this.mkcol(current)
-    }
-  }
-
-  private async mkcol(path: string): Promise<void> {
-    const response = await fetch(this.directoryUrl(path), {
-      method: 'MKCOL',
-      headers: this.authHeaders(),
-    })
-    if (response.ok || response.status === 405) return
-    await assertOkResponse(response, 'WebDAV directory creation failed')
-  }
-
-  private async listDirectoryRecursive(prefix: string): Promise<RemoteObjectEntry[]> {
-    const normalizedPrefix = normalizeObjectPath(prefix)
-    const response = await assertOkResponse(await fetch(this.directoryUrl(normalizedPrefix), {
-      method: 'PROPFIND',
-      headers: {
-        ...this.authHeaders(),
-        Depth: '1',
-      },
-    }), 'WebDAV list failed')
-    const xml = await response.text()
-    const doc = parseXml(xml)
-    const entries: RemoteObjectEntry[] = []
-    const currentUrl = new URL(this.directoryUrl(normalizedPrefix), globalThis.location?.href || undefined)
-    for (const node of Array.from(doc.getElementsByTagNameNS('*', 'response'))) {
-      const href = node.getElementsByTagNameNS('*', 'href')[0]?.textContent || ''
-      const url = new URL(href, currentUrl)
-      if (url.pathname.replace(/\/+$/g, '') === currentUrl.pathname.replace(/\/+$/g, '')) continue
-      const name = decodeURIComponent(url.pathname.split('/').filter(Boolean).pop() || '')
-      if (!name) continue
-      const childPath = joinRemotePath(normalizedPrefix, name)
-      if (isCollectionNode(node as Element)) {
-        entries.push(...await this.listDirectoryRecursive(childPath))
-        continue
-      }
-      const sizeText = node.getElementsByTagNameNS('*', 'getcontentlength')[0]?.textContent
-      const updatedAt = node.getElementsByTagNameNS('*', 'getlastmodified')[0]?.textContent
-      const contentType = node.getElementsByTagNameNS('*', 'getcontenttype')[0]?.textContent || undefined
-      entries.push({
-        path: childPath,
-        sizeBytes: sizeText ? Number(sizeText) : undefined,
-        updatedAt: updatedAt ? new Date(updatedAt).toISOString() : undefined,
-        contentType,
-      })
-    }
-    return entries
-  }
-
-  private authHeaders(): Record<string, string> {
-    if (!this.config.username && !this.config.password) return {}
-    return {
-      Authorization: `Basic ${btoa(`${this.config.username}:${this.config.password}`)}`,
-    }
-  }
-
-  private baseUrl(): string {
-    if (!this.config.endpoint) {
-      throw new Error('WebDAV endpoint is required')
-    }
-    return `${this.config.endpoint.replace(/\/+$/g, '')}/${encodePathSegments(this.config.directory)}/`
-  }
-
-  private directoryUrl(path: string): string {
-    const encoded = encodePathSegments(path)
-    return `${this.baseUrl()}${encoded ? `${encoded}/` : ''}`
-  }
-
-  private fileUrl(path: string): string {
-    return `${this.baseUrl()}${encodePathSegments(path)}`
+class WebDavRemoteObjectStore {
+  constructor(_config: never) {
+    throw new Error('WebDavRemoteObjectStore was removed from UI; use Desktop IPC remote storage.')
   }
 }
+
 
 class DesktopIpcRemoteObjectStore extends BaseRemoteObjectStore {
   provider: RemoteBackupProviderKind
@@ -1574,193 +1420,38 @@ class DesktopIpcRemoteObjectStore extends BaseRemoteObjectStore {
   }
 }
 
-class S3CompatibleRemoteObjectStore extends BaseRemoteObjectStore {
-  provider: RemoteBackupProviderKind = 's3-compatible'
-  private readonly client: S3Client
-
-  constructor(private readonly config: Extract<RemoteBackupProviderConfig, { kind: 's3-compatible' }>) {
-    super()
-    this.assertConfigured()
-    this.client = new S3Client({
-      endpoint: config.endpoint,
-      region: config.region || 'auto',
-      forcePathStyle: config.forcePathStyle !== false,
-      credentials: {
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey,
-      },
-    })
-  }
-
-  async exists(path: string): Promise<boolean> {
-    return Boolean(await this.head(path))
-  }
-
-  async head(path: string): Promise<RemoteObjectEntry | null> {
-    const normalized = normalizeObjectPath(path)
-    try {
-      const response = await this.client.send(new HeadObjectCommand({
-        Bucket: this.config.bucket,
-        Key: this.keyForPath(normalized),
-      }))
-      return {
-        path: normalized,
-        sizeBytes: typeof response.ContentLength === 'number' ? response.ContentLength : undefined,
-        updatedAt: response.LastModified instanceof Date ? response.LastModified.toISOString() : undefined,
-        contentType: typeof response.ContentType === 'string' ? response.ContentType : undefined,
-      }
-    } catch (error) {
-      if (isS3NotFoundError(error)) return null
-      throw new Error(`S3 metadata lookup failed: ${s3ErrorMessage(error)}`, { cause: error })
-    }
-  }
-
-  async put(
-    path: string,
-    body: Blob | ArrayBuffer | Uint8Array | string,
-    options?: { contentType?: string },
-  ): Promise<RemoteObjectEntry> {
-    const normalized = normalizeObjectPath(path)
-    const blob = bodyToBlob(body, options?.contentType || JSON_MIME_TYPE)
-    const bytes = await bodyToUint8Array(blob)
-    const contentType = blob.type || options?.contentType || JSON_MIME_TYPE
-    try {
-      await this.client.send(new PutObjectCommand({
-        Bucket: this.config.bucket,
-        Key: this.keyForPath(normalized),
-        Body: bytes,
-        ContentType: contentType,
-      }))
-    } catch (error) {
-      throw new Error(`S3 upload failed: ${s3ErrorMessage(error)}`, { cause: error })
-    }
-    return {
-      path: normalized,
-      sizeBytes: bytes.byteLength,
-      updatedAt: new Date().toISOString(),
-      contentType,
-    }
-  }
-
-  async get(path: string): Promise<ArrayBuffer> {
-    const normalized = normalizeObjectPath(path)
-    let lastError: unknown
-
-    for (let attempt = 1; attempt <= S3_DOWNLOAD_RETRY_ATTEMPTS; attempt += 1) {
-      try {
-        const response = await this.client.send(new GetObjectCommand({
-          Bucket: this.config.bucket,
-          Key: this.keyForPath(normalized),
-        }))
-        return await s3BodyToArrayBuffer(response.Body)
-      } catch (error) {
-        if (isS3NotFoundError(error)) {
-          throw new Error(`S3 object not found: ${normalized}`, { cause: error })
-        }
-        lastError = error
-        if (!isRetryableS3DownloadError(error) || attempt === S3_DOWNLOAD_RETRY_ATTEMPTS) {
-          break
-        }
-        await sleep(S3_DOWNLOAD_RETRY_BASE_DELAY_MS * attempt)
-      }
-    }
-
-    throw new Error(`S3 download failed: ${s3ErrorMessage(lastError)}`, { cause: lastError })
-  }
-
-  async list(prefix: string): Promise<RemoteObjectEntry[]> {
-    const entries: RemoteObjectEntry[] = []
-    let continuationToken: string | undefined
-
-    try {
-      do {
-        const response = await this.client.send(new ListObjectsV2Command({
-          Bucket: this.config.bucket,
-          Prefix: this.listPrefixForPath(prefix),
-          ContinuationToken: continuationToken,
-        }))
-        for (const object of response.Contents ?? []) {
-          const key = object.Key || ''
-          const path = this.pathFromKey(key)
-          if (!path) continue
-          entries.push({
-            path,
-            sizeBytes: typeof object.Size === 'number' ? object.Size : undefined,
-            updatedAt: object.LastModified instanceof Date
-              ? object.LastModified.toISOString()
-              : undefined,
-          })
-        }
-        continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined
-      } while (continuationToken)
-    } catch (error) {
-      throw new Error(`S3 list failed: ${s3ErrorMessage(error)}`, { cause: error })
-    }
-
-    return entries.sort((a, b) => a.path.localeCompare(b.path))
-  }
-
-  async delete(path: string): Promise<void> {
-    try {
-      await this.client.send(new DeleteObjectCommand({
-        Bucket: this.config.bucket,
-        Key: this.keyForPath(path),
-      }))
-    } catch (error) {
-      throw new Error(`S3 delete failed: ${s3ErrorMessage(error)}`, { cause: error })
-    }
-  }
-
-  private prefix(): string {
-    return joinRemotePath(this.config.prefix || 'prompt-optimizer-backups')
-  }
-
-  private keyForPath(path: string): string {
-    return joinRemotePath(this.prefix(), path)
-  }
-
-  private listPrefixForPath(path: string): string {
-    return `${this.keyForPath(path)}/`
-  }
-
-  private pathFromKey(key: string): string {
-    const prefix = this.prefix()
-    return key === prefix
-      ? ''
-      : key.startsWith(`${prefix}/`)
-        ? key.slice(prefix.length + 1)
-        : key
-  }
-
-  private assertConfigured(): void {
-    if (!this.config.endpoint || !this.config.bucket || !this.config.accessKeyId || !this.config.secretAccessKey) {
-      throw new Error('S3 endpoint, bucket, access key, and secret key are required')
-    }
+class S3CompatibleRemoteObjectStore {
+  constructor(_config: never) {
+    throw new Error('S3CompatibleRemoteObjectStore was removed from UI; use Desktop IPC remote storage.')
   }
 }
 
-class CloudflareR2RemoteObjectStore extends S3CompatibleRemoteObjectStore {
-  provider: RemoteBackupProviderKind = 'cloudflare-r2'
 
-  constructor(config: Extract<RemoteBackupProviderConfig, { kind: 'cloudflare-r2' }>) {
-    super(toCloudflareR2S3Config(config))
+class CloudflareR2RemoteObjectStore {
+  constructor(_config: never) {
+    throw new Error('CloudflareR2RemoteObjectStore was removed from UI; use Desktop IPC remote storage.')
   }
 }
+
 
 export const createRemoteObjectStore = (
   provider: RemoteBackupProviderConfig,
   runtime: RemoteBackupRuntime = 'web',
 ): RemoteObjectStore => {
+  // B5: UI never constructs S3/WebDAV clients. Desktop uses main-process IPC;
+  // Web only supports Google Drive OAuth in the browser.
   if (runtime === 'desktop') {
     if (provider.kind === 'google-drive') {
       throw new Error('Google Drive remote backup is only supported in the Web version')
     }
     return new DesktopIpcRemoteObjectStore(provider)
   }
-  if (provider.kind === 'google-drive') return new GoogleDriveRemoteObjectStore(provider)
-  if (provider.kind === 'cloudflare-r2') return new CloudflareR2RemoteObjectStore(provider)
-  if (provider.kind === 'webdav') return new WebDavRemoteObjectStore(provider)
-  return new S3CompatibleRemoteObjectStore(provider)
+  if (provider.kind === 'google-drive') {
+    return new GoogleDriveRemoteObjectStore(provider)
+  }
+  throw new Error(
+    'S3/R2/WebDAV remote backup is Desktop-only. Use the desktop app or Google Drive on web.',
+  )
 }
 
 export const createRemoteBackupAdapter = (

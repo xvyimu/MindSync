@@ -195,9 +195,6 @@ importers:
 
   packages/ui:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.1044.0
-        version: 3.1044.0
       '@codemirror/autocomplete':
         specifier: ^6.20.1
         version: 6.20.1

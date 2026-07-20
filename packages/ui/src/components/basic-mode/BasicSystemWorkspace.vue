@@ -197,6 +197,13 @@
                         @apply-patch="handleApplyPatch"
                         @save-local-edit="handleSaveLocalEdit"
                     />
+                    <PostOptimizeActions
+                        :show="showPostOptimizeCta"
+                        @test="handlePostOptimizeTest"
+                        @evaluate="handlePostOptimizeEvaluate"
+                        @favorite="handleSaveFavorite"
+                        @dismiss="showPostOptimizeCta = false"
+                    />
                 </TestSourceLinkedCard>
                 </NFlex>
             </div>
@@ -558,6 +565,7 @@ import { NButton, NCard, NFlex, NIcon, NText, NRadioGroup, NRadioButton, NTag } 
 import InputPanelUI from '../InputPanel.vue'
 import PromptPanelUI from '../PromptPanel.vue'
 import WorkspaceUtilityMenu from '../common/WorkspaceUtilityMenu.vue'
+import PostOptimizeActions from '../common/PostOptimizeActions.vue'
 import ThemedTooltip from '../common/ThemedTooltip.vue'
 import { resolveSourceAssetRef } from '../../utils/source-asset'
 import TestInputSection from '../TestInputSection.vue'
@@ -696,6 +704,7 @@ const logic = useBasicWorkspaceLogic({
   onOptimizeComplete: (_chain) => {
     // 发送历史刷新事件
     window.dispatchEvent(new CustomEvent('prompt-optimizer:history-refresh'))
+    showPostOptimizeCta.value = true
   },
   onIterateComplete: (_chain) => {
     window.dispatchEvent(new CustomEvent('prompt-optimizer:history-refresh'))
@@ -726,6 +735,15 @@ const evalCaseSet = useEvalCaseSet({
 const evalCaseModelKey = evalCaseModelKeyRef
 const evalCaseSaving = ref(false)
 const evalCaseSaveGeneration = ref(0)
+const showPostOptimizeCta = ref(false)
+watch(
+  () => logic.isOptimizing.value,
+  (optimizing, was) => {
+    if (optimizing && !was) {
+      showPostOptimizeCta.value = false
+    }
+  },
+)
 
 const openEvalCasePanel = async () => {
   await evalCaseSet.load()

@@ -1,4 +1,12 @@
 const messages = {
+  "postOptimize": {
+    "title": "优化完成",
+    "hint": "建议下一步：测试效果、评估质量，或收藏结果。",
+    "test": "去测试",
+    "evaluate": "评估",
+    "favorite": "收藏",
+    "ariaLabel": "优化完成后的下一步操作"
+  },
   "history": {
     "title": "历史记录",
     "iterationNote": "迭代说明",

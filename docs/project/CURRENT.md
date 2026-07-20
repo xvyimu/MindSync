@@ -69,6 +69,9 @@
 - **Cut-1 可复现评估用例**：`EvalCaseSet` 本地存取 + `contains` 批跑 + 证据 JSON 导出（Basic System 工作区入口）；手测修补：失败不丢表单、错误区、max cases  
 - **Cut+1 Desktop safeStorage**：`models` / `image-models` 的 `apiKey` 等字段落盘为 `__enc:v1:` + OS 级加密；业务层仍见明文；Web 透传  
 - **B3 历史上限可感知**：默认 50 可配置（10–500）；History 抽屉显示占用与 near/full 警告；`setMaxRecords` 可截断最旧  
+- **C4 优化完成 CTA**：Basic System/User 优化结束后固定「测试 / 评估 / 收藏」条（`PostOptimizeActions`）  
+- **导出默认脱敏 Key**：`exportAllData({ includeSecrets? })` 默认去掉 models/imageModels 密钥；DataManager 可勾选包含  
+- **B5 远程备份边界**：UI 移除 `@aws-sdk/client-s3`；Web 仅 Google Drive；S3/R2/WebDAV 仅 Desktop IPC  
 - **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
 - **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`（本地优先工作台定位，非 LLMOps 平台）  
 

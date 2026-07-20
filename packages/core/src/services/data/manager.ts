@@ -12,6 +12,10 @@ import {
   DataInvalidJsonError,
 } from './errors';
 import { toErrorWithCode } from '../../utils/error';
+import {
+  redactExportDataObject,
+  type ExportAllDataOptions,
+} from './export-secrets';
 
 /**
  * 数据导入导出管理器
@@ -30,9 +34,10 @@ import { toErrorWithCode } from '../../utils/error';
 export interface IDataManager {
   /**
    * 导出所有数据
+   * @param options.includeSecrets 默认 false：导出中脱敏模型 API Key
    * @returns JSON格式的数据字符串
    */
-  exportAllData(): Promise<string>;
+  exportAllData(options?: ExportAllDataOptions): Promise<string>;
 
   /**
    * 导入所有数据
@@ -68,7 +73,7 @@ export class DataManager implements IDataManager {
     this.favoriteManager = favoriteManager;
   }
 
-  async exportAllData(): Promise<string> {
+  async exportAllData(options: ExportAllDataOptions = {}): Promise<string> {
     const data: Record<string, any> = {};
 
     try {
@@ -92,9 +97,16 @@ export class DataManager implements IDataManager {
       throw new DataExportFailedError(error instanceof Error ? error.message : String(error))
     }
 
+    // 默认脱敏 models / imageModels 中的 apiKey 等（B4 配套）
+    const safeData = redactExportDataObject(data, options);
+
     const exportFormat = {
       version: 1,
-      data
+      data: safeData,
+      // 标记导出是否含密钥，便于导入侧与 UI 提示
+      meta: {
+        secretsIncluded: options.includeSecrets === true,
+      },
     };
 
     return JSON.stringify(exportFormat, null, 2); // 格式化输出，便于调试

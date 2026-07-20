@@ -2,6 +2,8 @@
  * 数据导入导出相关类型定义
  */
 
+import type { ExportAllDataOptions } from './export-secrets';
+
 /**
  * 完整的导出数据结构
  */
@@ -17,9 +19,10 @@ export interface ExportData {
 export interface IDataManager {
   /**
    * 导出所有数据
+   * @param options.includeSecrets 默认 false：脱敏模型 API Key
    * @returns JSON格式的数据字符串
    */
-  exportAllData(): Promise<string>;
+  exportAllData(options?: ExportAllDataOptions): Promise<string>;
 
   /**
    * 导入所有数据
