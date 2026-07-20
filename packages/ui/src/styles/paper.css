@@ -1,0 +1,163 @@
+/*
+ * Paper theme design tokens (offline-first).
+ *
+ * Components may opt into tokens via `var(--paper-*)`. Non-paper themes keep
+ * working because :root fallbacks mirror the active Naive UI variables.
+ *
+ * Fonts intentionally do NOT load from Google CDN (desktop installs are often
+ * offline / CDN-blocked). Prefer local IBM Plex / JetBrains Mono when present,
+ * otherwise fall through to a clean system stack.
+ */
+
+:root {
+  /* Neutral fallbacks mirror the current Naive theme. */
+  --paper-bg: var(--n-body-color, #f8fafc);
+  --paper-surface: var(--n-card-color, #ffffff);
+  --paper-rule: var(--n-border-color, #e2e8f0);
+  --paper-rule-strong: #cbd5e1;
+  --paper-ink: var(--n-text-color-1, #1e293b);
+  --paper-ink-2: var(--n-text-color-2, #475569);
+  --paper-ink-3: var(--n-text-color-3, #64748b);
+  --paper-primary: var(--n-primary-color, #3b82f6);
+  --paper-primary-soft: color-mix(
+    in srgb,
+    var(--n-primary-color, #3b82f6) 12%,
+    transparent
+  );
+  --paper-cta: #f97316;
+  --paper-focus-ring: 0 0 0 2px
+    color-mix(in srgb, var(--n-primary-color, #3b82f6) 22%, transparent);
+
+  /* 8pt spacing scale */
+  --paper-space-0: 0;
+  --paper-space-1: 4px;
+  --paper-space-2: 8px;
+  --paper-space-3: 12px;
+  --paper-space-4: 16px;
+  --paper-space-5: 24px;
+  --paper-space-6: 32px;
+  --paper-space-7: 48px;
+
+  --paper-radius-sm: 6px;
+  --paper-radius-md: 10px;
+  --paper-radius-pill: 999px;
+
+  --paper-dur-fast: 150ms;
+  --paper-dur-med: 220ms;
+  --paper-ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+
+  /* Local-first stacks (no network font fetch). */
+  --paper-font-sans:
+    'IBM Plex Sans', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system,
+    BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei',
+    sans-serif;
+  --paper-font-mono:
+    'JetBrains Mono', 'Cascadia Code', 'Segoe UI Mono', ui-monospace,
+    'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+}
+
+/*
+ * Active paper theme: lock the E-Ink palette and sharpen text rendering.
+ * Hook is set by applyThemeId → html[data-app-theme='paper'].
+ */
+html[data-app-theme='paper'] {
+  --paper-bg: #f8fafc;
+  --paper-surface: #ffffff;
+  --paper-rule: #e2e8f0;
+  --paper-rule-strong: #cbd5e1;
+  --paper-ink: #1e293b;
+  --paper-ink-2: #475569;
+  --paper-ink-3: #64748b;
+  --paper-primary: #3b82f6;
+  --paper-primary-soft: rgba(59, 130, 246, 0.12);
+  --paper-focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.22);
+
+  color: var(--paper-ink);
+  background-color: var(--paper-bg);
+  font-family: var(--paper-font-sans);
+  font-feature-settings: 'ss01', 'cv02', 'cv03', 'cv04';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Selection + scrollbar tuned for paper only. */
+html[data-app-theme='paper'] ::selection {
+  background: color-mix(in srgb, var(--paper-primary) 22%, transparent);
+  color: var(--paper-ink);
+}
+
+html[data-app-theme='paper'] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html[data-app-theme='paper'] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html[data-app-theme='paper'] ::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.28);
+  border-radius: 4px;
+}
+
+html[data-app-theme='paper'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.45);
+}
+
+/* Flat chrome: no elevation on paper surfaces. */
+html[data-app-theme='paper'] .n-card {
+  box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.7) !important;
+}
+
+html[data-app-theme='paper'] .n-layout-header {
+  box-shadow: none !important;
+}
+
+/* Code / mono surfaces — developer-tool feel. */
+html[data-app-theme='paper'] .n-input__textarea-el,
+html[data-app-theme='paper'] .n-code,
+html[data-app-theme='paper'] pre,
+html[data-app-theme='paper'] code,
+html[data-app-theme='paper'] .version-tag-clickable {
+  font-family: var(--paper-font-mono);
+  font-feature-settings: 'zero', 'ss01';
+  letter-spacing: 0.01em;
+}
+
+/* Reusable helpers */
+.paper-hairline {
+  border: 1px solid var(--paper-rule);
+  border-radius: var(--paper-radius-md);
+  background: var(--paper-surface);
+}
+
+.paper-rule {
+  border: 0;
+  border-top: 1px solid var(--paper-rule);
+}
+
+.paper-mono {
+  font-family: var(--paper-font-mono);
+  font-feature-settings: 'zero', 'ss01';
+  letter-spacing: 0.01em;
+}
+
+.paper-sans {
+  font-family: var(--paper-font-sans);
+}
+
+.paper-focus:focus-visible,
+.paper-focus-within:focus-within {
+  outline: none;
+  box-shadow: var(--paper-focus-ring);
+  border-color: var(--paper-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --paper-dur-fast: 0ms;
+    --paper-dur-med: 0ms;
+  }
+}

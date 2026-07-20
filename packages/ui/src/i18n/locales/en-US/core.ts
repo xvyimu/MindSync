@@ -186,7 +186,8 @@ const messages = {
     "blue": "Blue",
     "classic": "Beige",
     "green": "Green",
-    "purple": "Purple"
+    "purple": "Purple",
+    "paper": "Paper"
   },
   "toast": {
     "error": {

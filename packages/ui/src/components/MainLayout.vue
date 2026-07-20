@@ -153,6 +153,15 @@ const openBrandWebsite = async () => {
   padding: 12px 16px !important;
 }
 
+/* Paper theme: flat hairline header, slightly roomier horizontal padding. */
+html[data-app-theme='paper'] .nav-header-enhanced {
+  min-height: 60px !important;
+  padding: 10px 24px !important;
+  background: var(--paper-surface, var(--n-card-color));
+  border-bottom: 1px solid var(--paper-rule, var(--n-border-color));
+  box-shadow: none !important;
+}
+
 .nav-content {
   min-height: 40px;
 }

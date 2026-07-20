@@ -23,26 +23,32 @@
   line-height: 1.4;
 }
 
-/* Paper theme: stop button uses CTA orange #F97316 */
+/* Paper theme: stop button uses CTA orange (token: --paper-cta) */
 html[data-app-theme='paper'] .n-button--error-type[data-testid$='-cancel-button'],
 html[data-app-theme='paper'] .input-panel-cancel-btn.n-button--error-type {
-  --n-color: #F97316;
-  --n-color-hover: #EA580C;
-  --n-color-pressed: #C2410C;
-  --n-color-focus: #F97316;
-  --n-border: 1px solid #F97316;
-  --n-border-hover: 1px solid #EA580C;
-  --n-border-pressed: 1px solid #C2410C;
-  --n-border-focus: 1px solid #F97316;
-  --n-text-color: #FFFFFF;
-  --n-text-color-hover: #FFFFFF;
-  --n-text-color-pressed: #FFFFFF;
-  --n-text-color-focus: #FFFFFF;
+  --n-color: var(--paper-cta, #f97316);
+  --n-color-hover: #ea580c;
+  --n-color-pressed: #c2410c;
+  --n-color-focus: var(--paper-cta, #f97316);
+  --n-border: 1px solid var(--paper-cta, #f97316);
+  --n-border-hover: 1px solid #ea580c;
+  --n-border-pressed: 1px solid #c2410c;
+  --n-border-focus: 1px solid var(--paper-cta, #f97316);
+  --n-text-color: #ffffff;
+  --n-text-color-hover: #ffffff;
+  --n-text-color-pressed: #ffffff;
+  --n-text-color-focus: #ffffff;
   --n-ripple-color: rgba(249, 115, 22, 0.35);
 }
 
 html[data-app-theme='paper'] .n-button:focus-visible {
   box-shadow: var(--paper-focus-ring, 0 0 0 2px rgba(59, 130, 246, 0.22));
+}
+
+/* Quiet workbench: optimizing status stays secondary on paper. */
+html[data-app-theme='paper'] .input-panel-status {
+  color: var(--paper-ink-3, #64748b);
+  font-family: var(--paper-font-sans, inherit);
 }
 
 @media (prefers-reduced-motion: reduce) {

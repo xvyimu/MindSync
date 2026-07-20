@@ -730,6 +730,213 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         borderColor: 'rgba(147, 111, 214, 0.35)'
       }
     }
+  },
+
+  // Paper: developer-tool + E-Ink palette. Offline-first system font stacks.
+  // WCAG AAA body text; hairline borders; no elevation shadows.
+  paper: {
+    id: 'paper',
+    labelKey: 'theme.paper',
+    naiveTheme: lightTheme,
+    themeOverrides: {
+      common: {
+        fontFamily:
+          '"IBM Plex Sans", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif',
+        fontFamilyMono:
+          '"JetBrains Mono", "Cascadia Code", "Segoe UI Mono", ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+        primaryColor: '#3B82F6',
+        primaryColorHover: '#2563EB',
+        primaryColorPressed: '#1D4ED8',
+        primaryColorSuppl: '#60A5FA',
+        successColor: '#059669',
+        successColorHover: '#047857',
+        successColorPressed: '#065F46',
+        successColorSuppl: '#D1FAE5',
+        warningColor: '#D97706',
+        warningColorHover: '#B45309',
+        warningColorPressed: '#92400E',
+        warningColorSuppl: '#FEF3C7',
+        errorColor: '#DC2626',
+        errorColorHover: '#B91C1C',
+        errorColorPressed: '#991B1B',
+        errorColorSuppl: '#FEE2E2',
+        infoColor: '#3B82F6',
+        infoColorHover: '#2563EB',
+        infoColorPressed: '#1D4ED8',
+        infoColorSuppl: '#DBEAFE',
+        bodyColor: '#F8FAFC',
+        cardColor: '#FFFFFF',
+        modalColor: '#FFFFFF',
+        popoverColor: '#FFFFFF',
+        tableColor: '#FFFFFF',
+        tableHeaderColor: '#F1F5F9',
+        inputColor: '#FFFFFF',
+        codeColor: '#F1F5F9',
+        actionColor: '#F8FAFC',
+        hoverColor: 'rgba(59, 130, 246, 0.06)',
+        pressedColor: 'rgba(59, 130, 246, 0.12)',
+        textColorBase: '#1E293B',
+        textColor1: '#1E293B',
+        textColor2: '#475569',
+        textColor3: '#64748B',
+        textColorDisabled: 'rgba(30, 41, 59, 0.38)',
+        placeholderColor: '#94A3B8',
+        placeholderColorDisabled: 'rgba(148, 163, 184, 0.5)',
+        iconColor: '#64748B',
+        iconColorHover: '#475569',
+        iconColorPressed: '#1E293B',
+        iconColorDisabled: 'rgba(100, 116, 139, 0.5)',
+        borderColor: '#E2E8F0',
+        dividerColor: '#EEF2F6',
+        scrollbarColor: 'rgba(100, 116, 139, 0.28)',
+        scrollbarColorHover: 'rgba(71, 85, 105, 0.45)',
+        closeIconColor: 'rgba(30, 41, 59, 0.65)',
+        closeIconColorHover: '#1E293B',
+        closeIconColorPressed: '#0F172A',
+        clearColor: 'rgba(30, 41, 59, 0.2)',
+        clearColorHover: 'rgba(30, 41, 59, 0.3)',
+        clearColorPressed: 'rgba(30, 41, 59, 0.4)',
+        borderRadius: '8px',
+        borderRadiusSmall: '6px'
+      },
+      Button: {
+        textColorPrimary: '#FFFFFF',
+        textColorHoverPrimary: '#FFFFFF',
+        textColorPressedPrimary: '#FFFFFF',
+        textColorFocusPrimary: '#FFFFFF',
+        textColorDisabledPrimary: 'rgba(255, 255, 255, 0.65)',
+        colorPrimary: '#3B82F6',
+        colorHoverPrimary: '#2563EB',
+        colorPressedPrimary: '#1D4ED8',
+        colorFocusPrimary: '#3B82F6',
+        colorDisabledPrimary: '#93C5FD',
+        borderPrimary: '1px solid #3B82F6',
+        borderHoverPrimary: '1px solid #2563EB',
+        borderPressedPrimary: '1px solid #1D4ED8',
+        borderFocusPrimary: '1px solid #3B82F6',
+        borderDisabledPrimary: '1px solid #93C5FD',
+        rippleColorPrimary: 'rgba(59, 130, 246, 0.35)',
+        // Warning reserved for stop/CTA chrome (paired with common.css paper cancel).
+        colorWarning: '#F97316',
+        colorHoverWarning: '#EA580C',
+        colorPressedWarning: '#C2410C',
+        colorFocusWarning: '#F97316',
+        borderWarning: '1px solid #F97316',
+        borderHoverWarning: '1px solid #EA580C',
+        borderPressedWarning: '1px solid #C2410C',
+        borderFocusWarning: '1px solid #F97316',
+        rippleColorWarning: 'rgba(249, 115, 22, 0.35)',
+        textColor: '#1E293B',
+        textColorHover: '#0F172A',
+        textColorPressed: '#0F172A',
+        color: '#FFFFFF',
+        colorHover: '#F1F5F9',
+        colorPressed: '#E2E8F0',
+        border: '1px solid #CBD5E1',
+        borderHover: '1px solid #94A3B8',
+        borderPressed: '1px solid #64748B'
+      },
+      Input: {
+        color: '#FFFFFF',
+        colorDisabled: '#F1F5F9',
+        colorFocus: '#FFFFFF',
+        textColor: '#1E293B',
+        textColorDisabled: 'rgba(30, 41, 59, 0.45)',
+        placeholderColor: '#94A3B8',
+        placeholderColorDisabled: 'rgba(148, 163, 184, 0.6)',
+        iconColor: '#94A3B8',
+        iconColorHover: '#64748B',
+        iconColorPressed: '#475569',
+        iconColorDisabled: 'rgba(148, 163, 184, 0.5)',
+        clearColor: 'rgba(30, 41, 59, 0.2)',
+        clearColorHover: 'rgba(30, 41, 59, 0.3)',
+        clearColorPressed: 'rgba(30, 41, 59, 0.4)',
+        border: '1px solid #CBD5E1',
+        borderDisabled: '1px solid rgba(203, 213, 225, 0.6)',
+        borderHover: '1px solid #94A3B8',
+        borderFocus: '1px solid #3B82F6',
+        boxShadowFocus: '0 0 0 2px rgba(59, 130, 246, 0.18)',
+        loadingColor: '#3B82F6',
+        caretColor: '#3B82F6',
+        suffixTextColor: '#64748B',
+        prefixTextColor: '#64748B'
+      },
+      Card: {
+        color: '#FFFFFF',
+        colorModal: '#FFFFFF',
+        colorTarget: '#FFFFFF',
+        textColor: '#1E293B',
+        titleTextColor: '#0F172A',
+        borderColor: '#E2E8F0',
+        actionColor: '#F8FAFC',
+        closeIconColor: '#94A3B8',
+        closeIconColorHover: '#64748B',
+        closeIconColorPressed: '#475569',
+        boxShadow: '0 0 0 1px rgba(226, 232, 240, 0.6)'
+      },
+      Tabs: {
+        tabColor: '#F1F5F9',
+        tabColorActive: '#FFFFFF',
+        tabBorderColor: '#E2E8F0',
+        tabTextColorBar: '#64748B',
+        tabTextColorBarHover: '#1E293B',
+        tabTextColorBarActive: '#0F172A',
+        tabTextColorCard: '#64748B',
+        tabTextColorCardActive: '#0F172A',
+        barColor: '#3B82F6'
+      },
+      Radio: {
+        buttonBorderColor: '#CBD5E1',
+        buttonBorderColorActive: '#3B82F6',
+        buttonColor: '#FFFFFF',
+        buttonColorActive: '#DBEAFE',
+        buttonTextColor: '#475569',
+        buttonTextColorActive: '#1D4ED8'
+      },
+      Dropdown: {
+        color: '#FFFFFF',
+        optionTextColor: '#1E293B',
+        optionTextColorHover: '#0F172A',
+        optionTextColorActive: '#1D4ED8',
+        optionColorHover: '#F1F5F9',
+        optionColorActive: '#DBEAFE',
+        borderColor: '#E2E8F0'
+      },
+      Tag: {
+        borderRadius: '4px',
+        border: '1px solid #E2E8F0',
+        color: '#F8FAFC',
+        textColor: '#475569'
+      },
+      Select: {
+        peers: {
+          InternalSelection: {
+            border: '1px solid #CBD5E1',
+            borderHover: '1px solid #94A3B8',
+            borderFocus: '1px solid #3B82F6',
+            borderActive: '1px solid #3B82F6',
+            boxShadowFocus: '0 0 0 2px rgba(59, 130, 246, 0.18)',
+            boxShadowActive: '0 0 0 2px rgba(59, 130, 246, 0.18)'
+          }
+        }
+      },
+      Menu: {
+        itemTextColor: '#475569',
+        itemTextColorHover: '#0F172A',
+        itemTextColorActive: '#1D4ED8',
+        itemColorActive: '#DBEAFE',
+        itemColorActiveHover: '#BFDBFE'
+      },
+      DataTable: {
+        borderColor: '#E2E8F0',
+        thColor: '#F1F5F9',
+        thTextColor: '#475569',
+        tdTextColor: '#1E293B'
+      },
+      Divider: {
+        color: '#EEF2F6'
+      }
+    }
   }
 }
 
@@ -777,6 +984,8 @@ const applyThemeId = (selectedThemeId: string): boolean => {
     if (typeof document !== 'undefined' && document.documentElement) {
       const isDark = naiveThemeConfigs[applied]?.naiveTheme === darkTheme
       document.documentElement.classList.toggle('dark', Boolean(isDark))
+      // Expose theme id for CSS hooks (paper.css / common.css paper overrides).
+      document.documentElement.setAttribute('data-app-theme', applied)
     }
   } catch (error) {
     // Best-effort only; theme switching must not break if DOM is unavailable.

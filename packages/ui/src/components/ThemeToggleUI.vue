@@ -112,7 +112,20 @@ const createThemeIcon = (themeId: string, isColored: boolean = false) => {
           d: 'M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z'
         })
       ])
-    
+
+    case 'paper':
+      // Document / paper sheet icon for the E-Ink paper theme.
+      return h('svg', {
+        class: `${baseClass}`,
+        style: isColored ? 'color: #3b82f6;' : undefined, // paper primary blue
+        viewBox: '0 0 24 24',
+        fill: 'currentColor'
+      }, [
+        h('path', {
+          d: 'M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8.828a2 2 0 00-.586-1.414l-4.828-4.828A2 2 0 0013.172 2H6zm7 1.414L18.586 9H15a2 2 0 01-2-2V3.414zM8 13a1 1 0 100 2h8a1 1 0 100-2H8zm0 4a1 1 0 100 2h5a1 1 0 100-2H8z'
+        })
+      ])
+
     default:
       return null
   }
