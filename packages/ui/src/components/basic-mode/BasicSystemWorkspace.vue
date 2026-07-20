@@ -78,7 +78,7 @@
                         :model-label="t('promptOptimizer.optimizeModel')"
                         :template-label="t('promptOptimizer.templateLabel')"
                         :button-text="t('promptOptimizer.optimize')"
-                        :loading-text="t('promptOptimizer.optimizing')"
+                        :loading-text="t('prompt.optimizing')"
                         :loading="unwrappedLogicProps.isOptimizing"
                         :disabled="unwrappedLogicProps.isOptimizing"
                         :show-preview="false"

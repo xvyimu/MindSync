@@ -111,7 +111,7 @@
                                 block
                                 data-testid="pro-multi-optimize-button"
                             >
-                                {{ displayAdapter.displayedIsOptimizing.value ? $t('promptOptimizer.optimizing') : $t('promptOptimizer.optimize') }}
+                                {{ displayAdapter.displayedIsOptimizing.value ? $t('prompt.optimizing') : $t('promptOptimizer.optimize') }}
                             </NButton>
                         </NFlex>
                     </NCard>

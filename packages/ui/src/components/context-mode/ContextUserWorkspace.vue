@@ -87,7 +87,7 @@
                     :model-label="t('promptOptimizer.optimizeModel')"
                     :template-label="t('promptOptimizer.templateLabel')"
                     :button-text="t('promptOptimizer.optimize')"
-                    :loading-text="t('promptOptimizer.optimizing')"
+                    :loading-text="t('prompt.optimizing')"
                     :loading="contextUserOptimization.isOptimizing"
                     :disabled="contextUserOptimization.isOptimizing"
                     :allow-cancel="true"
