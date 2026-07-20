@@ -396,6 +396,10 @@ export function useAppInitializer(): {
           createNewChain: (record) => historyManagerInstance.createNewChain(record),
           addIteration: (params) => historyManagerInstance.addIteration(params),
           deleteChain: (id) => historyManagerInstance.deleteChain(id),
+          // B3 history capacity
+          getUsage: () => historyManagerInstance.getUsage(),
+          getMaxRecords: () => historyManagerInstance.getMaxRecords(),
+          setMaxRecords: (max) => historyManagerInstance.setMaxRecords(max),
           // IImportExportable methods
           exportData: () => historyManagerInstance.exportData(),
           importData: (data) => historyManagerInstance.importData(data),
