@@ -1,5 +1,5 @@
 /**
- * Unit tests for access session helpers (Node 22+ has global Web Crypto).
+ * Unit tests for access session helpers (Node 24+ has global Web Crypto).
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';

@@ -34,7 +34,7 @@
 3. **包边界 `app → ui → core`**：ui **不** re-export 工厂（已落地）；生产走 dist。  
 4. **单人可维护 / 小核心**：拒绝 K8s 默认、通用 Agent 宿主、多租户中台。
 
-附加工程约束（继承仓库）：Node ^22、pnpm 10、AGPL、Electron contextIsolation + IPC manifest。
+附加工程约束（继承仓库）：Node ^24、pnpm 10、AGPL、Electron contextIsolation + IPC manifest。
 
 ---
 

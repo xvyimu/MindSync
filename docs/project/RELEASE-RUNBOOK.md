@@ -16,13 +16,13 @@
 
 ```powershell
 cd D:\PromtOptimizer\src\prompt-optimizer
-# 推荐 Node 22（portable：D:\PromtOptimizer\tools\node-v22.17.0-win-x64）
+# 推荐 Node 24（engines ^24；系统 Node 即可）
 node scripts/check-docs-current-version.mjs
-# 或完整文档门禁（Node 22 下也可用 pnpm check:docs）：
+# 或完整文档门禁（Node 24 下也可用 pnpm check:docs）：
 # node -e "require('child_process').execSync('node scripts/check-docs-current-version.mjs&&node scripts/check-docs-freeze-banners.mjs&&node scripts/check-docs-handoff-paths.mjs&&node scripts/check-docs-pnpm-script-refs.mjs&&node scripts/check-docs-version-sync-list.mjs&&node scripts/check-docs-version-consistency.mjs',{stdio:'inherit'})"
 ```
 
-建议发版前：`pnpm test:gate`（或至少 core/ui 相关门禁）在 Node 22 下通过。
+建议发版前：`pnpm test:gate`（或至少 core/ui 相关门禁）在 Node 24 下通过。
 
 ---
 

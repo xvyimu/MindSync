@@ -58,10 +58,10 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 | 项 | 最佳方案 |
 |----|----------|
 | Shell | **pwsh 7**，不用 5.1 |
-| Node | **^22**；portable：`D:\PromtOptimizer\tools\node-v22.17.0-win-x64` |
+| Node | **^24**（本机系统 Node；勿再强制 portable 22） |
 | 包管理 | pnpm workspace |
 | i18n | `docs/developer/i18n-policy.md`：en-US source；UI 走 `t()`；模板中文在 allowlist |
-| 测试 | `pnpm --filter @prompt-optimizer/core test`（Node 22） |
+| 测试 | `pnpm --filter @prompt-optimizer/core test`（Node 24） |
 | 分支 | feature 短命；UX 栈：`feat/ux-2026-07-20` → #3；`feat/ux-2026-07-21-cancel-parity` → #4（base=#3） |
 | 合入顺序 | **#3 → develop → #4 retarget/rebase → develop** |
 | 不做除非要求 | 自动合 PR、NSIS 打包、unsuppress vendor、上游 #325–#330 整包 |
@@ -78,7 +78,7 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 1. 从正确 base 开分支（独立 → develop；叠 → 当前 PR tip）  
 2. 最小 diff；匹配周围代码风格  
 3. i18n：先确认 key 存在（防 `promptOptimizer.optimizing` 类假 key）  
-4. Node 22 跑相关单测
+4. Node 24 跑相关单测
 
 ### Phase C · 质量门
 1. **自审**：i18n、cancel wiring、Handlebars、import 路径  
@@ -122,16 +122,15 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 | stacked PR 父未合 | 子 PR base 保持父分支 |
 | 共享 helper 抽取（altitude） | 标 follow-up，不塞进 4 文件 parity PR |
 | push / 合 PR / 删 / 外发 | 先确认（除非用户已明确授权本会话） |
-| Node 版本 | 始终 portable 22，拒绝 24 跑 pnpm engines |
+| Node 版本 | **^24**；系统 Node 24 即可，无需再挂 portable 22 |
 
 ---
 
 ## 5. 命令速查
 
 ```powershell
-# Node 22
-$env:PATH = "D:\PromtOptimizer\tools\node-v22.17.0-win-x64;" + $env:PATH
-node -v   # expect v22.x
+# Node 24（系统安装即可）
+node -v   # expect v24.x
 
 # 测试
 pnpm --filter @prompt-optimizer/core test

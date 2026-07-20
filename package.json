@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.6.1",
   "engines": {
-    "node": "^22.0.0",
+    "node": "^24.0.0",
     "npm": "Please use pnpm instead of npm",
     "yarn": "Please use pnpm instead of yarn"
   },

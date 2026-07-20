@@ -36,7 +36,7 @@ git checkout develop
 # 仅跟踪上游（只读 remote 可另加）
 # git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
 
-# 安装依赖（Node 22.x + pnpm）
+# 安装依赖（Node 24.x + pnpm）
 pnpm install
 
 # 启动开发服务

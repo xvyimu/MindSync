@@ -23,7 +23,7 @@
 | 源码 | `D:\PromtOptimizer\src\prompt-optimizer` |
 | **运行安装** | **`D:\PromtOptimizer\app\PromptOptimizer.exe`** |
 | 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` |
-| 工具链 | `D:\PromtOptimizer\tools`（portable Node 22，常用 `tools\node-v22.17.0-win-x64`） |
+| 工具链 | **Node ^24**（本机系统 Node 即可；旧 portable `tools\node-v22.*` 可弃用） |
 | 用户模板 | `D:\PromtOptimizer\custom-templates\`（勿删） |
 | Desktop IPC 协议 | `packages/desktop/config/ipc/channel-manifest.js` · **1.1.0** |
 
@@ -76,7 +76,7 @@
 
 ```powershell
 cd D:\PromtOptimizer\src\prompt-optimizer
-# Node 22 推荐
+# Node 24（engines ^24）
 pnpm -F @prompt-optimizer/core build
 pnpm -F @prompt-optimizer/ui build:bundle
 pnpm -F @prompt-optimizer/desktop build:ci

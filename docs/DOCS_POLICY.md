@@ -34,7 +34,7 @@
 
 ```powershell
 cd D:\PromtOptimizer\src\prompt-optimizer
-# 推荐 Node 22；或逐条 node：
+# 推荐 Node 24；或逐条 node：
 node scripts/check-docs-current-version.mjs
 node scripts/check-docs-freeze-banners.mjs
 node scripts/check-docs-handoff-paths.mjs

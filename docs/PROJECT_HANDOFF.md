@@ -176,7 +176,7 @@ git push origin develop
 ### 4.1 改 Core / Desktop（推荐）
 
 1. 在 `D:\PromtOptimizer\src\prompt-optimizer` 改代码  
-2. 使用 **Node 22**（portable：`D:\PromtOptimizer\tools`）  
+2. 使用 **Node 24**（engines `^24`；系统 Node 即可）  
 3. 构建并重装：
 
 ```powershell
@@ -243,7 +243,7 @@ node scripts/write-release-traceability.cjs
 ### 5.5 Playwright gate（VCR）
 
 ```powershell
-# Node 22；浏览器 chromium-1208
+# Node 24；浏览器 chromium-1208
 $env:PLAYWRIGHT_BROWSERS_PATH='D:\ms-playwright'
 $env:NO_PROXY='localhost,127.0.0.1'
 # 只开 DeepSeek + SiliconFlow，勿开 OpenAI

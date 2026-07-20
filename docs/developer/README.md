@@ -10,7 +10,7 @@
 - [技术开发指南](./technical-development-guide.md) — 技术栈与规范  
 - [项目结构](./project-structure.md) — 目录组织  
 - [通用开发经验](./general-experience.md) — 经验与最佳实践  
-- [开发工作流（本机）](../project/DEV-WORKFLOW.md) — Node 22 / 命令摘要  
+- [开发工作流（本机）](../project/DEV-WORKFLOW.md) — Node 24 / 命令摘要  
 
 ## 平台
 

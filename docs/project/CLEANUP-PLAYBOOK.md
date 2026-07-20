@@ -34,7 +34,7 @@
 |------|------|
 | `D:\PromtOptimizer\src\prompt-optimizer\` | 源码真相源 |
 | `D:\PromtOptimizer\app\` | **现行** NSIS 安装根（`PromptOptimizer.exe` + `resources\app.asar`） |
-| `D:\PromtOptimizer\tools\` | portable Node 等工具链（如 `tools\node-v22.17.0-win-x64`） |
+| `D:\PromtOptimizer\tools\` | 历史 portable Node 等（Node 基线已升 **^24**，系统 Node 优先） |
 | `D:\PromtOptimizer\custom-templates\` | 用户模板数据 |
 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` | Paper 主题安装包归档 |
 | `D:\PromtOptimizer\nsis-2026-07-20-develop-ux\` | UX 安装包归档 |
