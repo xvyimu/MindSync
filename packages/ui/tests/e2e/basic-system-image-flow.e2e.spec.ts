@@ -58,8 +58,31 @@ vi.mock('naive-ui', () => {
     NRadioGroup: passthrough('NRadioGroup'),
     NRadioButton: passthrough('NRadioButton'),
     NTag: passthrough('NTag'),
+    NDrawer: passthrough('NDrawer'),
+    NDrawerContent: passthrough('NDrawerContent'),
+    NEmpty: passthrough('NEmpty'),
+    NInput: passthrough('NInput'),
+    NAlert: passthrough('NAlert'),
+    NSpace: passthrough('NSpace'),
   }
 })
+
+
+vi.mock('../../src/components/common/PostOptimizeActions.vue', () => ({
+  default: {
+    name: 'PostOptimizeActions',
+    props: ['show'],
+    template: '<div class="post-optimize-actions-stub" v-if="show" />',
+  },
+}))
+
+vi.mock('../../src/components/evaluation/EvalCaseSetPanel.vue', () => ({
+  default: {
+    name: 'EvalCaseSetPanel',
+    props: ['show'],
+    template: '<div class="eval-case-set-panel-stub" />',
+  },
+}))
 
 const Passthrough = defineComponent({
   name: 'Passthrough',
@@ -183,6 +206,8 @@ const createHarness = async (): Promise<Harness> => {
         TestPanelVersionSelect: true,
         TestSourceLinkedCard: Passthrough,
         TestVariantSourceTag: true,
+        PostOptimizeActions: true,
+        EvalCaseSetPanel: true,
       },
     },
   })

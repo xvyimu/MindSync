@@ -1588,6 +1588,25 @@ provideEvaluation(evaluationHandler.evaluation)
 
 // 评估状态
 const { evaluation, handleEvaluate: handleEvaluateInternal } = evaluationHandler
+
+const handlePostOptimizeTest = () => {
+  showPostOptimizeCta.value = false
+  const el = testPaneRef.value
+  if (el && typeof el.scrollIntoView === 'function') {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  void runAllVariants()
+}
+
+const handlePostOptimizeEvaluate = async () => {
+  showPostOptimizeCta.value = false
+  try {
+    await handleEvaluateInternal('prompt-only')
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : String(e))
+  }
+}
+
 const panelProps = evaluationHandler.panelProps
 const getResultEvaluationProps = (variantId: string) => evaluationHandler.getResultEvaluationProps(variantId)
 
