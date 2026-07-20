@@ -4,7 +4,7 @@
  * 运行：llmService.sendMessage + core runEvalCaseSet
  */
 
-import { ref, computed, type Ref } from 'vue'
+import { ref, computed, type Ref, type ComputedRef } from 'vue'
 import {
   CORE_SERVICE_KEYS,
   createEmptyEvalCaseSet,
@@ -21,10 +21,12 @@ import {
   type IPreferenceService,
 } from '@prompt-optimizer/core'
 
+type MaybeRefOrComputed<T> = Ref<T> | ComputedRef<T>
+
 export interface UseEvalCaseSetOptions {
-  preferenceService: Ref<IPreferenceService | null | undefined>
-  llmService: Ref<ILLMService | null | undefined>
-  modelKey: Ref<string>
+  preferenceService: MaybeRefOrComputed<IPreferenceService | null | undefined>
+  llmService: MaybeRefOrComputed<ILLMService | null | undefined>
+  modelKey: MaybeRefOrComputed<string>
 }
 
 const STORAGE_KEY = CORE_SERVICE_KEYS.EVAL_CASE_SET
