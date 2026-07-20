@@ -173,90 +173,82 @@ export class PromptService implements IPromptService {
   }
 
   /**
+   * 构建消息优化的 LLM messages（同步/流式共用）
+   */
+  private async buildMessageOptimizationMessages(
+    request: MessageOptimizationRequest,
+  ): Promise<{ messages: Message[]; selectedContent: string }> {
+    this.validateMessageOptimizationRequest(request);
+
+    const modelConfig = await this.modelManager.getModel(request.modelKey);
+    if (!modelConfig) {
+      throw new OptimizationError("", "Model not found");
+    }
+
+    const selectedMessage = request.messages.find(
+      msg => msg.id === request.selectedMessageId
+    )!;
+    const selectedIndex = request.messages.findIndex(
+      msg => msg.id === request.selectedMessageId
+    );
+
+    const template = await this.templateManager.getTemplate(
+      request.templateId || "context-message-optimize"
+    );
+    if (!template?.content) {
+      throw new OptimizationError(
+        selectedMessage.content,
+        "Template not found or invalid",
+      );
+    }
+
+    const messagesWithMeta = request.messages.map((msg, idx) => ({
+      index: idx + 1,
+      roleLabel: msg.role.toUpperCase(),
+      content: msg.content,
+      isSelected: msg.id === request.selectedMessageId,
+    }));
+
+    const maxLength = 200;
+    const selectedMessageData = {
+      index: selectedIndex + 1,
+      roleLabel: selectedMessage.role.toUpperCase(),
+      content: selectedMessage.content,
+      contentTooLong: selectedMessage.content.length > maxLength,
+      contentPreview: selectedMessage.content.length > maxLength
+        ? selectedMessage.content.substring(0, 150)
+        : undefined,
+    };
+
+    const context: TemplateContext = {
+      originalPrompt: selectedMessage.content,
+      messageRole: selectedMessage.role,
+      contextMode: request.contextMode,
+      customVariables: request.variables,
+      tools: request.tools,
+      conversationMessages: messagesWithMeta,
+      selectedMessage: selectedMessageData,
+    };
+
+    if (request.tools && request.tools.length > 0) {
+      context.toolsContext = TemplateProcessor.formatToolsAsText(request.tools);
+    }
+
+    return {
+      messages: TemplateProcessor.processTemplate(template, context),
+      selectedContent: selectedMessage.content,
+    };
+  }
+
+  /**
    * 优化单条消息 - 多轮对话模式专用
    */
   async optimizeMessage(request: MessageOptimizationRequest): Promise<string> {
     try {
-      // 验证请求参数
-      this.validateMessageOptimizationRequest(request);
-
-      // 获取模型配置
-      const modelConfig = await this.modelManager.getModel(request.modelKey);
-      if (!modelConfig) {
-        throw new OptimizationError("", "Model not found");
-      }
-
-      // 从消息数组中找到选中的消息
-      const selectedMessage = request.messages.find(
-        msg => msg.id === request.selectedMessageId
-      )!;
-
-      // 获取选中消息的索引（从0开始）
-      const selectedIndex = request.messages.findIndex(
-        msg => msg.id === request.selectedMessageId
-      );
-
-      // 获取模板（默认使用 context-message-optimize）
-      const template = await this.templateManager.getTemplate(
-        request.templateId || "context-message-optimize"
-      );
-
-      if (!template?.content) {
-        throw new OptimizationError(
-          selectedMessage.content,
-          "Template not found or invalid",
-        );
-      }
-
-      // 为消息数组添加元数据（用于模板循环）
-      const messagesWithMeta = request.messages.map((msg, idx) => ({
-        index: idx + 1,  // 序号从1开始
-        roleLabel: msg.role.toUpperCase(),
-        content: msg.content,
-        isSelected: msg.id === request.selectedMessageId,
-      }));
-
-      // 准备选中消息的数据（包含长度判断）
-      const maxLength = 200;
-      const selectedMessageData = {
-        index: selectedIndex + 1,
-        roleLabel: selectedMessage.role.toUpperCase(),
-        content: selectedMessage.content,
-        contentTooLong: selectedMessage.content.length > maxLength,
-        contentPreview: selectedMessage.content.length > maxLength
-          ? selectedMessage.content.substring(0, 150)
-          : undefined,
-      };
-
-      // 构建模板上下文
-      const context: TemplateContext = {
-        originalPrompt: selectedMessage.content,
-        messageRole: selectedMessage.role,
-        contextMode: request.contextMode,
-        customVariables: request.variables,
-        tools: request.tools,
-        // 🆕 模板驱动的数据
-        conversationMessages: messagesWithMeta,
-        selectedMessage: selectedMessageData,
-      };
-
-      // 如果有工具定义，格式化为工具文本
-      if (request.tools && request.tools.length > 0) {
-        context.toolsContext = TemplateProcessor.formatToolsAsText(
-          request.tools
-        );
-      }
-
-      // 处理模板并调用 LLM
-      const messages = TemplateProcessor.processTemplate(template, context);
-      const result = await this.llmService.sendMessage(
-        messages,
-        request.modelKey,
-      );
-
-      // 验证响应
-      this.validateResponse(result, selectedMessage.content);
-
+      const { messages, selectedContent } =
+        await this.buildMessageOptimizationMessages(request);
+      const result = await this.llmService.sendMessage(messages, request.modelKey);
+      this.validateResponse(result, selectedContent);
       return result;
     } catch (error) {
       const errorMessage =
@@ -266,6 +258,87 @@ export class PromptService implements IPromptService {
         `Message optimization failed: ${errorMessage}`,
       );
     }
+  }
+
+  /**
+   * 构建迭代优化的 LLM messages（同步/流式共用）
+   */
+  private async buildIterationMessages(
+    originalPrompt: string,
+    lastOptimizedPrompt: string,
+    iterateInput: string,
+    modelKey: string,
+    templateId?: string,
+    contextData?: {
+      messages?: ConversationMessage[];
+      selectedMessageId?: string;
+      variables?: Record<string, string>;
+      tools?: ToolDefinition[];
+    },
+  ): Promise<Message[]> {
+    // 迭代模板只需要 lastOptimizedPrompt 和 iterateInput
+    this.validateInput(lastOptimizedPrompt, modelKey);
+    this.validateInput(iterateInput, modelKey);
+
+    const modelConfig = await this.modelManager.getModel(modelKey);
+    if (!modelConfig) {
+      throw new ServiceDependencyError("ModelManager", "Model not found");
+    }
+
+    let template;
+    try {
+      template = await this.templateManager.getTemplate(
+        templateId || DEFAULT_TEMPLATES.ITERATE,
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      throw new IterationError(
+        originalPrompt,
+        iterateInput,
+        `Iteration failed: ${errorMessage}`,
+      );
+    }
+
+    if (!template?.content) {
+      throw new IterationError(
+        originalPrompt,
+        iterateInput,
+        "Iteration failed: Template not found or invalid",
+      );
+    }
+
+    if (typeof template.content === "string") {
+      throw new IterationError(
+        originalPrompt,
+        iterateInput,
+        `Iteration requires advanced template (message array format) for variable substitution.\n` +
+          `Template ID: ${template.id}\n` +
+          `Current template type: Simple template (string format)\n` +
+          `Suggestion: Please use message array format template that supports {{lastOptimizedPrompt}} and {{iterateInput}} variables`,
+      );
+    }
+
+    const context: TemplateContext = {
+      originalPrompt,
+      lastOptimizedPrompt,
+      iterateInput,
+      customVariables: contextData?.variables,
+      tools: contextData?.tools,
+    };
+
+    if (contextData?.messages && contextData.messages.length > 0) {
+      context.conversationContext = TemplateProcessor.formatConversationAsText(
+        contextData.messages,
+      );
+    }
+    if (contextData?.tools && contextData.tools.length > 0) {
+      context.toolsContext = TemplateProcessor.formatToolsAsText(
+        contextData.tools,
+      );
+    }
+
+    return TemplateProcessor.processTemplate(template, context);
   }
 
   /**
@@ -285,87 +358,16 @@ export class PromptService implements IPromptService {
     },
   ): Promise<string> {
     try {
-      // 🔧 迭代模板只需要 lastOptimizedPrompt 和 iterateInput
-      // originalPrompt 可以为空（用户直接在工作区编辑后迭代的场景）
-      this.validateInput(lastOptimizedPrompt, modelKey);
-      this.validateInput(iterateInput, modelKey);
-
-      // 获取模型配置
-      const modelConfig = await this.modelManager.getModel(modelKey);
-      if (!modelConfig) {
-        throw new ServiceDependencyError("ModelManager", "Model not found");
-      }
-
-      // 获取迭代提示词
-      let template;
-      try {
-        template = await this.templateManager.getTemplate(
-          templateId || DEFAULT_TEMPLATES.ITERATE,
-        );
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        throw new IterationError(
-          originalPrompt,
-          iterateInput,
-          `Iteration failed: ${errorMessage}`,
-        );
-      }
-
-      if (!template?.content) {
-        throw new IterationError(
-          originalPrompt,
-          iterateInput,
-          "Iteration failed: Template not found or invalid",
-        );
-      }
-
-      // 🔧 迭代功能必须使用高级模板（message array 格式）以支持变量替换
-      if (typeof template.content === "string") {
-        throw new IterationError(
-          originalPrompt,
-          iterateInput,
-          `Iteration requires advanced template (message array format) for variable substitution.\n` +
-            `Template ID: ${template.id}\n` +
-            `Current template type: Simple template (string format)\n` +
-            `Suggestion: Please use message array format template that supports {{lastOptimizedPrompt}} and {{iterateInput}} variables`,
-        );
-      }
-
-      // 使用TemplateProcessor处理模板和变量替换
-      const context: TemplateContext = {
+      const messages = await this.buildIterationMessages(
         originalPrompt,
         lastOptimizedPrompt,
         iterateInput,
-        customVariables: contextData?.variables,
-        tools: contextData?.tools,
-      };
-
-      // 如果有会话消息，将其格式化为文本并添加到上下文
-      if (contextData?.messages && contextData.messages.length > 0) {
-        const conversationText = TemplateProcessor.formatConversationAsText(
-          contextData.messages,
-        );
-        context.conversationContext = conversationText;
-      }
-
-      // 如果有工具信息，将其格式化为文本并添加到上下文
-      if (contextData?.tools && contextData.tools.length > 0) {
-        const toolsText = TemplateProcessor.formatToolsAsText(
-          contextData.tools,
-        );
-        context.toolsContext = toolsText;
-      }
-
-      const messages = TemplateProcessor.processTemplate(template, context);
-
-      // 发送请求
-      const result = await this.llmService.sendMessage(messages, modelKey);
-
-      // 注意：迭代历史记录保存由UI层的historyManager.addIteration方法处理
-      // 移除重复的addRecord调用以避免重复保存
-
-      return result;
+        modelKey,
+        templateId,
+        contextData,
+      );
+      // 迭代历史记录由 UI 层 historyManager.addIteration 处理
+      return await this.llmService.sendMessage(messages, modelKey);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -614,94 +616,19 @@ export class PromptService implements IPromptService {
   ): Promise<void> {
     try {
       options?.signal?.throwIfAborted();
-      // 验证请求参数
-      this.validateMessageOptimizationRequest(request);
+      const { messages, selectedContent } =
+        await this.buildMessageOptimizationMessages(request);
 
-      // 获取模型配置
-      const modelConfig = await this.modelManager.getModel(request.modelKey);
-      if (!modelConfig) {
-        throw new OptimizationError("", "Model not found");
-      }
-
-      // 从消息数组中找到选中的消息
-      const selectedMessage = request.messages.find(
-        msg => msg.id === request.selectedMessageId
-      )!;
-
-      // 获取选中消息的索引（从0开始）
-      const selectedIndex = request.messages.findIndex(
-        msg => msg.id === request.selectedMessageId
-      );
-
-      // 获取模板（默认使用 context-message-optimize）
-      const template = await this.templateManager.getTemplate(
-        request.templateId || "context-message-optimize"
-      );
-
-      if (!template?.content) {
-        throw new OptimizationError(
-          selectedMessage.content,
-          "Template not found or invalid",
-        );
-      }
-
-      // 为消息数组添加元数据（用于模板循环）
-      const messagesWithMeta = request.messages.map((msg, idx) => ({
-        index: idx + 1,  // 序号从1开始
-        roleLabel: msg.role.toUpperCase(),
-        content: msg.content,
-        isSelected: msg.id === request.selectedMessageId,
-      }));
-
-      // 准备选中消息的数据（包含长度判断）
-      const maxLength = 200;
-      const selectedMessageData = {
-        index: selectedIndex + 1,
-        roleLabel: selectedMessage.role.toUpperCase(),
-        content: selectedMessage.content,
-        contentTooLong: selectedMessage.content.length > maxLength,
-        contentPreview: selectedMessage.content.length > maxLength
-          ? selectedMessage.content.substring(0, 150)
-          : undefined,
-      };
-
-      // 构建模板上下文
-      const context: TemplateContext = {
-        originalPrompt: selectedMessage.content,
-        messageRole: selectedMessage.role,
-        contextMode: request.contextMode,
-        customVariables: request.variables,
-        tools: request.tools,
-        // 🆕 模板驱动的数据
-        conversationMessages: messagesWithMeta,
-        selectedMessage: selectedMessageData,
-      };
-
-      // 如果有工具定义，格式化为工具文本
-      if (request.tools && request.tools.length > 0) {
-        context.toolsContext = TemplateProcessor.formatToolsAsText(
-          request.tools
-        );
-      }
-
-      // 处理模板
-      const messages = TemplateProcessor.processTemplate(template, context);
-
-      // 使用流式发送
       await this.llmService.sendMessageStream(messages, request.modelKey, {
         onToken: callbacks.onToken,
         onReasoningToken: callbacks.onReasoningToken,
         onComplete: async (response) => {
           try {
             if (response) {
-              // 验证主要内容
-              this.validateResponse(response.content, selectedMessage.content);
+              this.validateResponse(response.content, selectedContent);
             }
-
-            // 调用原始完成回调
             callbacks.onComplete(response);
           } catch (error) {
-            // 如果验证失败，调用错误回调
             callbacks.onError(
               error instanceof Error ? error : new Error(String(error)),
             );
@@ -739,94 +666,25 @@ export class PromptService implements IPromptService {
   ): Promise<void> {
     try {
       options?.signal?.throwIfAborted();
-      // 🔧 迭代模板只需要 lastOptimizedPrompt 和 iterateInput
-      // originalPrompt 可以为空（用户直接在工作区编辑后迭代的场景）
-      this.validateInput(lastOptimizedPrompt, modelKey);
-      this.validateInput(iterateInput, modelKey);
-
-      // 获取模型配置
-      const modelConfig = await this.modelManager.getModel(modelKey);
-      if (!modelConfig) {
-        throw new ServiceDependencyError("ModelManager", "Model not found");
-      }
-
-      // 获取迭代提示词
-      let template;
-      try {
-        template = await this.templateManager.getTemplate(templateId);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        throw new IterationError(
-          originalPrompt,
-          iterateInput,
-          `Iteration failed: ${errorMessage}`,
-        );
-      }
-
-      if (!template?.content) {
-        throw new IterationError(
-          originalPrompt,
-          iterateInput,
-          "Iteration failed: Template not found or invalid",
-        );
-      }
-
-      // 🔧 迭代功能必须使用高级模板（message array 格式）以支持变量替换
-      if (typeof template.content === "string") {
-        throw new IterationError(
-          originalPrompt,
-          iterateInput,
-          `Iteration requires advanced template (message array format) for variable substitution.\n` +
-            `Template ID: ${template.id}\n` +
-            `Current template type: Simple template (string format)\n` +
-            `Suggestion: Please use message array format template that supports {{lastOptimizedPrompt}} and {{iterateInput}} variables`,
-        );
-      }
-
-      // 使用TemplateProcessor处理模板和变量替换
-      const context: TemplateContext = {
+      const messages = await this.buildIterationMessages(
         originalPrompt,
         lastOptimizedPrompt,
         iterateInput,
-        customVariables: contextData?.variables,
-        tools: contextData?.tools,
-      };
+        modelKey,
+        templateId,
+        contextData,
+      );
 
-      // 如果有会话消息，将其格式化为文本并添加到上下文
-      if (contextData?.messages && contextData.messages.length > 0) {
-        const conversationText = TemplateProcessor.formatConversationAsText(
-          contextData.messages,
-        );
-        context.conversationContext = conversationText;
-      }
-
-      // 如果有工具信息，将其格式化为文本并添加到上下文
-      if (contextData?.tools && contextData.tools.length > 0) {
-        const toolsText = TemplateProcessor.formatToolsAsText(
-          contextData.tools,
-        );
-        context.toolsContext = toolsText;
-      }
-
-      const messages = TemplateProcessor.processTemplate(template, context);
-
-      // 使用新的结构化流式响应
       await this.llmService.sendMessageStream(messages, modelKey, {
         onToken: handlers.onToken,
-        onReasoningToken: handlers.onReasoningToken, // 支持推理内容流
+        onReasoningToken: handlers.onReasoningToken,
         onComplete: async (response) => {
           try {
             if (response) {
-              // 验证迭代结果
               this.validateResponse(response.content, lastOptimizedPrompt);
             }
-
-            // 调用原始完成回调，传递结构化响应
-            // 注意：迭代历史记录由UI层的historyManager.addIteration方法处理
             handlers.onComplete(response);
           } catch (error) {
-            // 如果验证失败，调用错误回调
             handlers.onError(
               error instanceof Error ? error : new Error(String(error)),
             );

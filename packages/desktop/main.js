@@ -266,6 +266,50 @@ function setupEmergencyExit() {
   }, EMERGENCY_EXIT_TIME);
 }
 
+function clearEmergencyExit() {
+  if (emergencyExitTimer) {
+    clearTimeout(emergencyExitTimer);
+    emergencyExitTimer = null;
+  }
+}
+
+/**
+ * 统一退出前落盘：close / before-quit 共用，避免双路径复制超时与标志逻辑。
+ * @returns {Promise<'skipped' | 'saved' | 'failed'>}
+ */
+async function flushStorageBeforeExit(logLabel) {
+  if (isUpdaterQuitting) {
+    console.log(`[DESKTOP] Updater quit detected, skipping data save (${logLabel})`);
+    return 'skipped';
+  }
+  if (isQuitting) {
+    return 'skipped';
+  }
+  if (!storageProvider || typeof storageProvider.flush !== 'function') {
+    return 'skipped';
+  }
+
+  isQuitting = true;
+  setupEmergencyExit();
+
+  try {
+    console.log(`[DESKTOP] Saving data before ${logLabel}...`);
+    await Promise.race([
+      storageProvider.flush(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Save timeout')), MAX_SAVE_TIME - 1000)
+      ),
+    ]);
+    console.log('[DESKTOP] Data saved successfully');
+    return 'saved';
+  } catch (error) {
+    console.error(`[DESKTOP] Failed to save data before ${logLabel}:`, error);
+    return 'failed';
+  } finally {
+    clearEmergencyExit();
+  }
+}
+
 // === System Proxy → Undici Global Dispatcher (A1 方案) ===
 // 说明：在主进程中尽量早地设置 undici 全局代理分发器，使 Node/SDK 请求复用系统代理。
 // 安全：任意步骤失败将优雅跳过，绝不影响启动流程。
@@ -508,52 +552,32 @@ function createWindow() {
     }
   }
 
-  // 窗口关闭前保存数据
+  // 窗口关闭前保存数据（与 before-quit 共用 flushStorageBeforeExit）
   mainWindow.on('close', async (event) => {
-    // 如果是更新安装退出，直接关闭窗口，不保存数据
-    if (isUpdaterQuitting) {
-      console.log('[DESKTOP] Updater quit detected, skipping data save');
+    if (isUpdaterQuitting || isQuitting) {
+      return;
+    }
+    if (!storageProvider || typeof storageProvider.flush !== 'function') {
       return;
     }
 
-    if (!isQuitting && storageProvider && typeof storageProvider.flush === 'function') {
-      event.preventDefault(); // 阻止立即关闭
-      isQuitting = true; // 设置退出标志
+    event.preventDefault();
+    forceQuitTimer = setTimeout(() => {
+      console.warn('[DESKTOP] Force closing window due to timeout');
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.destroy();
+      }
+    }, MAX_SAVE_TIME);
 
-      // 启动应急退出机制
-      setupEmergencyExit();
-
-      // 设置强制退出定时器，确保程序不会卡住
-      forceQuitTimer = setTimeout(() => {
-        console.warn('[DESKTOP] Force closing window due to timeout');
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.destroy();
-        }
-      }, MAX_SAVE_TIME);
-
-      try {
-        console.log('[DESKTOP] Saving data before window close...');
-        await Promise.race([
-          storageProvider.flush(),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Save timeout')), MAX_SAVE_TIME - 1000)
-          )
-        ]);
-        console.log('[DESKTOP] Data saved successfully');
-      } catch (error) {
-        console.error('[DESKTOP] Failed to save data before close:', error);
-      } finally {
-        if (forceQuitTimer) {
-          clearTimeout(forceQuitTimer);
-          forceQuitTimer = null;
-        }
-        if (emergencyExitTimer) {
-          clearTimeout(emergencyExitTimer);
-          emergencyExitTimer = null;
-        }
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.destroy();
-        }
+    try {
+      await flushStorageBeforeExit('window close');
+    } finally {
+      if (forceQuitTimer) {
+        clearTimeout(forceQuitTimer);
+        forceQuitTimer = null;
+      }
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.destroy();
       }
     }
   });
@@ -946,50 +970,33 @@ process.on('SIGTERM', () => {
 
 // 全局异常处理已在 console-logger 中设置
 
-// 应用退出前保存数据
+// 应用退出前保存数据（与 window close 共用 flushStorageBeforeExit）
 app.on('before-quit', async (event) => {
-  // 如果是更新安装退出，直接退出，不保存数据
   if (isUpdaterQuitting) {
     console.log('[DESKTOP] Updater quit detected, allowing immediate quit');
     return;
   }
+  if (isQuitting) {
+    return;
+  }
+  if (!storageProvider || typeof storageProvider.flush !== 'function') {
+    return;
+  }
 
-  if (!isQuitting && storageProvider && typeof storageProvider.flush === 'function') {
-    event.preventDefault(); // 阻止立即退出
-    isQuitting = true; // 设置退出标志
+  event.preventDefault();
+  const forceAppQuitTimer = setTimeout(() => {
+    console.warn('[DESKTOP] Force quitting app due to timeout');
+    process.exit(0);
+  }, MAX_SAVE_TIME);
 
-    // 启动应急退出机制
-    setupEmergencyExit();
-
-    // 设置强制退出定时器，确保应用不会卡住
-    const forceAppQuitTimer = setTimeout(() => {
-      console.warn('[DESKTOP] Force quitting app due to timeout');
-      process.exit(0); // 强制退出进程
-    }, MAX_SAVE_TIME);
-
-    try {
-      console.log('[DESKTOP] Saving data before quit...');
-      await Promise.race([
-        storageProvider.flush(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Save timeout')), MAX_SAVE_TIME - 1000)
-        )
-      ]);
-      console.log('[DESKTOP] Data saved successfully');
-    } catch (error) {
-      console.error('[DESKTOP] Failed to save data before quit:', error);
-    } finally {
-      clearTimeout(forceAppQuitTimer);
-      if (emergencyExitTimer) {
-        clearTimeout(emergencyExitTimer);
-        emergencyExitTimer = null;
-      }
-      // 使用setImmediate确保在下一个事件循环中退出
-      setImmediate(() => {
-        isQuitting = false; // 重置标志以允许正常退出
-        app.quit(); // 手动退出
-      });
-    }
+  try {
+    await flushStorageBeforeExit('quit');
+  } finally {
+    clearTimeout(forceAppQuitTimer);
+    setImmediate(() => {
+      isQuitting = false;
+      app.quit();
+    });
   }
 });
 

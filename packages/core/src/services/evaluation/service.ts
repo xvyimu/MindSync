@@ -546,7 +546,7 @@ export class EvaluationService implements IEvaluationService {
         break;
 
       default:
-        throw new EvaluationValidationError(`Unknown evaluation type: ${(request as any).type}`);
+        throw new EvaluationValidationError(`Unknown evaluation type: ${String((request as { type?: unknown }).type)}`);
     }
   }
 
@@ -2906,6 +2906,9 @@ export class EvaluationService implements IEvaluationService {
       const queue: unknown[] = [value];
       let steps = 0;
 
+      const asRecord = (v: unknown): Record<string, unknown> | null =>
+        v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
+
       while (queue.length > 0 && steps < 1000) {
         steps += 1;
         const current = queue.shift();
@@ -2914,21 +2917,22 @@ export class EvaluationService implements IEvaluationService {
         if (visited.has(current)) continue;
         visited.add(current);
 
-        if ((current as any).score !== undefined) {
-          const score = (current as any).score;
+        const rec = asRecord(current);
+        if (rec && rec.score !== undefined) {
+          const score = rec.score;
 
           // 过滤掉类似维度项 "{ key, label, score }" 这种误命中。
           const isDimensionLike =
-            typeof (current as any).key === 'string' &&
-            typeof (current as any).label === 'string' &&
+            typeof rec.key === 'string' &&
+            typeof rec.label === 'string' &&
             (typeof score === 'number' || typeof score === 'string');
 
           const looksLikeEvaluation =
             (!isDimensionLike && (typeof score === 'number' || typeof score === 'string')) ||
-            (score && typeof score === 'object' && ('overall' in score || 'dimensions' in score)) ||
-            typeof (current as any).summary === 'string' ||
-            Array.isArray((current as any).improvements) ||
-            Array.isArray((current as any).patchPlan);
+            (score && typeof score === 'object' && score !== null && ('overall' in (score as object) || 'dimensions' in (score as object))) ||
+            typeof rec.summary === 'string' ||
+            Array.isArray(rec.improvements) ||
+            Array.isArray(rec.patchPlan);
 
           if (looksLikeEvaluation) {
             return current;
@@ -2937,8 +2941,8 @@ export class EvaluationService implements IEvaluationService {
 
         if (Array.isArray(current)) {
           for (const item of current) queue.push(item);
-        } else {
-          for (const v of Object.values(current as Record<string, unknown>)) {
+        } else if (rec) {
+          for (const v of Object.values(rec)) {
             queue.push(v);
           }
         }
@@ -2955,7 +2959,11 @@ export class EvaluationService implements IEvaluationService {
         const payload = findEvaluationPayload(parsed);
         if (!payload) continue;
 
-        const normalized = this.normalizeEvaluationResponse(payload as any, type, metadata);
+        const normalized = this.normalizeEvaluationResponse(
+          payload as Record<string, unknown>,
+          type,
+          metadata,
+        );
         return normalized;
       } catch (e) {
         console.warn(
@@ -3143,16 +3151,17 @@ export class EvaluationService implements IEvaluationService {
       return { key, label: label || key, score };
     };
 
-    const normalizeDimensionsFromArray = (dims: any[]): EvaluationDimension[] => {
+    const normalizeDimensionsFromArray = (dims: unknown[]): EvaluationDimension[] => {
       const out: EvaluationDimension[] = [];
-      dims.forEach((dim: any, index: number) => {
+      dims.forEach((dim: unknown, index: number) => {
         if (dim === null || dim === undefined) return;
 
         // 常见结构：{ key, label, score }
         if (typeof dim === 'object' && !Array.isArray(dim)) {
-          const key = typeof dim.key === 'string' ? dim.key : typeof dim.name === 'string' ? dim.name : '';
-          const label = typeof dim.label === 'string' ? dim.label : typeof dim.title === 'string' ? dim.title : key;
-          const scoreValue = (dim as any).score ?? (dim as any).value;
+          const rec = dim as Record<string, unknown>;
+          const key = typeof rec.key === 'string' ? rec.key : typeof rec.name === 'string' ? rec.name : '';
+          const label = typeof rec.label === 'string' ? rec.label : typeof rec.title === 'string' ? rec.title : key;
+          const scoreValue = rec.score ?? rec.value;
           if (key) {
             const d = toDimension(key, label, scoreValue);
             if (d) out.push(d);
@@ -3169,12 +3178,13 @@ export class EvaluationService implements IEvaluationService {
       return out;
     };
 
-    const normalizeDimensionsFromObject = (dims: Record<string, any>): EvaluationDimension[] => {
+    const normalizeDimensionsFromObject = (dims: Record<string, unknown>): EvaluationDimension[] => {
       const out: EvaluationDimension[] = [];
       for (const [key, value] of Object.entries(dims)) {
         if (value && typeof value === 'object' && !Array.isArray(value)) {
-          const label = typeof (value as any).label === 'string' ? (value as any).label : key;
-          const scoreValue = (value as any).score ?? (value as any).value;
+          const rec = value as Record<string, unknown>;
+          const label = typeof rec.label === 'string' ? rec.label : key;
+          const scoreValue = rec.score ?? rec.value;
           const d = toDimension(key, label, scoreValue);
           if (d) out.push(d);
         } else {
@@ -3193,20 +3203,21 @@ export class EvaluationService implements IEvaluationService {
     if (typeof scoreRaw === 'number' || typeof scoreRaw === 'string') {
       overall = tryExtractScore(scoreRaw, 'overall');
     } else if (scoreRaw && typeof scoreRaw === 'object') {
-      overall = tryExtractScore((scoreRaw as any).overall, 'overall');
+      const scoreRec = scoreRaw as Record<string, unknown>;
+      overall = tryExtractScore(scoreRec.overall, 'overall');
 
-      const dimensionsRaw = (scoreRaw as any).dimensions;
+      const dimensionsRaw = scoreRec.dimensions;
       if (Array.isArray(dimensionsRaw)) {
         dimensions = normalizeDimensionsFromArray(dimensionsRaw);
       } else if (dimensionsRaw && typeof dimensionsRaw === 'object') {
-        dimensions = normalizeDimensionsFromObject(dimensionsRaw as Record<string, any>);
+        dimensions = normalizeDimensionsFromObject(dimensionsRaw as Record<string, unknown>);
       } else {
         // 有些模型会把维度直接平铺到 score 对象里：{ overall, goalAchievement, ... }
         const knownKeys = ['goalAchievement', 'outputQuality', 'formatCompliance', 'relevance'];
-        const flattened: Record<string, any> = {};
+        const flattened: Record<string, unknown> = {};
         for (const k of knownKeys) {
-          if ((scoreRaw as any)[k] !== undefined) {
-            flattened[k] = (scoreRaw as any)[k];
+          if (scoreRec[k] !== undefined) {
+            flattened[k] = scoreRec[k];
           }
         }
         if (Object.keys(flattened).length > 0) {
