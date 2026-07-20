@@ -61,6 +61,8 @@ const IMAGE_CHANNELS = Object.freeze([
   'image-validateMultiImageRequest',
   'image-testConnection',
   'image-getDynamicModels',
+  // multimodal evaluation：主进程图像理解（非 image-model 配置域）
+  'image-understanding-understand',
 ]);
 
 /** 模板管理 channel。 */
@@ -218,6 +220,12 @@ const UPDATE_CHANNELS = Object.freeze([
   IPC_EVENTS.UPDATE_UNIGNORE_VERSION,
   IPC_EVENTS.UPDATE_GET_IGNORED_VERSIONS,
   IPC_EVENTS.UPDATE_DOWNLOAD_SPECIFIC_VERSION,
+  IPC_EVENTS.UPDATE_OPEN_RELEASE_PAGE,
+]);
+
+/** 远程备份存储（S3/WebDAV/Drive）IPC。 */
+const REMOTE_STORAGE_CHANNELS = Object.freeze([
+  'remote-storage:invoke',
 ]);
 
 /** 自动更新事件 channel（main → renderer）。 */
@@ -244,6 +252,7 @@ const ALL_DOMAIN_CHANNELS = Object.freeze([
   ...PREFERENCE_CHANNELS,
   ...SYSTEM_CHANNELS,
   ...UPDATE_CHANNELS,
+  ...REMOTE_STORAGE_CHANNELS,
 ]);
 
 /**
@@ -259,6 +268,7 @@ const CHANNEL_META = Object.freeze(
       else if (channel.startsWith('prompt-')) domain = 'prompt';
       else if (channel.startsWith('model-')) domain = 'model';
       else if (channel.startsWith('image-')) domain = 'image';
+      else if (channel.startsWith('remote-storage')) domain = 'remote-storage';
       else if (channel.startsWith('template-')) domain = 'template';
       else if (channel.startsWith('history-')) domain = 'history';
       else if (channel.startsWith('context-')) domain = 'context';
@@ -322,6 +332,7 @@ module.exports = {
   SYSTEM_CHANNELS,
   UPDATE_CHANNELS,
   UPDATE_EVENT_CHANNELS,
+  REMOTE_STORAGE_CHANNELS,
   ALL_DOMAIN_CHANNELS,
   CHANNEL_META,
   isKnownInvokeChannel,

@@ -11,6 +11,7 @@ const {
   resolveUpdateRepositoryConfig,
 } = require('../update-config');
 const { assertTrustedRendererSender } = require('../ipc-security');
+const { assertKnownInvokeChannel } = require('./channel-manifest');
 
 function createUpdateHandlers(ctx) {
   const {
@@ -36,6 +37,7 @@ function createUpdateHandlers(ctx) {
    * 不能用 registerSensitiveIpc（会双重包装）。
    */
   const secureHandle = (channel, handler) => {
+    assertKnownInvokeChannel(channel);
     ipcMain.handle(channel, async (event, ...args) => {
       try {
         assertTrustedRendererSender(

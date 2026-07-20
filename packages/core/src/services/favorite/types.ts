@@ -191,6 +191,12 @@ export interface IFavoriteManager {
     errors: string[];
   }>;
 
+  /** IImportExportable：供 DataManager 全量备份使用 */
+  exportData(): Promise<any>;
+  importData(data: any): Promise<void>;
+  getDataType(): Promise<string>;
+  validateData(data: any): Promise<boolean>;
+
   /** 获取所有标签及其使用统计（包含独立标签和使用中的标签） */
   getAllTags(): Promise<Array<{ tag: string; count: number }>>;
 

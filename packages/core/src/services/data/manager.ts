@@ -4,6 +4,7 @@ import type { IImageModelManager } from '../image/types';
 import { ITemplateManager } from '../template/types';
 import { IPreferenceService } from '../preference/types';
 import { ContextRepo } from '../context/types';
+import type { IFavoriteManager } from '../favorite/types';
 import {
   DataExportFailedError,
   DataImportPartialFailedError,
@@ -47,6 +48,7 @@ export class DataManager implements IDataManager {
   private historyManager: IHistoryManager;
   private preferenceService: IPreferenceService;
   private contextRepo: ContextRepo;
+  private favoriteManager?: IFavoriteManager;
 
   constructor(
     modelManager: IModelManager,
@@ -54,7 +56,8 @@ export class DataManager implements IDataManager {
     historyManager: IHistoryManager,
     preferenceService: IPreferenceService,
     contextRepo: ContextRepo,
-    imageModelManager?: IImageModelManager
+    imageModelManager?: IImageModelManager,
+    favoriteManager?: IFavoriteManager,
   ) {
     this.modelManager = modelManager;
     this.imageModelManager = imageModelManager;
@@ -62,6 +65,7 @@ export class DataManager implements IDataManager {
     this.historyManager = historyManager;
     this.preferenceService = preferenceService;
     this.contextRepo = contextRepo;
+    this.favoriteManager = favoriteManager;
   }
 
   async exportAllData(): Promise<string> {
@@ -77,6 +81,9 @@ export class DataManager implements IDataManager {
       data['userTemplates'] = await this.templateManager.exportData();
       data['userSettings'] = await this.preferenceService.exportData();
       data['contexts'] = await this.contextRepo.exportData();
+      if (this.favoriteManager) {
+        data['favorites'] = await this.favoriteManager.exportData();
+      }
     } catch (error) {
       console.error('Failed to export data:', error);
       if (typeof (error as any)?.code === 'string') {
@@ -117,7 +124,7 @@ export class DataManager implements IDataManager {
       dataToImport = exportData.data;
     }
     // Old format: direct data object { history: [...], models: [...], ... }
-    else if (exportData.history || exportData.models || exportData.imageModels || exportData.userTemplates || exportData.userSettings || exportData.contexts) {
+    else if (exportData.history || exportData.models || exportData.imageModels || exportData.userTemplates || exportData.userSettings || exportData.contexts || exportData.favorites) {
       dataToImport = exportData;
     }
     else {
@@ -133,7 +140,8 @@ export class DataManager implements IDataManager {
       ...(this.imageModelManager ? [{ service: this.imageModelManager, dataKey: 'imageModels' }] : []),
       { service: this.templateManager, dataKey: 'userTemplates' },
       { service: this.preferenceService, dataKey: 'userSettings' },
-      { service: this.contextRepo, dataKey: 'contexts' }
+      { service: this.contextRepo, dataKey: 'contexts' },
+      ...(this.favoriteManager ? [{ service: this.favoriteManager, dataKey: 'favorites' }] : []),
     ];
 
     for (const { service, dataKey } of serviceMap) {
@@ -170,7 +178,16 @@ export function createDataManager(
   historyManager: IHistoryManager,
   preferenceService: IPreferenceService,
   contextRepo: ContextRepo,
-  imageModelManager?: IImageModelManager
+  imageModelManager?: IImageModelManager,
+  favoriteManager?: IFavoriteManager,
 ): DataManager {
-  return new DataManager(modelManager, templateManager, historyManager, preferenceService, contextRepo, imageModelManager);
+  return new DataManager(
+    modelManager,
+    templateManager,
+    historyManager,
+    preferenceService,
+    contextRepo,
+    imageModelManager,
+    favoriteManager,
+  );
 }

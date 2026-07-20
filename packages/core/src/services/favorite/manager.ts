@@ -1449,4 +1449,51 @@ export class FavoriteManager implements IFavoriteManager {
       );
     }
   }
+
+  /**
+   * IImportExportable：导出收藏为可序列化对象（供 DataManager 全量备份）。
+   */
+  async exportData(): Promise<{
+    version: string;
+    exportDate: string;
+    favorites: FavoritePrompt[];
+    categories: FavoriteCategory[];
+    tags: FavoriteTag[];
+  }> {
+    const raw = await this.exportFavorites();
+    return JSON.parse(raw);
+  }
+
+  /**
+   * IImportExportable：导入收藏数据。全量备份场景使用 overwrite 合并策略。
+   */
+  async importData(data: unknown): Promise<void> {
+    if (!(await this.validateData(data))) {
+      throw new FavoriteValidationError(
+        'Invalid favorites data format: expected object with favorites array',
+      );
+    }
+    const payload = typeof data === 'string' ? data : JSON.stringify(data);
+    await this.importFavorites(payload, { mergeStrategy: 'overwrite' });
+  }
+
+  async getDataType(): Promise<string> {
+    return 'favorites';
+  }
+
+  async validateData(data: unknown): Promise<boolean> {
+    let parsed: unknown = data;
+    if (typeof data === 'string') {
+      try {
+        parsed = JSON.parse(data);
+      } catch {
+        return false;
+      }
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return false;
+    }
+    const favorites = (parsed as { favorites?: unknown }).favorites;
+    return Array.isArray(favorites);
+  }
 }

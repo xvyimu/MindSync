@@ -81,7 +81,15 @@ function registerSecureIpcHandler(ipcMain, channel, handler, {
   validateArgs,
   createSuccess = createSuccessResponse,
   createError = createErrorResponse,
+  /** 默认校验 channel 已登记在 manifest；测试可传 false 跳过。 */
+  assertKnownChannel = true,
 } = {}) {
+  // 延迟 require 避免与 channel-manifest 循环依赖
+  if (assertKnownChannel) {
+    const { assertKnownInvokeChannel } = require('./ipc/channel-manifest');
+    assertKnownInvokeChannel(channel);
+  }
+
   ipcMain.handle(channel, async (event, ...args) => {
     try {
       assertTrustedRendererSender(event, senderOptions);

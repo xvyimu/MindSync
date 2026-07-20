@@ -4,13 +4,32 @@ import { resolve } from 'path'
 import path from 'path'
 import { DEFAULT_VITE_ENV } from '../core/src/utils/default-env'
 
+/** 与 desktop/runtime-security 对齐：仅公共配置可进前端 bundle。 */
+const PUBLIC_RUNTIME_CONFIG_PATTERN = /^VITE_(?:APP|PUBLIC)_[A-Z0-9_]+$/
+const SENSITIVE_RUNTIME_CONFIG_SEGMENT =
+  /(?:^|_)(?:API_KEY|KEY|TOKEN|SECRET|PASSWORD|PASS|AUTHORIZATION|HEADERS|CREDENTIALS?|COOKIE|PRIVATE)(?:_|$)/i
+
+const isSafeViteDefineKey = (key: string): boolean => {
+  // 产品默认 feature flag 始终可注入（非密钥）
+  if (Object.prototype.hasOwnProperty.call(DEFAULT_VITE_ENV, key)) {
+    return true
+  }
+  return (
+    PUBLIC_RUNTIME_CONFIG_PATTERN.test(key) &&
+    !SENSITIVE_RUNTIME_CONFIG_SEGMENT.test(key)
+  )
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const monorepoRoot = resolve(__dirname, '../..')
   const env = loadEnv(mode, monorepoRoot)
+  const filteredEnv = Object.fromEntries(
+    Object.entries(env).filter(([key]) => isSafeViteDefineKey(key)),
+  )
   const processEnv = {
     ...DEFAULT_VITE_ENV,
-    ...env,
+    ...filteredEnv,
   }
 
   return {

@@ -79,10 +79,11 @@ test('secure IPC handler rejects untrusted senders with the shared error envelop
   const ipcMain = createIpcMain();
   let called = false;
 
+  // 测试专用 channel 不在 manifest；跳过登记校验，只测 sender 门闩
   registerSecureIpcHandler(ipcMain, 'sensitive-action', async () => {
     called = true;
     return 'unreachable';
-  }, { senderOptions: options });
+  }, { senderOptions: options, assertKnownChannel: false });
 
   const result = await ipcMain.handlers.get('sensitive-action')(
     createEvent({ url: 'https://attacker.example' }),
@@ -103,6 +104,7 @@ test('secure IPC handler validates arguments and normalizes successful results',
 
   registerSecureIpcHandler(ipcMain, 'validated-action', async (_event, value) => value.toUpperCase(), {
     senderOptions: options,
+    assertKnownChannel: false,
     validateArgs: ([value]) => {
       if (typeof value !== 'string') {
         throw createIpcError('IPC_INVALID_ARGUMENT', 'Invalid IPC request arguments');

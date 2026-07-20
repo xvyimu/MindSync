@@ -400,6 +400,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
     },
   });
 
@@ -687,10 +688,19 @@ async function initializeServices() {
     contextRepo = createContextRepo(storageProvider);
 
     console.log('[DESKTOP] Creating Data manager...');
-    dataManager = createDataManager(modelManager, templateManager, historyManager, preferenceService, contextRepo, imageModelManager);
-
     console.log('[DESKTOP] Creating Favorite manager...');
     favoriteManager = new FavoriteManager(storageProvider);
+
+    // favoriteManager 先创建，纳入全量备份导出/导入
+    dataManager = createDataManager(
+      modelManager,
+      templateManager,
+      historyManager,
+      preferenceService,
+      contextRepo,
+      imageModelManager,
+      favoriteManager,
+    );
     
     console.log('[Main Process] Core services initialized successfully.');
     
@@ -743,67 +753,28 @@ function createStructuredErrorResponse(error) {
 }
 
 // 创建详细的错误响应，确保100%信息保真
+/**
+ * 更新链路用户可见错误信封：仅 message/code/status，禁止 stack/对象 dump 进入 renderer。
+ * 完整错误仅写主进程控制台。
+ */
 function createDetailedErrorResponse(error) {
-  const timestamp = new Date().toISOString();
-  let detailedMessage = `[${timestamp}] Error Details:\n\n`;
+  const message = error instanceof Error ? error.message : String(error);
+  let detailedMessage = `Error: ${message}`;
 
-  // 详细序列化错误信息
   if (error instanceof Error) {
-    detailedMessage += `Message: ${error.message}\n`;
-
     if (error.name && error.name !== 'Error') {
-      detailedMessage += `Type: ${error.name}\n`;
+      detailedMessage += `\nType: ${error.name}`;
     }
-
     if (error.code) {
-      detailedMessage += `Code: ${error.code}\n`;
+      detailedMessage += `\nCode: ${error.code}`;
     }
-
     if (error.statusCode) {
-      detailedMessage += `HTTP Status: ${error.statusCode}\n`;
+      detailedMessage += `\nHTTP Status: ${error.statusCode}`;
     }
-
-    if (error.url) {
-      detailedMessage += `URL: ${error.url}\n`;
-    }
-
-    if (error.stack) {
-      detailedMessage += `\nStack Trace:\n${error.stack}\n`;
-    }
-
-    // 捕获其他可能的属性
-    const otherProps = {};
-    for (const key in error) {
-      if (!['message', 'name', 'code', 'statusCode', 'url', 'stack'].includes(key)) {
-        try {
-          otherProps[key] = error[key];
-        } catch (e) {
-          otherProps[key] = `[Cannot serialize: ${e.message}]`;
-        }
-      }
-    }
-
-    if (Object.keys(otherProps).length > 0) {
-      detailedMessage += `\nAdditional Properties:\n${JSON.stringify(otherProps, null, 2)}\n`;
-    }
-  } else {
-    // 非 Error 对象的处理
-    detailedMessage += `Value: ${String(error)}\n`;
-    detailedMessage += `Type: ${typeof error}\n`;
   }
 
-  // 兜底：完整的 JSON 序列化
-  try {
-    const jsonError = JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
-    if (jsonError && jsonError !== '{}' && jsonError !== 'null') {
-      detailedMessage += `\nComplete Object Dump:\n${jsonError}`;
-    }
-  } catch (jsonError) {
-    detailedMessage += `\nJSON Serialization Failed: ${jsonError.message}`;
-  }
-
-  // 同时在控制台输出详细信息
-  console.error('[Detailed Error Info]', detailedMessage);
+  // 主进程保留完整诊断信息，不跨 IPC 回传
+  console.error('[Detailed Error Info]', error);
 
   return { success: false, error: detailedMessage };
 }

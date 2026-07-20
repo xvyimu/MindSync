@@ -213,4 +213,30 @@ export class FavoriteManagerElectronProxy implements IFavoriteManager {
   }>): Promise<void> {
     return this.invokeMethod('ensureDefaultCategories', defaultCategories);
   }
+
+  async exportData(): Promise<any> {
+    const raw = await this.exportFavorites();
+    return JSON.parse(raw);
+  }
+
+  async importData(data: any): Promise<void> {
+    const payload = typeof data === 'string' ? data : JSON.stringify(data);
+    await this.importFavorites(payload, { mergeStrategy: 'overwrite' });
+  }
+
+  async getDataType(): Promise<string> {
+    return 'favorites';
+  }
+
+  async validateData(data: any): Promise<boolean> {
+    let parsed = data;
+    if (typeof data === 'string') {
+      try {
+        parsed = JSON.parse(data);
+      } catch {
+        return false;
+      }
+    }
+    return !!(parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Array.isArray(parsed.favorites));
+  }
 }

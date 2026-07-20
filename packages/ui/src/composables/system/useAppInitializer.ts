@@ -433,7 +433,10 @@ export function useAppInitializer(): {
         // 创建 ContextRepo（使用相同的存储提供器）
         const contextRepo = createContextRepo(storageProvider);
 
-        // 创建 DataManager（需要contextRepo）
+        // 创建收藏管理器（先于 DataManager，纳入全量备份）
+        favoriteManager = new FavoriteManager(storageProvider);
+
+        // 创建 DataManager（需要contextRepo + favoriteManager）
         dataManager = createDataManager(
           modelManagerInstance,
           templateManagerInstance,
@@ -441,10 +444,8 @@ export function useAppInitializer(): {
           preferenceService,
           contextRepo,
           imageModelManagerInstance,
+          favoriteManager,
         );
-
-        // 创建收藏管理器
-        favoriteManager = new FavoriteManager(storageProvider);
         favoriteManager = attachFavoriteAssetGc(favoriteManager, favoriteImageStorageService)
 
         if (favoriteImageStorageService) {
