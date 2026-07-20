@@ -15,12 +15,11 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: {
-        index: resolve(__dirname, 'src/index.ts'),
-        app: resolve(__dirname, 'src/app-entry.ts')
-      },
+      // Single library entry. Optional app-entry was removed (never committed);
+      // web/desktop resolve UI via package exports or source aliases.
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'PromptOptimizerUI',
-      fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
+      fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
       formats: ['es', 'cjs']
     },
     watch: process.env.NODE_ENV === 'development' ? {

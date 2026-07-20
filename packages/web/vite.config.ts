@@ -50,10 +50,14 @@ export default defineConfig(({ mode }) => {
       ],
       alias: {
         '@': resolve(__dirname, 'src'),
-        '@prompt-optimizer/ui/app': path.resolve(__dirname, '../ui/src/app-entry.ts'),
+        // Prefer source for monorepo electron/desktop builds so newly added
+        // templates and proxies ship without a stale package dist.
+        // Keep style subpath on built CSS (ui vite emits dist/style.css).
+        '@prompt-optimizer/ui/dist/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
+        '@prompt-optimizer/ui/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
         '@prompt-optimizer/core/electron': path.resolve(__dirname, '../core/src/electron.ts'),
-        '@prompt-optimizer/core': path.resolve(__dirname, '../core'),
-        '@prompt-optimizer/ui': path.resolve(__dirname, '../ui'),
+        '@prompt-optimizer/core': path.resolve(__dirname, '../core/src/index.ts'),
+        '@prompt-optimizer/ui': path.resolve(__dirname, '../ui/src/index.ts'),
         '@prompt-optimizer/web': path.resolve(__dirname, '../web'),
         '@prompt-optimizer/extension': path.resolve(__dirname, '../extension')
       }
