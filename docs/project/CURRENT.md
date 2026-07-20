@@ -41,6 +41,10 @@
 | 全面扫描建议 | `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
 | **全面扫描+规划（2026-07-21）** | `D:\PromtOptimizer\docs\FULL-SCAN-PLAN-RECOMMENDATIONS-2026-07-21.md` |
 | **竞品/架构调研（万字）** | `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md` |
+| **决策简报（目标/约束/验收）** | [`COMPETITIVE-BRIEF.md`](./COMPETITIVE-BRIEF.md) |
+| **架构宪章** | [`../architecture/charter.md`](../architecture/charter.md) |
+| **90 天 backlog** | [`BACKLOG-90D-2026-07-21.md`](./BACKLOG-90D-2026-07-21.md) |
+| **下一刀规格（EvalCaseSet）** | [`NEXT-CUT-SPEC-2026-07-21.md`](./NEXT-CUT-SPEC-2026-07-21.md) |
 | 文档怎么管 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`（方案 C 已落地） |
 | **文档二期 C2** | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-C2-2026-07-20.md`（漂移清零 + 门禁硬化） |
 | **文档漂移台账** | [`DOC-DRIFT-REGISTRY.md`](./DOC-DRIFT-REGISTRY.md)（DOC-01～20 状态） |

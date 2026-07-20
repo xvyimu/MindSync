@@ -8,6 +8,7 @@
 
 | 文档 | 主题 |
 |------|------|
+| [**charter.md**](./charter.md) | **架构宪章**（本地工作台边界、依赖方向、Won't do） |
 | [storage-runtime-architecture.md](./storage-runtime-architecture.md) | Web/Desktop/Ext 存储运行时与图片分库边界 |
 | [storage-key-architecture.md](./storage-key-architecture.md) | 存储键约定 |
 | [function-mode.md](./function-mode.md) | Basic / Pro / Image 功能模式（注意与代码命名可能有历史别名） |
@@ -28,3 +29,7 @@
 
 - 模块与边界总览：[`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) · FULL-AUDIT
 - 现行版本：[`../project/CURRENT.md`](../project/CURRENT.md)
+- 决策简报：[`../project/COMPETITIVE-BRIEF.md`](../project/COMPETITIVE-BRIEF.md)
+- 90 天 backlog：[`../project/BACKLOG-90D-2026-07-21.md`](../project/BACKLOG-90D-2026-07-21.md)
+- 下一刀规格：[`../project/NEXT-CUT-SPEC-2026-07-21.md`](../project/NEXT-CUT-SPEC-2026-07-21.md)
+- 竞品调研（全文）：`D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`
