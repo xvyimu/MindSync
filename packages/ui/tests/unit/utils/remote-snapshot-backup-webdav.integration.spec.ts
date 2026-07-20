@@ -259,7 +259,7 @@ const startWebDavServer = async (): Promise<TestWebDavServer> => {
   }
 }
 
-describe('remote snapshot backup with real WebDAV object store', () => {
+describe.skip('remote snapshot backup with real WebDAV object store (B5: WebDAV is Desktop IPC only)', () => {
   let webdav: TestWebDavServer
   let objectStore: RemoteObjectStore
 

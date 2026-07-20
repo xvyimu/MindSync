@@ -334,6 +334,7 @@ describe('DataManager storage breakdown', () => {
   })
 
   it('renders Cloudflare R2 as a simplified S3-compatible preset', async () => {
+    isRunningInElectronMock.mockReturnValue(true)
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
     window.localStorage.setItem('prompt-optimizer:remote-backup-settings', JSON.stringify({
       provider: {
@@ -399,6 +400,7 @@ describe('DataManager storage breakdown', () => {
   })
 
   it('keeps configured Cloudflare R2 setup collapsed until requested', async () => {
+    isRunningInElectronMock.mockReturnValue(true)
     window.localStorage.setItem('prompt-optimizer:remote-backup-settings', JSON.stringify({
       provider: {
         kind: 'cloudflare-r2',
@@ -440,6 +442,7 @@ describe('DataManager storage breakdown', () => {
   })
 
   it('allows collapsing non-Google configuration after a connection failure', async () => {
+    isRunningInElectronMock.mockReturnValue(true)
     window.localStorage.setItem('prompt-optimizer:remote-backup-settings', JSON.stringify({
       provider: {
         kind: 'cloudflare-r2',
@@ -479,6 +482,7 @@ describe('DataManager storage breakdown', () => {
   })
 
   it('auto-connects saved direct storage settings before refreshing remote backups', async () => {
+    isRunningInElectronMock.mockReturnValue(true)
     window.localStorage.setItem('prompt-optimizer:remote-backup-settings', JSON.stringify({
       provider: {
         kind: 'webdav',
@@ -488,42 +492,36 @@ describe('DataManager storage breakdown', () => {
         directory: 'prompt-optimizer-backups',
       },
     }))
-    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      const method = init?.method || 'GET'
-      if (method === 'PROPFIND') {
-        return new Response(
-          '<?xml version="1.0"?><D:multistatus xmlns:D="DAV:"><D:response><D:href>/prompt-optimizer-backups/</D:href><D:propstat><D:prop><D:resourcetype><D:collection/></D:resourcetype></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response></D:multistatus>',
-          { status: 207, headers: { 'Content-Type': 'application/xml' } },
-        )
-      }
-      if (method === 'PUT') return new Response('', { status: 201 })
-      if (method === 'DELETE') return new Response(null, { status: 204 })
-      if (method === 'MKCOL') return new Response('', { status: 405 })
-      return new Response('ok')
-    })
-    const originalFetch = globalThis.fetch
-    globalThis.fetch = fetchMock as typeof fetch
-
-    try {
-      const wrapper = mountComponent()
-      await flushPromises()
-
-      const refreshButton = wrapper.findAll('button').find((button) =>
-        button.text().includes('Refresh Remote Backup List')
-      )
-      expect(refreshButton).toBeTruthy()
-      await refreshButton!.trigger('click')
-      await flushPromises()
-
-      expect(fetchMock).toHaveBeenCalledWith(
-        'https://dav.example.test/prompt-optimizer-backups/',
-        expect.objectContaining({ method: 'PROPFIND' }),
-      )
-      expect(remoteSnapshotMocks.listRemoteSnapshotBackups).toHaveBeenCalledTimes(1)
-      expect(wrapper.text()).toContain('This backup provider is connected')
-    } finally {
-      globalThis.fetch = originalFetch
+    const remoteStorage = {
+      invoke: vi.fn(async (request: { operation: string }) => {
+        if (request.operation === 'list') return []
+        if (request.operation === 'put') return { path: 'detect/test.txt' }
+        if (request.operation === 'get') return new Uint8Array([1, 2, 3])
+        if (request.operation === 'delete') return null
+        if (request.operation === 'exists') return true
+        if (request.operation === 'head') return null
+        if (request.operation === 'getText') return '{}'
+        return null
+      }),
     }
+    ;(window as any).electronAPI = {
+      ...(window as any).electronAPI,
+      remoteStorage,
+    }
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const refreshButton = wrapper.findAll('button').find((button) =>
+      button.text().includes('Refresh Remote Backup List')
+    )
+    expect(refreshButton).toBeTruthy()
+    await refreshButton!.trigger('click')
+    await flushPromises()
+
+    expect(remoteStorage.invoke).toHaveBeenCalled()
+    expect(remoteSnapshotMocks.listRemoteSnapshotBackups).toHaveBeenCalledTimes(1)
+    expect(wrapper.text()).toContain('This backup provider is connected')
   })
 
   it('opens Cloudflare R2 links in the system browser on desktop', async () => {
