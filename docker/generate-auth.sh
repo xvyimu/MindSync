@@ -23,21 +23,25 @@ EOF
     
     # 生成htpasswd文件 - 使用printf避免特殊字符问题
     printf '%s' "$ACCESS_PASSWORD" | htpasswd -i -c /etc/nginx/auth/.htpasswd "$USERNAME"
-    
-    # 容器环境中简化权限管理 - 确保所有人都可读取认证文件
-    chmod -R a+r /etc/nginx/auth
-    
+
+    # 仅 nginx worker 需要读认证文件；禁止 world-readable（防容器内其他进程离线爆破）
+    chmod 0750 /etc/nginx/auth
+    chmod 0640 /etc/nginx/auth/.htpasswd
+    if id nginx >/dev/null 2>&1; then
+      chown -R root:nginx /etc/nginx/auth 2>/dev/null || true
+    fi
+
     # 创建启用认证的配置
     cat > /etc/nginx/http.d/auth.conf << EOF
 # 此文件由generate-auth.sh脚本自动生成
 auth_basic "请输入访问凭据 (Please enter your credentials)";
 auth_basic_user_file /etc/nginx/auth/.htpasswd;
 EOF
-    
+
     echo "Basic认证已配置，用户名: $USERNAME"
 else
-    echo "未设置ACCESS_PASSWORD环境变量，不启用Basic认证"
-    
+    echo "未设置ACCESS_PASSWORD环境变量，不启用Basic认证（compose 部署请设置 ACCESS_PASSWORD）"
+
     # 创建空的auth配置（禁用认证）
     cat > /etc/nginx/http.d/auth.conf << EOF
 # Basic认证未启用

@@ -184,7 +184,7 @@ export const GOOGLE_DRIVE_DEFAULT_BACKUP_FOLDER_NAME = 'prompt-optimizer-backups
 export const CLOUDFLARE_R2_DEFAULT_BACKUP_PREFIX = 'prompt-optimizer-backups/'
 const CLOUDFLARE_DASHBOARD_URL = 'https://dash.cloudflare.com/'
 const CLOUDFLARE_R2_DOCS_URL = 'https://developers.cloudflare.com/r2/'
-const GOOGLE_DRIVE_DEFAULT_CLIENT_ID = '1056948847608-0gshmh967ei478h0ood6c8q2korb1ku8.apps.googleusercontent.com'
+// 不再内置上游 Client ID：fork/自建必须配置 VITE_GOOGLE_DRIVE_CLIENT_ID
 const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
 const GOOGLE_DRIVE_FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
 const GOOGLE_IDENTITY_SCRIPT_URL = 'https://accounts.google.com/gsi/client'
@@ -239,7 +239,7 @@ const isGoogleAuthStatus = (status: number): boolean =>
   status === 401 || status === 403
 
 export const resolveGoogleDriveClientId = (): string => {
-  return getEnvVar('VITE_GOOGLE_DRIVE_CLIENT_ID').trim() || GOOGLE_DRIVE_DEFAULT_CLIENT_ID
+  return getEnvVar('VITE_GOOGLE_DRIVE_CLIENT_ID').trim()
 }
 
 export const isGoogleDriveRemoteBackupAuthorized = (): boolean => {
@@ -583,13 +583,45 @@ const fetchGoogleDriveDownloadWithRetry = async (
   throw new Error(`${context}: ${(lastError as Error)?.message || String(lastError)}`)
 }
 
-export const joinRemotePath = (...parts: string[]): string =>
-  parts
-    .map((part) => part.replace(/^\/+|\/+$/g, ''))
-    .filter(Boolean)
-    .join('/')
+/** 与 desktop/remote-storage.js 对齐：解码路径段，防双重编码穿越。 */
+const decodeRemotePathSegment = (segment: string): string => {
+  let decoded = segment
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    let next: string
+    try {
+      next = decodeURIComponent(decoded)
+    } catch {
+      break
+    }
+    if (next === decoded) break
+    decoded = next
+  }
+  return decoded
+}
 
-const normalizeObjectPath = (path: string): string => joinRemotePath(path)
+/**
+ * 与 desktop/remote-storage.js 对齐的路径规范化：
+ * 拒绝控制字符、反斜杠、`.` / `..` 段，避免路径穿越。
+ */
+export const normalizeObjectPath = (path: string): string => {
+  const raw = String(path || '')
+  // Align with desktop/remote-storage.js: backslash + C0 controls + DEL
+  if (/[\\ -]/.test(raw)) {
+    throw new Error('Remote storage path contains invalid characters')
+  }
+
+  const segments = raw.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean)
+  for (const segment of segments) {
+    const decoded = decodeRemotePathSegment(segment)
+    if (decoded === '.' || decoded === '..' || /[\\/ -]/.test(decoded)) {
+      throw new Error('Remote storage path contains an unsafe segment')
+    }
+  }
+  return segments.join('/')
+}
+
+export const joinRemotePath = (...parts: string[]): string =>
+  parts.map((part) => normalizeObjectPath(part)).filter(Boolean).join('/')
 
 const parentPathOf = (path: string): string => {
   const normalized = normalizeObjectPath(path)

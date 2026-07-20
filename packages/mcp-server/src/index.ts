@@ -167,7 +167,11 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
             properties: {
               prompt: {
                 type: "string",
-                description: "The existing prompt to refine. This should be a complete prompt that is already in use but needs improvement."
+                description: "The original prompt (baseline). Prefer also passing lastOptimized when iterating on a previously optimized version."
+              },
+              lastOptimized: {
+                type: "string",
+                description: "The last optimized prompt version to refine further. If omitted, falls back to prompt (same as original)."
               },
               requirements: {
                 type: "string",
@@ -241,7 +245,7 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
           return {
             content: [{
               type: "text",
-              text: result
+              text: ParameterValidator.truncateResult(result)
             }]
           };
         }
@@ -293,14 +297,15 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
           return {
             content: [{
               type: "text",
-              text: result
+              text: ParameterValidator.truncateResult(result)
             }]
           };
         }
 
         case "iterate-prompt": {
-          const { prompt, requirements, template } = args as {
+          const { prompt, lastOptimized, requirements, template } = args as {
             prompt?: string;
+            lastOptimized?: string;
             requirements?: string;
             template?: string
           };
@@ -327,6 +332,7 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
 
           // 参数验证
           ParameterValidator.validatePrompt(prompt);
+          ParameterValidator.validateLastOptimized(lastOptimized);
           ParameterValidator.validateRequirements(requirements);
           if (template) {
             ParameterValidator.validateTemplate(template);
@@ -350,9 +356,11 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
           }
 
           const templateId = template || await getDefaultTemplateId(templateManager, 'iterate');
+          // lastOptimized 缺省时回退到原始 prompt（兼容旧调用方）
+          const previousOptimized = (lastOptimized && lastOptimized.trim()) || prompt;
           const result = await promptService.iteratePrompt(
             prompt,
-            prompt, // 使用原始提示词作为上次优化的提示词
+            previousOptimized,
             requirements,
             'mcp-default',
             templateId
@@ -361,7 +369,7 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
           return {
             content: [{
               type: "text",
-              text: result
+              text: ParameterValidator.truncateResult(result)
             }]
           };
         }

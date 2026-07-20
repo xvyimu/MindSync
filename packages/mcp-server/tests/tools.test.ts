@@ -43,6 +43,21 @@ describe('MCP Server Tools', () => {
       expect(() => ParameterValidator.validateTemplate('')).toThrow('Template must be a non-empty string');
       expect(() => ParameterValidator.validateTemplate('   ')).toThrow('Template must be a non-empty string');
     });
+
+    it('validates lastOptimized input', () => {
+      expect(() => ParameterValidator.validateLastOptimized(undefined)).not.toThrow();
+      expect(() => ParameterValidator.validateLastOptimized('previous version')).not.toThrow();
+      expect(() => ParameterValidator.validateLastOptimized('')).toThrow('lastOptimized must be a non-empty string');
+      expect(() => ParameterValidator.validateLastOptimized('a'.repeat(60000))).toThrow('lastOptimized must not exceed 50,000 characters');
+    });
+
+    it('truncates long tool results', () => {
+      const long = 'x'.repeat(ParameterValidator.DEFAULT_RESULT_MAX_CHARS + 10);
+      const truncated = ParameterValidator.truncateResult(long);
+      expect(truncated.length).toBeLessThan(long.length);
+      expect(truncated).toContain('[truncated:');
+      expect(ParameterValidator.truncateResult('short')).toBe('short');
+    });
   });
 
   describe('MCPErrorHandler', () => {

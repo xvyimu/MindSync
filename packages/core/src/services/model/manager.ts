@@ -28,15 +28,25 @@ import {
 export class ModelManager implements IModelManager {
   private readonly storageKey = CORE_SERVICE_KEYS.MODELS;
   private readonly storage: IStorageProvider;
-  private initPromise: Promise<void>;
+  /** null 表示尚未启动或上次失败，允许 ensureInitialized 重试 */
+  private initPromise: Promise<void> | null = null;
   private registry?: ITextAdapterRegistry;
+  /** 进程内模型表缓存，写路径失效；避免 getModel 每次全量读盘 */
+  private modelsCache: Record<string, any> | null = null;
 
   constructor(storageProvider: IStorageProvider, registry?: ITextAdapterRegistry) {
     // 使用适配器确保所有存储提供者都支持高级方法
     this.storage = new StorageAdapter(storageProvider);
     this.registry = registry;
-    this.initPromise = this.init().catch(err => {
+    // 启动初始化，但失败不永久钉死 promise
+    this.initPromise = this.startInit();
+  }
+
+  private startInit(): Promise<void> {
+    return this.init().catch(err => {
       console.error('Model manager initialization failed:', err);
+      this.initPromise = null;
+      this.modelsCache = null;
       throw err;
     });
   }
@@ -61,9 +71,12 @@ export class ModelManager implements IModelManager {
   }
 
   /**
-   * 确保初始化完成
+   * 确保初始化完成；若上次 init 失败则重新发起（可重试）
    */
   public async ensureInitialized(): Promise<void> {
+    if (!this.initPromise) {
+      this.initPromise = this.startInit();
+    }
     await this.initPromise;
   }
 
@@ -229,15 +242,18 @@ export class ModelManager implements IModelManager {
           // 如果有更新，保存到存储
           if (hasUpdates) {
             await this.storage.setItem(this.storageKey, JSON.stringify(updatedModels));
+            this.invalidateModelsCache();
             console.log('[ModelManager] Saved updated models to storage');
           }
         } catch (error) {
           console.error('[ModelManager] Failed to parse stored models, initializing with defaults:', error);
           await this.storage.setItem(this.storageKey, JSON.stringify(this.getDefaultModels()));
+          this.invalidateModelsCache();
         }
       } else {
         console.log('[ModelManager] No existing models found, initializing with defaults');
         await this.storage.setItem(this.storageKey, JSON.stringify(this.getDefaultModels()));
+        this.invalidateModelsCache();
       }
 
       console.log('[ModelManager] Initialization completed');
@@ -246,6 +262,7 @@ export class ModelManager implements IModelManager {
       // 如果初始化失败，至少保存默认配置到存储
       try {
         await this.storage.setItem(this.storageKey, JSON.stringify(this.getDefaultModels()));
+        this.invalidateModelsCache();
       } catch (saveError) {
         console.error('[ModelManager] Failed to save default models:', saveError);
       }
@@ -778,16 +795,25 @@ export class ModelManager implements IModelManager {
    * 从存储获取模型配置，如果不存在则返回默认配置
    * 返回any类型以兼容新旧格式
    */
+  private invalidateModelsCache(): void {
+    this.modelsCache = null;
+  }
+
   private async getModelsFromStorage(): Promise<Record<string, any>> {
+    if (this.modelsCache) {
+      return this.modelsCache;
+    }
     const storedData = await this.storage.getItem(this.storageKey);
     if (storedData) {
       try {
-        return JSON.parse(storedData);
+        this.modelsCache = JSON.parse(storedData);
+        return this.modelsCache!;
       } catch (error) {
         console.error('[ModelManager] Failed to parse stored models, using defaults:', error);
       }
     }
-    return this.getDefaultModels();
+    this.modelsCache = this.getDefaultModels();
+    return this.modelsCache;
   }
 
   /**
@@ -850,6 +876,7 @@ export class ModelManager implements IModelManager {
         };
       }
     );
+    this.invalidateModelsCache();
   }
 
   /**
@@ -955,6 +982,7 @@ export class ModelManager implements IModelManager {
         };
       }
     );
+    this.invalidateModelsCache();
   }
 
   /**
@@ -975,6 +1003,7 @@ export class ModelManager implements IModelManager {
         return remaining;
       }
     );
+    this.invalidateModelsCache();
   }
 
   /**
@@ -1022,6 +1051,7 @@ export class ModelManager implements IModelManager {
         };
       }
     );
+    this.invalidateModelsCache();
   }
 
   /**
@@ -1066,6 +1096,7 @@ export class ModelManager implements IModelManager {
         };
       }
     );
+    this.invalidateModelsCache();
   }
 
   /**
@@ -1301,6 +1332,7 @@ export class ModelManager implements IModelManager {
       console.warn(`Failed to import ${failedModels.length} models`);
       // 不抛出错误，允许部分成功的导入
     }
+    this.invalidateModelsCache();
   }
 
   /**

@@ -51,6 +51,7 @@ const {
   assertValidStreamId,
 } = require('./config/ipc-security');
 const { createStreamRegistry } = require('./config/stream-registry');
+const { createCoreServices } = require('./config/service-container');
 const { createOwnedStreamRunner } = require('./config/ipc/owned-stream-runner');
 const { registerLlmIpcHandlers } = require('./config/ipc/llm-handlers');
 const { registerPromptStreamIpcHandlers } = require('./config/ipc/prompt-stream-handlers');
@@ -567,12 +568,11 @@ function createWindow() {
 async function initializeServices() {
   try {
     console.log('[Main Process] Initializing core services...');
-    
+
     // 设置环境变量，确保主进程能访问API密钥
     // 这些环境变量应该在启动桌面应用之前设置
     console.log('[Main Process] Checking environment variables...');
 
-    // 静态环境变量
     const staticEnvVars = [
       'VITE_OPENAI_API_KEY',
       'VITE_GEMINI_API_KEY',
@@ -590,23 +590,17 @@ async function initializeServices() {
       'VITE_CUSTOM_API_HEADERS'
     ];
 
-    // 扫描动态自定义模型环境变量
-    // 使用统一的正则表达式模式和验证规则
-
     const dynamicEnvVars = Object.keys(process.env).filter(key => {
       const match = key.match(CUSTOM_API_PATTERN);
       if (!match) return false;
-
       const [, , suffix] = match;
       return suffix && suffix.length <= MAX_SUFFIX_LENGTH && SUFFIX_PATTERN.test(suffix);
     });
 
     const allEnvVars = [...staticEnvVars, ...dynamicEnvVars];
-
     let hasApiKeys = false;
     allEnvVars.forEach(envVar => {
-      const value = process.env[envVar];
-      if (value) {
+      if (process.env[envVar]) {
         console.log(`[Main Process] Found ${envVar}: [CONFIGURED]`);
         hasApiKeys = true;
       } else {
@@ -617,93 +611,61 @@ async function initializeServices() {
     if (dynamicEnvVars.length > 0) {
       console.log(`[Main Process] Found ${dynamicEnvVars.length} dynamic custom model environment variables`);
     }
-    
+
     if (!hasApiKeys) {
       console.warn('[Main Process] No API keys found in environment variables.');
       console.warn('[Main Process] Please set environment variables before starting the desktop app.');
-      console.warn('[Main Process] Examples:');
-      console.warn('[Main Process]   VITE_OPENAI_API_KEY=your_key_here npm start');
-      console.warn('[Main Process]   VITE_CUSTOM_API_KEY_qwen3=your_qwen_key npm start');
-      console.warn('[Main Process]   VITE_CUSTOM_API_KEY_claude=your_claude_key npm start');
     }
-    
-    console.log('[DESKTOP] Creating file storage provider for desktop environment');
 
-    // 使用标准用户数据目录，支持自动更新
-    const userDataPath = app.getPath('userData');
-    console.log('[DESKTOP] Using standard user data directory for auto-update compatibility:', userDataPath);
-    storageProvider = new FileStorageProvider(userDataPath);
-    const startupRepairReport = await runStorageStartupSafetyCheck(storageProvider);
-    await writeStartupRepairReport(storageProvider, startupRepairReport);
-    
-    await initializePreferenceService(storageProvider);
-    
-    console.log('[DESKTOP] Creating model manager...');
-    modelManager = createModelManager(storageProvider);
-    
-    console.log('[DESKTOP] Creating template language service...');
-    templateLanguageService = createTemplateLanguageService(preferenceService);
-
-    console.log('[DESKTOP] Initializing template language service...');
-    await templateLanguageService.initialize();
-
-    console.log('[DESKTOP] Creating template manager...');
-    templateManager = createTemplateManager(storageProvider, templateLanguageService);
-    
-    console.log('[DESKTOP] Creating history manager...');
-    historyManager = createHistoryManager(storageProvider, modelManager);
-    
-    console.log('[DESKTOP] Initializing model manager...');
-    await modelManager.ensureInitialized();
-    // 图像模型管理器
-    console.log('[DESKTOP] Creating image model manager...');
-    imageAdapterRegistry = createImageAdapterRegistry();
-    imageModelManager = createImageModelManager(storageProvider, imageAdapterRegistry);
-    await imageModelManager.ensureInitialized();
-    
-    // 在创建任何网络相关服务前，先根据系统代理设置 undici 全局分发器
-    await setupGlobalProxyDispatcherFromSystem();
-
-    console.log('[DESKTOP] Creating LLM service...');
-    llmService = createLLMService(modelManager);
-
-    imageUnderstandingService = createImageUnderstandingService({
-      imageInputConverter: convertImageInputWithElectronNativeImage,
+    // 核心服务装配下沉到 service-container，main 只保留环境探测与结果绑定
+    const result = await createCoreServices({
+      core: {
+        createModelManager,
+        createTemplateManager,
+        createHistoryManager,
+        createLLMService,
+        createPromptService,
+        createImageUnderstandingService,
+        createImageModelManager,
+        createImageAdapterRegistry,
+        createImageService,
+        createTemplateLanguageService,
+        createDataManager,
+        createContextRepo,
+        FavoriteManager,
+        FileStorageProvider,
+        runStorageStartupSafetyCheck,
+        writeStartupRepairReport,
+      },
+      getUserDataPath: () => app.getPath('userData'),
+      initializePreferenceService,
+      getPreferenceService: () => preferenceService,
+      setupGlobalProxyDispatcherFromSystem,
+      convertImageInputWithElectronNativeImage,
     });
 
-    console.log('[DESKTOP] Creating Prompt service...');
-    promptService = createPromptService(
+    if (!result.ok) {
+      return false;
+    }
+
+    ({
+      storageProvider,
       modelManager,
-      llmService,
+      templateLanguageService,
       templateManager,
       historyManager,
-      imageUnderstandingService,
-    );
-    console.log('[DESKTOP] Creating Image service...');
-    imageService = createImageService(imageModelManager, imageAdapterRegistry, {
-      imageInputConverter: convertImageInputWithElectronNativeImage,
-    });
-    
-    console.log('[DESKTOP] Creating Context repository...');
-    contextRepo = createContextRepo(storageProvider);
-
-    console.log('[DESKTOP] Creating Data manager...');
-    console.log('[DESKTOP] Creating Favorite manager...');
-    favoriteManager = new FavoriteManager(storageProvider);
-
-    // favoriteManager 先创建，纳入全量备份导出/导入
-    dataManager = createDataManager(
-      modelManager,
-      templateManager,
-      historyManager,
-      preferenceService,
-      contextRepo,
+      imageAdapterRegistry,
       imageModelManager,
+      llmService,
+      imageUnderstandingService,
+      promptService,
+      imageService,
+      contextRepo,
       favoriteManager,
-    );
-    
-    console.log('[Main Process] Core services initialized successfully.');
-    
+      dataManager,
+      preferenceService,
+    } = result.services);
+
     return true;
   } catch (error) {
     console.error('[Main Process] Failed to initialize core services:', error);
