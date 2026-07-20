@@ -1,0 +1,33 @@
+const messages = {
+  evalCase: {
+    title: '可复现用例',
+    hint: '保存小型用例并用「输出包含」断言重复跑批；导出本地证据 JSON，无需云端。',
+    addTitle: '添加 / 编辑用例',
+    listTitle: '用例（{count}）',
+    empty: '暂无用例',
+    fields: {
+      name: '用例名称',
+      input: '发给模型的用户输入 / 任务',
+      systemPromptOptional: '系统提示（可选）',
+      contains: '输出必须包含…',
+    },
+    add: '添加用例',
+    update: '更新用例',
+    runAll: '运行全部',
+    export: '导出证据',
+    resultsTitle: '最近一次运行',
+    summary: '共 {total} · 通过 {passed} · 失败 {failed}',
+    pass: '通过',
+    fail: '失败',
+    model: '模型：{model}',
+    open: '用例',
+    saved: '用例已保存',
+    removed: '用例已删除',
+    runDone: '运行完成',
+    exportDone: '证据已导出',
+    needModel: '请先选择模型',
+    needServices: '服务未就绪',
+  },
+}
+
+export default messages

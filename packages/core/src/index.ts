@@ -262,6 +262,21 @@ export * from './services/evaluation/types'
 export * from './services/evaluation/errors'
 export { EvaluationService, createEvaluationService } from './services/evaluation/service'
 export * from './services/evaluation/rewrite-from-evaluation'
+export * from './services/evaluation/eval-case-types'
+export {
+  EvalCaseSetRepository,
+  createEvalCaseSetRepository,
+  createEmptyEvalCaseSet,
+  createEvalCaseId,
+  isEvalCaseSet,
+} from './services/evaluation/eval-case-repository'
+export {
+  evaluateAssertions,
+  runEvalCaseSet,
+  serializeEvalEvidenceBundle,
+  createEvalEvidenceFileName,
+} from './services/evaluation/eval-case-runner'
+export type { EvalCaseRunnerDeps } from './services/evaluation/eval-case-runner'
 
 // 导出图像理解服务相关
 export * from './services/image-understanding/types'

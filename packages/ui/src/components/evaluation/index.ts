@@ -12,6 +12,7 @@ export { default as AnalyzeActionIcon } from './AnalyzeActionIcon.vue'
 export { default as CompareRoleConfigDialog } from './CompareRoleConfigDialog.vue'
 export { default as CompareHelpButton } from './CompareHelpButton.vue'
 export { default as CompareRoleBadge } from './CompareRoleBadge.vue'
+export { default as EvalCaseSetPanel } from './EvalCaseSetPanel.vue'
 
 // 类型导出
 export type { ScoreLevel } from './types'

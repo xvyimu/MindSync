@@ -11,3 +11,20 @@ export * from './errors';
 // 导出服务类和工厂函数
 export { EvaluationService, createEvaluationService } from './service';
 export * from './rewrite-from-evaluation';
+
+// Cut-1：可复现用例集
+export * from './eval-case-types';
+export {
+  EvalCaseSetRepository,
+  createEvalCaseSetRepository,
+  createEmptyEvalCaseSet,
+  createEvalCaseId,
+  isEvalCaseSet,
+} from './eval-case-repository';
+export {
+  evaluateAssertions,
+  runEvalCaseSet,
+  serializeEvalEvidenceBundle,
+  createEvalEvidenceFileName,
+  type EvalCaseRunnerDeps,
+} from './eval-case-runner';

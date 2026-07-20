@@ -7,6 +7,7 @@ import testing from './testing'
 import context from './context'
 import image from './image'
 import errors from './errors'
+import evalCase from './evalCase'
 
 const messages = {
   ...core,
@@ -18,6 +19,7 @@ const messages = {
   ...context,
   ...image,
   ...errors,
+  ...evalCase,
 } as const;
 
 export default messages;

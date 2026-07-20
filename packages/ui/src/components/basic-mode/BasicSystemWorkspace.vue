@@ -5,6 +5,23 @@
         data-mode="basic-system"
     >
         <div class="workspace-page-tools">
+            <ThemedTooltip :label="t('evalCase.open')" placement="left">
+                <NButton
+                    class="workspace-utility-button"
+                    size="small"
+                    secondary
+                    circle
+                    data-testid="basic-system-eval-case-open"
+                    :aria-label="t('evalCase.open')"
+                    @click="openEvalCasePanel"
+                >
+                    <template #icon>
+                        <NIcon>
+                            <ClipboardList />
+                        </NIcon>
+                    </template>
+                </NButton>
+            </ThemedTooltip>
             <WorkspaceUtilityMenu
                 :disabled="unwrappedLogicProps.isOptimizing || unwrappedLogicProps.isIterating || isAnyVariantRunning"
                 :source="resolveSourceAssetRef(session.origin, session.assetBinding)"
@@ -481,6 +498,19 @@
             @clear="handleClearEvaluation"
             @retry="handleReEvaluateActive"
         />
+        <EvalCaseSetPanel
+            v-model:show="evalCaseSet.showPanel.value"
+            :case-set="evalCaseSet.caseSet.value"
+            :model-key="evalCaseModelKey"
+            :is-running="evalCaseSet.isRunning.value"
+            :can-run="evalCaseSet.canRun.value"
+            :last-bundle="evalCaseSet.lastBundle.value"
+            @add="handleEvalCaseAdd"
+            @remove="handleEvalCaseRemove"
+            @run="handleEvalCaseRun"
+            @cancel="evalCaseSet.cancel()"
+            @export="handleEvalCaseExport"
+        />
         <CompareRoleConfigDialog
             v-model="compareRoleConfig.showDialog.value"
             :entries="compareRoleConfig.entries.value"
@@ -518,6 +548,7 @@ import { useBasicWorkspaceLogic } from '../../composables/workspaces/useBasicWor
 import { useWorkspaceModelSelection } from '../../composables/workspaces/useWorkspaceModelSelection'
 import { useWorkspaceTemplateSelection } from '../../composables/workspaces/useWorkspaceTemplateSelection'
 import { useEvaluationHandler } from '../../composables/prompt/useEvaluationHandler'
+import { useEvalCaseSet } from '../../composables/prompt/useEvalCaseSet'
 import { buildCompareEvaluationPayload, useCompareRoleConfig, useTestSourceAreaFeedback, useTestVariantSourceFeedback } from '../../composables/prompt'
 import { provideEvaluation } from '../../composables/prompt/useEvaluationContext'
 import { NButton, NCard, NFlex, NIcon, NText, NRadioGroup, NRadioButton, NTag } from 'naive-ui'
@@ -535,6 +566,7 @@ import {
   CompareHelpButton,
   CompareRoleBadge,
   CompareRoleConfigDialog,
+  EvalCaseSetPanel,
   EvaluationPanel,
   EvaluationScoreBadge,
   FocusAnalyzeButton,
@@ -564,6 +596,7 @@ import {
 import type { PersistedCompareSnapshotRoles } from '../../types/evaluation'
 import { useElementSize } from '@vueuse/core'
 import { runTasksWithExecutionMode } from '../../utils/runTasksSequentially'
+import { ClipboardList } from '@vicons/tabler'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -671,6 +704,79 @@ const logic = useBasicWorkspaceLogic({
 
 // 模型选择
 const modelSelection = useWorkspaceModelSelection(services, session)
+
+// ---- Cut-1 EvalCaseSet (local reproducible cases) ----
+const preferenceServiceRef = computed(() => services.value?.preferenceService ?? null)
+const llmServiceRef = computed(() => services.value?.llmService ?? null)
+const evalCaseModelKeyRef = computed(() => {
+  return (
+    (logic.selectedOptimizeModelKey?.value as string | undefined)
+    || (logic.selectedTestModelKey?.value as string | undefined)
+    || ''
+  )
+})
+const evalCaseSet = useEvalCaseSet({
+  preferenceService: preferenceServiceRef,
+  llmService: llmServiceRef,
+  modelKey: evalCaseModelKeyRef,
+})
+const evalCaseModelKey = evalCaseModelKeyRef
+
+const openEvalCasePanel = async () => {
+  await evalCaseSet.load()
+  evalCaseSet.showPanel.value = true
+}
+
+const handleEvalCaseAdd = async (payload: {
+  id?: string
+  name: string
+  input: string
+  systemPrompt?: string
+  contains: string
+}) => {
+  try {
+    await evalCaseSet.upsertCase(payload)
+    toast.success(t('evalCase.saved'))
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : String(e))
+  }
+}
+
+const handleEvalCaseRemove = async (id: string) => {
+  try {
+    await evalCaseSet.removeCase(id)
+    toast.success(t('evalCase.removed'))
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : String(e))
+  }
+}
+
+const handleEvalCaseRun = async () => {
+  if (!evalCaseModelKeyRef.value) {
+    toast.warning(t('evalCase.needModel'))
+    return
+  }
+  try {
+    await evalCaseSet.runAll()
+    toast.success(t('evalCase.runDone'))
+  } catch (e) {
+    if (e instanceof Error && e.name === 'AbortError') return
+    toast.error(e instanceof Error ? e.message : String(e))
+  }
+}
+
+const handleEvalCaseExport = () => {
+  if (evalCaseSet.downloadEvidence()) {
+    toast.success(t('evalCase.exportDone'))
+  }
+}
+
+watch(services, (s) => {
+  if (s?.preferenceService) {
+    void evalCaseSet.load()
+  }
+}, { immediate: true })
+
 
 // 模板选择（templateType: 'optimize', iterateTemplateType: 'iterate'）
 const templateSelection = useWorkspaceTemplateSelection(

@@ -12,6 +12,7 @@ export * from './useContextUserTester'  // 🆕 ContextUser 测试器
 export * from './usePromptDisplayAdapter'  // 🆕 提示词显示适配器
 export * from './useEvaluation'  // 🆕 LLM 智能评估
 export * from './useEvaluationHandler'  // 🆕 评估处理器（封装业务逻辑）
+export * from './useEvalCaseSet'  // Cut-1：可复现用例集
 export * from './compareEvaluation'
 export * from './useCompareRoleConfig'
 export * from './testVariantState'
