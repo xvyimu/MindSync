@@ -145,8 +145,9 @@ export class SecretAwareStorageProvider implements IStorageProvider {
 
   /** 透传 FileStorageProvider.flush，供 Desktop 退出保存 */
   async flush(): Promise<void> {
-    if (typeof (this.base as { flush?: () => Promise<void> }).flush === 'function') {
-      return (this.base as { flush: () => Promise<void> }).flush();
+    const base = this.base as IStorageProvider & { flush?: () => Promise<void> };
+    if (typeof base.flush === 'function') {
+      return base.flush();
     }
   }
 

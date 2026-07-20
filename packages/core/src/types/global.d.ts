@@ -77,6 +77,19 @@ interface Window {
         templateId: string;
       }) => Promise<any>;
       deleteChain: (chainId: string) => Promise<void>;
+      /** B3：历史上限占用 */
+      getUsage: () => Promise<{
+        count: number;
+        max: number;
+        nearThreshold: number;
+        warningLevel: 'ok' | 'near' | 'full';
+      }>;
+      getMaxRecords: () => Promise<number>;
+      setMaxRecords: (max: number) => Promise<{ max: number; dropped: number }>;
+      exportData?: () => Promise<any>;
+      importData?: (data: any) => Promise<void>;
+      getDataType?: () => Promise<string>;
+      validateData?: (data: any) => Promise<boolean>;
     };
     context: {
       list: () => Promise<Array<{ id: string; title: string; updatedAt: string }>>;
