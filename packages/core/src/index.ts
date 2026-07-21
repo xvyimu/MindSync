@@ -160,6 +160,22 @@ export { PromptService } from './services/prompt/service'
 export { createPromptService } from './services/prompt/factory'
 export * from './services/prompt/types'
 export * from './services/prompt/errors'
+export {
+  TemplateOptimizationStrategy,
+  ExperimentalAutoOptimizationStrategy,
+  DEFAULT_EXPERIMENTAL_AUTO_OPTIMIZE,
+  EXPERIMENTAL_AUTO_OPTIMIZE_PREF_KEY,
+  createDefaultExperimentalAutoOptimizeSettings,
+  normalizeExperimentalAutoOptimizeSettings,
+  resolveOptimizationStrategy,
+} from './services/prompt/optimization-strategy'
+export type {
+  OptimizationStrategy,
+  OptimizationStrategyKind,
+  OptimizationStrategyContext,
+  OptimizationStrategyPlan,
+  ExperimentalAutoOptimizeSettings,
+} from './services/prompt/optimization-strategy'
 
 // 导出标准提示词领域模型
 export * from './services/prompt-model'
