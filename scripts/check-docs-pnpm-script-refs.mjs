@@ -27,7 +27,22 @@ function walk(dir) {
   }
 }
 
-walk(path.join(root, 'docs', 'project'));
+// L1 live docs only. Historical dumps under docs/project/archives/** are L2
+// frozen (install-side / session archives) and must not gate on live scripts.
+function walkProjectDocs(dir) {
+  if (!fs.existsSync(dir)) return;
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, ent.name);
+    if (ent.isDirectory()) {
+      if (ent.name === 'archives') continue;
+      walkProjectDocs(p);
+    } else if (ent.isFile() && ent.name.endsWith('.md')) {
+      mdFiles.push(p);
+    }
+  }
+}
+
+walkProjectDocs(path.join(root, 'docs', 'project'));
 addFile(path.join(root, 'docs', 'DOCS_POLICY.md'));
 addFile(path.join(root, 'docs', 'PROJECT_HANDOFF.md'));
 addFile(path.join(root, 'docs', 'README.md'));
