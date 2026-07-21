@@ -1,56 +1,141 @@
-# Changes: D3 ServiceContainer slim main + D4 non-root Docker
+# Changes: E1 ship — commit + handtest assist + NSIS archive
 
 ## Summary
 
-- **D3**: `createCoreServices` owns core factory requires, PreferenceService creation, and env API-key probe. `main.js` is composition root only. Domain IPC registration moves to `register-domain-handlers.js`; `image-understanding-understand` lives in `image-handlers.js`.
-- **D4**: Image user `app`/uid `10001`, writable-path chown, MCP `user=app` in supervisord; docs + commented compose for full non-root with `NGINX_PORT=8080`. Default path still allows port 80 (no forced `USER app`).
+| 项 | 值 |
+|----|-----|
+| Goal | Commit E1 (CTA+EvalCase+dual entry parity) · machine handtest · NSIS 2.11.7 archive |
+| Branch | `develop` |
+| E1 commit | **`1e2346e`** `feat(ui): E1 entry parity CTA+EvalCase+dual on Context and Basic User` |
+| Docs commit | **`53bf4a8`** `docs(project): archive path for nsis-2026-07-21-e1 + handtest status` |
+| Tip HEAD | `53bf4a8` |
+| Version | **2.11.7** (no bump) |
+| Push | **not done (by design)** · ahead of origin/develop by 2 |
+| NSIS | **OK** → `D:\PromtOptimizer\nsis-2026-07-21-e1\` |
+| Handtest status | `docs/project/HANDTEST-STATUS-2026-07-21-E1.md` |
 
-## Files
+**One line:** E1 已本地 commit；typecheck/UI unit 绿；testid 静态全命中；2.11.7 NSIS 已归档；硬约束未破；未 push。
 
-### D3
+---
 
-| File | Change |
-|------|--------|
-| `packages/desktop/config/service-container.js` | Internal `require('@prompt-optimizer/core')`; create PreferenceService inside container; env probe helper; deps slimmed to Electron/env only (`core` optional for tests) |
-| `packages/desktop/main.js` | Remove core factory bag + preference init + env scan; thin `initializeServices`; `setupIPC` → `registerDomainIpcHandlers` |
-| `packages/desktop/config/ipc/register-domain-handlers.js` | **New** — single entry calling all domain `register*IpcHandlers` + optional `setupUpdateHandlers` |
-| `packages/desktop/config/ipc/image-handlers.js` | Accept `imageUnderstandingService`; register `image-understanding-understand` |
-| `packages/desktop/config/service-container.test.js` | **New** — mock-core success / throw / FileStorage fallback |
-| `packages/desktop/config/ipc-domain-handlers.test.js` | Assert image-understanding channel + forward |
-| `scripts/desktop-ipc-handlers.test.mjs` | Composition-root + preference bridge contracts use `registerDomainIpcHandlers` |
-| `docs/project/BACKLOG-90D-2026-07-21.md` | D3/D4 → **done** |
-| `docs/project/CURRENT.md` | Capability lines for D3/D4 |
+## Files committed
 
-### D4
+### Commit `1e2346e` (E1 feature + project docs)
 
-| File | Change |
-|------|--------|
-| `Dockerfile` | Create `app` uid/gid 10001; chown runtime writable paths; comments on non-root (no default `USER`) |
-| `docker/supervisord.conf` | `user=app` on mcp-server; comments for full non-root |
-| `docker/start-services.sh` | Clearer mkdir/write failures for non-root |
-| `docker/generate-auth.sh` | chown matrix for root vs app entry; keep 0640 auth |
-| `docker/docker-compose.yml` | Commented non-root example (`user: "10001:10001"`, port 8080) |
-| `docker/docker-compose.dev.yml` | Short non-root comment |
-| `docs/user/deployment/docker-runtime-security.md` | Non-root section + one-liner |
-| `mkdocs/docs/zh/deployment/docker-advanced.md` | Non-root section |
-| `mkdocs/docs/en/deployment/docker-advanced.md` | Non-root section |
+| Path | What changed |
+|------|----------------|
+| `packages/ui/src/components/context-mode/ContextSystemWorkspace.vue` | PostOptimize CTA + EvalCase panel + dual-model seed (`pro-multi-*`) |
+| `packages/ui/src/components/context-mode/ContextUserWorkspace.vue` | Same pattern (`pro-variable-*`) |
+| `packages/ui/src/components/basic-mode/BasicUserWorkspace.vue` | EvalCase entry/panel parity (`basic-user-*`; CTA/dual already present) |
+| `docs/project/NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md` | **new** · E0/E1/E2 cut spec |
+| `docs/project/CURRENT.md` | E1 capability row + doc entry |
+| `docs/project/BACKLOG-90D-2026-07-21.md` | Stage E table |
+| `docs/project/COMPETITIVE-BRIEF.md` | R3 form freeze |
 
-## Verification (ran)
+### Commit `53bf4a8` (archive + handtest)
 
-```powershell
-cd D:\PromtOptimizer\src\prompt-optimizer
-pnpm -F @prompt-optimizer/desktop test
-# → 75 pass, 0 fail
+| Path | What changed |
+|------|----------------|
+| `docs/project/CURRENT.md` | Install archive line `nsis-2026-07-21-e1` + HANDTEST-STATUS link |
+| `docs/project/HANDTEST-STATUS-2026-07-21-E1.md` | **new** · machine pass / GUI partial-human |
 
-node --test scripts/desktop-ipc-handlers.test.mjs
-# → 10 pass, 0 fail
+### Not staged (intentional)
+
+| Path | Note |
+|------|------|
+| `.pipeline/spec.md` | Planner/pipeline working file · not product · left dirty |
+| `packages/desktop/web-dist/**` · `packages/desktop/dist/**` | Build artifacts · **not** committed |
+| NSIS archive | Outside git: `D:\PromtOptimizer\nsis-2026-07-21-e1\` |
+
+---
+
+## Commands run + exit
+
+| Command | Exit / result |
+|---------|----------------|
+| `git status` / precheck | dirty §3.1 only (+ `.pipeline/spec.md`) |
+| `rg @aws-sdk` packages/web | no hits |
+| `rg @aws-sdk` packages/ui | only `tests/unit/utils/remote-backup.spec.ts` |
+| `rg includeSecrets` packages/core/src | manager/types/export-secrets present |
+| `pnpm -F @prompt-optimizer/ui typecheck` | **0** |
+| `pnpm -F @prompt-optimizer/ui test` | **0** · 929 passed \| 4 skipped \| 1 todo |
+| data-testid static (all §3.2) | **all hit** |
+| `pnpm -F @prompt-optimizer/core build` | **0** |
+| `pnpm -F @prompt-optimizer/ui build:bundle` | **0** |
+| `pnpm -F @prompt-optimizer/desktop build:ci` | **0** · nsis + zip |
+| `git push` | **not run** |
+
+---
+
+## Hard constraints (spot-check)
+
+| Constraint | Status |
+|------------|--------|
+| Export default redaction (`includeSecrets`) | untouched · still in core |
+| Web no `@aws-sdk` / S3 UI dep | pass |
+| auto-opt default OFF | not modified this knife |
+| fork-only | no upstream PR |
+| Package boundary app→ui→core | UI-only feature files |
+| Version 2.11.7 | root + desktop package.json |
+
+---
+
+## data-testid contract (§3.2)
+
+| Workspace | EvalCase open | Dual model | CTA |
+|-----------|---------------|------------|-----|
+| Basic System (pre-existing) | `basic-system-eval-case-open` | `basic-system-test-dual-model` | `post-optimize-cta` |
+| Basic User | `basic-user-eval-case-open` | `basic-user-test-dual-model` | shared |
+| Context System | `pro-multi-eval-case-open` | `pro-multi-test-dual-model` | shared |
+| Context User | `pro-variable-eval-case-open` | `pro-variable-test-dual-model` | shared |
+
+---
+
+## NSIS archive
+
+**Path:** `D:\PromtOptimizer\nsis-2026-07-21-e1\`
+
+| File | Size (approx) |
+|------|----------------|
+| `PromptOptimizer-2.11.7-win-x64.exe` | ~105 MB |
+| `PromptOptimizer-2.11.7-win-x64.zip` | ~146 MB |
+| `PromptOptimizer-2.11.7-win-x64.exe.blockmap` | ~114 KB |
+| `latest.yml` | small |
+| `README.md` | build note · commit `1e2346e` |
+
+Optional install: user may run installer to `D:\PromtOptimizer\app\` — **not** forced by pipeline. Existing app\ exe is 2026-07-20 build (pre-E1).
+
+---
+
+## Handtest
+
+- Status file: `docs/project/HANDTEST-STATUS-2026-07-21-E1.md`
+- Checklist authority: `docs/project/HANDTEST-CHECKLIST-2026-07-21.md`
+- Machine: **pass** (typecheck, UI unit, testids, hard constraints)
+- GUI §1–§6: **partial/human** (LLM optimize / export eyeball / dual live run)
+
+---
+
+## Tester focus (Phase B)
+
+1. **T1** Working tree: product E1 committed; only `.pipeline/spec.md` dirty OK  
+2. **T2–T3** Re-run typecheck + UI unit if desired (already green at tip)  
+3. **T5** Re-grep §3.2 testids  
+4. **T6** Hard constraints still hold  
+5. **T7** HANDTEST-STATUS exists with auto vs human  
+6. **T8** Archive has `PromptOptimizer-2.11.7-win-x64.exe`  
+7. **T9** Version still 2.11.7  
+8. **T10** Not pushed (`ahead by 2`)  
+
+No Playwright full e2e required as gate.
+
+---
+
+## Final git
+
+```
+53bf4a8 docs(project): archive path for nsis-2026-07-21-e1 + handtest status
+1e2346e feat(ui): E1 entry parity CTA+EvalCase+dual on Context and Basic User
 ```
 
-Static D4: Dockerfile has `10001`/`app`; supervisord has `user=app` on mcp; docs mention `NGINX_PORT=8080`.
-
-## Tester focus
-
-1. Desktop contract: service-container mock tests; image-understanding channel still registered; no business factories in `main.js` (grep).
-2. IPC preload ↔ handler parity still green after domain register move.
-3. D4: default container may still start as root for port 80; non-root needs high port; MCP still behind `/mcp`.
-4. Hard won't: auto-optimize default OFF; export redaction; Web no S3 — untouched.
+**Push: not done (by design)**

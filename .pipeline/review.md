@@ -1,14 +1,18 @@
-# Review: D3 ServiceContainer slim main + D4 non-root Docker
+# Review: E1 ship — handtest assist + commit + NSIS
 
 **Date:** 2026-07-21  
-**Tip:** `fe12cbf` — `feat(desktop,docker): D3 slim ServiceContainer main; D4 non-root milestone`  
-**Scope:** D3 + D4 only  
+**Scope:** E1 entry parity (CTA + EvalCase + dual-model) + E0 machine handtest + E2 NSIS archive  
+**Tip:** `53bf4a8` (HEAD) · E1 feature `1e2346e` · branch `develop` **ahead origin by 2**  
+**Version:** **2.11.7** (no bump) · **not pushed** (by design)
+
+Handoffs read: `.pipeline/spec.md` · `.pipeline/changes.md` · `.pipeline/test-results.md`  
+Independent checks: `git show --stat`, data-testid rg, hard-constraint rg, NSIS archive listing, HANDTEST-STATUS, package.json version.
 
 ---
 
 ## VERDICT: **SHIP**
 
-Implementation matches `.pipeline/spec.md` acceptance criteria. Tests are meaningful (not greps-only). Hard won't surfaces untouched. Residual risks are documented and non-blocking for this milestone.
+Coder and Tester gates match the E1 ship spec. Commits are scoped, hard constraints intact, machine handtest honest about GUI residual, NSIS artifact present. Residual items are non-blocking.
 
 ---
 
@@ -23,82 +27,66 @@ _None._
 ### Medium
 _None that block ship._
 
-### Low
+### Low (non-blocking)
 
-| ID | Severity | Finding | Where |
-|----|----------|---------|--------|
-| L1 | Low | `image-understanding-understand` is now **conditionally** registered (`if imageUnderstandingService?.understand`). Previously main always registered the channel. Production always creates the service via `createCoreServices`, so happy-path parity holds; failure/missing-service mode silently omits the channel instead of registering a throwing handler. | `packages/desktop/config/ipc/image-handlers.js` L124–128 |
-| L2 | Low | `docs/project/CURRENT.md` inserts two capability bullets **above** the `# 现行事实快照` H1 (duplicate of bullets also under the capabilities list). Cosmetic doc structure drift only. | `docs/project/CURRENT.md` L1–2 vs L84–86 |
-| L3 | Low | No single test exercises `registerDomainIpcHandlers` as one bag (domain modules still unit-tested; composition-root contract is static text). Acceptable per spec; optional follow-up. | `register-domain-handlers.js` |
-| L4 | Low | D4 full non-root path not smoke-built in CI/this run (static + docs only). Spec allows this. | Dockerfile / compose comments |
-
----
-
-## Spec vs code
-
-### D3 — PASS
-
-| Criterion | Evidence |
-|-----------|----------|
-| main 无业务装配构造 | `main.js` no longer requires `@prompt-optimizer/core` factories; no `new PreferenceService` / `createModelManager` / etc. Only comment + module-level service vars + bag assign. |
-| `createCoreServices` sole assembly entry | `service-container.js`: internal core require, PreferenceService, env probe, storage→…→data order; deps slimmed to Electron/env (+ optional `core` for tests). |
-| Preference 不双向耦合 main | Removed `initializePreferenceService` / `getPreferenceService` from deps. |
-| `image-understanding-understand` 不在 main 内联 | Moved to `image-handlers.js`; `register-domain-handlers.js` wires services. |
-| 契约测试 | New `service-container.test.js` (success bag, throw→ok:false, FileStorage fallback, order pref before language / proxy before LLM). `ipc-domain-handlers` asserts understanding channel + forward. `scripts/desktop-ipc-handlers.test.mjs` updated for composition root. |
-| 生命周期未大拆 | Window / proxy / update / sensitive IPC factory remain in main. |
-
-### D4 — PASS (milestone as specified)
-
-| Criterion | Evidence |
-|-----------|----------|
-| uid 10001 user `app` | Dockerfile `addgroup`/`adduser` 10001 |
-| Writable path ownership | chown app:app on supervisor logs, nginx tmp/logs/run, auth, http.d, html, `/app` |
-| No forced `USER app` (port 80 compat) | Explicit comments; default `NGINX_PORT=80` |
-| MCP non-root (Layer A) | `docker/supervisord.conf` `[program:mcp-server] user=app` |
-| Scripts permission-friendly | `start-services.sh` clearer mkdir/envsubst failures + non-root hints; `generate-auth.sh` root vs app chown matrix, 0640 kept |
-| Compose | `no-new-privileges` retained; non-root example **commented** (`user: "10001:10001"`, 8080, healthcheck) |
-| Docs | `docker-runtime-security.md` + zh/en `docker-advanced.md` non-root section + one-liner |
-| BACKLOG / CURRENT | D3/D4 → **done** |
-
-### Hard won't — PASS (spot)
-
-| Item | Result |
-|------|--------|
-| Default auto-optimize ON | Untouched (`packages/ui` / experimental defaults not in diff; prior D2 default OFF) |
-| Auto-opt as main CTA | Untouched |
-| Unlimited unbudgeted search | Untouched |
-| local-first / export redaction | Untouched (`packages/core` data export not in this diff) |
-| Web no S3 | Untouched (no `@aws-sdk` / web package changes) |
-| No new runtime deps | No `pnpm add` |
-| No UI/core product surface churn | Diff limited to desktop, docker, docs, scripts, pipeline |
+| ID | Finding | Note |
+|----|---------|------|
+| L1 | Full GUI handtest (§1–§6) still **human/partial** | By design in spec; machine side green |
+| L2 | Working tree dirty: `.pipeline/{spec,changes,test-results,review}.md` | Pipeline working files; not product; do not mix into product commit unless intentional |
+| L3 | `app\PromptOptimizer.exe` is still **2026-07-20** install | New package is under `nsis-2026-07-21-e1\`; user must install to pick up E1 |
+| L4 | `origin/develop` not updated | Local-only commit per form; push is a separate human decision |
 
 ---
 
-## Tests
+## Spec vs reality
 
-| Suite | Result | Assessment |
-|-------|--------|------------|
-| `pnpm -F @prompt-optimizer/desktop test` | 75 pass | Includes new service-container mocks + image IPC understanding; **meaningful** |
-| `node --test scripts/desktop-ipc-handlers.test.mjs` | 10 pass | Composition-root / preload contracts updated for domain register move; **meaningful** |
-| D4 Docker build/run | Not required / not run | Spec-ok; residual ops risk only |
+| Spec goal | Result |
+|-----------|--------|
+| Commit E1 local only | **PASS** — `1e2346e` 7 files, +787/−8; no dist/web-dist/secrets |
+| Docs commit | **PASS** — `53bf4a8` CURRENT archive line + HANDTEST-STATUS |
+| No push / no tag / no version bump | **PASS** — ahead 2; 2.11.7 |
+| Machine handtest | **PASS** — typecheck 0; UI 929 pass; testids HIT; constraints pass |
+| NSIS 2.11.7 archive | **PASS** — `D:\PromtOptimizer\nsis-2026-07-21-e1\PromptOptimizer-2.11.7-win-x64.exe` (~105 MB) + zip + latest.yml |
+| Hard constraints | **PASS** — no prod `@aws-sdk`; `includeSecrets` default false; auto-opt only on explicit `true` |
 
-Green tests align with intended behavior for D3 contracts. They do **not** prove full Electron GUI or non-root container boot — residual, not a false green on wrong product logic.
+### Commit scope (`1e2346e`)
+
+```
+ContextSystemWorkspace.vue
+ContextUserWorkspace.vue
+BasicUserWorkspace.vue
+NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md (new)
+CURRENT.md · BACKLOG-90D · COMPETITIVE-BRIEF
+```
+
+No build artifacts staged. Good.
+
+### data-testid parity
+
+| Workspace | Eval open | Dual |
+|-----------|-----------|------|
+| Basic User | `basic-user-eval-case-open` | `basic-user-test-dual-model` |
+| Context System | `pro-multi-eval-case-open` | `pro-multi-test-dual-model` |
+| Context User | `pro-variable-eval-case-open` | `pro-variable-test-dual-model` |
+| Shared CTA | `post-optimize-cta` (+ test/evaluate/favorite/dismiss) | — |
+
+Basic System pre-existed; not re-touched in E1 commit — acceptable.
+
+### Tester agreement
+
+Independent re-check agrees with T1–T10 PASS (T4 core gate SKIP non-blocking). No need to re-run full UI suite in review.
 
 ---
 
-## Residual risks
+## Recommendation
 
-1. **Layer B full non-root (`--user 10001`)** unproven in this environment: supervisord as non-root + `user=app` on MCP may be no-op or fail depending on Alpine supervisord privileges; nginx bind needs `NGINX_PORT≥1024`. Docs correctly warn; first real deploy should smoke with `curl` healthz.
-2. **`chown -R app:app /app`** broadens ownership of node_modules/packages vs historical root-owned tree — intended for non-root; watch for any process still assuming root-only writes outside chowned paths.
-3. **Default path still root entry** for port 80 — security posture improves MCP drop, not full container root elimination. Matches milestone, not “rootless by default.”
-4. **No e2e desktop launch** after service-container move — low risk given bag shape preserved and IPC modules unchanged aside from understanding channel wiring.
+1. **SHIP** — local tip is shippable as E1 delivery.  
+2. Optional next human steps (not required for this verdict):  
+   - Install from `D:\PromtOptimizer\nsis-2026-07-21-e1\PromptOptimizer-2.11.7-win-x64.exe` into `app\`  
+   - Complete GUI HANDTEST-CHECKLIST on the **new** install  
+   - `git push origin develop` when ready (fork-only; no upstream PR)  
+3. Do **not** open platformization / default auto-opt / Web S3 work under this ship.
 
 ---
 
-## Ship notes
-
-- Commit already on `develop` tip `fe12cbf`; pipeline artifacts consistent with that commit.
-- Optional polish (non-blocking): fix `CURRENT.md` H1 ordering; consider always registering `image-understanding-understand` with a clear error if service missing (restore strict channel presence).
-- Next ops: optional `docker build` + non-root run when Docker available; no product rework required for D3/D4 acceptance.
-
-**Final: SHIP**
+**Reviewer:** pipeline-reviewer (Phase 4) · 2026-07-21
