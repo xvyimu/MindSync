@@ -520,6 +520,7 @@
             @run="handleEvalCaseRun"
             @cancel="evalCaseSet.cancel()"
             @export="handleEvalCaseExport"
+            @export-promptfoo="handleEvalCaseExportPromptfoo"
         />
         <CompareRoleConfigDialog
             v-model="compareRoleConfig.showDialog.value"
@@ -727,10 +728,16 @@ const evalCaseModelKeyRef = computed(() => {
     || ''
   )
 })
+const evalCaseExportPromptRef = computed(
+  () => logic.optimizedPrompt.value || logic.prompt.value || '',
+)
+const evalCaseExportSecondaryPromptRef = computed(() => logic.prompt.value || '')
 const evalCaseSet = useEvalCaseSet({
   preferenceService: preferenceServiceRef,
   llmService: llmServiceRef,
   modelKey: evalCaseModelKeyRef,
+  exportPrompt: evalCaseExportPromptRef,
+  exportSecondaryPrompt: evalCaseExportSecondaryPromptRef,
 })
 const evalCaseModelKey = evalCaseModelKeyRef
 const evalCaseSaving = ref(false)
@@ -807,6 +814,14 @@ const handleEvalCaseExport = () => {
     toast.success(t('evalCase.exportDone'))
   } else {
     toast.warning(t('evalCase.exportEmpty'))
+  }
+}
+
+const handleEvalCaseExportPromptfoo = () => {
+  if (evalCaseSet.downloadPromptfooYaml()) {
+    toast.success(t('evalCase.exportPromptfooDone'))
+  } else {
+    toast.warning(t('evalCase.exportPromptfooEmpty'))
   }
 }
 

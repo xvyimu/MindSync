@@ -28,3 +28,10 @@ export {
   createEvalEvidenceFileName,
   type EvalCaseRunnerDeps,
 } from './eval-case-runner';
+export {
+  exportPromptfooYaml,
+  createPromptfooExportFileName,
+  assertPromptfooYamlHasNoSecrets,
+  type PromptfooExportInput,
+  type PromptfooExportResult,
+} from './promptfoo-export';

@@ -15,6 +15,7 @@ const messages = {
     update: '更新用例',
     runAll: '运行全部',
     export: '导出证据',
+    exportPromptfoo: '导出 promptfoo.yaml',
     resultsTitle: '最近一次运行',
     summary: '共 {total} · 通过 {passed} · 失败 {failed}',
     pass: '通过',
@@ -25,10 +26,12 @@ const messages = {
     removed: '用例已删除',
     runDone: '运行完成',
     exportDone: '证据已导出',
+    exportPromptfooDone: '已导出 promptfoo.yaml（仅 contains 映射，不含密钥）',
     needModel: '请先选择模型',
     needServices: '服务未就绪',
     maxCases: '用例数量已达上限（{max}）',
     exportEmpty: '暂无运行结果可导出',
+    exportPromptfooEmpty: '需要至少一个用例，并填写优化/原始提示词',
   },
 }
 

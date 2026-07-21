@@ -142,6 +142,13 @@
             >
               {{ t('evalCase.export') }}
             </NButton>
+            <NButton
+              :disabled="cases.length === 0"
+              data-testid="eval-case-export-promptfoo"
+              @click="$emit('export-promptfoo')"
+            >
+              {{ t('evalCase.exportPromptfoo') }}
+            </NButton>
           </NSpace>
         </NSpace>
       </template>
@@ -191,6 +198,7 @@ const emit = defineEmits<{
   (e: 'run'): void
   (e: 'cancel'): void
   (e: 'export'): void
+  (e: 'export-promptfoo'): void
 }>()
 
 const { t } = useI18n()

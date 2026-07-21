@@ -15,6 +15,7 @@ const messages = {
     update: '更新用例',
     runAll: '執行全部',
     export: '匯出證據',
+    exportPromptfoo: '匯出 promptfoo.yaml',
     resultsTitle: '最近一次執行',
     summary: '共 {total} · 通過 {passed} · 失敗 {failed}',
     pass: '通過',
@@ -25,10 +26,12 @@ const messages = {
     removed: '用例已刪除',
     runDone: '執行完成',
     exportDone: '證據已匯出',
+    exportPromptfooDone: '已匯出 promptfoo.yaml（僅 contains 對應，不含金鑰）',
     needModel: '請先選擇模型',
     needServices: '服務未就緒',
     maxCases: '用例數量已達上限（{max}）',
     exportEmpty: '尚無可匯出的執行結果',
+    exportPromptfooEmpty: '需要至少一個用例，並填寫優化/原始提示詞',
   },
 }
 

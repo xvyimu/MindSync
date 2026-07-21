@@ -40,7 +40,8 @@
 | 全面检查/安全/模块审计 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
 | 全面扫描建议 | `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
 | **全面扫描+规划（2026-07-21）** | `D:\PromtOptimizer\docs\FULL-SCAN-PLAN-RECOMMENDATIONS-2026-07-21.md` |
-| **整合决策调研（tip 91da4e4）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21.md` |
+| **整合决策调研（tip 对齐 R2）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21.md` |
+| **下一刀规格（Cut-R2a C2）** | [`NEXT-CUT-SPEC-2026-07-21-R2-C2.md`](./NEXT-CUT-SPEC-2026-07-21-R2-C2.md) |
 | **竞品/架构调研（万字）** | `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md` |
 | **决策简报（目标/约束/验收）** | [`COMPETITIVE-BRIEF.md`](./COMPETITIVE-BRIEF.md) |
 | **架构宪章** | [`../architecture/charter.md`](../architecture/charter.md) |
@@ -74,6 +75,7 @@
 - **C4 优化完成 CTA**：Basic System/User 优化结束后固定「测试 / 评估 / 收藏」条（`PostOptimizeActions`）  
 - **导出默认脱敏 Key**：`exportAllData({ includeSecrets? })` 默认去掉 models/imageModels 密钥；DataManager 可勾选包含  
 - **F2 全量导出含 EvalCaseSet**：`data.evalCaseSets` ↔ preference `eval.caseSets.v1`  
+- **C2 promptfoo.yaml 最小导出**（进行中/本 tip）：EvalCase 面板一键导出 contains 映射，不含密钥  
 - **B5 远程备份边界**：UI 移除 `@aws-sdk/client-s3`；Web 仅 Google Drive；S3/R2/WebDAV 仅 Desktop IPC  
 - **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
 - **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`（本地优先工作台定位，非 LLMOps 平台）  

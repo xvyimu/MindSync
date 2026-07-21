@@ -15,6 +15,7 @@ const messages = {
     update: 'Update case',
     runAll: 'Run all',
     export: 'Export evidence',
+    exportPromptfoo: 'Export promptfoo.yaml',
     resultsTitle: 'Last run',
     summary: 'Total {total} · passed {passed} · failed {failed}',
     pass: 'Pass',
@@ -25,10 +26,12 @@ const messages = {
     removed: 'Case removed',
     runDone: 'Run finished',
     exportDone: 'Evidence exported',
+    exportPromptfooDone: 'Exported promptfoo.yaml (contains mapping only; no secrets)',
     needModel: 'Select a model first',
     needServices: 'Services not ready',
     maxCases: 'Case limit reached ({max})',
     exportEmpty: 'No run results to export yet',
+    exportPromptfooEmpty: 'Need at least one case and an optimized/original prompt',
   },
 }
 

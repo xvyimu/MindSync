@@ -12,6 +12,7 @@ import {
   createEvalCaseId,
   createEvalEvidenceFileName,
   evaluateAssertions,
+  exportPromptfooYaml,
   isEvalCaseSet,
   runEvalCaseSet,
   serializeEvalEvidenceBundle,
@@ -28,6 +29,10 @@ export interface UseEvalCaseSetOptions {
   preferenceService: MaybeRefOrComputed<IPreferenceService | null | undefined>
   llmService: MaybeRefOrComputed<ILLMService | null | undefined>
   modelKey: MaybeRefOrComputed<string>
+  /** Optimized (or primary) prompt for promptfoo export */
+  exportPrompt?: MaybeRefOrComputed<string>
+  /** Optional original prompt as secondary promptfoo prompt entry */
+  exportSecondaryPrompt?: MaybeRefOrComputed<string>
 }
 
 const STORAGE_KEY = CORE_SERVICE_KEYS.EVAL_CASE_SET
@@ -227,6 +232,47 @@ export function useEvalCaseSet(options: UseEvalCaseSetOptions) {
     return true
   }
 
+  const exportPromptfoo = (): { fileName: string; yaml: string } | null => {
+    const primary =
+      (options.exportPrompt?.value ?? '').trim() ||
+      (options.exportSecondaryPrompt?.value ?? '').trim()
+    if (!primary) {
+      error.value = 'prompt required for promptfoo export'
+      return null
+    }
+    if (caseSet.value.cases.length === 0) {
+      error.value = 'no cases for promptfoo export'
+      return null
+    }
+    try {
+      const result = exportPromptfooYaml({
+        prompt: primary,
+        secondaryPrompt: options.exportSecondaryPrompt?.value,
+        caseSet: caseSet.value,
+      })
+      error.value = null
+      return { fileName: result.fileName, yaml: result.yaml }
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : String(e)
+      return null
+    }
+  }
+
+  const downloadPromptfooYaml = (): boolean => {
+    const exported = exportPromptfoo()
+    if (!exported || typeof document === 'undefined') return false
+    const blob = new Blob([exported.yaml], {
+      type: 'text/yaml;charset=utf-8',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = exported.fileName
+    a.click()
+    URL.revokeObjectURL(url)
+    return true
+  }
+
   return {
     caseSet,
     caseCount,
@@ -244,6 +290,8 @@ export function useEvalCaseSet(options: UseEvalCaseSetOptions) {
     cancel,
     exportEvidence,
     downloadEvidence,
+    exportPromptfoo,
+    downloadPromptfooYaml,
     // re-export pure helper for optional UI dry-check
     evaluateAssertions,
   }
