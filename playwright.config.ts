@@ -92,6 +92,10 @@ export default defineConfig({
       ...process.env,
       ...(USE_VCR_PLACEHOLDER_KEYS
         ? {
+            // Placeholder keys + allowlist: steel-remove suppressed presets still
+            // seed deepseek/siliconflow/dashscope for VCR replay fixtures only.
+            VITE_E2E_VCR_ALLOW_PRESETS: '1',
+            VITE_E2E_VCR_PRESETS: process.env.VITE_E2E_VCR_PRESETS || 'deepseek,siliconflow,dashscope',
             VITE_SILICONFLOW_API_KEY: process.env.VITE_SILICONFLOW_API_KEY || 'vcr',
             VITE_DEEPSEEK_API_KEY: process.env.VITE_DEEPSEEK_API_KEY || 'vcr',
             VITE_DASHSCOPE_API_KEY: process.env.VITE_DASHSCOPE_API_KEY || 'vcr',

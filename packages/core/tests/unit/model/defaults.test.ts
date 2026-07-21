@@ -15,6 +15,9 @@ describe('model defaults provider env mapping', () => {
   const originalXaiApiKey = process.env.VITE_XAI_API_KEY
   const originalMimoTokenPlanApiKey = process.env.VITE_MIMO_TOKEN_PLAN_API_KEY
   const originalMimoTokenPlanApiBaseUrl = process.env.VITE_MIMO_TOKEN_PLAN_API_BASE_URL
+  const originalE2eVcrAllow = process.env.VITE_E2E_VCR_ALLOW_PRESETS
+  const originalE2eVcrPresets = process.env.VITE_E2E_VCR_PRESETS
+  const originalDeepseekApiKey = process.env.VITE_DEEPSEEK_API_KEY
 
   beforeEach(() => {
     delete process.env.VITE_ANTHROPIC_API_KEY
@@ -30,6 +33,9 @@ describe('model defaults provider env mapping', () => {
     delete process.env.VITE_XAI_API_KEY
     delete process.env.VITE_MIMO_TOKEN_PLAN_API_KEY
     delete process.env.VITE_MIMO_TOKEN_PLAN_API_BASE_URL
+    delete process.env.VITE_E2E_VCR_ALLOW_PRESETS
+    delete process.env.VITE_E2E_VCR_PRESETS
+    delete process.env.VITE_DEEPSEEK_API_KEY
   })
 
   afterAll(() => {
@@ -110,6 +116,24 @@ describe('model defaults provider env mapping', () => {
     } else {
       process.env.VITE_MIMO_TOKEN_PLAN_API_BASE_URL = originalMimoTokenPlanApiBaseUrl
     }
+
+    if (originalE2eVcrAllow === undefined) {
+      delete process.env.VITE_E2E_VCR_ALLOW_PRESETS
+    } else {
+      process.env.VITE_E2E_VCR_ALLOW_PRESETS = originalE2eVcrAllow
+    }
+
+    if (originalE2eVcrPresets === undefined) {
+      delete process.env.VITE_E2E_VCR_PRESETS
+    } else {
+      process.env.VITE_E2E_VCR_PRESETS = originalE2eVcrPresets
+    }
+
+    if (originalDeepseekApiKey === undefined) {
+      delete process.env.VITE_DEEPSEEK_API_KEY
+    } else {
+      process.env.VITE_DEEPSEEK_API_KEY = originalDeepseekApiKey
+    }
   })
 
   // 需求变更（钢铁铲除）：15 个厂商预设不再默认生成。
@@ -150,6 +174,23 @@ describe('model defaults provider env mapping', () => {
   it('should only generate the custom preset (plus any dynamic custom models)', () => {
     const models = getDefaultTextModels()
     expect(Object.keys(models)).toEqual(['custom'])
+  })
+
+  it('should allow E2E VCR presets when VITE_E2E_VCR_ALLOW_PRESETS=1', () => {
+    process.env.VITE_E2E_VCR_ALLOW_PRESETS = '1'
+    process.env.VITE_E2E_VCR_PRESETS = 'deepseek'
+    process.env.VITE_DEEPSEEK_API_KEY = 'vcr'
+    try {
+      const models = getDefaultTextModels()
+      expect(models.deepseek).toBeDefined()
+      expect(models.deepseek.enabled).toBe(true)
+      expect(models.openai).toBeUndefined()
+      expect(models.custom).toBeDefined()
+    } finally {
+      delete process.env.VITE_E2E_VCR_ALLOW_PRESETS
+      delete process.env.VITE_E2E_VCR_PRESETS
+      delete process.env.VITE_DEEPSEEK_API_KEY
+    }
   })
 
   it('should expose the custom preset as OpenAI-compatible with chat completions but keep it disabled by default', () => {

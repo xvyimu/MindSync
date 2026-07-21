@@ -350,19 +350,20 @@ class E2EVCR {
       }
     }
 
-    const imageEvidenceMatch = normalized.match(
-      /Image-to-Image modification-request evidence \(JSON\):\s*([\s\S]*?)\n\nPlease output/i,
+    // Prefer originalPrompt evidence JSON so template-wrapper wording drift does not bust VCR hashes.
+    const evidenceJsonMatch = normalized.match(
+      /(?:User prompt evidence to optimize|Image-to-Image modification-request evidence|System prompt evidence to optimize)\s*\(JSON\):\s*([\s\S]*?)\n\nPlease output/i,
     )
-    if (imageEvidenceMatch) {
+    if (evidenceJsonMatch) {
       try {
-        const parsedEvidence = JSON.parse(imageEvidenceMatch[1].trim())
+        const parsedEvidence = JSON.parse(evidenceJsonMatch[1].trim())
         if (typeof parsedEvidence?.originalPrompt === 'string' && parsedEvidence.originalPrompt.trim()) {
           return parsedEvidence.originalPrompt.trim()
         }
 
         return this.stableStringify(this.normalizeRequestValue(parsedEvidence))
       } catch {
-        return imageEvidenceMatch[1].trim()
+        return evidenceJsonMatch[1].trim()
       }
     }
 

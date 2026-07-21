@@ -99,10 +99,24 @@ export function getDefaultTextModels(registry?: ITextAdapterRegistry): Record<st
   const adapterRegistry = registry || new TextAdapterRegistry();
   const result: Record<string, TextModelConfig> = {};
 
+  // E2E VCR replay: allow a small allowlist of vendor presets so Playwright
+  // placeholder keys (see playwright.config.ts) still seed selectable models.
+  // Production UI keeps steel-remove defaults (no vendor presets).
+  // Use getEnvVar so Vite/import.meta.env works in browser (not only process.env).
+  const e2eVcrAllowlist = new Set(
+    getEnvVar('VITE_E2E_VCR_ALLOW_PRESETS') === '1'
+      ? (getEnvVar('VITE_E2E_VCR_PRESETS') || 'deepseek,siliconflow,dashscope')
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [],
+  );
+
   // 批量生成标准 Provider 配置
   for (const [providerId, envKeys] of Object.entries(PROVIDER_ENV_KEYS)) {
     // 被抑制的厂商预设不再默认生成（彻底铲除，不进默认配置）。
-    if (SUPPRESSED_BUILTIN_PRESET_IDS.has(providerId)) {
+    // E2E allowlist is the only intentional exception (test keys only).
+    if (SUPPRESSED_BUILTIN_PRESET_IDS.has(providerId) && !e2eVcrAllowlist.has(providerId)) {
       continue;
     }
     const adapter = adapterRegistry.getAdapter(providerId);
