@@ -1,7 +1,7 @@
 # Prompt Optimizer · 开发工作流（整合版）
 
 > 目标：把 Orca 运行时、Claude Code 技能、本 monorepo 约定合成**一条默认可执行路径**。  
-> 日期：2026-07-20 · 仓库：`D:\PromtOptimizer\src\prompt-optimizer` · **主战场：fork `xvyimu/prompt-optimizer`（fork-only）**  
+> 日期：2026-07-20 · 仓库：`D:\PromtOptimizer\src\prompt-optimizer` · **主战场：`xvyimu/MindSync`（独立仓，原 prompt-optimizer）** 
 > 上游 `linshenkx/prompt-optimizer` 贡献默认暂停；除非用户明确要求，不向 upstream 开 PR。
 
 ---
@@ -14,10 +14,10 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 → 合入 develop（先解冲突）→ stacked PR retarget/rebase → 可选 smoke → 合
 ```
 
-**当前推进焦点（2026-07-20 · fork-only）：**  
-1. UX #3/#4 已合入 fork `develop`  
+**当前推进焦点（2026-07-21 · 独立仓 MindSync）：**  
+1. UX #3/#4 已合入本仓 `develop`  
 2. 上游贡献暂停（#325–#330 / #332–#337 均已关闭，不重开）  
-3. 桌面发布配置指向 `xvyimu/prompt-optimizer`；用最新 develop 打 NSIS 并按 smoke 清单自测
+3. 桌面发布配置指向 `xvyimu/MindSync`；用最新 develop 打 NSIS 并按 smoke 清单自测
 
 ---
 
@@ -98,13 +98,13 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 
 ---
 
-## 3. 当前交付状态（fork-only）
+## 3. 当前交付状态（独立仓 MindSync）
 
 | 项 | 状态 |
 |----|------|
-| Fork UX #3 / #4 | **已合** `develop` |
+| UX #3 / #4 | **已合** `develop` |
 | 上游贡献 | **暂停**（#325–#330 / #332–#337 已关） |
-| 桌面 publish | `xvyimu/prompt-optimizer` |
+| 桌面 publish | `xvyimu/MindSync` |
 | 下一动作 | 最新 develop 打 NSIS + smoke 清单 |
 
 历史冲突解法仍见 git 历史 `bf2c26d`（#3 vs develop）。
@@ -156,7 +156,7 @@ git push --force-with-lease   # 仅 rebase 后需要，且已授权时
 - 自动 merge PR 到 develop  
 - 未要求时的 NSIS / 安装包  
 - unsuppress 15 vendor presets  
-- 上游 `linshenkx/prompt-optimizer` 默认不投 PR（fork-only；用户明确要求再开）  
+- 上游 `linshenkx/prompt-optimizer` 默认不投 PR（独立仓；用户明确要求再开）  
 - 把 shared stream-cancel helper 强塞进当前 parity PR  
 
 ---

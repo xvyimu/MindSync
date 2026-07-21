@@ -19,7 +19,7 @@
 
 ### 开发环境设置
 
-**本 fork 维护者**推荐直接使用本机源码树（不必再 clone）：
+**本仓维护者**推荐直接使用本机源码树（不必再 clone；本地目录名可仍为 `prompt-optimizer`）：
 
 ```text
 D:\PromtOptimizer\src\prompt-optimizer
@@ -28,9 +28,9 @@ D:\PromtOptimizer\src\prompt-optimizer
 从 GitHub 拉取时：
 
 ```bash
-# fork（维护/推送）
-git clone https://github.com/xvyimu/prompt-optimizer.git
-cd prompt-optimizer
+# 本仓（维护/推送）
+git clone https://github.com/xvyimu/MindSync.git
+cd MindSync
 git checkout develop
 
 # 仅跟踪上游（只读 remote 可另加）
@@ -47,7 +47,7 @@ pnpm dev:desktop:fresh # Desktop 完整重置
 ```
 
 现行版本与本机安装路径：见 [`../project/CURRENT.md`](../project/CURRENT.md)。  
-策略 **fork-only**：默认不向上游开 PR。
+策略 **独立仓 / 不默认向上游开 PR**（仓库身份见 [`../../GITHUB_IDENTITY.md`](../../GITHUB_IDENTITY.md)）。
 
 ## Docker开发和部署
 

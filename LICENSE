@@ -1,6 +1,11 @@
 Prompt Optimizer
 Copyright (C) 2025 linshenkx
 
+This distribution is independently maintained as MindSync
+(https://github.com/xvyimu/MindSync) by xvyimu.
+It remains licensed under the GNU Affero General Public License v3.0 only.
+Upstream project: https://github.com/linshenkx/prompt-optimizer
+
 This program is licensed under the GNU Affero General Public License v3.0 only.
 See the full license text below.
 

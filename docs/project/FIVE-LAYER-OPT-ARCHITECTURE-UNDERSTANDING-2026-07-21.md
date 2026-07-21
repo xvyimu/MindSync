@@ -14,7 +14,7 @@
 - **产品**：本地优先多端提示词**工作台**（非 LLMOps、非 Agent OS）。
 - **依赖方向**（不可反）：`extension|web|desktop-renderer → ui → core`；`desktop-main|mcp-server → core`。
 - **ui 禁止** re-export core 工厂；**敏感能力**仅 Electron main；IPC 登记 + secure。
-- **硬约束**：导出默认脱敏、Web 无 S3、auto-opt 默认关、fork-only。
+- **硬约束**：导出默认脱敏、Web 无 S3、auto-opt 默认关、独立仓（不默认上游 PR）。
 
 ## 2. 包与调用关系
 

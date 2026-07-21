@@ -8,7 +8,7 @@
 |----|-----|
 | 日期 | 2026-07-20 |
 | 源码根 | `D:\PromtOptimizer\src\prompt-optimizer` |
-| 策略 | fork-only · 默认分支 `develop` |
+| 策略 | 独立仓 MindSync · 不默认上游 PR · 默认分支 `develop` |
 
 ---
 

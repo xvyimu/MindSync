@@ -4,10 +4,10 @@
 
 **最后更新：** 2026-07-20 文档体系方案 C + 产品态收口  
 **产品版本：** Desktop **2.11.7**（权威快照：[`project/CURRENT.md`](./project/CURRENT.md)）  
-**维护分支：** fork **`develop`**（tip 以 `git log -1` 为准）  
-**Fork：** https://github.com/xvyimu/prompt-optimizer  
-**上游：** https://github.com/linshenkx/prompt-optimizer（`upstream`）  
-**贡献策略：** **fork-only**（默认不重开上游 PR）  
+**维护分支：** **`develop`**（tip 以 `git log -1` 为准）  
+**本仓：** https://github.com/xvyimu/MindSync（原 `prompt-optimizer`，已脱离 fork 网络并改名）  
+**上游：** https://github.com/linshenkx/prompt-optimizer（`upstream`，仅拉取）  
+**贡献策略：** **独立仓 / 不默认向上游开 PR**  
 **文档分层：** L0 本文 + 安装 README · L1 CURRENT/AUDIT/user · L2 archives/workspace/.pipeline  
 **本机安装：** `D:\PromtOptimizer\app\PromptOptimizer.exe`  
 **全面检查：** `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md`  
@@ -29,7 +29,7 @@
 | 文档怎么分层 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` · [`docs/README.md`](./README.md) |
 | 历史 hardening / ship | §2 + `.pipeline/`（**非规范**）+ `CLOSEOUT.md` |
 | 跑测试 | §5；Desktop 契约见 FULL-AUDIT §8 |
-| 推送到 GitHub | §6（fork-only · 默认 `develop`） |
+| 推送到 GitHub | §6（独立仓 MindSync · 默认 `develop`） |
 | 优化债务 | FULL-AUDIT §10 · CURRENT |
 
 ---
@@ -78,7 +78,7 @@ D:\PromtOptimizer\
 
 | remote | URL | 用途 |
 |--------|-----|------|
-| origin | https://github.com/xvyimu/prompt-optimizer.git | 你的 fork |
+| origin | https://github.com/xvyimu/MindSync.git | 本仓（独立，非 fork） |
 | upstream | https://github.com/linshenkx/prompt-optimizer.git | 官方 |
 
 - **日常分支：`develop`**（功能用 `feat/*` 再合入）
@@ -196,7 +196,7 @@ node --test scripts/desktop-ipc-handlers.test.mjs
 ### 4.2 环境
 
 - engines：Node `^22`；推荐 portable 22，避免系统 Node 24 踩 engines  
-- fork-only；高风险 push/删除先确认
+- 独立仓 MindSync；高风险 push/删除先确认
 
 ---
 
@@ -269,7 +269,7 @@ node scripts/run-e2e-group.js gate
 
 **源码根（唯一）：** `D:\PromtOptimizer\src\prompt-optimizer`  
 **日常分支：** `develop`（功能用 `feat/*` 再合入）  
-**策略：** fork-only · 默认 **不**向上游开 PR  
+**策略：** 独立仓 `xvyimu/MindSync` · 默认 **不**向上游开 PR  
 
 ```powershell
 cd D:\PromtOptimizer\src\prompt-optimizer

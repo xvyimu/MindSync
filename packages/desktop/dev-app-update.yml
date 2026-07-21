@@ -1,12 +1,12 @@
 provider: github
 owner: xvyimu
-repo: prompt-optimizer
+repo: MindSync
 private: false
 
 # 开发环境配置说明：
 # 1. 此文件用于本地开发时测试自动更新功能
 # 2. 需要在 main.js 中设置 autoUpdater.forceDevUpdateConfig = true
-# 3. 默认指向本 fork（xvyimu/prompt-optimizer）；可用 DEV_REPO_OWNER / DEV_REPO_NAME 覆盖
+# 3. 默认指向本仓（xvyimu/MindSync，原 prompt-optimizer 已改名并脱离 fork）；可用 DEV_REPO_OWNER / DEV_REPO_NAME 覆盖
 # 4. 只支持公开仓库，不支持私有仓库
 
 # 使用说明：

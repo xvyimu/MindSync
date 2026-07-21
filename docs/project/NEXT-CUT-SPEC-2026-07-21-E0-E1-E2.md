@@ -19,7 +19,7 @@
 | E1 深度 | **CTA + EvalCase + 双模型** |
 | 竞品带回 | Context CTA（已并入 E1） |
 
-硬约束钉死：导出默认脱敏 · Web 无 S3 · 主安装 auto-opt **关** · fork-only · 包边界。
+硬约束钉死：导出默认脱敏 · Web 无 S3 · 主安装 auto-opt **关** · 独立仓 MindSync · 包边界。
 
 ---
 

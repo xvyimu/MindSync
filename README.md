@@ -1,5 +1,10 @@
 # Prompt Optimizer 🚀
 
+> **Repository identity:** [xvyimu/MindSync](https://github.com/xvyimu/MindSync) (formerly `xvyimu/prompt-optimizer`, **left the upstream fork network**).  
+> **Product name** remains **Prompt Optimizer**. Upstream reference: [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer) via `upstream` remote.  
+> **License:** AGPL-3.0-only (see [LICENSE](LICENSE)).
+
+
 <div align="center">
 
 [English](README.md) | [中文](README.zh-CN.md)
@@ -324,21 +329,20 @@ Configure environment variables through the `-e` parameter when deploying with D
 
 For detailed documentation, see [Development Documentation](docs/developer/development.md).
 
-**This repository is maintained as a fork** ([xvyimu/prompt-optimizer](https://github.com/xvyimu/prompt-optimizer), branch `develop`, **fork-only** by default).  
-Authoritative version / install paths for the maintainer workspace: [docs/project/CURRENT.md](docs/project/CURRENT.md) · handoff: [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
+Identity card: [GITHUB_IDENTITY.md](GITHUB_IDENTITY.md) · maintainer SSOT: [docs/project/CURRENT.md](docs/project/CURRENT.md) · handoff: [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
 
 <details>
 <summary>Click to view local development commands</summary>
 
 ```bash
-# 1. Clone (fork — recommended for this product line)
-git clone https://github.com/xvyimu/prompt-optimizer.git
-cd prompt-optimizer
+# 1. Clone this repository
+git clone https://github.com/xvyimu/MindSync.git
+cd MindSync
 
 # Optional: track upstream for pulls only (do not assume PRs to upstream)
 # git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
 
-# 2. Install dependencies
+# 2. Install dependencies (Node ^24, pnpm)
 pnpm install
 
 # 3. Start development server

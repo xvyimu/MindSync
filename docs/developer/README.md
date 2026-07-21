@@ -1,12 +1,12 @@
 # 开发者文档
 
 欢迎参与 **Prompt Optimizer** 开发。  
-**本 fork 策略：fork-only** — 默认在 [xvyimu/prompt-optimizer](https://github.com/xvyimu/prompt-optimizer) 的 `develop` 上工作，不默认向上游开 PR。  
+**本仓策略：独立仓** — 默认在 [xvyimu/MindSync](https://github.com/xvyimu/MindSync) 的 `develop` 上工作（原 `prompt-optimizer`，已脱离 fork），不默认向上游开 PR。  
 现行版本/路径：[`../project/CURRENT.md`](../project/CURRENT.md) · 工程交接：[`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md)
 
 ## 快速开始
 
-- [开发指南](./development.md) — 环境、Docker、常用工作流（**clone 本 fork**）  
+- [开发指南](./development.md) — 环境、Docker、常用工作流（**clone 本仓 MindSync**）  
 - [技术开发指南](./technical-development-guide.md) — 技术栈与规范  
 - [项目结构](./project-structure.md) — 目录组织  
 - [通用开发经验](./general-experience.md) — 经验与最佳实践  

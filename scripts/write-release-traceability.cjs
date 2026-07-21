@@ -55,7 +55,7 @@ lines.push('');
 lines.push(`- generatedAt: ${new Date().toISOString()}`);
 lines.push(`- branch: \`${branch}\``);
 lines.push(`- commit: \`${commit}\``);
-lines.push(`- fork: https://github.com/xvyimu/prompt-optimizer`);
+lines.push(`- repo: https://github.com/xvyimu/MindSync`);
 lines.push(`- upstream: https://github.com/linshenkx/prompt-optimizer`);
 lines.push('');
 lines.push('## git status');

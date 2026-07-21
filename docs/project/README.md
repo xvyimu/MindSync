@@ -19,7 +19,7 @@
 | 文档 | 说明 |
 |------|------|
 | [project-status.md](./project-status.md) | **Superseded**：进度文停在 v2.10.0，仅作历史参考 |
-| [UPSTREAM-325-330-GAP.md](./UPSTREAM-325-330-GAP.md) | 上游 PR 差距（fork-only 背景） |
+| [UPSTREAM-325-330-GAP.md](./UPSTREAM-325-330-GAP.md) | 上游 PR 差距（独立仓 / 历史 fork 背景） |
 
 ## 相关 L0 / 审计
 
