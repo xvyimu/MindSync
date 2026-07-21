@@ -1,5 +1,10 @@
 # Prompt Optimizer 🚀
 
+> **Repository identity:** [xvyimu/MindSync](https://github.com/xvyimu/MindSync) (formerly `xvyimu/prompt-optimizer`, **left the upstream fork network**).  
+> **Product name** remains **Prompt Optimizer**. Upstream reference: [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer) via `upstream` remote.  
+> **License:** AGPL-3.0-only (see [LICENSE](LICENSE)).
+
+
 <div align="center">
 
 [English](README.md) | [中文](README.zh-CN.md)
@@ -324,7 +329,7 @@ Configure environment variables through the `-e` parameter when deploying with D
 
 For detailed documentation, see [Development Documentation](docs/developer/development.md).
 
-**This repository is maintained as a fork** ([xvyimu/prompt-optimizer](https://github.com/xvyimu/prompt-optimizer), branch `develop`, **fork-only** by default).  
+**This repository is maintained independently** as [xvyimu/MindSync](https://github.com/xvyimu/MindSync) (formerly `prompt-optimizer`; left the fork network; branch `develop`; no default upstream PRs). 
 Authoritative version / install paths for the maintainer workspace: [docs/project/CURRENT.md](docs/project/CURRENT.md) · handoff: [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
 
 <details>
@@ -332,7 +337,7 @@ Authoritative version / install paths for the maintainer workspace: [docs/projec
 
 ```bash
 # 1. Clone (fork — recommended for this product line)
-git clone https://github.com/xvyimu/prompt-optimizer.git
+git clone https://github.com/xvyimu/MindSync.git
 cd prompt-optimizer
 
 # Optional: track upstream for pulls only (do not assume PRs to upstream)

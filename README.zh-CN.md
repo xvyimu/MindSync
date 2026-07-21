@@ -1,5 +1,10 @@
 # Prompt Optimizer (提示词优化器) 🚀
 
+> **仓库身份：** [xvyimu/MindSync](https://github.com/xvyimu/MindSync)（原 `xvyimu/prompt-optimizer`，**已脱离 upstream fork 网络**）。  
+> **产品名**仍为 **Prompt Optimizer（提示词优化器）**。上游参考：[linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer)（remote `upstream`）。  
+> **许可：** AGPL-3.0-only（见 [LICENSE](LICENSE)）。
+
+
 <div align="center">
 
 [English](README.md) | [中文](README.zh-CN.md)
@@ -315,25 +320,38 @@ Docker部署时通过 `-e` 参数配置环境变量：
 
 </details>
 
+## 关于本仓库（MindSync）
+
+本 GitHub 仓库为 **[xvyimu/MindSync](https://github.com/xvyimu/MindSync)**——Prompt Optimizer 工作台的**独立**维护线。
+
+| 项 | 值 |
+|----|-----|
+| 产品名 | **Prompt Optimizer**（UI / Desktop / 包名不变） |
+| 仓库身份 | **MindSync** · 已脱离上游 fork 网络 |
+| 默认分支 | `develop` |
+| 上游（仅拉取） | [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer) |
+| 策略 | 不默认向上游开 PR；安全补丁可 cherry-pick |
+| 维护者 SSOT | [docs/project/CURRENT.md](docs/project/CURRENT.md) · [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md) |
+| 许可 | AGPL-3.0-only · 见 [LICENSE](LICENSE) |
+
+上方徽章与演示链接仍可指向原上游产品（stars / Docker Hub / 公开文档），便于对照。
+
 ## 本地开发
 
 详细文档见 [开发文档](docs/developer/development.md)。
-
-**本仓库按 fork 维护**（[xvyimu/prompt-optimizer](https://github.com/xvyimu/prompt-optimizer)，分支 `develop`，默认 **fork-only**）。  
-维护者本机版本/安装路径权威： [docs/project/CURRENT.md](docs/project/CURRENT.md) · 交接：[docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md)。
 
 <details>
 <summary>点击查看本地开发命令</summary>
 
 ```bash
-# 1. 克隆（推荐本产品线 fork）
-git clone https://github.com/xvyimu/prompt-optimizer.git
-cd prompt-optimizer
+# 1. 克隆本仓库
+git clone https://github.com/xvyimu/MindSync.git
+cd MindSync
 
 # 可选：仅拉取上游（默认不向上游开 PR）
 # git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
 
-# 2. 安装依赖
+# 2. 安装依赖（Node ^24、pnpm）
 pnpm install
 
 # 3. 启动开发服务
