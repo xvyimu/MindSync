@@ -13,6 +13,7 @@ import {
   createHistoryManager,
   createPromptService,
   createImageUnderstandingService,
+  createTextAdapterRegistry,
   PromptService,
   IPromptService,
   ModelManager,
@@ -61,16 +62,17 @@ export class CoreServicesManager {
       logger.debug('Creating memory storage provider');
       const storage = new MemoryStorageProvider();
 
-      // 2. 初始化模型管理器
+      // 2. 共享文本适配器注册表 + 模型管理器
       logger.debug('Initializing ModelManager');
-      this.modelManager = createModelManager(storage);
+      const textAdapterRegistry = createTextAdapterRegistry();
+      this.modelManager = createModelManager(storage, textAdapterRegistry);
 
       // 3. 配置默认模型
       await this.setupDefaultModel(config);
 
-      // 4. 初始化 LLM 服务
+      // 4. 初始化 LLM 服务（与 ModelManager 共用 Registry）
       logger.debug('Initializing LLMService');
-      this.llmService = createLLMService(this.modelManager);
+      this.llmService = createLLMService(this.modelManager, textAdapterRegistry);
 
       // 5. 初始化语言服务
       logger.debug('Initializing LanguageService');
@@ -94,7 +96,7 @@ export class CoreServicesManager {
         this.llmService,
         this.templateManager,
         this.historyManager,
-        createImageUnderstandingService(),
+        createImageUnderstandingService({ registry: textAdapterRegistry }),
       );
 
       // 10. 验证服务健康状态

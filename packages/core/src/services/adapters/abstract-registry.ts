@@ -15,9 +15,35 @@ export abstract class AbstractAdapterRegistry<
 > {
   protected adapters: Map<string, TAdapter> = new Map();
   protected staticModelsCache: Map<string, TModel[]> = new Map();
+  /** 动态模型成功结果短缓存（降上游限流；不含明文密钥） */
+  private dynamicModelsCache: Map<string, { expiresAt: number; models: TModel[] }> = new Map();
+  /** 同 key 并发合并，避免重复打厂商 list 接口 */
+  private dynamicModelsInflight: Map<string, Promise<TModel[]>> = new Map();
+  private static readonly DYNAMIC_MODELS_TTL_MS = 30_000;
 
   constructor() {
     this.initializeAdapters();
+  }
+
+  /**
+   * 构建动态模型缓存键：仅用 provider + baseURL + 是否有 Key，不写入密钥明文。
+   */
+  protected buildDynamicModelsCacheKey(
+    providerId: string,
+    connectionConfig: TConnectionConfig,
+  ): string {
+    const normalizedId = providerId.toLowerCase();
+    const cfg = connectionConfig as {
+      connectionConfig?: { baseURL?: string; apiKey?: string };
+      baseURL?: string;
+      apiKey?: string;
+    };
+    const baseURL =
+      (cfg?.connectionConfig?.baseURL || cfg?.baseURL || '').toString().trim().toLowerCase();
+    const hasKey = Boolean(
+      (cfg?.connectionConfig?.apiKey || cfg?.apiKey || '').toString().trim(),
+    );
+    return `${normalizedId}::${baseURL}::k${hasKey ? '1' : '0'}`;
   }
 
   /**
@@ -155,12 +181,37 @@ export abstract class AbstractAdapterRegistry<
       throw this.createDynamicModelUnsupportedError(provider);
     }
 
-    try {
-      return await this.getModelsAsyncFromAdapter(adapter, connectionConfig);
-    } catch (error) {
-      console.warn(`Failed to fetch dynamic models (${providerId}):`, error);
-      throw error;
+    const cacheKey = this.buildDynamicModelsCacheKey(providerId, connectionConfig);
+    const now = Date.now();
+    const cached = this.dynamicModelsCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      return cached.models;
     }
+
+    const inflight = this.dynamicModelsInflight.get(cacheKey);
+    if (inflight) {
+      return inflight;
+    }
+
+    const pending = (async () => {
+      try {
+        const models = await this.getModelsAsyncFromAdapter(adapter, connectionConfig);
+        this.dynamicModelsCache.set(cacheKey, {
+          expiresAt: Date.now() + AbstractAdapterRegistry.DYNAMIC_MODELS_TTL_MS,
+          models,
+        });
+        return models;
+      } catch (error) {
+        // 失败不缓存，允许立即重试
+        console.warn(`Failed to fetch dynamic models (${providerId}):`, error);
+        throw error;
+      } finally {
+        this.dynamicModelsInflight.delete(cacheKey);
+      }
+    })();
+
+    this.dynamicModelsInflight.set(cacheKey, pending);
+    return pending;
   }
 
   // ===== 统一的模型获取接口（自动选择静态或动态） =====

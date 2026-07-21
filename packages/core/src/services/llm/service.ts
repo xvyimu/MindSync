@@ -387,20 +387,20 @@ export class LLMService implements ILLMService {
 /**
  * 创建LLM服务实例的工厂函数
  * @param modelManager 模型管理器实例
+ * @param registry 可选共享 TextAdapterRegistry（Web/MCP/Desktop 装配应注入，避免多份 Adapter 图）
  * @returns LLM服务实例
  */
-export function createLLMService(modelManager: ModelManager): ILLMService {
-  // 在Electron环境中，返回代理实例
+export function createLLMService(
+  modelManager: ModelManager,
+  registry?: ITextAdapterRegistry,
+): ILLMService {
+  // 在Electron渲染进程：走 IPC 代理，不在此构造本地 Registry
   if (isRunningInElectron()) {
-    console.log('[LLM Service Factory] Electron environment detected, using proxy.');
     return new ElectronLLMProxy();
   }
 
-  // 创建 Registry 实例
-  const registry = new TextAdapterRegistry();
-
-  // 返回注入了 Registry 的 LLMService 实例
-  return new LLMService(modelManager, registry);
+  const textRegistry = registry ?? new TextAdapterRegistry();
+  return new LLMService(modelManager, textRegistry);
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types

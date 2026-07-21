@@ -286,11 +286,14 @@ export function useAppInitializer(): {
 
         const languageService = createTemplateLanguageService(preferenceService);
         
-        // Services with no dependencies or only storage
-        const modelManagerInstance = createModelManager(storageProvider);
-
-        // 文本模型适配器注册表（本地实例）
+        // 文本模型适配器注册表：单一实例供 ModelManager / LLM / ImageUnderstanding 共享
         textAdapterRegistryInstance = createTextAdapterRegistry();
+
+        // Services with no dependencies or only storage
+        const modelManagerInstance = createModelManager(
+          storageProvider,
+          textAdapterRegistryInstance,
+        );
 
         // 图像模型管理器（独立存储空间）
         const imageAdapterRegistry = await import('@prompt-optimizer/core').then(m => m.createImageAdapterRegistry())
@@ -409,7 +412,8 @@ export function useAppInitializer(): {
 
         // Services that depend on initialized managers
         console.log('[AppInitializer] Creating services that depend on initialized managers...');
-        llmService = createLLMService(modelManagerInstance);
+        llmService = createLLMService(modelManagerInstance, textAdapterRegistryInstance);
+        // 单实例：Prompt 与 Evaluation 共用，避免重复构造
         const imageUnderstandingService = createImageUnderstandingService({
           registry: textAdapterRegistryInstance,
         })
@@ -467,12 +471,10 @@ export function useAppInitializer(): {
           }
         }
 
-        // 🆕 创建评估服务
+        // 🆕 创建评估服务（复用上方 imageUnderstandingService）
         evaluationService = createEvaluationService(llmService, modelManagerAdapter, templateManagerAdapter, {
           imageStorageService,
-          imageUnderstandingService: createImageUnderstandingService({
-            registry: textAdapterRegistryInstance,
-          }),
+          imageUnderstandingService,
         });
 
         // 🆕 创建变量提取服务
