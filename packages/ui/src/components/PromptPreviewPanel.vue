@@ -93,7 +93,7 @@ import {
   NButton,
   NScrollbar
 } from 'naive-ui'
-import type { ContextMode } from '@prompt-optimizer/core'
+import type { ContextMode } from '@mindsync/core'
 
 const props = defineProps<{
   /** 预览内容 */

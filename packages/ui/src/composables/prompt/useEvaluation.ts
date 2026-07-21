@@ -36,7 +36,7 @@ import type {
   CompareAnalysisHints,
   CompareStopSignals,
   StructuredCompareRole,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 /** 评分等级类型 */
 export type ScoreLevel = 'excellent' | 'good' | 'acceptable' | 'poor' | 'very-poor'

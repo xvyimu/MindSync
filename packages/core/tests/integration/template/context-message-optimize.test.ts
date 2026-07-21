@@ -25,7 +25,7 @@ import type { MessageOptimizationRequest, ConversationMessage } from '../../../s
  * 测试场景：4场景 × 3模板 = 12测试
  *
  * 运行方式：
- *   pnpm -F @prompt-optimizer/core test -- --run context-message-optimize
+ *   pnpm -F @mindsync/core test -- --run context-message-optimize
  */
 
 // ============================================================================

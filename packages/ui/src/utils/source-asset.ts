@@ -2,7 +2,7 @@ import type {
   FavoritePrompt,
   PromptAssetBinding,
   PromptSessionOrigin,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import { resolveFavoritePromptAsset } from './favorite-reproducibility'
 

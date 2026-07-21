@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { useBasicSystemSession } from '../../../../src/stores/session/useBasicSystemSession'
 import { useBasicUserSession } from '../../../../src/stores/session/useBasicUserSession'
 import { createPreferenceServiceStub, createTestPinia } from '../../../utils/pinia-test-helpers'
-import { TEMPLATE_SELECTION_KEYS } from '@prompt-optimizer/core'
+import { TEMPLATE_SELECTION_KEYS } from '@mindsync/core'
 
 describe('Session stores (basic) persistence', () => {
   it('basic-system clearContent removes derived content and test image while preserving workspace selections', async () => {

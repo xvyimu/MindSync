@@ -13,8 +13,8 @@ export default defineConfig(({ command }) => {
     '@': resolve(__dirname, 'src'),
   }
   if (!isBuild) {
-    alias['@prompt-optimizer/ui'] = resolve(__dirname, '../ui/src/index.ts')
-    alias['@prompt-optimizer/core'] = resolve(__dirname, '../core/src/index.ts')
+    alias['@mindsync/ui'] = resolve(__dirname, '../ui/src/index.ts')
+    alias['@mindsync/core'] = resolve(__dirname, '../core/src/index.ts')
   }
 
   return {

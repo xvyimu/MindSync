@@ -47,7 +47,7 @@
 在项目根目录执行：
 
 ```bash
-pnpm -F @prompt-optimizer/core build
+pnpm -F @mindsync/core build
 node scripts/run-structured-compare-calibration.mjs
 ```
 

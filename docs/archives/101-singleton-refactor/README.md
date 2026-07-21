@@ -17,7 +17,7 @@
 - [ ] `experience.md` - 重构过程中的经验总结（待从experience.md中提取）
 
 ## 相关代码变更
-- 影响包：@prompt-optimizer/core, @prompt-optimizer/ui
+- 影响包：@mindsync/core, @mindsync/ui
 - 主要变更：移除单例服务，改为依赖注入
 - 重构范围：服务层架构完全重构
 

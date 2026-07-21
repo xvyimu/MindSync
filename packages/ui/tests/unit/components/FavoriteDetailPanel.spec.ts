@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { ref } from 'vue'
 
-import type { FavoriteCategory, FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoriteCategory, FavoritePrompt } from '@mindsync/core'
 
 vi.mock('vue-i18n', async (importOriginal) => {
   const actual = await importOriginal<typeof import('vue-i18n')>()

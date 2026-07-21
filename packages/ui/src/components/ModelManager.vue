@@ -117,7 +117,7 @@ import { inject, onMounted, onUnmounted, provide, ref, type Ref } from 'vue'
 
 import { useI18n } from 'vue-i18n'
 import { NButton, NCard, NModal, NTabs, NTabPane } from 'naive-ui'
-import type { ImageModelConfig } from '@prompt-optimizer/core'
+import type { ImageModelConfig } from '@mindsync/core'
 import ImageModelEditModal from './ImageModelEditModal.vue'
 import ImageModelManager from './ImageModelManager.vue'
 import TextModelManager from './TextModelManager.vue'

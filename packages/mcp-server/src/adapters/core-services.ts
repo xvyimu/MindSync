@@ -21,7 +21,7 @@ import {
   TemplateManager,
   HistoryManager,
 
-} from '@prompt-optimizer/core';
+} from '@mindsync/core';
 
 import { MCPServerConfig } from '../config/environment.js';
 import { setupDefaultModel } from '../config/models.js';

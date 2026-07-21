@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { ref } from 'vue'
-import type { FullImageData } from '@prompt-optimizer/core'
+import type { FullImageData } from '@mindsync/core'
 
 import FavoriteImportPanel from '../../../src/components/FavoriteImportPanel.vue'
 import { createFavoriteResourcePackage } from '../../../src/utils/favorite-resource-package'

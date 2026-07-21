@@ -32,10 +32,10 @@ packages/extension/src/App.vue 已经完成迁移到新的TestAreaPanel统一组
 #### 1. 更新导入语句
 ```vue
 // 旧代码
-import { TestPanelUI, AdvancedTestPanel } from '@prompt-optimizer/ui'
+import { TestPanelUI, AdvancedTestPanel } from '@mindsync/ui'
 
 // 新代码  
-import { TestAreaPanel, useResponsiveTestLayout, useTestModeConfig } from '@prompt-optimizer/ui'
+import { TestAreaPanel, useResponsiveTestLayout, useTestModeConfig } from '@mindsync/ui'
 ```
 
 #### 2. 添加状态管理

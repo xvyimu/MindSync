@@ -143,9 +143,9 @@ fix(core): 修复API调用超时问题
 pnpm test
 
 # 运行特定包的测试（直接使用pnpm workspace命令）
-pnpm -F @prompt-optimizer/core test
-pnpm -F @prompt-optimizer/ui test
-pnpm -F @prompt-optimizer/web test
+pnpm -F @mindsync/core test
+pnpm -F @mindsync/ui test
+pnpm -F @mindsync/web test
 ```
 
 ## 项目构建和部署
@@ -247,11 +247,11 @@ git push origin v1.2.0-beta.1
 
 ### 构建说明
 项目采用 monorepo 架构，包含以下子包：
-- `@prompt-optimizer/core`: 核心逻辑包
-- `@prompt-optimizer/ui`: UI组件包
-- `@prompt-optimizer/web`: Web应用
-- `@prompt-optimizer/extension`: 浏览器扩展
-- `@prompt-optimizer/desktop`: Desktop应用
+- `@mindsync/core`: 核心逻辑包
+- `@mindsync/ui`: UI组件包
+- `@mindsync/web`: Web应用
+- `@mindsync/extension`: 浏览器扩展
+- `@mindsync/desktop`: Desktop应用
 
 构建顺序：core → ui → (web/extension/desktop 并行)
 

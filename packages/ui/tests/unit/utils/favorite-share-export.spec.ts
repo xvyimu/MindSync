@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { strFromU8, unzipSync } from 'fflate'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import {
   DEFAULT_FAVORITE_SHARE_SECTIONS,

@@ -8,7 +8,7 @@
 - 已落地：`pairwise judge`、`structured compare synthesis`、`rewrite-from-evaluation` 都已切到“规则说明 + JSON payload”协议。
 - 已落地：rewrite payload 现在额外包含 machine-readable `rewriteGuidance`，用于表达 `skip / minor-rewrite / rewrite` 的第一版 gating 结论。
 - 已保留：Markdown 渲染函数没有删除，继续作为 docs / calibration 的 debug 辅助视图。
-- 已验证：本地单测、`@prompt-optimizer/core build`、`pnpm compare:calibrate` 已跑通。
+- 已验证：本地单测、`@mindsync/core build`、`pnpm compare:calibrate` 已跑通。
 - 当前 calibration 结果：
   - `synthetic-schema-drift-regression`: `4/4`
   - `synthetic-cosmetic-regression`: `3/3`

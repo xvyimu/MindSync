@@ -3,7 +3,7 @@ import type {
   PromptRecord,
   PromptRecordChain,
   PromptSessionOrigin,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 type SourceBindingState = {
   assetBinding?: PromptAssetBinding

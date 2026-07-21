@@ -2,7 +2,7 @@ import { ref, readonly, type Ref } from 'vue'
 
 import type { AppServices } from '../../types/services'
 import { usePreferences } from '../storage/usePreferenceManager'
-import { UI_SETTINGS_KEYS, type ProSubMode } from '@prompt-optimizer/core'
+import { UI_SETTINGS_KEYS, type ProSubMode } from '@mindsync/core'
 
 interface UseProSubModeApi {
   proSubMode: Ref<ProSubMode>

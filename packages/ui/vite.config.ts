@@ -32,16 +32,16 @@ export default defineConfig({
       external: [
         'vue',
         'vue-router',
-        '@prompt-optimizer/core',
-        '@prompt-optimizer/core/electron',
+        '@mindsync/core',
+        '@mindsync/core/electron',
         'uuid'
       ],
       output: {
         globals: {
           vue: 'Vue',
           'vue-router': 'VueRouter',
-          '@prompt-optimizer/core': 'PromptOptimizerCore',
-          '@prompt-optimizer/core/electron': 'PromptOptimizerCoreElectron',
+          '@mindsync/core': 'PromptOptimizerCore',
+          '@mindsync/core/electron': 'PromptOptimizerCoreElectron',
           'uuid': 'uuid'
         },
         assetFileNames: 'style.css'

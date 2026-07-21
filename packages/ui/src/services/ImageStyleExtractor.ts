@@ -5,7 +5,7 @@ import {
   type Message,
   type Template,
   type TextModelConfig,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { VARIABLE_VALIDATION, isValidVariableName } from '../types/variable'
 
 export type ImagePromptExtractionMode = 'text2image' | 'image2image'

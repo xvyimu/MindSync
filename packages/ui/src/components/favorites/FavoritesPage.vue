@@ -31,7 +31,7 @@ import { computed, inject, onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NButton, NIcon } from 'naive-ui'
 import { ArrowBackUp } from '@vicons/tabler'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import FavoriteLibraryWorkspace from '../FavoriteLibraryWorkspace.vue'
 import { router as routerInstance } from '../../router'

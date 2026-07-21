@@ -1,4 +1,4 @@
-import type { TextModelConfig, Template } from '@prompt-optimizer/core'
+import type { TextModelConfig, Template } from '@mindsync/core'
 import type { ModelSelectOption, TemplateSelectOption, SelectOption } from '../types/select-options'
 
 interface ModelSelectTransformOptions {

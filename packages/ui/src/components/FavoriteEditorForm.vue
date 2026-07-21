@@ -393,7 +393,7 @@ import {
   type UploadFileInfo,
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { FavoritePrompt, PromptContentVersion } from '@prompt-optimizer/core'
+import type { FavoritePrompt, PromptContentVersion } from '@mindsync/core'
 
 import { useToast } from '../composables/ui/useToast'
 import { useTagSuggestions } from '../composables/ui/useTagSuggestions'

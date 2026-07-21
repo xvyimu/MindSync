@@ -117,7 +117,7 @@ ACCESS_PASSWORD=your_password
 | --- | --- |
 | Framework preset | `None` 或留空 |
 | Root directory | `/` 或留空 |
-| Build command | `pnpm -F @prompt-optimizer/core build && pnpm -F @prompt-optimizer/ui build && pnpm -F @prompt-optimizer/web build` |
+| Build command | `pnpm -F @mindsync/core build && pnpm -F @mindsync/ui build && pnpm -F @mindsync/web build` |
 | Build output directory | `packages/web/dist` |
 
 通常不需要手动配置构建环境变量。Cloudflare 会根据仓库里的 `packageManager` 和 `engines` 检测 `pnpm` 和 Node.js 版本。

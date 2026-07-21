@@ -61,7 +61,7 @@ import {
   type DataTableColumns,
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { VariableValueGenerationResponse, GeneratedVariableValue } from '@prompt-optimizer/core'
+import type { VariableValueGenerationResponse, GeneratedVariableValue } from '@mindsync/core'
 
 type RowKey = string | number
 

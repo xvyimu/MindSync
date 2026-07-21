@@ -11,7 +11,7 @@ if (!fs.existsSync(builtCliPath)) {
   console.error(
     [
       'prompt-optimizer-mcp is not built yet.',
-      'Run `pnpm mcp:build` or `pnpm --filter @prompt-optimizer/mcp-server build` first.',
+      'Run `pnpm mcp:build` or `pnpm --filter @mindsync/mcp-server build` first.',
     ].join(' '),
   );
   process.exit(1);

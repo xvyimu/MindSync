@@ -85,7 +85,7 @@ const handleToggle = async () => {
 ```typescript
 // packages/ui/src/index.ts 缺少关键导出
 // 导致其他组件无法正确引用NFlex
-import { NFlex } from '@prompt-optimizer/ui' // ❌ 失败
+import { NFlex } from '@mindsync/ui' // ❌ 失败
 ```
 
 **解决方案**:

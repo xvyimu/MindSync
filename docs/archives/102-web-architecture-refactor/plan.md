@@ -4,8 +4,8 @@
 
 **最新状态 (2024-12-29):** 底层与上层应用重构均已完成。
 
-- **已完成**: `@prompt-optimizer/core` 和 `@prompt-optimizer/ui` 包已成功移除所有单例服务。
-- **已解决**: Web 应用 (`@prompt-optimizer/web`) 和浏览器插件 (`@prompt-optimizer/extension`) 的入口文件 (`App.vue`) 已完成适配，应用**能够正常启动和运行**。
+- **已完成**: `@mindsync/core` 和 `@mindsync/ui` 包已成功移除所有单例服务。
+- **已解决**: Web 应用 (`@mindsync/web`) 和浏览器插件 (`@mindsync/extension`) 的入口文件 (`App.vue`) 已完成适配，应用**能够正常启动和运行**。
 
 本计划旨在记录并总结 `App.vue` 的适配过程。
 
@@ -21,7 +21,7 @@
 ### 阶段一：净化 UI 包 (已完成) ✅
 
 1.  **文件**: `packages/ui/src/index.ts`
-    -   **任务**: 移除所有从 `@prompt-optimizer/core` 重新导出的服务实例。
+    -   **任务**: 移除所有从 `@mindsync/core` 重新导出的服务实例。
     -   **状态**: ✅ **已完成**。UI 包现在只导出组件、Composables、工厂函数和类型。
 
 ### 阶段二：创建统一的应用初始化器 (已完成) ✅
@@ -74,7 +74,7 @@
 
 ## 5. 最新进展：净化 UI 子组件 (已完成) ✅
 
-**背景**: 在 `App.vue` 完成对 `useAppInitializer` 的适配后，发现其下属的多个 UI 组件 (`@prompt-optimizer/ui/components/*`) 仍然直接从 `@prompt-optimizer/core` 导入单例服务，这违反了新的依赖注入架构，并可能导致潜在的 bug 和测试难题。
+**背景**: 在 `App.vue` 完成对 `useAppInitializer` 的适配后，发现其下属的多个 UI 组件 (`@mindsync/ui/components/*`) 仍然直接从 `@mindsync/core` 导入单例服务，这违反了新的依赖注入架构，并可能导致潜在的 bug 和测试难题。
 
 **任务**: 彻底移除 UI 组件层对服务单例的直接依赖，改为通过 `props` 接收服务实例。
 

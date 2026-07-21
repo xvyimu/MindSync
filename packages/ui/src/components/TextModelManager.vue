@@ -24,7 +24,7 @@
 import { onMounted, provide, ref, h } from 'vue'
 
 import { useI18n } from 'vue-i18n'
-import { isRunningInElectron } from '@prompt-optimizer/core'
+import { isRunningInElectron } from '@mindsync/core'
 import { useTextModelManager } from '../composables/model/useTextModelManager'
 import TextModelList from './TextModelList.vue'
 import TextModelEditModal from './TextModelEditModal.vue'

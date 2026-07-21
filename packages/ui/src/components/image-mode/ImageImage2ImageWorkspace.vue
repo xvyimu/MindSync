@@ -925,7 +925,7 @@ import {
     type PromptRecordChain,
     type PromptRecordType,
     type Template,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { v4 as uuidv4 } from 'uuid'
 
 // 国际化

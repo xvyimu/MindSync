@@ -3,7 +3,7 @@ import type {
   PromptAsset,
   PromptContent,
   PromptContentVersion,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value)

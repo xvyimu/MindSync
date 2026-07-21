@@ -20,7 +20,7 @@
 ## 仓库与身份
 - 路径：D:\PromtOptimizer\src\prompt-optimizer（本地目录名可保留）
 - remote origin：https://github.com/xvyimu/MindSync （独立仓，默认不向上游开 PR）
-- 产品名：Prompt Optimizer；包 scope：@prompt-optimizer/*（不因改名而改）
+- 产品名：Prompt Optimizer；包 scope：@mindsync/*（不因改名而改）
 - 默认基线分支：develop（先 git fetch && git checkout develop && git pull）
 - 产品版本：2.11.7；L1 版本/安装路径只信 docs/project/CURRENT.md
 - 身份卡：GITHUB_IDENTITY.md
@@ -60,11 +60,11 @@
 4. 结束时写：改了什么、验证命令与结果、未做事项、风险
 
 ## 建议验证菜单（按触及面选）
-- core：pnpm -F @prompt-optimizer/core build && pnpm -F @prompt-optimizer/core test:gate
-- 动态模型缓存：pnpm -F @prompt-optimizer/core exec vitest run tests/unit/adapters/dynamic-models-cache.test.ts
-- ui：pnpm -F @prompt-optimizer/ui typecheck && pnpm -F @prompt-optimizer/ui test --run
+- core：pnpm -F @mindsync/core build && pnpm -F @mindsync/core test:gate
+- 动态模型缓存：pnpm -F @mindsync/core exec vitest run tests/unit/adapters/dynamic-models-cache.test.ts
+- ui：pnpm -F @mindsync/ui typecheck && pnpm -F @mindsync/ui test --run
 - desktop 契约：node --test packages/desktop/config/*.test.js
-- mcp：pnpm -F @prompt-optimizer/mcp-server test
+- mcp：pnpm -F @mindsync/mcp-server test
 - 装机：仅当用户要求；归档到 D:\PromtOptimizer\nsis-YYYY-MM-DD-*/
 - 硬约束抽查：rg "@aws-sdk" packages/ui packages/web；确认 includeSecrets 默认 false
 

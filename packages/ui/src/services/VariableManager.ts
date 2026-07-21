@@ -3,7 +3,7 @@
  * 负责自定义变量的管理、存储和解析
  */
 
-import type { IPreferenceService } from '@prompt-optimizer/core';
+import type { IPreferenceService } from '@mindsync/core';
 import { 
   PREDEFINED_VARIABLES, 
   VARIABLE_VALIDATION,

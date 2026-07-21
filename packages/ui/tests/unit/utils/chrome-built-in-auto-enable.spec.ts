@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { TextModelConfig } from '@prompt-optimizer/core'
+import type { TextModelConfig } from '@mindsync/core'
 import { autoEnableChromeBuiltInModelIfReady } from '../../../src/utils/chrome-built-in-auto-enable'
 import {
   CHROME_BUILT_IN_AUTO_ENABLE_SOURCE,
   CHROME_BUILT_IN_PROVIDER_ID
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 const createChromeConfig = (overrides: Partial<TextModelConfig> = {}): TextModelConfig => ({
   id: CHROME_BUILT_IN_PROVIDER_ID,

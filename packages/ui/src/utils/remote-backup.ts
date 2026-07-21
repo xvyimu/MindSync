@@ -1,6 +1,6 @@
 // S3/WebDAV live in packages/desktop/remote-storage.js (Desktop IPC).
 // UI only keeps Google Drive (web) + DesktopIpcRemoteObjectStore.
-import { getEnvVar } from '@prompt-optimizer/core'
+import { getEnvVar } from '@mindsync/core'
 
 export type RemoteBackupProviderKind =
   | 'google-drive'

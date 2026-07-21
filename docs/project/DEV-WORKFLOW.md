@@ -1,23 +1,25 @@
-# Prompt Optimizer · 开发工作流（整合版）
+# MindSync · 开发工作流（整合版）
 
 > 目标：把 Orca 运行时、Claude Code 技能、本 monorepo 约定合成**一条默认可执行路径**。  
-> 日期：2026-07-20 · 仓库：`D:\PromtOptimizer\src\prompt-optimizer` · **主战场：`xvyimu/MindSync`（独立仓，原 prompt-optimizer）** 
-> 上游 `linshenkx/prompt-optimizer` 贡献默认暂停；除非用户明确要求，不向 upstream 开 PR。
+> 日期：2026-07-21 · 源码：`D:\PromtOptimizer\src\mindsync` · **唯一远端：`xvyimu/MindSync`（`origin` only）**  
+> **独立产品仓**：不设置 `upstream` remote；不默认同步 linshenkx/prompt-optimizer；不向其开 PR。  
+> **许可**：AGPL-3.0-only（见 `LICENSE`）。身份：`GITHUB_IDENTITY.md`。
 
 ---
 
 ## 0. 一句话默认路径（Best Path）
 
 ```
-grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
-→ /review 或 /simplify → 修 judgement → 开/更新 PR
-→ 合入 develop（先解冲突）→ stacked PR retarget/rebase → 可选 smoke → 合
+grill → feature/<名> 从 develop 切出 → 实现 → typecheck/单测
+→ 自检（架构/质量/功能/性能/安全）→ 迭代报告 → 人工审核
+→ 授权后 commit；默认不 push；合 develop 须明确授权
 ```
 
-**当前推进焦点（2026-07-21 · 独立仓 MindSync）：**  
-1. UX #3/#4 已合入本仓 `develop`  
-2. 上游贡献暂停（#325–#330 / #332–#337 均已关闭，不重开）  
-3. 桌面发布配置指向 `xvyimu/MindSync`；用最新 develop 打 NSIS 并按 smoke 清单自测
+**当前推进焦点（2026-07-21 · MindSync 独立体系）：**  
+1. 身份与 remote：仅 `origin`；G1–G3 见 `PACKAGE-RENAME-PLAN` / `GITHUB_IDENTITY`  
+2. 桌面 UI 重设计：`feature/redesign-shell`（R0 骨架，flag 默认关）  
+3. 包名/appId 重命名：**未执行**，按 `PACKAGE-RENAME-PLAN-2026-07-21.md` 分阶段  
+4. 发布只打 `xvyimu/MindSync`；NSIS/手测见 `CURRENT.md`
 
 ---
 
@@ -61,7 +63,7 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 | Node | **^24**（本机系统 Node；勿再强制 portable 22） |
 | 包管理 | pnpm workspace |
 | i18n | `docs/developer/i18n-policy.md`：en-US source；UI 走 `t()`；模板中文在 allowlist |
-| 测试 | `pnpm --filter @prompt-optimizer/core test`（Node 24） |
+| 测试 | `pnpm --filter @mindsync/core test`（Node 24） |
 | 分支 | feature 短命；UX 栈：`feat/ux-2026-07-20` → #3；`feat/ux-2026-07-21-cancel-parity` → #4（base=#3） |
 | 合入顺序 | **#3 → develop → #4 retarget/rebase → develop** |
 | 不做除非要求 | 自动合 PR、NSIS 打包、unsuppress vendor、上游 #325–#330 整包 |
@@ -133,14 +135,14 @@ grill → 小分支实现 → Node22 单测 → 自审 i18n/key → commit/push
 node -v   # expect v24.x
 
 # 测试
-pnpm --filter @prompt-optimizer/core test
+pnpm --filter @mindsync/core test
 
 # 解 #3 冲突（在 feat/ux-2026-07-20）
 git fetch origin develop
 git checkout feat/ux-2026-07-20
 git merge origin/develop
 # … resolve …
-pnpm --filter @prompt-optimizer/core test
+pnpm --filter @mindsync/core test
 git push origin feat/ux-2026-07-20
 
 # #3 合入后处理 #4

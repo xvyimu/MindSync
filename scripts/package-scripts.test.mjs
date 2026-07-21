@@ -40,7 +40,7 @@ test('web build script targets the web package build', () => {
 
   // 现行 build:web 仅构建 web 包；bundle budget 门禁尚未落地，勿断言不存在的脚本
   assert.equal(typeof rootPackage.scripts?.['build:web'], 'string')
-  assert.match(rootPackage.scripts['build:web'], /@prompt-optimizer\/web/)
+  assert.match(rootPackage.scripts['build:web'], /@mindsync\/web/)
   assert.match(rootPackage.scripts['build:web'], /\bbuild\b/)
   assert.equal(rootPackage.scripts['check:bundle-budget'], undefined)
 })
@@ -77,7 +77,7 @@ test('electron adapters use a dedicated core subpath and build entry', () => {
   assert.match(electronEntry, /ElectronModelManagerProxy/)
   assert.match(electronEntry, /FavoriteManagerElectronProxy/)
   assert.match(electronEntry, /waitForElectronApi/)
-  assert.match(appInitializer, /import\('@prompt-optimizer\/core\/electron'\)/)
+  assert.match(appInitializer, /import\('@mindsync\/core\/electron'\)/)
 })
 
 test('provider SDKs load through the retryable adapter loader', () => {
@@ -126,10 +126,10 @@ test('web and extension package typecheck scripts use isolated tsconfig files', 
   assert.equal(typeof extensionPackage.scripts?.typecheck, 'string')
   assert.match(extensionPackage.scripts.typecheck, /tsconfig\.typecheck\.json/)
 
-  assert.equal(webTypecheckConfig.compilerOptions?.paths?.['@prompt-optimizer/ui'], undefined)
-  assert.equal(webTypecheckConfig.compilerOptions?.paths?.['@prompt-optimizer/ui/*'], undefined)
-  assert.equal(extensionTypecheckConfig.compilerOptions?.paths?.['@prompt-optimizer/ui'], undefined)
-  assert.equal(extensionTypecheckConfig.compilerOptions?.paths?.['@prompt-optimizer/ui/*'], undefined)
+  assert.equal(webTypecheckConfig.compilerOptions?.paths?.['@mindsync/ui'], undefined)
+  assert.equal(webTypecheckConfig.compilerOptions?.paths?.['@mindsync/ui/*'], undefined)
+  assert.equal(extensionTypecheckConfig.compilerOptions?.paths?.['@mindsync/ui'], undefined)
+  assert.equal(extensionTypecheckConfig.compilerOptions?.paths?.['@mindsync/ui/*'], undefined)
   assert.match(extensionTypecheckConfig.include.join(' '), /\benv\.d\.ts\b/)
 })
 
@@ -137,10 +137,10 @@ test('web and extension declare direct core dependency for package boundary', ()
   const webPackage = readJson(path.join('packages', 'web', 'package.json'))
   const extensionPackage = readJson(path.join('packages', 'extension', 'package.json'))
 
-  assert.equal(webPackage.dependencies?.['@prompt-optimizer/core'], 'workspace:*')
-  assert.equal(webPackage.dependencies?.['@prompt-optimizer/ui'], 'workspace:*')
-  assert.equal(extensionPackage.dependencies?.['@prompt-optimizer/core'], 'workspace:*')
-  assert.equal(extensionPackage.dependencies?.['@prompt-optimizer/ui'], 'workspace:*')
+  assert.equal(webPackage.dependencies?.['@mindsync/core'], 'workspace:*')
+  assert.equal(webPackage.dependencies?.['@mindsync/ui'], 'workspace:*')
+  assert.equal(extensionPackage.dependencies?.['@mindsync/core'], 'workspace:*')
+  assert.equal(extensionPackage.dependencies?.['@mindsync/ui'], 'workspace:*')
 })
 
 test('ui package index does not re-export core factories or electron proxies', () => {
@@ -158,7 +158,7 @@ test('ui package index does not re-export core factories or electron proxies', (
   assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bwaitForElectronApi\b/)
   assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bcreateImageService\b/)
   assert.doesNotMatch(uiIndex, /export\s*\{[^}]*\bisRunningInElectron\b/)
-  assert.match(uiIndex, /@prompt-optimizer\/core/)
+  assert.match(uiIndex, /@mindsync\/core/)
 })
 
 test('web/extension production builds resolve packages via exports not source aliases', () => {

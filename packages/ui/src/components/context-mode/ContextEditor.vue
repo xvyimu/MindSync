@@ -513,7 +513,7 @@ import type {
     ContextEditorState,
     ConversationMessage,
     ToolDefinition,
-} from "@prompt-optimizer/core";
+} from "@mindsync/core";
 import {
     PREDEFINED_VARIABLES,
     type PredefinedVariable,

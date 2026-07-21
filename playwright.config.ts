@@ -82,9 +82,9 @@ export default defineConfig({
 
   // 自动启动 E2E 测试专用开发服务器
   webServer: {
-    // E2E 依赖 workspace 包的 dist 产物（@prompt-optimizer/core/@prompt-optimizer/ui），
+    // E2E 依赖 workspace 包的 dist 产物（@mindsync/core/@mindsync/ui），
     // 先构建再启动 web dev server，避免跑到过期 dist 导致交互/事件异常。
-    command: `pnpm -F @prompt-optimizer/core build && pnpm -F @prompt-optimizer/ui build && pnpm -F @prompt-optimizer/web dev --port ${E2E_PORT}`,
+    command: `pnpm -F @mindsync/core build && pnpm -F @mindsync/ui build && pnpm -F @mindsync/web dev --port ${E2E_PORT}`,
     url: BASE_URL,
     // 为 Vite 提供最小的“启用”环境变量：让内置 SiliconFlow 图像模型在 E2E (VCR replay) 下可选，
     // 避免因本机缺少真实 key 而导致 UI 不渲染对应选项，从而无法命中既有 VCR fixtures。

@@ -217,27 +217,27 @@ src/
 
 ## 5. 依赖关系
 
-### 5.1 核心包依赖 (@prompt-optimizer/core)
+### 5.1 核心包依赖 (@mindsync/core)
 ```
-@prompt-optimizer/core
+@mindsync/core
 ├── @openai/openai ^4.83.0      # OpenAI SDK
 ├── @google/generative-ai ^0.21.0 # Google Generative AI SDK
 └── uuid ^11.0.5                # UUID生成
 ```
 
-### 5.2 Web包依赖 (@prompt-optimizer/web)
+### 5.2 Web包依赖 (@mindsync/web)
 ```
-@prompt-optimizer/web
-├── @prompt-optimizer/core  # 依赖核心包
+@mindsync/web
+├── @mindsync/core  # 依赖核心包
 ├── vue ^3.5.x             # Vue框架
 ├── pinia ^2.1.x           # 状态管理
 └── tailwindcss ^3.4.1     # 样式框架
 ```
 
-### 5.3 扩展包依赖 (@prompt-optimizer/extension)
+### 5.3 扩展包依赖 (@mindsync/extension)
 ```
-@prompt-optimizer/extension
-├── @prompt-optimizer/core  # 依赖核心包
-├── @prompt-optimizer/ui    # 依赖UI组件包
+@mindsync/extension
+├── @mindsync/core  # 依赖核心包
+├── @mindsync/ui    # 依赖UI组件包
 └── vue ^3.5.x             # Vue框架
 ```

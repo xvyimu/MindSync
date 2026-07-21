@@ -1,5 +1,5 @@
 {
-  "name": "@prompt-optimizer/extension",
+  "name": "@mindsync/extension",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,8 +12,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@prompt-optimizer/core": "workspace:*",
-    "@prompt-optimizer/ui": "workspace:*",
+    "@mindsync/core": "workspace:*",
+    "@mindsync/ui": "workspace:*",
     "vue": "^3.5.31"
   },
   "devDependencies": {

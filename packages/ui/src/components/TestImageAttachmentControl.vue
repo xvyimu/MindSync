@@ -100,7 +100,7 @@
 import { computed } from 'vue'
 import { NButton, NIcon, NUpload, type UploadFileInfo } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { ImageInputRef } from '@prompt-optimizer/core'
+import type { ImageInputRef } from '@mindsync/core'
 
 import { useToast } from '../composables/ui/useToast'
 import AppPreviewImage from './media/AppPreviewImage.vue'

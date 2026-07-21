@@ -1,4 +1,4 @@
-import type { EvaluationPromptRef } from '@prompt-optimizer/core'
+import type { EvaluationPromptRef } from '@mindsync/core'
 import type { SelectOption } from 'naive-ui'
 
 export type DynamicTestPanelVersionValue = 'workspace' | 'previous' | 0 | number

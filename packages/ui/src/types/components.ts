@@ -12,7 +12,7 @@ import type {
   ComponentVisibility,
   VariableImportOptions,
   VariableExportData
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { AppServices } from '../types/services'
 import type { VariableManagerHooks } from '../composables/prompt/useVariableManager'
 

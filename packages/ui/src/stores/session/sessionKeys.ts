@@ -1,4 +1,4 @@
-import type { LegacySessionSubModeKey } from '@prompt-optimizer/core'
+import type { LegacySessionSubModeKey } from '@mindsync/core'
 
 export type SubModeKey = LegacySessionSubModeKey
 

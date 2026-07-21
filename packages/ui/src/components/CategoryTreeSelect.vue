@@ -43,7 +43,7 @@ import { NTreeSelect, NButton, NIcon, NModal, type TreeSelectOption } from 'naiv
 import { Folder } from '@vicons/tabler';
 import { useI18n } from 'vue-i18n';
 import CategoryManager from './CategoryManager.vue';
-import type { FavoriteCategory } from '@prompt-optimizer/core';
+import type { FavoriteCategory } from '@mindsync/core';
 import type { AppServices } from '../types/services';
 
 const { t } = useI18n();

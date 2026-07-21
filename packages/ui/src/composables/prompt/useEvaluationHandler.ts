@@ -29,7 +29,7 @@ import {
   type EvaluationTestCase,
   type EvaluationType,
   type ProEvaluationContext,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { AppServices } from '../../types/services'
 import type { PersistedEvaluationResults } from '../../types/evaluation'
 

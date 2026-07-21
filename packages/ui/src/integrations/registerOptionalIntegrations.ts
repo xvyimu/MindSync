@@ -1,6 +1,6 @@
 import type { OptionalIntegration, OptionalIntegrationsContext } from './types'
 
-import { getEnvVar } from '@prompt-optimizer/core'
+import { getEnvVar } from '@mindsync/core'
 
 function isEnvEnabled(value: unknown): boolean {
   return value === '1' || value === 'true'

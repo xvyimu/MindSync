@@ -13,7 +13,7 @@ import { createPinia, type Pinia } from 'pinia'
 import { createApp } from 'vue'
 import { setPiniaServices, getPiniaServices } from '../../src/plugins/pinia'
 import type { AppServices } from '../../src/types/services'
-import type { IPreferenceService } from '@prompt-optimizer/core'
+import type { IPreferenceService } from '@mindsync/core'
 
 /**
  * 创建 PreferenceService stub（可复用的默认实现）

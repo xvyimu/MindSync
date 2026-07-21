@@ -664,7 +664,7 @@ import {
     type ToolDefinition,
     type ProSystemEvaluationContext,
     type PatchOperation,
-} from "@prompt-optimizer/core";
+} from "@mindsync/core";
 import type { PersistedCompareSnapshotRoles } from '../../types/evaluation'
 import type { TestAreaPanelInstance } from "../types/test-area";
 import type { IteratePayload, SaveFavoritePayload } from "../../types/workspace";

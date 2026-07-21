@@ -1,7 +1,7 @@
 import type {
   EvaluationPromptRef,
   StructuredCompareRole,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 export type CompareUiTranslator = (
   key: string,

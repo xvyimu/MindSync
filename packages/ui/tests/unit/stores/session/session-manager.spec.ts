@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import type { PromptRecordChain } from '@prompt-optimizer/core'
+import type { PromptRecordChain } from '@mindsync/core'
 
 import { createTestPinia, createPreferenceServiceStub } from '../../../utils/pinia-test-helpers'
 import { useSessionManager } from '../../../../src/stores/session/useSessionManager'

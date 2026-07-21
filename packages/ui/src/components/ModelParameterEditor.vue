@@ -329,7 +329,7 @@ import { computed, ref, watch, type PropType } from 'vue'
 
 import { useI18n } from 'vue-i18n'
 import { useMessage, createDiscreteApi, NAlert, NButton, NCheckbox, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NTag, NText } from 'naive-ui'
-import { parseCustomValue, type UnifiedParameterDefinition } from '@prompt-optimizer/core'
+import { parseCustomValue, type UnifiedParameterDefinition } from '@mindsync/core'
 
 const props = defineProps({
   schema: {

@@ -1,4 +1,4 @@
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 export type GardenSnapshotPreviewVariable = {
   name: string

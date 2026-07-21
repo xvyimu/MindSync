@@ -59,7 +59,7 @@
 import { computed, inject, ref, watch, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NPopover, NSelect, NSpace, NTag, NText, type SelectOption as NaiveSelectOption } from 'naive-ui'
-import type { IImageAdapterRegistry, ImageModel, ImageModelConfig } from '@prompt-optimizer/core'
+import type { IImageAdapterRegistry, ImageModel, ImageModelConfig } from '@mindsync/core'
 
 import { useToast } from '../composables/ui/useToast'
 import type { SelectOption } from '../types/select-options'

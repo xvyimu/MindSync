@@ -174,11 +174,11 @@
 
 ### 本次验证
 
-- `pnpm -F @prompt-optimizer/core test -- tests/unit/evaluation/result-compare-evidence-behavior.test.ts`
-- `pnpm -F @prompt-optimizer/core test -- tests/unit/evaluation/rendered-samples.test.ts`
-- `pnpm -F @prompt-optimizer/ui test -- tests/integration/context-user-tester.spec.ts tests/integration/conversation-tester.spec.ts`
-- `pnpm -F @prompt-optimizer/ui exec tsc --noEmit -p tsconfig.json`
-- `pnpm -F @prompt-optimizer/core exec tsc --noEmit -p tsconfig.json`
+- `pnpm -F @mindsync/core test -- tests/unit/evaluation/result-compare-evidence-behavior.test.ts`
+- `pnpm -F @mindsync/core test -- tests/unit/evaluation/rendered-samples.test.ts`
+- `pnpm -F @mindsync/ui test -- tests/integration/context-user-tester.spec.ts tests/integration/conversation-tester.spec.ts`
+- `pnpm -F @mindsync/ui exec tsc --noEmit -p tsconfig.json`
+- `pnpm -F @mindsync/core exec tsc --noEmit -p tsconfig.json`
 
 ## 补充状态（2026-03-17，`pro/multi prompt-only` 示例进一步收口）
 
@@ -239,10 +239,10 @@
 
 ### 本次回归验证
 
-- `pnpm -F @prompt-optimizer/ui test -- tests/unit/composables/useEvaluationHandler.spec.ts`
-- `pnpm -F @prompt-optimizer/core test -- tests/unit/evaluation/rendered-samples.test.ts`
-- `pnpm -F @prompt-optimizer/ui exec tsc --noEmit -p tsconfig.json`
-- `pnpm -F @prompt-optimizer/core exec tsc --noEmit -p tsconfig.json`
+- `pnpm -F @mindsync/ui test -- tests/unit/composables/useEvaluationHandler.spec.ts`
+- `pnpm -F @mindsync/core test -- tests/unit/evaluation/rendered-samples.test.ts`
+- `pnpm -F @mindsync/ui exec tsc --noEmit -p tsconfig.json`
+- `pnpm -F @mindsync/core exec tsc --noEmit -p tsconfig.json`
 
 ## 补充状态（2026-03-17，`pro/multi prompt-only` 真实对照已完成）
 
@@ -329,11 +329,11 @@
 
 ### 本次回归验证
 
-- `pnpm -F @prompt-optimizer/ui test -- tests/unit/composables/useEvaluationHandler.spec.ts`
-- `pnpm -F @prompt-optimizer/core test -- tests/unit/evaluation/rendered-samples.test.ts`
-- `pnpm -F @prompt-optimizer/ui exec tsc --noEmit -p tsconfig.json`
-- `pnpm -F @prompt-optimizer/core exec tsc --noEmit -p tsconfig.json`
-- `pnpm -F @prompt-optimizer/core build`
+- `pnpm -F @mindsync/ui test -- tests/unit/composables/useEvaluationHandler.spec.ts`
+- `pnpm -F @mindsync/core test -- tests/unit/evaluation/rendered-samples.test.ts`
+- `pnpm -F @mindsync/ui exec tsc --noEmit -p tsconfig.json`
+- `pnpm -F @mindsync/core exec tsc --noEmit -p tsconfig.json`
+- `pnpm -F @mindsync/core build`
 
 ## 补充状态（2026-03-17，输入最小化规范补充）
 
@@ -599,11 +599,11 @@
 
 ### 已通过
 
-- `pnpm -F @prompt-optimizer/ui typecheck`
-- `pnpm -F @prompt-optimizer/core test -- tests/unit/evaluation/service.test.ts`
-- `pnpm -F @prompt-optimizer/ui test -- tests/unit/composables/compareEvaluation.spec.ts tests/unit/composables/useEvaluationHandler.spec.ts tests/unit/components/EvaluationScoreBadge.spec.ts tests/unit/components/EvaluationHoverCard.spec.ts tests/unit/composables/useAppPromptGardenImport.spec.ts`
-- `pnpm -F @prompt-optimizer/ui test -- tests/unit/stores/session/basic-session-persistence.spec.ts tests/unit/stores/session/pro-session-persistence.spec.ts`
-- `pnpm -F @prompt-optimizer/ui test -- tests/integration/basic-workspace-logic.spec.ts tests/integration/context-user-tester.spec.ts tests/integration/conversation-tester.spec.ts`
+- `pnpm -F @mindsync/ui typecheck`
+- `pnpm -F @mindsync/core test -- tests/unit/evaluation/service.test.ts`
+- `pnpm -F @mindsync/ui test -- tests/unit/composables/compareEvaluation.spec.ts tests/unit/composables/useEvaluationHandler.spec.ts tests/unit/components/EvaluationScoreBadge.spec.ts tests/unit/components/EvaluationHoverCard.spec.ts tests/unit/composables/useAppPromptGardenImport.spec.ts`
+- `pnpm -F @mindsync/ui test -- tests/unit/stores/session/basic-session-persistence.spec.ts tests/unit/stores/session/pro-session-persistence.spec.ts`
+- `pnpm -F @mindsync/ui test -- tests/integration/basic-workspace-logic.spec.ts tests/integration/context-user-tester.spec.ts tests/integration/conversation-tester.spec.ts`
 - `pnpm exec playwright test tests/e2e/analysis/basic-user.spec.ts --grep "分析提示词并显示评估结果"`
 - `pnpm exec playwright test tests/e2e/analysis/basic-system.spec.ts --grep "分析提示词并显示评估结果"`
 - `pnpm exec playwright test tests/e2e/analysis/pro-variable.spec.ts --grep "分析带变量的提示词并显示评估结果"`

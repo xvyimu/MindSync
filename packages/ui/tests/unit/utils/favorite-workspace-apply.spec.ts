@@ -5,7 +5,7 @@ import {
   createPromptContract,
   type PromptAsset,
   type PromptModeKey,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import {
   createFavoriteWorkspaceApplyDraft,
   promptModeKeyToWorkspaceTargetKey,

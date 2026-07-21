@@ -7,7 +7,7 @@ import {
   type FavoritePrompt,
   type PromptAsset,
   type PromptRecord,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import { useAppFavorite, type SaveFavoriteData } from '../../../src/composables/app/useAppFavorite'
 import { setGlobalMessageApi } from '../../../src/composables/ui/useToast'

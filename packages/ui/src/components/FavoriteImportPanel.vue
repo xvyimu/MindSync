@@ -169,7 +169,7 @@ import {
 import { ExternalLink, Plant2, Upload } from '@vicons/tabler'
 import { useI18n } from 'vue-i18n'
 
-import { getEnvVar } from '@prompt-optimizer/core'
+import { getEnvVar } from '@mindsync/core'
 import { useToast } from '../composables/ui/useToast'
 import type { AppServices } from '../types/services'
 import { getI18nErrorMessage } from '../utils/error'

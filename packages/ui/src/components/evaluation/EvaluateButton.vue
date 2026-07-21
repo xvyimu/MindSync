@@ -22,7 +22,7 @@
 import { computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NDropdown, NButton, NIcon, type DropdownOption } from 'naive-ui'
-import type { EvaluationType } from '@prompt-optimizer/core'
+import type { EvaluationType } from '@mindsync/core'
 
 // 使用一个简单的 SVG 图标作为图表图标
 const ChartIcon = {

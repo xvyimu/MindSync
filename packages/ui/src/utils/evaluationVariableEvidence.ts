@@ -1,4 +1,4 @@
-import { PREDEFINED_VARIABLES } from '@prompt-optimizer/core'
+import { PREDEFINED_VARIABLES } from '@mindsync/core'
 
 const VARIABLE_TOKEN_PATTERN = /\{\{\s*([^{}]+?)\s*\}\}/g
 

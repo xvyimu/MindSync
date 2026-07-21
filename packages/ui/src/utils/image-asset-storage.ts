@@ -1,4 +1,4 @@
-import type { IImageStorageService } from '@prompt-optimizer/core'
+import type { IImageStorageService } from '@mindsync/core'
 
 import { computeStableImageId } from '../stores/session/imageStorageMaintenance'
 

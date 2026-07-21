@@ -5,7 +5,7 @@ import type {
   IFavoriteManager,
   IImageStorageService,
   PromptRecordChain,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import type { BasicSystemSessionApi } from '../stores/session/useBasicSystemSession'
 import type { BasicUserSessionApi } from '../stores/session/useBasicUserSession'

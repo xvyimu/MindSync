@@ -2,7 +2,7 @@ import type {
   FullImageData,
   IImageStorageService,
   ImageMetadata,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 export type ImageResourceManifestEntryBase = {
   kind: 'image'

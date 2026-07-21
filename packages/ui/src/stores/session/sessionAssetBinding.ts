@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { PromptAssetBinding, PromptSessionOrigin } from '@prompt-optimizer/core'
+import type { PromptAssetBinding, PromptSessionOrigin } from '@mindsync/core'
 
 export type SessionAssetBindingState = {
   assetBinding?: PromptAssetBinding

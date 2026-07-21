@@ -423,7 +423,7 @@ export type ImageSubMode = "text2image" | "image2image"
 import { ref, readonly, type Ref } from 'vue'
 import type { AppServices } from '../types/services'
 import { usePreferences } from './usePreferenceManager'
-import { UI_SETTINGS_KEYS, type BasicSubMode } from '@prompt-optimizer/core'
+import { UI_SETTINGS_KEYS, type BasicSubMode } from '@mindsync/core'
 
 interface UseBasicSubModeApi {
   basicSubMode: Ref<BasicSubMode>
@@ -549,7 +549,7 @@ import {
     useProSubMode,
     useImageSubMode,
     // ... 其他导入
-} from '@prompt-optimizer/ui'
+} from '@mindsync/ui'
 
 // 功能模式
 const { functionMode, setFunctionMode } = useFunctionMode(services as any)
@@ -621,7 +621,7 @@ onMounted(async () => {
         selectedOptimizationMode.value = proSubMode.value as OptimizationMode;
         // 同步到 contextMode（关键！否则界面不会切换）
         await handleContextModeChange(
-            proSubMode.value as import("@prompt-optimizer/core").ContextMode,
+            proSubMode.value as import("@mindsync/core").ContextMode,
         );
         console.log(`[App] 上下文模式子模式已恢复: ${proSubMode.value}`);
     } else if (functionMode.value === "image") {
@@ -651,7 +651,7 @@ const handleModeSelect = async (mode: "basic" | "pro" | "image") => {
         await ensureInitialized();
         selectedOptimizationMode.value = proSubMode.value as OptimizationMode;
         await handleContextModeChange(
-            proSubMode.value as import("@prompt-optimizer/core").ContextMode,
+            proSubMode.value as import("@mindsync/core").ContextMode,
         );
         console.log(`[App] 切换到上下文模式，已恢复子模式: ${proSubMode.value}`);
     } else if (mode === "image") {
@@ -672,26 +672,26 @@ const handleModeSelect = async (mode: "basic" | "pro" | "image") => {
 ```typescript
 // 基础模式子模式变更处理器
 const handleBasicSubModeChange = async (mode: OptimizationMode) => {
-    await setBasicSubMode(mode as import("@prompt-optimizer/core").BasicSubMode);
+    await setBasicSubMode(mode as import("@mindsync/core").BasicSubMode);
     selectedOptimizationMode.value = mode;
     console.log(`[App] 基础模式子模式已切换并持久化: ${mode}`);
 };
 
 // 上下文模式子模式变更处理器
 const handleProSubModeChange = async (mode: OptimizationMode) => {
-    await setProSubMode(mode as import("@prompt-optimizer/core").ProSubMode);
+    await setProSubMode(mode as import("@mindsync/core").ProSubMode);
     selectedOptimizationMode.value = mode;
     
     if (services.value?.contextMode.value !== mode) {
         await handleContextModeChange(
-            mode as import("@prompt-optimizer/core").ContextMode,
+            mode as import("@mindsync/core").ContextMode,
         );
     }
     console.log(`[App] 上下文模式子模式已切换并持久化: ${mode}`);
 };
 
 // 图像模式子模式变更处理器
-const handleImageSubModeChange = async (mode: import("@prompt-optimizer/core").ImageSubMode) => {
+const handleImageSubModeChange = async (mode: import("@mindsync/core").ImageSubMode) => {
     await setImageSubMode(mode);
     console.log(`[App] 图像模式子模式已切换并持久化: ${mode}`);
     
@@ -737,15 +737,15 @@ const handleHistoryReuse = async (context: { record: any; chainId: string; rootP
         if (functionMode.value === "basic") {
             // 基础模式：持久化子模式选择
             await setBasicSubMode(
-                targetMode as import("@prompt-optimizer/core").BasicSubMode,
+                targetMode as import("@mindsync/core").BasicSubMode,
             );
         } else if (functionMode.value === "pro") {
             // 上下文模式：持久化子模式并同步 contextMode
             await setProSubMode(
-                targetMode as import("@prompt-optimizer/core").ProSubMode,
+                targetMode as import("@mindsync/core").ProSubMode,
             );
             await handleContextModeChange(
-                targetMode as import("@prompt-optimizer/core").ContextMode,
+                targetMode as import("@mindsync/core").ContextMode,
             );
         }
 
@@ -785,15 +785,15 @@ const handleUseFavorite = async (favorite: any) => {
         if (functionMode.value === "basic") {
             // 基础模式：持久化子模式选择
             await setBasicSubMode(
-                favOptimizationMode as import("@prompt-optimizer/core").BasicSubMode,
+                favOptimizationMode as import("@mindsync/core").BasicSubMode,
             );
         } else if (functionMode.value === "pro") {
             // 上下文模式：持久化子模式并同步 contextMode
             await setProSubMode(
-                favOptimizationMode as import("@prompt-optimizer/core").ProSubMode,
+                favOptimizationMode as import("@mindsync/core").ProSubMode,
             );
             await handleContextModeChange(
-                favOptimizationMode as import("@prompt-optimizer/core").ContextMode,
+                favOptimizationMode as import("@mindsync/core").ContextMode,
             );
         }
 
@@ -817,15 +817,15 @@ const handleUseFavorite = async (favorite: any) => {
             if (targetFunctionMode === "basic") {
                 // 基础模式：持久化子模式选择
                 await setBasicSubMode(
-                    favOptimizationMode as import("@prompt-optimizer/core").BasicSubMode,
+                    favOptimizationMode as import("@mindsync/core").BasicSubMode,
                 );
             } else if (targetFunctionMode === "pro") {
                 // 上下文模式：持久化子模式并同步 contextMode
                 await setProSubMode(
-                    favOptimizationMode as import("@prompt-optimizer/core").ProSubMode,
+                    favOptimizationMode as import("@mindsync/core").ProSubMode,
                 );
                 await handleContextModeChange(
-                    favOptimizationMode as import("@prompt-optimizer/core").ContextMode,
+                    favOptimizationMode as import("@mindsync/core").ContextMode,
                 );
             }
         }

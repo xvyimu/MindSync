@@ -1,8 +1,8 @@
 {
-  "name": "prompt-optimizer",
+  "name": "mindsync",
   "compatibility_date": "2026-05-27",
   "build": {
-    "command": "pnpm -F @prompt-optimizer/core build && pnpm -F @prompt-optimizer/ui build && pnpm -F @prompt-optimizer/web build"
+    "command": "pnpm -F @mindsync/core build && pnpm -F @mindsync/ui build && pnpm -F @mindsync/web build"
   },
   "assets": {
     "directory": "packages/web/dist",

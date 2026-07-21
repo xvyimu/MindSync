@@ -27,7 +27,7 @@
 import { computed, inject, ref, watch, type Ref } from 'vue'
 import { NCard, NSpace, NText } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import type { AppServices } from '../types/services'
 import { parseFavoriteMediaMetadata } from '../utils/favorite-media'

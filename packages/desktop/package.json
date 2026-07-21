@@ -1,7 +1,7 @@
 {
-  "name": "@prompt-optimizer/desktop",
+  "name": "@mindsync/desktop",
   "version": "2.11.7",
-  "description": "Desktop application for Prompt Optimizer",
+  "description": "Desktop application for MindSync (Prompt Optimizer)",
   "main": "main.js",
   "repository": {
     "type": "git",
@@ -15,8 +15,8 @@
     "package:ci": "electron-builder --publish never",
     "dev": "cross-env NODE_ENV=development electron .",
     "test": "node --test config/*.test.js",
-    "logs:view": "node -e \"const path=require('path');const os=require('os');const {execSync}=require('child_process');const logDir=path.join(os.homedir(),'AppData','Roaming','PromptOptimizer','logs');console.log('日志目录:',logDir);try{execSync('explorer '+logDir);}catch(e){console.log('请手动打开:',logDir);}\"",
-    "logs:clean": "node -e \"const fs=require('fs');const path=require('path');const os=require('os');const logDir=path.join(os.homedir(),'AppData','Roaming','PromptOptimizer','logs');if(fs.existsSync(logDir)){fs.rmSync(logDir,{recursive:true});console.log('日志已清理');}else{console.log('日志目录不存在');}\""
+    "logs:view": "node -e \"const path=require('path');const os=require('os');const {execSync}=require('child_process');const logDir=path.join(os.homedir(),'AppData','Roaming','MindSync','logs');console.log('日志目录:',logDir);try{execSync('explorer '+logDir);}catch(e){console.log('请手动打开:',logDir);}\"",
+    "logs:clean": "node -e \"const fs=require('fs');const path=require('path');const os=require('os');const logDir=path.join(os.homedir(),'AppData','Roaming','MindSync','logs');if(fs.existsSync(logDir)){fs.rmSync(logDir,{recursive:true});console.log('日志已清理');}else{console.log('日志目录不存在');}\""
   },
   "devDependencies": {
     "cross-env": "^10.1.0",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1044.0",
-    "@prompt-optimizer/core": "workspace:*",
+    "@mindsync/core": "workspace:*",
     "dotenv": "^17.4.2",
     "electron-log": "^5.4.4",
     "electron-updater": "6.8.9",
@@ -33,8 +33,8 @@
     "webdav": "^5.10.0"
   },
   "build": {
-    "appId": "com.promptoptimizer.desktop",
-    "productName": "PromptOptimizer",
+    "appId": "com.xvyimu.mindsync",
+    "productName": "MindSync",
     "directories": {
       "output": "dist"
     },

@@ -5,7 +5,7 @@ import {
   markChromeBuiltInAutoEnabled,
   type ChromeBuiltInStatus,
   type IModelManager
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 export interface ChromeBuiltInAutoEnableResult {
   checked: boolean

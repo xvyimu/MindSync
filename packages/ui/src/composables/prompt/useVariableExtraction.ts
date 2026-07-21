@@ -13,7 +13,7 @@ import { VARIABLE_VALIDATION, isValidVariableName } from '../../types/variable'
 import type {
   VariableExtractionResponse,
   ExtractedVariable,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 /**
  * 变量提取 Composable 返回类型

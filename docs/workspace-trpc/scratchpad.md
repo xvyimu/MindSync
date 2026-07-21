@@ -8,15 +8,15 @@
 **状态**: 已完成 ✅
 
 #### 解决步骤
-[x] 1. **分析浏览器端tRPC服务器错误**：确认了错误是由于 `@prompt-optimizer/core` 的主入口导出了仅服务器端的 `createAppRouter` 函数导致。
+[x] 1. **分析浏览器端tRPC服务器错误**：确认了错误是由于 `@mindsync/core` 的主入口导出了仅服务器端的 `createAppRouter` 函数导致。
 [x] 2. **分离客户端与服务器端代码**：从 `core` 包的 `index.ts` 中移除了 `createAppRouter` 的导出，初步解决了前端打包问题，但破坏了Electron后端的导入。
 [x] 3. **解决Vite构建失败问题**：尝试使用 `package.json` 的 `exports` 映射来修复后端导入，但这与Vite的构建逻辑冲突，导致 `ui` 包构建失败。最终方案是：
-    - **`ui` 包**：从 `vite.config.ts` 的 `externals` 中移除 `@prompt-optimizer/core`，使其成为一个自包含的、内置依赖的库。
+    - **`ui` 包**：从 `vite.config.ts` 的 `externals` 中移除 `@mindsync/core`，使其成为一个自包含的、内置依赖的库。
     - **`core` 包**：使用 `tsup` 多入口构建，同时编译公共API (`index.ts`)和服务器路由(`router.ts`)，但不为后者创建 `exports` 映射。
-    - **`desktop` 包**：修改 `main.js`，通过直接的文件路径 (`require('@prompt-optimizer/core/dist/services/trpc/router.cjs')`) 来导入服务器路由，绕过 `exports` 映射。
+    - **`desktop` 包**：修改 `main.js`，通过直接的文件路径 (`require('@mindsync/core/dist/services/trpc/router.cjs')`) 来导入服务器路由，绕过 `exports` 映射。
 [x] 4. **修复Node.js模块导出错误 (ERR_PACKAGE_PATH_NOT_EXPORTED)**：发现上一步的直接路径导入违反了Node.js的模块封装规则。最终的、正确的做法是：
     - 在 `core` 包的 `package.json` 中，使用 `exports` 字段明确导出 `./trpc-router` 路径。
-    - 在 `desktop` 包的 `main.js` 中，使用标准路径 `require('@prompt-optimizer/core/trpc-router')` 进行导入。
+    - 在 `desktop` 包的 `main.js` 中，使用标准路径 `require('@mindsync/core/trpc-router')` 进行导入。
 [x] 5. **验证修复**：重新构建 `core` 包，确保 Node.js 环境（Electron）可以正常启动，同时验证 Vite 构建（如果失败则下一步处理）
 
 #### 完成总结
@@ -47,9 +47,9 @@
 - **具体操作**:
     1. 在 `package.json` 中创建一个新的、专门为桌面开发优化的并行命令 `dev:desktop:parallel:fixed`。
     2. 在这个新命令中，移除了导致问题的 `watch:ui` 任务。
-    3. 只保留并行的 `dev:web` 和 `pnpm -F @prompt-optimizer/desktop dev`。
+    3. 只保留并行的 `dev:web` 和 `pnpm -F @mindsync/desktop dev`。
     4. 修改 `dev:desktop` 命令，使其调用这个新的、修复过的并行命令。
-- **结果**: 由 `dev:web` 这一个 Vite 实例全权负责处理所有前端依赖（包括 `@prompt-optimizer/ui` 的源文件）的实时编译和供应，彻底杜绝了"赛跑条件"。
+- **结果**: 由 `dev:web` 这一个 Vite 实例全权负责处理所有前端依赖（包括 `@mindsync/ui` 的源文件）的实时编译和供应，彻底杜绝了"赛跑条件"。
 
 ---
 
@@ -92,7 +92,7 @@
     - 风险评估：低。主要是替换和删除代码。
 
 [ ] 5. **功能测试与验证**
-    - [ ] 启动桌面应用 (`pnpm --filter @prompt-optimizer/desktop dev`)。
+    - [ ] 启动桌面应用 (`pnpm --filter @mindsync/desktop dev`)。
     - [ ] 执行一次"优化提示词"操作，验证打字机效果是否出现。
     - [ ] 查看控制台，确认没有 `not implemented` 警告，也没有历史记录创建失败的错误。
     - [ ] 执行一次"迭代优化"，验证功能正常。

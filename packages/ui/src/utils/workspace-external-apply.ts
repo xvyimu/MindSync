@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type { ConversationMessage, PromptRecordChain } from '@prompt-optimizer/core'
+import type { ConversationMessage, PromptRecordChain } from '@mindsync/core'
 
 import { isValidVariableName } from '../types/variable'
 

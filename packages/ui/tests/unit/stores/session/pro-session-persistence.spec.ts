@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { createTestPinia } from '../../../utils/pinia-test-helpers'
 import { useProMultiMessageSession } from '../../../../src/stores/session/useProMultiMessageSession'
 import { useProVariableSession } from '../../../../src/stores/session/useProVariableSession'
-import { TEMPLATE_SELECTION_KEYS } from '@prompt-optimizer/core'
+import { TEMPLATE_SELECTION_KEYS } from '@mindsync/core'
 
 describe('Session stores (pro) persistence', () => {
   it('pro-variable clearContent removes content and variables while preserving workspace selections', () => {

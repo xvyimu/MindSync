@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { UI_SETTINGS_KEYS } from '@prompt-optimizer/core'
+import { UI_SETTINGS_KEYS } from '@mindsync/core'
 import zhCN from '../../../src/i18n/locales/zh-CN'
 import zhTW from '../../../src/i18n/locales/zh-TW'
 import enUS from '../../../src/i18n/locales/en-US'

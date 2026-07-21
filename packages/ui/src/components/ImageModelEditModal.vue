@@ -244,7 +244,7 @@ import {
 } from 'naive-ui'
 import { useImageModelManager } from '../composables/model/useImageModelManager'
 import { useToast } from '../composables/ui/useToast'
-import { isRunningInElectron, type ImageModelConfig } from '@prompt-optimizer/core'
+import { isRunningInElectron, type ImageModelConfig } from '@mindsync/core'
 import ModelAdvancedSection from './ModelAdvancedSection.vue'
 import ProviderPillSelect from './ProviderPillSelect.vue'
 import ExternalLinkIcon from './icons/ExternalLinkIcon.vue'

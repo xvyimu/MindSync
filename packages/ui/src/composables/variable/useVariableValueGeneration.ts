@@ -13,7 +13,7 @@ import type {
   VariableValueGenerationResponse,
   GeneratedVariableValue,
   VariableToGenerate,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 /**
  * 变量值生成 Composable 返回类型

@@ -23,7 +23,7 @@ import {
   type IImageStorageService,
   type PromptAssetBinding,
   type PromptSessionOrigin,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { createSessionAssetBindingState } from './sessionAssetBinding'
 import {
   IMAGE_IMAGE2IMAGE_SESSION_KEY,

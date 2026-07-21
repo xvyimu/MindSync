@@ -53,7 +53,7 @@
 import { computed } from 'vue'
 import { NRadioGroup, NRadioButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { BasicSubMode, ProSubMode } from '@prompt-optimizer/core'
+import type { BasicSubMode, ProSubMode } from '@mindsync/core'
 import type { FunctionMode } from '../composables/mode'
 
 const { t } = useI18n()

@@ -83,7 +83,7 @@
 import { computed } from 'vue'
 import { NButton, NSpace, NTag, NText } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { PromptAsset, PromptContentVersion } from '@prompt-optimizer/core'
+import type { PromptAsset, PromptContentVersion } from '@mindsync/core'
 
 import {
   promptContentVersionPreview,

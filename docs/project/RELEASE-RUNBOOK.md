@@ -82,9 +82,9 @@ git push origin develop
 Desktop NSIS（可选，本机产品包）：
 
 ```powershell
-pnpm -F @prompt-optimizer/core build
-pnpm -F @prompt-optimizer/ui build:bundle
-pnpm -F @prompt-optimizer/desktop build:ci
+pnpm -F @mindsync/core build
+pnpm -F @mindsync/ui build:bundle
+pnpm -F @mindsync/desktop build:ci
 # 安装生成的 NSIS 到 D:\PromtOptimizer\app
 # 自检见 CLEANUP-PLAYBOOK.md
 ```

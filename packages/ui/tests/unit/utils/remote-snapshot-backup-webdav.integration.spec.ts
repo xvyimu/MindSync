@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AddressInfo } from 'node:net'
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
-import type { FullImageData } from '@prompt-optimizer/core'
+import type { FullImageData } from '@mindsync/core'
 
 import { createRemoteObjectStore, type RemoteObjectStore } from '../../../src/utils/remote-backup'
 import {

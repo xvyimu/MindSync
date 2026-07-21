@@ -106,7 +106,7 @@ import TestControlBar from "../TestControlBar.vue";
 import TestResultSection from "../TestResultSection.vue";
 import TemporaryVariablesPanel from "../variable/TemporaryVariablesPanel.vue";
 import VariableValuePreviewDialog from "../variable/VariableValuePreviewDialog.vue";
-import type { EvaluationResponse, EvaluationType, PatchOperation } from '@prompt-optimizer/core';
+import type { EvaluationResponse, EvaluationType, PatchOperation } from '@mindsync/core';
 import type { ScoreLevel } from '../../composables/prompt/useEvaluation';
 import type { AppServices } from '../../types/services';
 

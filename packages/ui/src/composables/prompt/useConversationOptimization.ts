@@ -12,7 +12,7 @@ import type {
   OptimizationRequest,
   MessageOptimizationRequest,
   Template
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { AppServices } from '../../types/services'
 import { useProMultiMessageSession } from '../../stores/session/useProMultiMessageSession'
 import { withHistorySourceBindingMetadata } from '../../utils/history-source-binding'

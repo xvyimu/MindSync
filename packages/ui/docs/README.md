@@ -6,10 +6,10 @@
 
 ```bash
 # 通过pnpm安装（推荐）
-pnpm add @prompt-optimizer/ui
+pnpm add @mindsync/ui
 
 # 或通过npm安装
-npm install @prompt-optimizer/ui
+npm install @mindsync/ui
 ```
 
 ### 基础用法
@@ -50,10 +50,10 @@ import {
   useAccessibility,
   type ContextState,
   type ToolCall
-} from '@prompt-optimizer/ui'
+} from '@mindsync/ui'
 
 // 引入样式
-import '@prompt-optimizer/ui/dist/style.css'
+import '@mindsync/ui/dist/style.css'
 
 // 上下文状态
 const showEditor = ref(false)
@@ -152,7 +152,7 @@ const handleSave = (context: ContextState) => {
 </template>
 
 <script setup lang="ts">
-import { useAccessibility } from '@prompt-optimizer/ui'
+import { useAccessibility } from '@mindsync/ui'
 
 const { aria, announce } = useAccessibility('MyComponent')
 
@@ -178,7 +178,7 @@ const handleSave = () => {
 </template>
 
 <script setup lang="ts">
-import { useResponsive } from '@prompt-optimizer/ui'
+import { useResponsive } from '@mindsync/ui'
 
 const { isMobile, isTablet, modalWidth } = useResponsive()
 </script>
@@ -221,7 +221,7 @@ const { isMobile, isTablet, modalWidth } = useResponsive()
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useDebounceThrottle } from '@prompt-optimizer/ui'
+import { useDebounceThrottle } from '@mindsync/ui'
 
 const { debounce } = useDebounceThrottle()
 const searchQuery = ref('')
@@ -304,7 +304,7 @@ const i18n = createI18n({
 import ContextEditor from './components/ContextEditor.vue'
 
 // 新版本
-import { ContextEditor } from '@prompt-optimizer/ui'
+import { ContextEditor } from '@mindsync/ui'
 ```
 
 2. **更新Props**：
@@ -338,7 +338,7 @@ import type {
   ToolCall,
   AccessibilityFeatures,
   FocusManagerOptions
-} from '@prompt-optimizer/ui'
+} from '@mindsync/ui'
 ```
 
 ### 开发时调试
@@ -346,7 +346,7 @@ import type {
 启用调试模式：
 
 ```typescript
-import { setDebugMode } from '@prompt-optimizer/ui'
+import { setDebugMode } from '@mindsync/ui'
 
 // 开发环境下启用
 if (process.env.NODE_ENV === 'development') {
@@ -359,7 +359,7 @@ if (process.env.NODE_ENV === 'development') {
 使用内置的测试工具：
 
 ```typescript
-import { useAccessibilityTesting } from '@prompt-optimizer/ui'
+import { useAccessibilityTesting } from '@mindsync/ui'
 
 const { runTest } = useAccessibilityTesting()
 

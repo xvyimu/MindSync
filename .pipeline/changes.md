@@ -57,12 +57,12 @@
 | `rg @aws-sdk` packages/web | no hits |
 | `rg @aws-sdk` packages/ui | only `tests/unit/utils/remote-backup.spec.ts` |
 | `rg includeSecrets` packages/core/src | manager/types/export-secrets present |
-| `pnpm -F @prompt-optimizer/ui typecheck` | **0** |
-| `pnpm -F @prompt-optimizer/ui test` | **0** · 929 passed \| 4 skipped \| 1 todo |
+| `pnpm -F @mindsync/ui typecheck` | **0** |
+| `pnpm -F @mindsync/ui test` | **0** · 929 passed \| 4 skipped \| 1 todo |
 | data-testid static (all §3.2) | **all hit** |
-| `pnpm -F @prompt-optimizer/core build` | **0** |
-| `pnpm -F @prompt-optimizer/ui build:bundle` | **0** |
-| `pnpm -F @prompt-optimizer/desktop build:ci` | **0** · nsis + zip |
+| `pnpm -F @mindsync/core build` | **0** |
+| `pnpm -F @mindsync/ui build:bundle` | **0** |
+| `pnpm -F @mindsync/desktop build:ci` | **0** · nsis + zip |
 | `git push` | **not run** |
 
 ---

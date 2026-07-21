@@ -159,7 +159,7 @@ import {
 import { useToast } from '../composables/ui/useToast';
 import { useI18n } from 'vue-i18n';
 import { getI18nErrorMessage } from '../utils/error';
-import type { FavoriteCategory } from '@prompt-optimizer/core';
+import type { FavoriteCategory } from '@mindsync/core';
 import type { AppServices } from '../types/services';
 
 const services = inject<Ref<AppServices | null> | null>('services', null);

@@ -24,7 +24,7 @@ vi.mock('../../src/composables/ui/useToast', () => ({
 }))
 
 import type { AppServices } from '../../src/types/services'
-import type { ConversationMessage } from '@prompt-optimizer/core'
+import type { ConversationMessage } from '@mindsync/core'
 import { useConversationTester } from '../../src/composables/prompt/useConversationTester'
 import {
   COMPARE_BASELINE_VARIANT_ID,

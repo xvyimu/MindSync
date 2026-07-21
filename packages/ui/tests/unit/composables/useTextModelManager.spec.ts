@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import {
   TextAdapterRegistry,
   type TextModelConfig
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { useTextModelManager } from '../../../src/composables/model/useTextModelManager'
 
 vi.mock('vue-i18n', async (importOriginal) => {

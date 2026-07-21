@@ -20,7 +20,7 @@ import type {
     IHistoryManager,
     OptimizationMode,
     PromptSessionOrigin,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { extractHistorySourceBinding } from '../../utils/history-source-binding'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>

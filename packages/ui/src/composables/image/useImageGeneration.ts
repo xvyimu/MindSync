@@ -9,7 +9,7 @@ import type {
   Image2ImageRequest,
   MultiImageGenerationRequest,
   MultiImageRequest,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { getI18nErrorMessage } from '../../utils/error'
 import {
   normalizeImageSourceToPayload,

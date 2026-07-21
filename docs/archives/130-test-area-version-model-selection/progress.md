@@ -63,6 +63,6 @@
 
 | 命令 | 结果 |
 | --- | --- |
-| `pnpm -F @prompt-optimizer/ui lint` | 通过 |
-| `pnpm -F @prompt-optimizer/ui typecheck` | 通过 |
-| `pnpm -F @prompt-optimizer/ui test` | 通过 |
+| `pnpm -F @mindsync/ui lint` | 通过 |
+| `pnpm -F @mindsync/ui typecheck` | 通过 |
+| `pnpm -F @mindsync/ui test` | 通过 |

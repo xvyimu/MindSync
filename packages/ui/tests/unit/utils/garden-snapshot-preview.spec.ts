@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import {
   parseFavoriteGardenSnapshotPreview,

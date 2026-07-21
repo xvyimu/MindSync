@@ -233,7 +233,7 @@ export function useBasicWorkspaceOperations(options: UseBasicWorkspaceOperations
    - 强制：禁止直接解构 store（要求 `storeToRefs`）
    - 强制：禁止 computed getter 返回临时对象（代码评审 + 规则/约定）
    - 建议：增加对 `any`/宽泛类型的限制（减少 TS “漏网”）
-3) CI/本地脚本：将 `pnpm -F @prompt-optimizer/ui test`、`pnpm -F @prompt-optimizer/ui build`、`pnpm -F @prompt-optimizer/web build` 纳入关键检查。
+3) CI/本地脚本：将 `pnpm -F @mindsync/ui test`、`pnpm -F @mindsync/ui build`、`pnpm -F @mindsync/web build` 纳入关键检查。
 4) 模板与示例：
    - `useXxxOperations` 模板（异步流程/副作用）
    - `useXxxDerived` 模板（派生状态聚合，可选）
@@ -291,8 +291,8 @@ export function useBasicWorkspaceOperations(options: UseBasicWorkspaceOperations
   - 刷新后 restore 正常（若该模式要求持久化）
   - 模式切换不互相污染（单一真源）
 - 自动化：
-  - `pnpm -F @prompt-optimizer/ui test` 通过
-  - `pnpm -F @prompt-optimizer/ui build` 通过
+  - `pnpm -F @mindsync/ui test` 通过
+  - `pnpm -F @mindsync/ui build` 通过
   - 新增/更新至少 1 个覆盖“测试结果展示”的单元测试（防回归）
 
 **风险点**
@@ -405,7 +405,7 @@ export function useBasicWorkspaceOperations(options: UseBasicWorkspaceOperations
 - [ ] 测试流式显示与完成后保持显示
 - [ ] 刷新后 restore 行为正确（若该模式要求）
 - [ ] 模式切换不污染
-- [ ] `pnpm -F @prompt-optimizer/ui test` / `build` 通过
+- [ ] `pnpm -F @mindsync/ui test` / `build` 通过
 
 ---
 

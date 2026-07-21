@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@prompt-optimizer/core/electron': resolve(__dirname, '../core/src/electron.ts'),
-      '@prompt-optimizer/core': resolve(__dirname, '../core/src/index.ts'),
+      '@mindsync/core/electron': resolve(__dirname, '../core/src/electron.ts'),
+      '@mindsync/core': resolve(__dirname, '../core/src/index.ts'),
     },
   },
   test: {

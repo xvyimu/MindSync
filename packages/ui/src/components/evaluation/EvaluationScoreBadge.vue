@@ -64,7 +64,7 @@
 import { computed, ref, onBeforeUnmount, watch, nextTick } from 'vue'
 import { NButton, NPopover } from 'naive-ui'
 import EvaluationHoverCard from './EvaluationHoverCard.vue'
-import type { EvaluationResponse, EvaluationType, PatchOperation } from '@prompt-optimizer/core'
+import type { EvaluationResponse, EvaluationType, PatchOperation } from '@mindsync/core'
 import type { ScoreLevel } from './types'
 
 type PopoverInst = {

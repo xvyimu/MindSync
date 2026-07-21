@@ -1,6 +1,6 @@
 import { computed, readonly, type Ref, type ComputedRef } from 'vue'
 
-import type { OptimizationMode } from '@prompt-optimizer/core'
+import type { OptimizationMode } from '@mindsync/core'
 
 export interface TestModeConfigOptions {
   // 是否启用高级模式功能

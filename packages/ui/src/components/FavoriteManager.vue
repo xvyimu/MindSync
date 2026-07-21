@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { NModal } from 'naive-ui'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import FavoriteLibraryWorkspace from './FavoriteLibraryWorkspace.vue'
 import ToastUI from './Toast.vue'

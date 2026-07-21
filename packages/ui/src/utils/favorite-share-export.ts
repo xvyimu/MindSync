@@ -3,7 +3,7 @@ import type {
   IImageStorageService,
   PromptContent,
   PromptExample,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { strFromU8, strToU8, unzlibSync, zlibSync } from 'fflate'
 
 import {

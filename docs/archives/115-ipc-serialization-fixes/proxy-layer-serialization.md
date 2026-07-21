@@ -203,7 +203,7 @@ async simpleMethod(id: string, count: number): Promise<void> {
 
 ### 3. 调试序列化问题
 ```typescript
-import { debugIPCSerializability } from '@prompt-optimizer/core';
+import { debugIPCSerializability } from '@mindsync/core';
 
 // 开发时检查对象是否可序列化
 debugIPCSerializability(complexObject, 'MyObject');

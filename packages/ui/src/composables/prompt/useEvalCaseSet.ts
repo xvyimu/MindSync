@@ -21,7 +21,7 @@ import {
   type EvalEvidenceBundle,
   type ILLMService,
   type IPreferenceService,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 type MaybeRefOrComputed<T> = Ref<T> | ComputedRef<T>
 

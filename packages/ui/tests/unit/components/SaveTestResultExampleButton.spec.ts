@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import type { ImageResult, PromptRecordChain } from '@prompt-optimizer/core'
+import type { ImageResult, PromptRecordChain } from '@mindsync/core'
 
 import { createTestPinia } from '../../utils/pinia-test-helpers'
 import SaveTestResultExampleButton from '../../../src/components/SaveTestResultExampleButton.vue'

@@ -3,7 +3,7 @@
  * 完全复用 core 包的内置模板系统
  */
 
-import { TemplateManager } from '@prompt-optimizer/core';
+import { TemplateManager } from '@mindsync/core';
 
 /**
  * 获取默认模板 ID

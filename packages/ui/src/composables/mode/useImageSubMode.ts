@@ -2,7 +2,7 @@ import { computed, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type { AppServices } from '../../types/services'
-import type { ImageSubMode } from '@prompt-optimizer/core'
+import type { ImageSubMode } from '@mindsync/core'
 
 interface UseImageSubModeApi {
   imageSubMode: Ref<ImageSubMode>

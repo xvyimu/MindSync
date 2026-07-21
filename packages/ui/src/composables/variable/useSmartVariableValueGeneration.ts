@@ -5,7 +5,7 @@ import type {
   GeneratedVariableValue,
   VariableToGenerate,
   VariableValueGenerationResponse,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import { useToast } from '../ui/useToast'
 import { useFunctionModelManager } from '../model/useFunctionModelManager'

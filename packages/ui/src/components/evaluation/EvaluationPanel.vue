@@ -452,7 +452,7 @@ import {
   type ScrollbarInst,
 } from 'naive-ui'
 import { ChartBar } from '@vicons/tabler'
-import type { EvaluationResponse, EvaluationType, PatchOperation } from '@prompt-optimizer/core'
+import type { EvaluationResponse, EvaluationType, PatchOperation } from '@mindsync/core'
 import {
   getCompareEvaluationMetadata,
   getCompareInsights,

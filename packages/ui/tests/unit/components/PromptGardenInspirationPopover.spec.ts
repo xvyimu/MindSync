@@ -5,7 +5,7 @@ import { mount } from '@vue/test-utils'
 const fetchSuggestionsMock = vi.hoisted(() => vi.fn())
 const openExternalUrlMock = vi.hoisted(() => vi.fn())
 
-vi.mock('@prompt-optimizer/core', () => ({
+vi.mock('@mindsync/core', () => ({
   getEnvVar: (key: string) => {
     if (key === 'VITE_ENABLE_PROMPT_GARDEN_IMPORT') return '1'
     if (key === 'VITE_PROMPT_GARDEN_BASE_URL') return 'https://garden.always200.com/'

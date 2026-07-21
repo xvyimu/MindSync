@@ -127,7 +127,7 @@ import { Search, Edit, Trash, GitMerge } from '@vicons/tabler';
 import { useI18n } from 'vue-i18n';
 import { useToast } from '../composables/ui/useToast';
 import type { AppServices } from '../types/services';
-import { TagTypeConverter, type TagStatistics } from '@prompt-optimizer/core';
+import { TagTypeConverter, type TagStatistics } from '@mindsync/core';
 import { getI18nErrorMessage } from '../utils/error';
 import ThemedTooltip from './common/ThemedTooltip.vue';
 

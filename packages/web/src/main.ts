@@ -16,8 +16,8 @@
  */
 
 import { createApp, watch } from 'vue'
-import { installI18nOnly, installPinia, i18n, router } from '@prompt-optimizer/ui'
-import '@prompt-optimizer/ui/dist/style.css'
+import { installI18nOnly, installPinia, i18n, router } from '@mindsync/ui'
+import '@mindsync/ui/dist/style.css'
 import App from './App.vue'
 
 const app = createApp(App)

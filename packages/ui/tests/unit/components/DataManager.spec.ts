@@ -21,7 +21,7 @@ import DataManager from '../../../src/components/DataManager.vue'
 const isRunningInElectronMock = vi.fn(() => false)
 const getEnvVarMock = vi.fn(() => '')
 
-vi.mock('@prompt-optimizer/core', () => ({
+vi.mock('@mindsync/core', () => ({
   isRunningInElectron: () => isRunningInElectronMock(),
   getEnvVar: (key: string) => getEnvVarMock(key),
 }))

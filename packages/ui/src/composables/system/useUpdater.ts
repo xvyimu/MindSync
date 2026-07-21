@@ -1,6 +1,6 @@
 import { reactive, onMounted, onUnmounted, nextTick, inject, type Ref } from 'vue'
 
-import { isRunningInElectron } from '@prompt-optimizer/core'
+import { isRunningInElectron } from '@mindsync/core'
 import { usePreferences } from '../storage/usePreferenceManager'
 import { useI18n } from 'vue-i18n'
 import { asExtendedError } from '../../utils/error'

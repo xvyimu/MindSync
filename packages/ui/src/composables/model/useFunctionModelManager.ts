@@ -8,7 +8,7 @@ import { ref, computed, watch, type Ref, type ComputedRef } from 'vue'
 import { usePreferences } from '../storage/usePreferenceManager'
 import {
   FUNCTION_MODEL_KEYS,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { AppServices } from '../../types/services'
 
 /**

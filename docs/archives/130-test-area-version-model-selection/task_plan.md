@@ -45,9 +45,9 @@ Phase 5（验证与交付）
 
 ### Phase 5：验证与交付（进行中）
 
-- [x] `pnpm -F @prompt-optimizer/ui lint`
-- [x] `pnpm -F @prompt-optimizer/ui typecheck`
-- [x] `pnpm -F @prompt-optimizer/ui test`
+- [x] `pnpm -F @mindsync/ui lint`
+- [x] `pnpm -F @mindsync/ui typecheck`
+- [x] `pnpm -F @mindsync/ui test`
 - [ ]（可选）补充 e2e：覆盖 basic-user 的新选择器与并行对比行为
 - [ ] 与用户确认是否提交代码变更与文档（`docs/workspace` + `docs/architecture`）
 

@@ -115,8 +115,8 @@ rg -n "includeSecrets" packages/core/src --glob "!**/*.test.*"
 可选但推荐（与用户已报绿对齐；若环境慢可只跑 typecheck + ui test）：
 
 ```powershell
-pnpm -F @prompt-optimizer/ui typecheck
-pnpm -F @prompt-optimizer/ui test
+pnpm -F @mindsync/ui typecheck
+pnpm -F @mindsync/ui test
 # 可选：pnpm test:gate:core
 ```
 
@@ -202,10 +202,10 @@ foreach ($t in $need) {
 ```powershell
 cd D:\PromtOptimizer\src\prompt-optimizer
 # 推荐顺序（与 RELEASE-RUNBOOK / CURRENT 一致）
-pnpm -F @prompt-optimizer/core build
-pnpm -F @prompt-optimizer/ui build:bundle
+pnpm -F @mindsync/core build
+pnpm -F @mindsync/ui build:bundle
 # desktop build:ci = build:web (ELECTRON_BUILD) + package:ci (electron-builder --publish never)
-pnpm -F @prompt-optimizer/desktop build:ci
+pnpm -F @mindsync/desktop build:ci
 # 或根脚本：pnpm build:desktop:ci
 ```
 
@@ -267,8 +267,8 @@ docs(project): archive path for nsis-2026-07-21-e1
 | ID | 检查 | 通过标准 |
 |----|------|----------|
 | T1 | Working tree | E1 相关已 commit；无意外 unstaged 产品代码（允许 handtest status / CURRENT 归档行若第二 commit 计划内） |
-| T2 | typecheck | `pnpm -F @prompt-optimizer/ui typecheck` exit 0 |
-| T3 | UI unit | `pnpm -F @prompt-optimizer/ui test` 全绿（期望 ~929 量级） |
+| T2 | typecheck | `pnpm -F @mindsync/ui typecheck` exit 0 |
+| T3 | UI unit | `pnpm -F @mindsync/ui test` 全绿（期望 ~929 量级） |
 | T4 | Core gate（推荐） | `pnpm test:gate:core` 或等价 21+ pass |
 | T5 | testid 静态 | §3.2 全部可 rg 命中 |
 | T6 | 硬约束 | 无 Web/UI 引入 `@aws-sdk`；未改 auto-opt 默认 ON；未改导出默认 secrets |

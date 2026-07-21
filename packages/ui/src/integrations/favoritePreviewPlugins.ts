@@ -1,4 +1,4 @@
-import { getEnvVar, type FavoritePrompt } from '@prompt-optimizer/core'
+import { getEnvVar, type FavoritePrompt } from '@mindsync/core'
 import type { Component } from 'vue'
 
 export interface FavoritePreviewPlugin {

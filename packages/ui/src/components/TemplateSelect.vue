@@ -65,7 +65,7 @@ import {
   type SelectFilter,
   type SelectOption as NaiveSelectOption,
 } from 'naive-ui'
-import type { OptimizationMode, Template, TemplateMetadata } from '@prompt-optimizer/core'
+import type { OptimizationMode, Template, TemplateMetadata } from '@mindsync/core'
 import type { AppServices } from '../types/services'
 
 const { t } = useI18n()

@@ -8,7 +8,7 @@
 
 1.  **"幽灵"服务**：在Electron的渲染进程中，意外地创建了一套基于 `Dexie` (IndexedDB) 的Web端服务。这些服务虽然未被最终使用，但占用了资源并造成了数据混乱的假象。
 2.  **状态不一致**：由于服务实例的创建不感知运行环境，导致UI进程（看到的是Web版实例状态）和主进程（实际执行逻辑）之间存在状态不一致。
-3.  **架构耦合**：`@prompt-optimizer/ui` 包不必要地导出了核心服务实例，使其职责不清，更像一个服务中转站而非纯UI库。
+3.  **架构耦合**：`@mindsync/ui` 包不必要地导出了核心服务实例，使其职责不清，更像一个服务中转站而非纯UI库。
 4.  **测试困难**：单例模式使得在测试中隔离和模拟服务变得非常困难。
 
 ## 2. 重构目标
@@ -46,10 +46,10 @@
 
 ### 阶段二：净化 UI 包，停止导出服务 (已完成) ✅
 
-**目标**：让 `@prompt-optimizer/ui` 回归其纯粹的UI库职责。
+**目标**：让 `@mindsync/ui` 回归其纯粹的UI库职责。
 
 6.  **`packages/ui/src/index.ts`**
-    - [x] **移除**所有从 `@prompt-optimizer/core` 重新导出的服务实例。UI包已回归纯UI库职责。
+    - [x] **移除**所有从 `@mindsync/core` 重新导出的服务实例。UI包已回归纯UI库职责。
 
 ### 阶段三：创建统一的应用初始化器 (已完成) ✅
 
@@ -146,7 +146,7 @@
             storageProvider,
             createLLMService,
             createPromptService
-        } from '@prompt-optimizer/core'
+        } from '@mindsync/core'
         ```
     - [x] **新增**: 导出 `createDataManager` 等其他必要的工厂函数。
 
@@ -167,8 +167,8 @@
 8.  **文件**: `packages/web/src/App.vue` & `packages/extension/src/App.vue`
     - [x] **移除**: 所有对 `modelManager`, `templateManager`, `historyManager` 等服务单例的导入。
     - [x] **替换**:
-        - **旧**: `import { modelManager, ... } from '@prompt-optimizer/ui'`
-        - **新**: `import { useAppInitializer } from '@prompt-optimizer/ui'`
+        - **旧**: `import { modelManager, ... } from '@mindsync/ui'`
+        - **新**: `import { useAppInitializer } from '@mindsync/ui'`
     - [x] **调用**: `const { services, isInitializing } = useAppInitializer();`
     - [x] **包裹**: 在模板的根元素上使用 `v-if="!isInitializing"`，并添加一个 `v-else` 的加载状态。
     - [x] **传递**: 将 `services.value` 作为 props 传递给需要的子组件，或在 `composable` 中使用 `services.value.modelManager` 等。

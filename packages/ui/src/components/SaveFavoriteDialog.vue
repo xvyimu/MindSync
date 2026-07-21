@@ -69,7 +69,7 @@ import { computed, inject, ref, watch, type Ref } from 'vue'
 
 import { NAlert, NButton, NButtonGroup, NModal, NSelect, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import FavoriteEditorForm from './FavoriteEditorForm.vue'
 import FavoritePanelShell from './favorites/FavoritePanelShell.vue'

@@ -59,7 +59,7 @@ import {
   type DataTableColumns,
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { ExtractedVariable, VariableExtractionResponse } from '@prompt-optimizer/core'
+import type { ExtractedVariable, VariableExtractionResponse } from '@mindsync/core'
 
 /**
  * 组件 Props

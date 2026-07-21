@@ -144,7 +144,7 @@ interface ContextEditorEmits {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ContextEditor, type ContextState } from '@prompt-optimizer/ui'
+import { ContextEditor, type ContextState } from '@mindsync/ui'
 
 const showEditor = ref(false)
 
@@ -251,7 +251,7 @@ interface ToolCall {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ToolCallDisplay, type ToolCall } from '@prompt-optimizer/ui'
+import { ToolCallDisplay, type ToolCall } from '@mindsync/ui'
 
 const toolCalls = ref<ToolCall[]>([
   {
@@ -338,7 +338,7 @@ interface ScreenReaderSupportMethods {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ScreenReaderSupport } from '@prompt-optimizer/ui'
+import { ScreenReaderSupport } from '@mindsync/ui'
 
 const screenReader = ref<InstanceType<typeof ScreenReaderSupport>>()
 const accessibilityMode = ref(false)
@@ -439,7 +439,7 @@ interface AccessibilityFeatures {
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useAccessibility } from '@prompt-optimizer/ui'
+import { useAccessibility } from '@mindsync/ui'
 
 const items = ref([
   { id: 1, name: '项目1' },
@@ -522,7 +522,7 @@ interface FocusManagerOptions {
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useFocusManager } from '@prompt-optimizer/ui'
+import { useFocusManager } from '@mindsync/ui'
 
 const containerRef = ref<HTMLElement>()
 
@@ -603,7 +603,7 @@ interface AccessibilityIssue {
 ```vue
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useAccessibilityTesting } from '@prompt-optimizer/ui'
+import { useAccessibilityTesting } from '@mindsync/ui'
 
 const { runTest, runSingleRule } = useAccessibilityTesting()
 
@@ -731,7 +731,7 @@ const routes = [
 ### 3. 防抖和节流
 
 ```typescript
-import { useDebounceThrottle } from '@prompt-optimizer/ui'
+import { useDebounceThrottle } from '@mindsync/ui'
 
 const { debounce, throttle } = useDebounceThrottle()
 
@@ -823,7 +823,7 @@ describe('ContextEditor', () => {
 ### 2. 可访问性测试
 
 ```typescript
-import { useAccessibilityTesting } from '@prompt-optimizer/ui'
+import { useAccessibilityTesting } from '@mindsync/ui'
 
 describe('Accessibility Tests', () => {
   it('应该通过WCAG AA标准', async () => {
@@ -888,7 +888,7 @@ export default defineConfig({
 
 ```json
 {
-  "name": "@prompt-optimizer/ui",
+  "name": "@mindsync/ui",
   "version": "1.0.0",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

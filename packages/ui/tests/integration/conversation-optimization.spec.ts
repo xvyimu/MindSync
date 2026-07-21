@@ -24,7 +24,7 @@ vi.mock('../../src/composables/ui/useToast', () => ({
 }))
 
 import type { AppServices } from '../../src/types/services'
-import type { Template, ConversationMessage } from '@prompt-optimizer/core'
+import type { Template, ConversationMessage } from '@mindsync/core'
 import { useProMultiMessageSession } from '../../src/stores/session/useProMultiMessageSession'
 import { createPreferenceServiceStub, createTestPinia } from '../utils/pinia-test-helpers'
 import { useConversationOptimization } from '../../src/composables/prompt/useConversationOptimization'

@@ -153,7 +153,7 @@ export interface EvalEvidenceBundle {
 
 | ID | 标准 | 验证命令/步骤 |
 |----|------|----------------|
-| N1 | 类型与 repository 单测：保存/加载 case set | `pnpm -F @prompt-optimizer/core test` 相关文件 |
+| N1 | 类型与 repository 单测：保存/加载 case set | `pnpm -F @mindsync/core test` 相关文件 |
 | N2 | `contains` 断言：命中 pass、不命中 fail | 单测 |
 | N3 | 运行 2 条用例产出 `summary.total===2` | 单测 mock LLM |
 | N4 | 导出 JSON 可 `JSON.parse` 且含 version/modelKey/results | 单测或手测 |

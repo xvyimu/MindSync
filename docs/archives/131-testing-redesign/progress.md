@@ -182,8 +182,8 @@
 
 ## 测试执行记录
 
-- 2026-01-09: `pnpm -F @prompt-optimizer/core test -- tests/unit/utils/vcr.spec.ts tests/unit/utils/llm-mock-service.spec.ts`（passed）
-- 2026-01-09: `pnpm -F @prompt-optimizer/ui test`（passed；含 1 skipped）
+- 2026-01-09: `pnpm -F @mindsync/core test -- tests/unit/utils/vcr.spec.ts tests/unit/utils/llm-mock-service.spec.ts`（passed）
+- 2026-01-09: `pnpm -F @mindsync/ui test`（passed；含 1 skipped）
 - 2026-01-09: `pnpm test:e2e -- tests/e2e/regression.spec.ts`（passed；含部分 skipped）
 - 2026-01-09: `pnpm test:gate:full`（passed）
 - 2026-01-09: **完整门禁验证**

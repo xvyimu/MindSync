@@ -1,5 +1,5 @@
 import { computed, type Ref, type ComputedRef } from 'vue'
-import type { ConversationMessage, PromptRecord } from '@prompt-optimizer/core'
+import type { ConversationMessage, PromptRecord } from '@mindsync/core'
 import type { UseConversationOptimization } from './useConversationOptimization'
 
 /**

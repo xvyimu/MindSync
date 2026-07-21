@@ -17,7 +17,7 @@
 - [ ] `experience.md` - 架构设计和实现经验
 
 ## 相关代码变更
-- 影响包：@prompt-optimizer/desktop（如果存在）
+- 影响包：@mindsync/desktop（如果存在）
 - 主要变更：
   - Electron架构设计
   - 与Web端架构对齐

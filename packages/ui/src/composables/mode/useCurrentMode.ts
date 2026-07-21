@@ -2,7 +2,7 @@ import { computed, ref, type Ref, type ComputedRef } from 'vue'
 
 import { useFunctionMode, type FunctionMode } from './useFunctionMode'
 import { useProSubMode } from './useProSubMode'
-import type { ProSubMode } from '@prompt-optimizer/core'
+import type { ProSubMode } from '@mindsync/core'
 
 /**
  * 只读模式访问 composable 的返回类型

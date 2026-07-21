@@ -91,7 +91,7 @@ export class ModelConfigError extends LLMError {
  * Unified error code constants for LLM operations
  * LLM操作的统一错误代码常量
  *
- * @deprecated Use LLM_ERROR_CODES from '@prompt-optimizer/core/constants/error-codes' instead
+ * @deprecated Use LLM_ERROR_CODES from '@mindsync/core/constants/error-codes' instead
  */
 export const ERROR_MESSAGES = {
   API_KEY_REQUIRED: LLM_ERROR_CODES.API_KEY_REQUIRED,

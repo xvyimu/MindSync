@@ -137,7 +137,7 @@ import type {
     EvaluationResponse,
     EvaluationType,
     PatchOperation,
-} from "@prompt-optimizer/core";
+} from "@mindsync/core";
 import type { ScoreLevel } from '../../composables/prompt/useEvaluation';
 import { useResponsive } from '../../composables/ui/useResponsive';
 import { usePerformanceMonitor } from "../../composables/performance/usePerformanceMonitor";

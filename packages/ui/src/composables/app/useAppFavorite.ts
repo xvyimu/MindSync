@@ -20,7 +20,7 @@ import type {
     PromptAssetBinding,
     PromptRecordChain,
     PromptSessionOrigin,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { isValidVariableName, VARIABLE_VALIDATION } from '../../types/variable'
 import {
     applyFavoriteReproducibilityToMetadata,

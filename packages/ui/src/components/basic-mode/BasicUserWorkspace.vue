@@ -600,7 +600,7 @@ import {
 } from '../../utils/testPanelVersion'
 import type { AppServices } from '../../types/services'
 import type { IteratePayload } from '../../types/workspace'
-import { applyPatchOperationsToText, type EvaluationType, type PatchOperation, type Template } from '@prompt-optimizer/core'
+import { applyPatchOperationsToText, type EvaluationType, type PatchOperation, type Template } from '@mindsync/core'
 import type { PersistedCompareSnapshotRoles } from '../../types/evaluation'
 import { useElementSize } from '@vueuse/core'
 import { runTasksWithExecutionMode } from '../../utils/runTasksSequentially'

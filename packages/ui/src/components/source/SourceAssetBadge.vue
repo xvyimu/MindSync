@@ -45,7 +45,7 @@ import { inject, ref, type Ref } from 'vue'
 import { NAlert, NButton, NIcon, NModal } from 'naive-ui'
 import { GitMerge } from '@vicons/tabler'
 import { useI18n } from 'vue-i18n'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import type { AppServices } from '../../types/services'
 import ThemedTooltip from '../common/ThemedTooltip.vue'

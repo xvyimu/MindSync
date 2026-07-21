@@ -7,7 +7,7 @@ import {
   type EvaluationTarget,
   type EvaluationTestCase,
   type ImageResult,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { ResultEvaluationTarget } from '../../composables/prompt/useEvaluationHandler'
 import {
   hasWorkspaceCompareSnapshot,

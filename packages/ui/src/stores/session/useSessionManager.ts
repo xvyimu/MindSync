@@ -22,7 +22,7 @@ import {
   type ProSubMode,
   type ImageSubMode,
   type PromptSession,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { FunctionMode } from '../../composables/mode/useFunctionMode'
 import { getPiniaServices } from '../../plugins/pinia'
 import { useBasicSystemSession } from './useBasicSystemSession'

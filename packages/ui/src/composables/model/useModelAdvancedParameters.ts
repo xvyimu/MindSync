@@ -10,7 +10,7 @@ import type {
   ImageModelConfig,
   IImageAdapterRegistry,
   IImageProviderAdapter
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 type ParameterizedModel = {
   id: string

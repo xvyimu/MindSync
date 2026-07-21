@@ -5,7 +5,7 @@ import {
   PROMPT_MODEL_SCHEMA_VERSION,
   createPromptContract,
   type FavoritePrompt,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import SaveFavoriteDialog from '../../../src/components/SaveFavoriteDialog.vue'
 

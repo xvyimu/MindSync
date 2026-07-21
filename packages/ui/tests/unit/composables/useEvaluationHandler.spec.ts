@@ -13,14 +13,14 @@ import type {
   EvaluationType,
   ProEvaluationContext,
   ResultEvaluationRequest,
-} from '@prompt-optimizer/core'
-import { buildRewritePayload, buildRewritePromptFromEvaluation } from '@prompt-optimizer/core'
+} from '@mindsync/core'
+import { buildRewritePayload, buildRewritePromptFromEvaluation } from '@mindsync/core'
 
 const toast = {
   info: vi.fn(),
 }
 
-vi.mock('@prompt-optimizer/core', () => ({
+vi.mock('@mindsync/core', () => ({
   buildRewritePayload: vi.fn(() => ({
     compressedEvaluation: {
       rewriteGuidance: {

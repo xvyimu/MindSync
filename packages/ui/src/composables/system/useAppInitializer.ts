@@ -46,7 +46,7 @@ import {
   type StartupRepairReport,
   type ContextMode,
   DEFAULT_CONTEXT_MODE
-} from '@prompt-optimizer/core';
+} from '@mindsync/core';
 import type { AppServices } from '../../types/services';
 import { scheduleImageStorageGc } from '../../stores/session/imageStorageMaintenance'
 import {
@@ -137,7 +137,7 @@ export function useAppInitializer(): {
           ElectronTemplateManagerProxy,
           FavoriteManagerElectronProxy,
           waitForElectronApi,
-        } = await import('@prompt-optimizer/core/electron')
+        } = await import('@mindsync/core/electron')
         
         // 等待 Electron API 完全就绪
         const apiReady = await waitForElectronApi();
@@ -296,7 +296,7 @@ export function useAppInitializer(): {
         );
 
         // 图像模型管理器（独立存储空间）
-        const imageAdapterRegistry = await import('@prompt-optimizer/core').then(m => m.createImageAdapterRegistry())
+        const imageAdapterRegistry = await import('@mindsync/core').then(m => m.createImageAdapterRegistry())
         imageAdapterRegistryInstance = imageAdapterRegistry
         const imageModelManagerInstance = createImageModelManager(storageProvider, imageAdapterRegistry);
 

@@ -1,6 +1,8 @@
 /*
- * Prompt Optimizer - AI提示词优化工具
+ * MindSync (Prompt Optimizer) - AI提示词优化工具
  * Copyright (C) 2025 linshenkx
+ *
+ * Independently maintained as MindSync (https://github.com/xvyimu/MindSync) by xvyimu.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -15,14 +17,40 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// 在所有其他模块之前初始化日志系统
+// Electron first — setName + userData migration MUST precede ConsoleLogger
+// (logger resolves userData path in its constructor).
+const { app, BrowserWindow, ipcMain, shell, session, Menu, nativeImage, safeStorage } = require('electron');
+
+try {
+  if (typeof app.setName === 'function') {
+    app.setName('MindSync');
+  }
+} catch (nameError) {
+  // non-fatal
+}
+
+try {
+  const { migrateUserDataIfNeeded } = require('./config/user-data-migration');
+  const migration = migrateUserDataIfNeeded(app, {
+    log: (...args) => {
+      // console still raw here; ConsoleLogger not up yet
+      if (typeof console !== 'undefined' && console.log) console.log('[DESKTOP]', ...args);
+    },
+  });
+  if (migration.migrated && console && console.log) {
+    console.log('[DESKTOP] userData migrated from', migration.from, 'to', migration.to);
+  }
+} catch (migrationError) {
+  if (console && console.warn) {
+    console.warn('[DESKTOP] userData migration error (non-fatal):', migrationError);
+  }
+}
+
+// 日志系统（此时 userData 已是 MindSync 路径 / 已完成迁移）
 const ConsoleLogger = require('./config/console-logger');
 const consoleLogger = new ConsoleLogger();
-
-// 立即设置全局错误处理器，确保任何异常都能被记录
 consoleLogger.setupGlobalErrorHandlers();
 
-const { app, BrowserWindow, ipcMain, shell, session, Menu, nativeImage, safeStorage } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const {
   buildReleaseUrl,
@@ -83,7 +111,7 @@ const envPath = path.join(__dirname, '.env');
 require('dotenv').config({ path: envLocalPath });
 require('dotenv').config({ path: envPath });
 
-// 业务服务工厂由 config/service-container.js 内聚 require('@prompt-optimizer/core')
+// 业务服务工厂由 config/service-container.js 内聚 require('@mindsync/core')
 
 /**
  * 安全序列化函数，用于清理Vue响应式对象

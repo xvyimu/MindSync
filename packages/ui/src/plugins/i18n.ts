@@ -8,7 +8,7 @@ import {
   getPreference,
   setPreference,
 } from '../composables/storage/usePreferenceManager';
-import { UI_SETTINGS_KEYS } from "@prompt-optimizer/core";
+import { UI_SETTINGS_KEYS } from "@mindsync/core";
 import type { AppServices } from "../types/services";
 
 export type SupportedLocale = "zh-CN" | "zh-TW" | "en-US";

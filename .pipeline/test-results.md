@@ -53,8 +53,8 @@ No unstaged product UI/docs outside pipeline.
 | ID | Gate | Status | Notes |
 |----|------|--------|-------|
 | **T1** | Commit scope clean | **PASS** | E1 product committed; dirty only `.pipeline/*` |
-| **T2** | Typecheck | **PASS** | `pnpm -F @prompt-optimizer/ui typecheck` · vue-tsc **exit 0** (re-run 2026-07-21) |
-| **T3** | UI unit | **PASS** | `pnpm -F @prompt-optimizer/ui test` · **929 passed** \| 4 skipped \| 1 todo · ~46s · exit 0 |
+| **T2** | Typecheck | **PASS** | `pnpm -F @mindsync/ui typecheck` · vue-tsc **exit 0** (re-run 2026-07-21) |
+| **T3** | UI unit | **PASS** | `pnpm -F @mindsync/ui test` · **929 passed** \| 4 skipped \| 1 todo · ~46s · exit 0 |
 | **T4** | Core gate | **SKIP** | Recommended, not hard gate this knife; not re-run. Coder previously reported green; UI unit + typecheck sufficient for E1 UI-only ship |
 | **T5** | data-testid static §3.2 | **PASS** | All required strings present in `packages/ui/src` (see below) |
 | **T6** | Hard constraints | **PASS** | See hard-constraint section |
@@ -68,7 +68,7 @@ No unstaged product UI/docs outside pipeline.
 ## T2 — Typecheck (re-run)
 
 ```
-pnpm -F @prompt-optimizer/ui typecheck
+pnpm -F @mindsync/ui typecheck
 > vue-tsc --noEmit
 EXIT: 0
 ```
@@ -78,7 +78,7 @@ EXIT: 0
 ## T3 — UI unit (re-run)
 
 ```
-pnpm -F @prompt-optimizer/ui test
+pnpm -F @mindsync/ui test
  Test Files  156 passed | 2 skipped (158)
       Tests  929 passed | 4 skipped | 1 todo (934)
  Duration  45.61s

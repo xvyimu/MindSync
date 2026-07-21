@@ -2,7 +2,7 @@ import type {
   FavoritePrompt,
   IFavoriteManager,
   IImageStorageService,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import { collectFavoriteAssetIds } from './favorite-asset-refs'
 

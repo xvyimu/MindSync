@@ -21,7 +21,7 @@
 
 ### 1.2 技术栈概览
 
-#### 1.2.1 核心包 (@prompt-optimizer/core)
+#### 1.2.1 核心包 (@mindsync/core)
 - TypeScript 5.3.x
   - 类型系统
   - 接口定义
@@ -38,7 +38,7 @@
   - 错误处理
   - 类型定义
 
-#### 1.2.2 Web包 (@prompt-optimizer/web)
+#### 1.2.2 Web包 (@mindsync/web)
 - Vue 3.5.x
   - Composition API
   - Script Setup
@@ -435,7 +435,7 @@ if (!services?.value) {
    </template>
    
    <script setup>
-   import { useNaiveTheme } from '@prompt-optimizer/ui'
+   import { useNaiveTheme } from '@mindsync/ui'
    
    const { naiveTheme, themeOverrides } = useNaiveTheme()
    </script>
@@ -587,7 +587,7 @@ const showNotification = () => {
 **4. 变量管理组件使用模式**
 ```vue
 <script setup>
-import { useVariableManager } from '@prompt-optimizer/ui'
+import { useVariableManager } from '@mindsync/ui'
 
 const services = inject('services')
 const {

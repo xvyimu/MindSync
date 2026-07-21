@@ -45,8 +45,8 @@ vi.mock('naive-ui', async () => {
   }
 })
 
-vi.mock('@prompt-optimizer/core', async () => {
-  const actual = await vi.importActual<any>('@prompt-optimizer/core')
+vi.mock('@mindsync/core', async () => {
+  const actual = await vi.importActual<any>('@mindsync/core')
   return {
     ...actual,
     isSafeCustomKey: (key: string) => /^[A-Za-z0-9._\-:/]+$/.test(key)

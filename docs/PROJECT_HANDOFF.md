@@ -180,9 +180,9 @@ git push origin develop
 3. 构建并重装：
 
 ```powershell
-pnpm -F @prompt-optimizer/core build
-pnpm -F @prompt-optimizer/ui build:bundle   # 若 vue-tsc 失败可跳过 types
-pnpm -F @prompt-optimizer/desktop build:ci
+pnpm -F @mindsync/core build
+pnpm -F @mindsync/ui build:bundle   # 若 vue-tsc 失败可跳过 types
+pnpm -F @mindsync/desktop build:ci
 # 安装生成的 NSIS 到 D:\PromtOptimizer\app
 ```
 

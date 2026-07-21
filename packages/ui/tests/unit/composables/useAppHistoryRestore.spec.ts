@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ref } from 'vue'
-import type { PromptRecord, PromptRecordChain } from '@prompt-optimizer/core'
+import type { PromptRecord, PromptRecordChain } from '@mindsync/core'
 import type { MessageReactive } from 'naive-ui'
 
 import { useAppHistoryRestore } from '../../../src/composables/app/useAppHistoryRestore'

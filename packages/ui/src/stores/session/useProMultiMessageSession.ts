@@ -11,7 +11,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getPiniaServices } from '../../plugins/pinia'
-import { TEMPLATE_SELECTION_KEYS, type ConversationMessage, type PromptAssetBinding, type PromptSessionOrigin } from '@prompt-optimizer/core'
+import { TEMPLATE_SELECTION_KEYS, type ConversationMessage, type PromptAssetBinding, type PromptSessionOrigin } from '@mindsync/core'
 import { coerceTestPanelVersionValue } from '../../utils/testPanelVersion'
 import { isValidVariableName, sanitizeVariableRecord } from '../../types/variable'
 import { createSessionAssetBindingState } from './sessionAssetBinding'
