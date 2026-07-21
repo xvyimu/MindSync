@@ -1,5 +1,3 @@
-- **D3 ServiceContainer**：业务装配下沉 `createCoreServices`；main 仅 composition root + IPC 胶水  
-- **D4 Docker 非 root 里程碑**：镜像用户 `app`/10001；MCP 子进程降权；整容器非 root 需 `NGINX_PORT=8080`（文档）  
 # 现行事实快照（CURRENT）
 
 > **L1 活文档 · 版本与路径只在这里维护权威数字。**  
