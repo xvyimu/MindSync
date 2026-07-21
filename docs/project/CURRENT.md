@@ -42,7 +42,8 @@
 | **全面扫描+规划（2026-07-21）** | `D:\PromtOptimizer\docs\FULL-SCAN-PLAN-RECOMMENDATIONS-2026-07-21.md` |
 | **整合决策调研（tip 对齐 R2）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21.md` |
 | **下一刀规格（Cut-R2a C2）** | [`NEXT-CUT-SPEC-2026-07-21-R2-C2.md`](./NEXT-CUT-SPEC-2026-07-21-R2-C2.md) |
-| **下一刀规格（Cut-R2b C1）** | [`NEXT-CUT-SPEC-2026-07-21-R2-C1.md`](./NEXT-CUT-SPEC-2026-07-21-R2-C1.md) |
+| **手测清单（15 min 闭环）** | [`HANDTEST-CHECKLIST-2026-07-21.md`](./HANDTEST-CHECKLIST-2026-07-21.md) |
+| **下一刀规格（Cut-R2c C3）** | [`NEXT-CUT-SPEC-2026-07-21-R2-C3.md`](./NEXT-CUT-SPEC-2026-07-21-R2-C3.md) |
 | **竞品/架构调研（万字）** | `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md` |
 | **决策简报（目标/约束/验收）** | [`COMPETITIVE-BRIEF.md`](./COMPETITIVE-BRIEF.md) |
 | **架构宪章** | [`../architecture/charter.md`](../architecture/charter.md) |
@@ -78,6 +79,8 @@
 - **F2 全量导出含 EvalCaseSet**：`data.evalCaseSets` ↔ preference `eval.caseSets.v1`  
 - **C2 promptfoo.yaml 最小导出**：EvalCase 面板一键导出 contains 映射，不含密钥  
 - **C1 双模型轻对照**：测试区「双模型」一键（同提示版本 · 两 modelKey 并排）；每列仍可独立改模型  
+- **C3 MCP 结构化返回**：工具结果 JSON `original`/`optimized`/`meta.version=1`（无密钥）  
+- **导出含密钥二次确认**：DataManager 勾选 includeSecrets 后导出需确认  
 - **B5 远程备份边界**：UI 移除 `@aws-sdk/client-s3`；Web 仅 Google Drive；S3/R2/WebDAV 仅 Desktop IPC  
 - **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
 - **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`（本地优先工作台定位，非 LLMOps 平台）  

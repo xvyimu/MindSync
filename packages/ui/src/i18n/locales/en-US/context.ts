@@ -250,7 +250,10 @@ const messages = {
       "failed": "Failed to export data",
       "includeSecrets": "Include model API keys (unsafe; off by default)",
       "secretsRedactedHint": "API keys are redacted by default. Re-enter keys after import on another machine.",
-      "secretsIncludedHint": "Warning: the export will contain plaintext API keys. Do not share it."
+      "secretsIncludedHint": "Warning: the export will contain plaintext API keys. Do not share it.",
+      "secretsConfirmTitle": "Export plaintext API keys?",
+      "secretsConfirmContent": "The export file will include model API keys in plaintext. Sharing it via cloud drive, chat, or tickets leaks credentials. Continue only for trusted local backup.",
+      "secretsConfirmOk": "Export with secrets anyway"
     },
     "import": {
       "title": "Import Data",

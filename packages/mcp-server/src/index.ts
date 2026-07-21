@@ -38,6 +38,10 @@ import { CoreServicesManager } from './adapters/core-services.js';
 import { loadConfig, validateConfig, type MCPServerConfig } from './config/environment.js';
 import * as logger from './utils/logging.js';
 import { ParameterValidator } from './adapters/parameter-adapter.js';
+import {
+  buildMcpStructuredResult,
+  serializeMcpStructuredResult,
+} from './adapters/structured-result.js';
 import { getTemplateOptions, getDefaultTemplateId } from './config/templates.js';
 import { registerHealthzRoute } from './health.js';
 import { randomUUID } from 'node:crypto';
@@ -242,10 +246,18 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
             templateId
           });
 
+          const structured = buildMcpStructuredResult({
+            tool: 'optimize-user-prompt',
+            mode: 'user',
+            original: prompt,
+            optimized: result,
+            templateId,
+          });
+
           return {
             content: [{
               type: "text",
-              text: ParameterValidator.truncateResult(result)
+              text: ParameterValidator.truncateResult(serializeMcpStructuredResult(structured, true))
             }]
           };
         }
@@ -294,10 +306,18 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
             templateId
           });
 
+          const structured = buildMcpStructuredResult({
+            tool: 'optimize-system-prompt',
+            mode: 'system',
+            original: prompt,
+            optimized: result,
+            templateId,
+          });
+
           return {
             content: [{
               type: "text",
-              text: ParameterValidator.truncateResult(result)
+              text: ParameterValidator.truncateResult(serializeMcpStructuredResult(structured, true))
             }]
           };
         }
@@ -366,10 +386,19 @@ async function setupServerHandlers(server: Server, coreServices: CoreServicesMan
             templateId
           );
 
+          const structured = buildMcpStructuredResult({
+            tool: 'iterate-prompt',
+            mode: 'iterate',
+            original: previousOptimized,
+            optimized: result,
+            templateId,
+            requirements,
+          });
+
           return {
             content: [{
               type: "text",
-              text: ParameterValidator.truncateResult(result)
+              text: ParameterValidator.truncateResult(serializeMcpStructuredResult(structured, true))
             }]
           };
         }

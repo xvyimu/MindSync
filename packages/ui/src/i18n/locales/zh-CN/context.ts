@@ -250,7 +250,10 @@ const messages = {
       "failed": "数据导出失败",
       "includeSecrets": "包含模型 API 密钥（不安全，默认关闭）",
       "secretsRedactedHint": "默认导出已脱敏模型 API Key；换机后请重新填写密钥。",
-      "secretsIncludedHint": "警告：导出文件将包含明文 API 密钥，请勿分享。"
+      "secretsIncludedHint": "警告：导出文件将包含明文 API 密钥，请勿分享。",
+      "secretsConfirmTitle": "确认导出明文密钥？",
+      "secretsConfirmContent": "导出文件将包含模型 API 密钥明文。若分享到网盘、聊天或工单，等同泄露密钥。请确认仅在可信本机备份场景使用。",
+      "secretsConfirmOk": "仍要导出含密钥文件"
     },
     "import": {
       "title": "导入数据",

@@ -250,7 +250,10 @@ const messages = {
       "failed": "資料匯出失敗",
       "includeSecrets": "包含模型 API 金鑰（不安全，預設關閉）",
       "secretsRedactedHint": "預設匯出已去除模型 API Key；換機後請重新填寫金鑰。",
-      "secretsIncludedHint": "警告：匯出檔案將包含明文 API 金鑰，請勿分享。"
+      "secretsIncludedHint": "警告：匯出檔案將包含明文 API 金鑰，請勿分享。",
+      "secretsConfirmTitle": "確認匯出明文金鑰？",
+      "secretsConfirmContent": "匯出檔案將包含模型 API 金鑰明文。若分享到網盤、聊天或工單，等同洩露金鑰。請確認僅在可信本機備份場景使用。",
+      "secretsConfirmOk": "仍要匯出含金鑰檔案"
     },
     "import": {
       "title": "匯入資料",

@@ -1821,6 +1821,18 @@ const handleExport = async () => {
     if (!servicesValue) {
       throw new Error('[DataManager] Services are not initialized. Make sure the application has started correctly.')
     }
+
+    // Security: secondary confirm when user opts into plaintext API keys in the backup file.
+    if (exportAppData.value && exportIncludeSecrets.value) {
+      const confirmed = await confirmDialog.warning({
+        title: t('dataManager.export.secretsConfirmTitle'),
+        content: t('dataManager.export.secretsConfirmContent'),
+        positiveText: t('dataManager.export.secretsConfirmOk'),
+        negativeText: t('common.cancel'),
+      })
+      if (!confirmed) return
+    }
+
     isExporting.value = true
 
     const exportPackage = await createDataManagerResourcePackage({
