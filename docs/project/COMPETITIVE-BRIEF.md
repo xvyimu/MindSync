@@ -34,7 +34,7 @@
 ## 2. 硬约束（Constraints）— 表单全选 + 两项钉死
 
 1. **本地优先 / 无强制账号**  
-2. **fork-only**  
+2. **独立仓 / 不默认向上游 PR**（`xvyimu/MindSync`；可手动 `upstream` 同步）  
 3. **包边界 `app → ui → core`**（ui 不 re-export 工厂；生产 dist）  
 4. **单人可维护 / 小核心**  
 5. **敏感在 main**（继承宪章）  

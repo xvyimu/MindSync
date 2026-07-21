@@ -10,8 +10,8 @@
 | **日期** | 2026-07-21 |
 | **分支** | `develop` |
 | **远端 tip** | 以 `git log -1 --oneline` 为准 |
-| **Fork** | https://github.com/xvyimu/prompt-optimizer |
-| **策略** | **fork-only**（默认不向上游开 PR） |
+| **本仓** | https://github.com/xvyimu/MindSync（原 `prompt-optimizer`，**已脱离 fork 网络并改名**） |
+| **策略** | **独立仓 / 不默认向上游开 PR**（仍可手动 `upstream` 同步） |
 | **上游 remote** | `upstream` → `linshenkx/prompt-optimizer`（可拉取，不默认贡献） |
 
 ---

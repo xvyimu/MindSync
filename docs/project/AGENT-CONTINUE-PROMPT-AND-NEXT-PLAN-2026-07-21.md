@@ -3,9 +3,9 @@
 | 项 | 值 |
 |----|-----|
 | 日期 | 2026-07-21 |
-| 适用仓库 | `D:\PromtOptimizer\src\prompt-optimizer` · fork `xvyimu/prompt-optimizer` |
-| 基线 tip | **`develop` @ `bbbc88a`**（以 `git log -1` / origin 为准） |
-| 产品 | **2.11.7** · 策略 **fork-only** |
+| 适用仓库 | `D:\PromtOptimizer\src\prompt-optimizer` · 本仓 `xvyimu/MindSync`（原 prompt-optimizer，已脱离 fork） |
+| 基线 tip | **`develop` @ 以 `git log -1` / origin 为准** |
+| 产品 | **2.11.7** · 策略 **独立仓 / 不默认上游 PR** |
 | 维护者用途 | 交给**其他 Agent** 开分支续作；或本人做规划/排障 |
 
 > **读法**：§1 复制给 Agent 当 system/task 提示词；§2 是产品/工程下一步；§3 是诊断剧本；§4 是禁止项。
@@ -15,13 +15,15 @@
 ## 1. 给其他 Agent 的完整续作提示词（可整段粘贴）
 
 ```text
-你是 Claude Code 工程代理，在维护者自有 fork 上工作，不是上游 linshenkx 仓库。
+你是 Claude Code 工程代理，在维护者独立仓 xvyimu/MindSync 上工作，不是上游 linshenkx 仓库。
 
 ## 仓库与身份
-- 路径：D:\PromtOptimizer\src\prompt-optimizer
-- remote origin：https://github.com/xvyimu/prompt-optimizer （fork-only，默认不向上游开 PR）
+- 路径：D:\PromtOptimizer\src\prompt-optimizer（本地目录名可保留）
+- remote origin：https://github.com/xvyimu/MindSync （独立仓，默认不向上游开 PR）
+- 产品名：Prompt Optimizer；包 scope：@prompt-optimizer/*（不因改名而改）
 - 默认基线分支：develop（先 git fetch && git checkout develop && git pull）
 - 产品版本：2.11.7；L1 版本/安装路径只信 docs/project/CURRENT.md
+- 身份卡：GITHUB_IDENTITY.md
 - 工具链：Node ^24、pnpm（以 packageManager 字段为准）、PowerShell 优先 pwsh
 
 ## 开工前必读（按序）
@@ -43,12 +45,12 @@
 8. 不把 secrets、web-dist、desktop/dist 提交进 git
 
 ## 分支纪律（强制）
-1. 禁止在 main 上改；本 fork 主线是 develop
+1. 禁止在 main 上改；本仓主线是 develop
 2. 每一刀从最新 develop 开 feature 分支：
    git checkout develop && git pull origin develop
    git checkout -b feature/<短横线主题>
 3. 推送：git push -u origin feature/<主题>
-4. PR：只对 origin develop（--repo xvyimu/prompt-optimizer），不要对 upstream
+4. PR：只对 origin develop（--repo xvyimu/MindSync），不要对 upstream
 5. 合入：维护者批准后 merge 到 develop；不要 force-push develop
 
 ## 工作方式
@@ -77,8 +79,8 @@ F. 仅文档：CURRENT/BRIEF/手测状态与 tip 对齐
 ## 排障时
 1. 先看 %AppData%\Roaming\@prompt-optimizer\desktop\logs\（error.log / main.log / ipc.log）
 2. IPC 初始化失败：搜 IPC_UNTRUSTED_SENDER；已有 isExplicitNonMainFrame 修复，确认 asar 是否含该符号
-3. updater 404 latest.yml：fork 无发布通道时预期；应 soft-fail 不刷 ERROR
-4. 区分 origin（xvyimu）与 upstream（linshenkx）；gh 命令加 --repo xvyimu/prompt-optimizer
+3. updater 404 latest.yml：本仓无 Release 通道时预期；应 soft-fail 不刷 ERROR
+4. 区分 origin（xvyimu/MindSync）与 upstream（linshenkx）；gh 命令加 --repo xvyimu/MindSync
 
 ## 交付物
 - 代码在 feature 分支；可选 PR 到 develop
@@ -96,7 +98,7 @@ F. 仅文档：CURRENT/BRIEF/手测状态与 tip 对齐
 |----|------|----------|
 | N1 | 启动 `D:\PromtOptimizer\app\PromptOptimizer.exe` 做人手测 | HANDTEST §1–§5 勾选或记 Fail |
 | N2 | 若 asar 过旧：用 `nsis-2026-07-21-ipc` 或 **重打含 bbbc88a 的包** | 启动无「初始化失败」 |
-| N3 | 看 CI：`gh run list --repo xvyimu/prompt-optimizer --branch develop --limit 5` | tip 上 test 绿或已知噪声 |
+| N3 | 看 CI：`gh run list --repo xvyimu/MindSync --branch develop --limit 5` | tip 上 test 绿或已知噪声 |
 
 ### 2.2 短线工程（1–3 天 · feature 分支）
 
@@ -175,9 +177,9 @@ F. 仅文档：CURRENT/BRIEF/手测状态与 tip 对齐
 | 情况 | 做法 |
 |------|------|
 | 用户要求「放宽脱敏/Web S3/默认 auto」 | 先改 COMPETITIVE-BRIEF，再开规格；禁止 silent |
-| gh pr 指错仓库 | 始终 `--repo xvyimu/prompt-optimizer` |
+| gh pr 指错仓库 | 始终 `--repo xvyimu/MindSync` |
 | 误在 develop 直接大改 | cherry-pick 到 feature 或 reset 未推送提交；已推送则 revert |
-| 与上游冲突 | fork-only：以己方 develop 为准，安全补丁可 cherry-pick |
+| 与上游冲突 | 独立仓：以己方 develop 为准，安全补丁可 cherry-pick |
 
 ---
 
@@ -196,9 +198,9 @@ F. 仅文档：CURRENT/BRIEF/手测状态与 tip 对齐
 
 | 项 | 值 |
 |----|-----|
-| develop tip | `bbbc88a` |
+| develop tip | 以 `git log -1` / origin 为准 |
+| 仓库身份 | `xvyimu/MindSync` · 见 `GITHUB_IDENTITY.md` |
 | 五层 | 已合 PR#5 |
 | 装机归档 | `nsis-2026-07-21-ipc`（五层之后若再打则更新 CURRENT） |
-| 记忆 | `~/.claude/projects/D--orca/memory/prompt-optimizer-handoff-2026-07-21.md` |
 
 **维护：** tip 前进时只改 CURRENT + 本文件 §6 + handoff 记忆；勿复制过期 SHA 到多处当真相。

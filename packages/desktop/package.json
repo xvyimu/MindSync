@@ -5,7 +5,7 @@
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xvyimu/prompt-optimizer.git"
+    "url": "https://github.com/xvyimu/MindSync.git"
   },
   "scripts": {
     "build": "pnpm run build:web && pnpm run package",
@@ -50,7 +50,7 @@
     "publish": {
       "provider": "github",
       "owner": "xvyimu",
-      "repo": "prompt-optimizer",
+      "repo": "MindSync",
       "private": false
     },
     "win": {

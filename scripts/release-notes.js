@@ -606,7 +606,7 @@ function printUsage() {
   console.log('  pnpm release:notes:check:entry v2.6.0');
   console.log('  node scripts/release-notes.js new 2.9.0');
   console.log('  node scripts/release-notes.js check v2.9.0');
-  console.log('  node scripts/release-notes.js render-body v2.9.0 xvyimu/prompt-optimizer');
+  console.log('  node scripts/release-notes.js render-body v2.9.0 xvyimu/MindSync');
   console.log('See docs/project/RELEASE-RUNBOOK.md');
 }
 

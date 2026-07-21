@@ -1,5 +1,6 @@
 /**
- * Guard: root README.md / README.zh-CN.md mention fork xvyimu or CURRENT.md.
+ * Guard: root README.md / README.zh-CN.md mention this repo identity or CURRENT.md.
+ * Accepts MindSync (current) or legacy prompt-optimizer / fork-only wording.
  * Usage: node scripts/check-docs-source-readme-fork.mjs
  */
 import fs from 'node:fs';
@@ -18,12 +19,15 @@ for (const f of files) {
   }
   const body = fs.readFileSync(f, 'utf8');
   const ok =
+    /xvyimu\/MindSync/.test(body) ||
     /xvyimu\/prompt-optimizer/.test(body) ||
     /docs\/project\/CURRENT\.md/.test(body) ||
-    /fork-only/i.test(body);
+    /fork-only/i.test(body) ||
+    /independent(?:ly)?\s+maintain/i.test(body) ||
+    /独立仓/.test(body);
   if (!ok) {
     console.error(
-      `[check-docs-source-readme-fork] FAIL ${path.basename(f)} needs xvyimu fork and/or CURRENT.md / fork-only`,
+      `[check-docs-source-readme-fork] FAIL ${path.basename(f)} needs xvyimu/MindSync (or CURRENT.md / independent-repo wording)`,
     );
     failed = true;
   } else {

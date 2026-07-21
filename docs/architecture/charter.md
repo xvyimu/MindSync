@@ -23,7 +23,7 @@
 6. **本地默认**：无强制账号；网络同步与云备份必须显式用户动作。  
 7. **构建期无密钥**：前端 bundle 仅允许 public `VITE_APP_*` / `VITE_PUBLIC_*`（及产品默认非敏感 flag）。  
 8. **小核心**：大功能以端口/策略/适配器接入；禁止为单功能引入第二套 monorepo 平台。  
-9. **fork-only**：默认不向上游开 PR；合入上游以安全与依赖为主。  
+9. **独立仓 / 不默认上游 PR**：仓库身份为 `xvyimu/MindSync`（已脱离 fork 网络）；默认不向上游开 PR；合入上游以安全与依赖为主，经 `upstream` 手动同步。  
 10. **文档数字单一真相**：版本与安装路径只改 `docs/project/CURRENT.md`。
 
 ---
@@ -114,7 +114,7 @@ MCP HTTP：Bearer +（非 loopback 时）强制 token；health 仅最小 `{ok}` 
 | ADR-003 | Desktop main 为敏感能力宿主 | Accepted |
 | ADR-004 | 评估可复现优先于花哨 | Proposed → 执行中（见 backlog） |
 | ADR-005 | 自动优化可选，默认人工模板 | Proposed |
-| ADR-006 | fork-only | Accepted |
+| ADR-006 | 独立仓 / 不默认向上游 PR（原 fork-only；现为 MindSync） | Accepted |
 
 细节叙事见调研报告 §19。
 

@@ -329,21 +329,20 @@ Configure environment variables through the `-e` parameter when deploying with D
 
 For detailed documentation, see [Development Documentation](docs/developer/development.md).
 
-**This repository is maintained independently** as [xvyimu/MindSync](https://github.com/xvyimu/MindSync) (formerly `prompt-optimizer`; left the fork network; branch `develop`; no default upstream PRs). 
-Authoritative version / install paths for the maintainer workspace: [docs/project/CURRENT.md](docs/project/CURRENT.md) · handoff: [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
+Identity card: [GITHUB_IDENTITY.md](GITHUB_IDENTITY.md) · maintainer SSOT: [docs/project/CURRENT.md](docs/project/CURRENT.md) · handoff: [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
 
 <details>
 <summary>Click to view local development commands</summary>
 
 ```bash
-# 1. Clone (fork — recommended for this product line)
+# 1. Clone this repository
 git clone https://github.com/xvyimu/MindSync.git
-cd prompt-optimizer
+cd MindSync
 
 # Optional: track upstream for pulls only (do not assume PRs to upstream)
 # git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
 
-# 2. Install dependencies
+# 2. Install dependencies (Node ^24, pnpm)
 pnpm install
 
 # 3. Start development server

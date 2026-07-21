@@ -1,7 +1,7 @@
 # Prompt Optimizer 产品需求文档
 
 > **L1 活文档（范围基线）。** 现行版本/安装路径见 [`CURRENT.md`](./CURRENT.md)。  
-> fork 维护策略：**fork-only**（默认不向上游开 PR）。
+> 仓库维护策略：**独立仓 `xvyimu/MindSync`**（原 prompt-optimizer，已脱离 fork；默认不向上游开 PR）。
 
 ## 1. 产品概述
 
