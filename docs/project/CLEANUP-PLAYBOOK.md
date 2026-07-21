@@ -6,9 +6,9 @@
 
 | 项 | 值 |
 |----|-----|
-| 日期 | 2026-07-20 |
+| 日期 | 2026-07-22（路径 mindsync 对齐 + 安装侧 junk 清理） |
 | 本机根 | `D:\PromtOptimizer` |
-| 源码 | `D:\PromtOptimizer\src\prompt-optimizer` |
+| 源码 | `D:\PromtOptimizer\src\mindsync` |
 
 ---
 
@@ -18,11 +18,18 @@
 |------|------|
 | `D:\PromtOptimizer\portable-build\` | 失败整壳拷贝（若存在） |
 | `D:\PromtOptimizer\portable-app-overlay\` | 已有 zip 时可删（若存在） |
-| `D:\PromtOptimizer\src\prompt-optimizer\.pipeline\core-unit-report.json` | 可重跑生成 |
-| `D:\PromtOptimizer\src\prompt-optimizer\packages\desktop\dist\win-unpacked\` | electron-builder 半成品 |
-| `D:\PromtOptimizer\src\prompt-optimizer\test-results\` | e2e 产物 |
-| `D:\PromtOptimizer\src\prompt-optimizer\playwright-report\` | e2e 报告 |
+| `D:\PromtOptimizer\src\mindsync\.pipeline\core-unit-report.json` | 可重跑生成 |
+| `D:\PromtOptimizer\src\mindsync\packages\desktop\dist\win-unpacked\` | electron-builder 半成品 |
+| `D:\PromtOptimizer\src\mindsync\test-results\` | e2e 产物 |
+| `D:\PromtOptimizer\src\mindsync\playwright-report\` | e2e 报告 |
 | `%TEMP%\po-local-e2e-*.log` | 烟测日志 |
+| `D:\PromtOptimizer\_extract-*` / `_ipc-install-tmp` / `app-run-ipc-*` | 安装/热修临时解压目录 |
+| `D:\PromtOptimizerpp-backup-*` | 被更新 asar 取代的整树备份（确认现行 app 正常后） |
+| `D:\PromtOptimizer
+sis-2026-07-20-*` / `nsis-2026-07-21-e1` | 旧 NSIS 归档；保留最新 `nsis-2026-07-21-ipc` 即可 |
+| `appesourcespp.asar.bak-pre-*` | asar 热修备份（确认现行 asar 后） |
+| `src/mindsync/ci-logs*.zip` | CI 日志包（可再生） |
+| `D:\orca\po-*.json` / 手测 dump / `tmp-*.html` | 会话临时文件（非仓内） |
 | `D:\PromtOptimizer\app\resources\app.asar.bak-pre-icons-*` | asar 热修备份（确认新 asar 正常后） |
 | `node_modules` / `packages/*/dist` 构建缓存 | 可用 `pnpm install` / build 恢复（删前确认无未提交改动依赖） |
 
@@ -32,7 +39,7 @@
 
 | 路径 | 说明 |
 |------|------|
-| `D:\PromtOptimizer\src\prompt-optimizer\` | 源码真相源 |
+| `D:\PromtOptimizer\src\mindsync\` | 源码真相源 |
 | `D:\PromtOptimizer\app\` | **现行** NSIS 安装根（`PromptOptimizer.exe` + `resources\app.asar`） |
 | `D:\PromtOptimizer\tools\` | 历史 portable Node 等（Node 基线已升 **^24**，系统 Node 优先） |
 | `D:\PromtOptimizer\custom-templates\` | 用户模板数据 |
@@ -68,11 +75,11 @@ Test-Path 'D:\PromtOptimizer\nsis-2026-07-20-paper-theme'
 Test-Path 'D:\PromtOptimizer\nsis-2026-07-20-develop-ux'
 
 # 源码与 SSOT
-Test-Path 'D:\PromtOptimizer\src\prompt-optimizer\docs\project\CURRENT.md'
-Test-Path 'D:\PromtOptimizer\src\prompt-optimizer\packages\desktop\config\ipc\channel-manifest.js'
+Test-Path 'D:\PromtOptimizer\src\mindsync\docs\project\CURRENT.md'
+Test-Path 'D:\PromtOptimizer\src\mindsync\packages\desktop\config\ipc\channel-manifest.js'
 
 # 可选：桌面烟测（需已安装 app）
-cd D:\PromtOptimizer\src\prompt-optimizer
+cd D:\PromtOptimizer\src\mindsync
 $env:PROMPT_OPTIMIZER_INSTALL_ROOT = 'D:\PromtOptimizer\app'
 # node scripts/desktop-local-e2e-smoke.cjs
 ```

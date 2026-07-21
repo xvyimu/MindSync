@@ -60,7 +60,7 @@
 | 文档怎么管 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`（方案 C 已落地） |
 | **文档二期 C2** | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-C2-2026-07-20.md`（漂移清零 + 门禁硬化） |
 | **文档漂移台账** | [`DOC-DRIFT-REGISTRY.md`](./DOC-DRIFT-REGISTRY.md)（DOC-01～20 状态） |
-| 磁盘清理 | [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md) |
+| 磁盘清理 | [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md) · 日志 [`CLEANUP-LOG-2026-07-22.md`](./CLEANUP-LOG-2026-07-22.md) |
 | **发版一步表** | [`RELEASE-RUNBOOK.md`](./RELEASE-RUNBOOK.md) |
 | 产品范围 | [`prd.md`](./prd.md) |
 | 部署（Vercel 等） | [`../user/deployment/`](../user/deployment/) |
@@ -102,7 +102,7 @@
 ## 构建 / 验证（摘要）
 
 ```powershell
-cd D:\PromtOptimizer\src\prompt-optimizer
+cd D:\PromtOptimizer\src\mindsync
 # Node 24（engines ^24）
 pnpm -F @mindsync/core build
 pnpm -F @mindsync/ui build:bundle
