@@ -1401,8 +1401,12 @@ export class ModelManager implements IModelManager {
 /**
  * 创建模型管理器的工厂函数
  * @param storageProvider 存储提供器实例
+ * @param registry 可选共享 TextAdapterRegistry（与 LLM / ImageUnderstanding 同实例，避免重复构造适配器图）
  * @returns 模型管理器实例
  */
-export function createModelManager(storageProvider: IStorageProvider): ModelManager {
-  return new ModelManager(storageProvider);
+export function createModelManager(
+  storageProvider: IStorageProvider,
+  registry?: ITextAdapterRegistry,
+): ModelManager {
+  return new ModelManager(storageProvider, registry);
 }

@@ -150,8 +150,14 @@ async function createCoreServices(deps) {
     const preferenceService = new PreferenceService(storageProvider);
     log('[DESKTOP] PreferenceService initialized.');
 
+    // 共享文本适配器注册表（ModelManager / LLM / ImageUnderstanding 同图）
+    const textAdapterRegistry =
+      typeof core.createTextAdapterRegistry === 'function'
+        ? core.createTextAdapterRegistry()
+        : undefined;
+
     log('[DESKTOP] Creating model manager...');
-    const modelManager = createModelManager(storageProvider);
+    const modelManager = createModelManager(storageProvider, textAdapterRegistry);
 
     log('[DESKTOP] Creating template language service...');
     const templateLanguageService = createTemplateLanguageService(preferenceService);
@@ -176,9 +182,10 @@ async function createCoreServices(deps) {
     }
 
     log('[DESKTOP] Creating LLM service...');
-    const llmService = createLLMService(modelManager);
+    const llmService = createLLMService(modelManager, textAdapterRegistry);
 
     const imageUnderstandingService = createImageUnderstandingService({
+      registry: textAdapterRegistry,
       imageInputConverter: deps.convertImageInputWithElectronNativeImage,
     });
 
