@@ -21,7 +21,7 @@
 | 硬约束 `@aws-sdk` | **pass** | packages/web 无命中；packages/ui 仅 tests unit remote-backup.spec.ts |
 | 硬约束 includeSecrets | **pass** | core data manager / types / export-secrets 仍在 |
 | 版本 | **pass** | 仍 2.11.7；无 version bump commit |
-| 安装 exe 存在 | **yes** | `D:\PromtOptimizer\app\PromptOptimizer.exe` · ~212 MB · 2026-07-20 21:11 |
+| 安装 exe 存在 | **yes · E1 已装入 app\\** | 2026-07-21 便携 zip 覆盖；asar **71188635**；backup=`app-backup-2026-07-20-pre-e1` |
 
 ### data-testid 命中清单
 
@@ -56,10 +56,34 @@ E1 增量重点（静态已具备；GUI 见 human）：
 | HANDTEST §5 双模型 | **partial/human** | testid 就位；需 ≥2 文本模型实跑 |
 | HANDTEST §6 Web/Desktop | **partial/human** | Web 无 S3 静态已验；Desktop 密文落盘需装机 |
 
-### Smoke path（可选）
+### 安装记录（2026-07-21 选项 1）
 
-1. 启动 `D:\PromtOptimizer\app\PromptOptimizer.exe`（当前为 2026-07-20 包，**未必**含 E1；E1 请用本刀 NSIS 归档安装后测）。  
-2. 或 `pnpm` 本地 web/desktop 对 tip `1e2346e` 做 §1/§5。  
+| 项 | 值 |
+|----|-----|
+| 方式 | 便携 zip 覆盖（**非**跑 NSIS 安装器；`app\` 原为便携树） |
+| 源 | `D:\PromtOptimizer\nsis-2026-07-21-e1\PromptOptimizer-2.11.7-win-x64.zip` |
+| 目标 | `D:\PromtOptimizer\app\` |
+| 回滚 | 删/改名 `app\` → 恢复 `D:\PromtOptimizer\app-backup-2026-07-20-pre-e1\` |
+| asar E1 字符串 | **HIT** `pro-multi-eval-case-open` · `pro-variable-eval-case-open` · `basic-user-eval-case-open` · `post-optimize-cta` · `pro-multi-test-dual-model` |
+| 启动 | 初次 **FAIL** → 见下「IPC 信任修复」；补丁后 **ok** |
+
+### IPC 信任修复（初始化失败根因）
+
+| 项 | 值 |
+|----|-----|
+| 症状 | UI「应用初始化失败，请刷新或联系支持」 |
+| 日志 | `IPC request sender is not trusted` / `IPC_UNTRUSTED_SENDER` |
+| 根因 | `isTrustedRendererSender` 要求 `senderFrame.isMainFrame === true`；Electron 41 合法主 frame 可能缺该属性 → 全 IPC 被拒 |
+| 修复 | `packages/desktop/config/ipc-security.js`：仅 **明确 false** 时拒子 frame；`window-security` Windows 路径大小写归一 |
+| 单测 | `node --test packages/desktop/config/ipc-security.test.js` 等 **9 pass** |
+| 热补丁 | 已写入当前 `app\resources\app.asar`（备份 `app.asar.bak-pre-ipc-fix`） |
+| 源码 commit | 见 `git log -1`（fix desktop IPC trust） |
+| 验证 | 重启后 stderr **无** 新 UNTRUSTED（updater 404 仍为噪声、非阻塞） |
+
+### Smoke path（人类 GUI · 装机后）
+
+1. 已启动：`D:\PromtOptimizer\app\PromptOptimizer.exe`（**E1 asar**）。  
+2. 按 `HANDTEST-CHECKLIST-2026-07-21.md` §1–§6 勾选。  
 3. E1 重点：Context System/User 优化后 CTA；四区 EvalCase open；双模型按钮。
 
 ---
@@ -69,5 +93,6 @@ E1 增量重点（静态已具备；GUI 见 human）：
 | 角色 | 状态 | 日期 |
 |------|------|------|
 | pipeline-coder（机器侧） | auto **pass** · GUI **partial/human** | 2026-07-21 |
-| pipeline-tester | 待 | |
-| 人类手测签字 | 待 | |
+| pipeline-tester | T1–T10 PASS | 2026-07-21 |
+| 安装到 app\\ | **done** · asar HIT · 进程启动 | 2026-07-21 |
+| 人类 GUI 手测签字 | 待 | |
