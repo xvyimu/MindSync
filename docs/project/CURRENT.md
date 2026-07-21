@@ -2,7 +2,7 @@
 
 > **L1 活文档 · 版本与路径只在这里维护权威数字。**  
 > 其他文档应链接本文，勿复制过期版本号。  
-> 文档体系：方案 C（双层真相源）— 见 `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`
+> 文档体系：方案 C（双层真相源）— 见 ``docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-2026-07-20.md``
 
 | 项 | 值 |
 |----|-----|
@@ -40,25 +40,25 @@
 |--------|------|
 | 安装/启动 | `D:\PromtOptimizer\README.md` |
 | 开发/模块/测试 | [`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) |
-| 全面检查/安全/模块审计 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
-| 全面扫描建议 | `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
-| **全面扫描+规划（2026-07-21）** | `D:\PromtOptimizer\docs\FULL-SCAN-PLAN-RECOMMENDATIONS-2026-07-21.md` |
-| **整合决策调研（tip 对齐 R2）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21.md` |
-| **整合决策调研（R3 · 90d 收工后）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md` |
+| 全面检查/安全/模块审计 | ``docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md`` |
+| 全面扫描建议 | ``docs/project/archives/install-side-2026-07/FULL-SCAN-RECOMMENDATIONS-2026-07-20.md`` |
+| **全面扫描+规划（2026-07-21）** | ``docs/project/archives/install-side-2026-07/FULL-SCAN-PLAN-RECOMMENDATIONS-2026-07-21.md`` |
+| **整合决策调研（tip 对齐 R2）** | ``docs/project/archives/install-side-2026-07/INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21.md`` |
+| **整合决策调研（R3 · 90d 收工后）** | ``docs/project/archives/install-side-2026-07/INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md`` |
 | **下一刀规格（Cut-R2a C2）** | [`NEXT-CUT-SPEC-2026-07-21-R2-C2.md`](./NEXT-CUT-SPEC-2026-07-21-R2-C2.md) |
 | **手测清单（15 min 闭环）** | [`HANDTEST-CHECKLIST-2026-07-21.md`](./HANDTEST-CHECKLIST-2026-07-21.md) |
 | **手测状态 E1（机器+human）** | [`HANDTEST-STATUS-2026-07-21-E1.md`](./HANDTEST-STATUS-2026-07-21-E1.md) |
 | **Agent 续作提示词/下一步/诊断** | [`AGENT-CONTINUE-PROMPT-AND-NEXT-PLAN-2026-07-21.md`](./AGENT-CONTINUE-PROMPT-AND-NEXT-PLAN-2026-07-21.md) |
 | **E0/E1/E2 规格（R3 表单）** | [`NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md`](./NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md) |
 | **B6/D1/D2 规格** | [`NEXT-CUT-SPEC-2026-07-21-B6-D1-D2.md`](./NEXT-CUT-SPEC-2026-07-21-B6-D1-D2.md) |
-| **竞品/架构调研（万字）** | `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md` |
+| **竞品/架构调研（万字）** | ``docs/project/archives/install-side-2026-07/COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`` |
 | **决策简报（目标/约束/验收）** | [`COMPETITIVE-BRIEF.md`](./COMPETITIVE-BRIEF.md) |
 | **架构宪章** | [`../architecture/charter.md`](../architecture/charter.md) |
 | **90 天 backlog** | [`BACKLOG-90D-2026-07-21.md`](./BACKLOG-90D-2026-07-21.md) |
 | **下一刀规格（EvalCaseSet）** | [`NEXT-CUT-SPEC-2026-07-21.md`](./NEXT-CUT-SPEC-2026-07-21.md)（Cut-1 史） |
 | **下一刀规格（Cut-R1 发布+F2）** | [`NEXT-CUT-SPEC-2026-07-21-RELEASE-F2.md`](./NEXT-CUT-SPEC-2026-07-21-RELEASE-F2.md) |
-| 文档怎么管 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`（方案 C 已落地） |
-| **文档二期 C2** | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-C2-2026-07-20.md`（漂移清零 + 门禁硬化） |
+| 文档怎么管 | ``docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-2026-07-20.md``（方案 C 已落地） |
+| **文档二期 C2** | ``docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-C2-2026-07-20.md``（漂移清零 + 门禁硬化） |
 | **文档漂移台账** | [`DOC-DRIFT-REGISTRY.md`](./DOC-DRIFT-REGISTRY.md)（DOC-01～20 状态） |
 | 磁盘清理 | [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md) · 日志 [`CLEANUP-LOG-2026-07-22.md`](./CLEANUP-LOG-2026-07-22.md) |
 | **发版一步表** | [`RELEASE-RUNBOOK.md`](./RELEASE-RUNBOOK.md) |
@@ -95,7 +95,7 @@
 - **B5 远程备份边界**：UI 移除 `@aws-sdk/client-s3`；Web 仅 Google Drive；S3/R2/WebDAV 仅 Desktop IPC  
 - **E1 入口铺全（R3）**：PostOptimize CTA + EvalCase 面板 + 双模型一键覆盖 **Basic System/User + Context System/User**（同一 `useEvalCaseSet` / `seedDualModelKeys`）  
 - **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
-- **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`；**R3 决策**见 `INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md`  
+- **战略文档**：竞品/架构调研见 ``docs/project/archives/install-side-2026-07/COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md``；**R3 决策**见 `INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md`  
 
 ---
 

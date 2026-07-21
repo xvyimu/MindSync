@@ -72,3 +72,16 @@ Test-Path 'D:\PromtOptimizer\src\prompt-optimizer'  # junction
 Test-Path 'D:\PromtOptimizer\app-backup-2026-07-20-pre-e1'
 Test-Path 'D:\PromtOptimizer\nsis-2026-07-21-e1'
 ```
+
+
+---
+
+## 6. 续作 2026-07-22（1 tools + 2 docs + 3 merge）
+
+| 动作 | 结果 |
+|------|------|
+| 删除 `tools/node-v22*` + `node22.zip` | ~133M；系统 Node v24.16.0 |
+| 外层 `D:\PromtOptimizer\docs\` 正文 | 迁入 `docs/project/archives/install-side-2026-07/`（9 份） |
+| 外层 docs | 仅 `README.md` 索引 |
+| CURRENT 链接 | 指向仓内 archive |
+| PR #7 / #8 | 见 merge 记录 |

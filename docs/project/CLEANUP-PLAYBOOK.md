@@ -27,7 +27,8 @@
 | `D:\PromtOptimizerpp-backup-*` | 被更新 asar 取代的整树备份（确认现行 app 正常后） |
 | `D:\PromtOptimizer
 sis-2026-07-20-*` / `nsis-2026-07-21-e1` | 旧 NSIS 归档；保留最新 `nsis-2026-07-21-ipc` 即可 |
-| `appesourcespp.asar.bak-pre-*` | asar 热修备份（确认现行 asar 后） |
+| `app
+esourcespp.asar.bak-pre-*` | asar 热修备份（确认现行 asar 后） |
 | `src/mindsync/ci-logs*.zip` | CI 日志包（可再生） |
 | `D:\orca\po-*.json` / 手测 dump / `tmp-*.html` | 会话临时文件（非仓内） |
 | `D:\PromtOptimizer\app\resources\app.asar.bak-pre-icons-*` | asar 热修备份（确认新 asar 正常后） |
