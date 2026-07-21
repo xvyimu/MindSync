@@ -44,3 +44,20 @@ services:
       - ACCESS_PASSWORD=${ACCESS_PASSWORD:?ACCESS_PASSWORD is required — set a strong value for any exposed host}
     security_opt:
       - no-new-privileges:true
+
+    # --- Optional: run entire container as non-root (uid 10001 = app) ---
+    # Requires NGINX_PORT >= 1024 (cannot bind :80 without CAP_NET_BIND_SERVICE).
+    # Map host port to the high container port, e.g. 28081:8080.
+    # Do not enable silently — uncomment and set env together:
+    #
+    # user: "10001:10001"
+    # environment:
+    #   - NGINX_PORT=8080
+    #   - MCP_AUTH_TOKEN=${MCP_AUTH_TOKEN:?MCP_AUTH_TOKEN is required}
+    #   - ACCESS_PASSWORD=${ACCESS_PASSWORD:?ACCESS_PASSWORD is required}
+    # ports:
+    #   - "28081:8080"
+    # healthcheck:
+    #   test: ["CMD", "sh", "-c", "curl -fsS http://localhost:8080/healthz >/dev/null"]
+    #
+    # Do NOT set read_only: true by default — startup writes config.js and auth files.

@@ -33,6 +33,38 @@ environment:
   # 不要指望 VITE_*_API_KEY 进入前端
 ```
 
+## 非 root 运行
+
+镜像内已创建固定用户 **`app`（uid/gid `10001`）**，并预 chown 运行期可写路径（nginx conf/auth、`config.js`、supervisor 日志等）。
+
+| 模式 | 说明 |
+|------|------|
+| **默认（兼容）** | 入口仍为 root，便于 `NGINX_PORT=80`；**MCP 进程**在 supervisord 中以 `user=app` 降权 |
+| **整容器非 root** | `docker run --user 10001:10001` + **`NGINX_PORT≥1024`**（推荐 `8080`）；**不要**把非 root 容器映射到容器内 80 |
+
+### 一键示例（整容器非 root）
+
+```bash
+docker run --rm \
+  --user 10001:10001 \
+  -e NGINX_PORT=8080 \
+  -e MCP_AUTH_TOKEN=change-me \
+  -e ACCESS_PASSWORD=change-me \
+  -p 8081:8080 \
+  --security-opt no-new-privileges:true \
+  prompt-optimizer:local
+# health: curl -fsS http://localhost:8081/healthz
+```
+
+Compose 片段见 `docker/docker-compose.yml` 末尾注释（默认注释掉，避免 silent break）。
+
+注意：
+
+- Healthcheck 必须使用实际 **`NGINX_PORT`**（非 root 时为 `8080`）。
+- MCP 仍经 nginx **`/mcp`** 反代；容器内 MCP 监听 `127.0.0.1:3000`。
+- `MCP_AUTH_TOKEN` 仍**必填**；public `config.js` 过滤规则不变。
+- 不要默认 `read_only: true`（启动需写 `config.js` / auth）。
+
 ## 相关
 
 - 实现：`docker/generate-config.sh` · `packages/desktop/config/runtime-security.js`（规则对齐）

@@ -5,13 +5,31 @@ if [ -z "${MCP_AUTH_TOKEN:-}" ]; then
     exit 1
 fi
 
-# 创建日志目录
-mkdir -p /var/log/supervisor
+# Writable runtime dirs (must be writable by entry user — root or app/10001).
+for d in /var/log/supervisor /var/run /etc/nginx/http.d /etc/nginx/auth /usr/share/nginx/html; do
+    if ! mkdir -p "$d" 2>/dev/null; then
+        echo "ERROR: cannot create $d (permission denied). If running as non-root, use the official image with app:10001 ownership and NGINX_PORT>=1024." >&2
+        exit 1
+    fi
+done
 
 # 处理nginx配置文件中的环境变量
 echo "Processing nginx configuration with environment variables..."
-envsubst '${NGINX_PORT}' < /etc/nginx/http.d/default.conf > /tmp/nginx.conf
-mv /tmp/nginx.conf /etc/nginx/http.d/default.conf
+if ! envsubst '${NGINX_PORT}' < /etc/nginx/http.d/default.conf > /tmp/nginx.conf 2>/dev/null; then
+    # /tmp may be restricted in some hardened setups; write in-place via temp under http.d
+    if ! envsubst '${NGINX_PORT}' < /etc/nginx/http.d/default.conf > /etc/nginx/http.d/default.conf.tmp; then
+        echo "ERROR: failed to write nginx config (check write access to /etc/nginx/http.d and NGINX_PORT=${NGINX_PORT:-})." >&2
+        echo "HINT: non-root requires NGINX_PORT>=1024 (e.g. 8080) and image paths owned by uid 10001." >&2
+        exit 1
+    fi
+    mv /etc/nginx/http.d/default.conf.tmp /etc/nginx/http.d/default.conf
+else
+    if ! mv /tmp/nginx.conf /etc/nginx/http.d/default.conf 2>/dev/null; then
+        echo "ERROR: failed to update /etc/nginx/http.d/default.conf (permission denied)." >&2
+        echo "HINT: non-root requires NGINX_PORT>=1024 (e.g. 8080) and image paths owned by uid 10001." >&2
+        exit 1
+    fi
+fi
 echo "Nginx configuration updated with NGINX_PORT=${NGINX_PORT}"
 
 # 运行原有的nginx初始化脚本

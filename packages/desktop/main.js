@@ -53,18 +53,7 @@ const {
 const { createStreamRegistry } = require('./config/stream-registry');
 const { createCoreServices } = require('./config/service-container');
 const { createOwnedStreamRunner } = require('./config/ipc/owned-stream-runner');
-const { registerLlmIpcHandlers } = require('./config/ipc/llm-handlers');
-const { registerPromptStreamIpcHandlers } = require('./config/ipc/prompt-stream-handlers');
-const { registerModelIpcHandlers } = require('./config/ipc/model-handlers');
-const { registerImageIpcHandlers } = require('./config/ipc/image-handlers');
-const { registerTemplateIpcHandlers } = require('./config/ipc/template-handlers');
-const { registerHistoryIpcHandlers } = require('./config/ipc/history-handlers');
-const { registerFavoriteIpcHandlers } = require('./config/ipc/favorite-handlers');
-const { registerContextIpcHandlers } = require('./config/ipc/context-handlers');
-const { registerDataIpcHandlers } = require('./config/ipc/data-handlers');
-const { registerPromptSyncIpcHandlers } = require('./config/ipc/prompt-sync-handlers');
-const { registerPreferenceIpcHandlers } = require('./config/ipc/preference-handlers');
-const { registerSystemIpcHandlers } = require('./config/ipc/system-handlers');
+const { registerDomainIpcHandlers } = require('./config/ipc/register-domain-handlers');
 const { createUpdateHandlers } = require('./config/ipc/update-handlers');
 const { setupRemoteStorageHandlers } = require('./remote-storage');
 const path = require('path');
@@ -94,30 +83,7 @@ const envPath = path.join(__dirname, '.env');
 require('dotenv').config({ path: envLocalPath });
 require('dotenv').config({ path: envPath });
 
-const {
-  PreferenceService,
-  createModelManager,
-  createTemplateManager,
-  createHistoryManager,
-  createLLMService,
-  createPromptService,
-  createImageUnderstandingService,
-  createImageModelManager,
-  createImageAdapterRegistry,
-  createImageService,
-  createTemplateLanguageService,
-  createDataManager,
-  createContextRepo,
-  FavoriteManager,
-  FileStorageProvider,
-  createSecretAwareStorageProvider,
-  runStorageStartupSafetyCheck,
-  writeStartupRepairReport,
-  // 导入共享的环境变量扫描常量
-  CUSTOM_API_PATTERN,
-  SUFFIX_PATTERN,
-  MAX_SUFFIX_LENGTH,
-} = require('@prompt-optimizer/core');
+// 业务服务工厂由 config/service-container.js 内聚 require('@prompt-optimizer/core')
 
 /**
  * 安全序列化函数，用于清理Vue响应式对象
@@ -390,16 +356,6 @@ async function setupGlobalProxyDispatcherFromSystem() {
   }
 }
 
-async function initializePreferenceService(storageProvider) {
-  console.log('[DESKTOP] Initializing PreferenceService with the provided storage provider...');
-  preferenceService = new PreferenceService(storageProvider);
-  console.log('[DESKTOP] PreferenceService initialized.');
-}
-
-function setupPreferenceHandlers() {
-  // Preference IPC is registered in setupIPC after registerSensitiveIpc exists.
-}
-
 // 构建注入到渲染进程的公共运行时配置脚本（双份键：带前缀与不带前缀）。
 function buildRuntimeConfigScriptFromEnv() {
   try {
@@ -590,85 +546,17 @@ function createWindow() {
   });
 }
 
+/**
+ * Composition root：注入 Electron/env 依赖，业务装配全部在 service-container。
+ */
 async function initializeServices() {
   try {
-    console.log('[Main Process] Initializing core services...');
-
-    // 设置环境变量，确保主进程能访问API密钥
-    // 这些环境变量应该在启动桌面应用之前设置
-    console.log('[Main Process] Checking environment variables...');
-
-    const staticEnvVars = [
-      'VITE_OPENAI_API_KEY',
-      'VITE_GEMINI_API_KEY',
-      'VITE_ANTHROPIC_API_KEY',
-      'VITE_DEEPSEEK_API_KEY',
-      'VITE_SILICONFLOW_API_KEY',
-      'VITE_ZHIPU_API_KEY',
-      'VITE_DASHSCOPE_API_KEY',
-      'VITE_OPENROUTER_API_KEY',
-      'VITE_MODELSCOPE_API_KEY',
-      'VITE_CUSTOM_API_KEY',
-      'VITE_CUSTOM_API_BASE_URL',
-      'VITE_CUSTOM_API_MODEL',
-      'VITE_CUSTOM_API_PARAMS',
-      'VITE_CUSTOM_API_HEADERS'
-    ];
-
-    const dynamicEnvVars = Object.keys(process.env).filter(key => {
-      const match = key.match(CUSTOM_API_PATTERN);
-      if (!match) return false;
-      const [, , suffix] = match;
-      return suffix && suffix.length <= MAX_SUFFIX_LENGTH && SUFFIX_PATTERN.test(suffix);
-    });
-
-    const allEnvVars = [...staticEnvVars, ...dynamicEnvVars];
-    let hasApiKeys = false;
-    allEnvVars.forEach(envVar => {
-      if (process.env[envVar]) {
-        console.log(`[Main Process] Found ${envVar}: [CONFIGURED]`);
-        hasApiKeys = true;
-      } else {
-        console.log(`[Main Process] Missing ${envVar}`);
-      }
-    });
-
-    if (dynamicEnvVars.length > 0) {
-      console.log(`[Main Process] Found ${dynamicEnvVars.length} dynamic custom model environment variables`);
-    }
-
-    if (!hasApiKeys) {
-      console.warn('[Main Process] No API keys found in environment variables.');
-      console.warn('[Main Process] Please set environment variables before starting the desktop app.');
-    }
-
-    // 核心服务装配下沉到 service-container，main 只保留环境探测与结果绑定
     const result = await createCoreServices({
-      core: {
-        createModelManager,
-        createTemplateManager,
-        createHistoryManager,
-        createLLMService,
-        createPromptService,
-        createImageUnderstandingService,
-        createImageModelManager,
-        createImageAdapterRegistry,
-        createImageService,
-        createTemplateLanguageService,
-        createDataManager,
-        createContextRepo,
-        FavoriteManager,
-        FileStorageProvider,
-        createSecretAwareStorageProvider,
-        runStorageStartupSafetyCheck,
-        writeStartupRepairReport,
-      },
       getUserDataPath: () => app.getPath('userData'),
       safeStorage,
-      initializePreferenceService,
-      getPreferenceService: () => preferenceService,
       setupGlobalProxyDispatcherFromSystem,
       convertImageInputWithElectronNativeImage,
+      env: process.env,
     });
 
     if (!result.ok) {
@@ -793,7 +681,6 @@ const { setupUpdateHandlers } = createUpdateHandlers({
 
 function setupIPC() {
   console.log('[Main Process] Setting up high-level service IPC handlers...');
-  setupPreferenceHandlers();
 
   /** 注册需要可信 sender、参数校验和统一响应信封的 IPC handler。 */
   const registerSensitiveIpc = (channel, handler, validateArgs) => {
@@ -809,33 +696,6 @@ function setupIPC() {
 
   // 集中执行 sender 绑定流任务，确保结束、异常和取消都会清理注册表。
   const runOwnedStream = createOwnedStreamRunner({ streamRegistry });
-
-  // 将 LLM 与取消通道注册委托给独立后端 module，main.js 只负责依赖装配。
-  registerLlmIpcHandlers({
-    registerSensitiveIpc,
-    llmService,
-    streamRegistry,
-    runOwnedStream,
-  });
-
-  // 将 Prompt 流式通道注册委托给独立后端 module，保持现有 renderer interface 不变。
-  registerPromptStreamIpcHandlers({
-    registerSensitiveIpc,
-    promptService,
-    runOwnedStream,
-  });
-
-  // 将 Prompt 同步接口委托给独立后端 module；流式接口由 prompt-stream-handlers 负责。
-  registerPromptSyncIpcHandlers({
-    registerSensitiveIpc,
-    promptService,
-    historyManager,
-  });
-
-  // multimodal evaluation：图像理解走主进程，避免 renderer 直连供应商。
-  registerSensitiveIpc('image-understanding-understand', async (_event, request) => {
-    return imageUnderstandingService.understand(safeSerialize(request));
-  });
 
   // 在页面加载前拦截 /config.js 并注入运行时环境变量（双份键）
   try {
@@ -856,69 +716,29 @@ function setupIPC() {
     console.warn('[Main Process] Unable to register runtime config interceptor:', e);
   }
 
-  registerPreferenceIpcHandlers({
+  // 领域 IPC 注册下沉到 register-domain-handlers；main 只做胶水。
+  registerDomainIpcHandlers({
     registerSensitiveIpc,
-    preferenceService,
-    safeSerialize,
-  });
-
-  // 将文本模型管理 IPC 委托给独立后端 module。
-  registerModelIpcHandlers({
-    registerSensitiveIpc,
-    modelManager,
-    safeSerialize,
-  });
-
-  // 将图像模型配置与图像生成 IPC 委托给独立后端 module。
-  registerImageIpcHandlers({
-    registerSensitiveIpc,
-    imageModelManager,
-    imageService,
-    imageAdapterRegistry,
-    safeSerialize,
+    services: {
+      llmService,
+      promptService,
+      historyManager,
+      preferenceService,
+      modelManager,
+      imageModelManager,
+      imageService,
+      imageAdapterRegistry,
+      imageUnderstandingService,
+      templateManager,
+      contextRepo,
+      favoriteManager,
+      dataManager,
+    },
     streamRegistry,
+    runOwnedStream,
+    safeSerialize,
     assertValidStreamId,
-  });
-
-  // 将模板管理 IPC 委托给独立后端 module。
-  registerTemplateIpcHandlers({
-    registerSensitiveIpc,
-    templateManager,
-    safeSerialize,
-  });
-
-  // 将历史记录 IPC 委托给独立后端 module。
-  registerHistoryIpcHandlers({
-    registerSensitiveIpc,
-    historyManager,
-    safeSerialize,
-  });
-
-  // 将会话上下文 IPC 委托给独立后端 module。
-  registerContextIpcHandlers({
-    registerSensitiveIpc,
-    contextRepo,
-    safeSerialize,
-  });
-
-  // 将收藏管理 IPC 委托给独立后端 module。
-  registerFavoriteIpcHandlers({
-    registerSensitiveIpc,
-    favoriteManager,
-    safeSerialize,
-  });
-
-  // 将数据导入导出与本地存储信息 IPC 委托给独立后端 module。
-  registerDataIpcHandlers({
-    registerSensitiveIpc,
-    dataManager,
     app,
-    shell,
-  });
-
-  // 将运行时配置、外链、应用信息与日志 IPC 委托给独立后端 module。
-  registerSystemIpcHandlers({
-    registerSensitiveIpc,
     shell,
     consoleLogger,
     getPublicRuntimeConfig,
@@ -928,10 +748,8 @@ function setupIPC() {
       uiLocale = locale;
     },
     normalizeUiLocale,
+    setupUpdateHandlers,
   });
-
-  // 自动更新相关处理器
-  setupUpdateHandlers();
 
   console.log('[Main Process] High-level service IPC handlers ready.');
 }

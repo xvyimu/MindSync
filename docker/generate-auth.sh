@@ -14,21 +14,34 @@ EOF
     fi
 
     echo "启用Basic认证..."
-    
+
     # 创建认证文件目录
-    mkdir -p /etc/nginx/auth
-    
+    if ! mkdir -p /etc/nginx/auth; then
+        echo "ERROR: cannot create /etc/nginx/auth (permission denied)." >&2
+        exit 1
+    fi
+
     # 确定用户名（如果未设置ACCESS_USERNAME则使用默认值"admin"）
     USERNAME=${ACCESS_USERNAME:-admin}
-    
+
     # 生成htpasswd文件 - 使用printf避免特殊字符问题
     printf '%s' "$ACCESS_PASSWORD" | htpasswd -i -c /etc/nginx/auth/.htpasswd "$USERNAME"
 
-    # 仅 nginx worker 需要读认证文件；禁止 world-readable（防容器内其他进程离线爆破）
+    # 仅 nginx / 入口用户需要读认证文件；禁止 world-readable
+    # 属主矩阵：
+    # - 默认 root 入口 + nginx 组：root:nginx 0640
+    # - 整容器 non-root (app/10001)：app:app 或 app:nginx 0640
     chmod 0750 /etc/nginx/auth
     chmod 0640 /etc/nginx/auth/.htpasswd
-    if id nginx >/dev/null 2>&1; then
+    if id nginx >/dev/null 2>&1 && [ "$(id -u)" = "0" ]; then
       chown -R root:nginx /etc/nginx/auth 2>/dev/null || true
+    elif id app >/dev/null 2>&1; then
+      # non-root entry or app-owned paths: keep readable by app (and nginx group if present)
+      if id nginx >/dev/null 2>&1; then
+        chown -R app:nginx /etc/nginx/auth 2>/dev/null || chown -R app:app /etc/nginx/auth 2>/dev/null || true
+      else
+        chown -R app:app /etc/nginx/auth 2>/dev/null || true
+      fi
     fi
 
     # 创建启用认证的配置

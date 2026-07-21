@@ -1,3 +1,5 @@
+- **D3 ServiceContainer**：业务装配下沉 `createCoreServices`；main 仅 composition root + IPC 胶水  
+- **D4 Docker 非 root 里程碑**：镜像用户 `app`/10001；MCP 子进程降权；整容器非 root 需 `NGINX_PORT=8080`（文档）  
 # 现行事实快照（CURRENT）
 
 > **L1 活文档 · 版本与路径只在这里维护权威数字。**  
@@ -83,6 +85,8 @@
 - **导出含密钥二次确认**：DataManager 勾选 includeSecrets 后导出需确认  
 - **B6 路径规范化测**：`normalizeObjectPath` 拒 `..`/反斜杠/控制字符（UI+Desktop 对齐）  
 - **D1/D2 实验自动优化**：策略接口默认 Template；实验开关 **默认关**（ADR-005）  
+- **D3 ServiceContainer**：业务装配下沉 `createCoreServices`；main 仅 composition root + IPC 胶水  
+- **D4 Docker 非 root 里程碑**：镜像用户 `app`/10001；MCP 子进程降权；整容器非 root 需 `NGINX_PORT=8080`（文档）  
 - **B5 远程备份边界**：UI 移除 `@aws-sdk/client-s3`；Web 仅 Google Drive；S3/R2/WebDAV 仅 Desktop IPC  
 - **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
 - **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`（本地优先工作台定位，非 LLMOps 平台）  

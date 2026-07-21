@@ -329,12 +329,16 @@ test('Image backend module registers the stable image IPC interface', async () =
   const imageAdapterRegistry = {
     getDynamicModels: async (providerId) => [{ id: `${providerId}-dynamic` }],
   };
+  const imageUnderstandingService = {
+    understand: async (request) => ({ text: 'understood', request }),
+  };
 
   registerImageIpcHandlers({
     registerSensitiveIpc: registrar.registerSensitiveIpc,
     imageModelManager,
     imageService,
     imageAdapterRegistry,
+    imageUnderstandingService,
     safeSerialize: (value) => value,
   });
 
@@ -342,6 +346,7 @@ test('Image backend module registers the stable image IPC interface', async () =
   assert.equal(registrar.handlers.has('image-generate'), true);
   assert.equal(registrar.handlers.has('image-testConnection'), true);
   assert.equal(registrar.handlers.has('image-getDynamicModels'), true);
+  assert.equal(registrar.handlers.has('image-understanding-understand'), true);
 
   assert.deepEqual(
     await registrar.handlers.get('image-generate')({}, { prompt: 'cat' }),
@@ -350,6 +355,10 @@ test('Image backend module registers the stable image IPC interface', async () =
   assert.deepEqual(
     await registrar.handlers.get('image-getDynamicModels')({}, 'openai', { apiKey: 'x' }),
     [{ id: 'openai-dynamic' }],
+  );
+  assert.deepEqual(
+    await registrar.handlers.get('image-understanding-understand')({}, { image: 'b64' }),
+    { text: 'understood', request: { image: 'b64' } },
   );
 });
 

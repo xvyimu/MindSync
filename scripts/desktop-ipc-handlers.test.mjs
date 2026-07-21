@@ -82,6 +82,7 @@ test('desktop streaming contract exposes an owner-bound cancellation channel', (
 
 test('desktop composition root delegates domain handlers to backend modules', () => {
   const main = readText('packages/desktop/main.js')
+  const registerDomain = readText('packages/desktop/config/ipc/register-domain-handlers.js')
   const llmModule = readText('packages/desktop/config/ipc/llm-handlers.js')
   const promptStreamModule = readText('packages/desktop/config/ipc/prompt-stream-handlers.js')
   const promptSyncModule = readText('packages/desktop/config/ipc/prompt-sync-handlers.js')
@@ -95,23 +96,26 @@ test('desktop composition root delegates domain handlers to backend modules', ()
   const preferenceModule = readText('packages/desktop/config/ipc/preference-handlers.js')
   const systemModule = readText('packages/desktop/config/ipc/system-handlers.js')
 
-  assert.match(main, /registerLlmIpcHandlers\(/)
-  assert.match(main, /registerPromptStreamIpcHandlers\(/)
-  assert.match(main, /registerPromptSyncIpcHandlers\(/)
-  assert.match(main, /registerModelIpcHandlers\(/)
-  assert.match(main, /registerImageIpcHandlers\(/)
-  assert.match(main, /registerTemplateIpcHandlers\(/)
-  assert.match(main, /registerHistoryIpcHandlers\(/)
-  assert.match(main, /registerFavoriteIpcHandlers\(/)
-  assert.match(main, /registerContextIpcHandlers\(/)
-  assert.match(main, /registerDataIpcHandlers\(/)
-  assert.match(main, /registerPreferenceIpcHandlers\(/)
-  assert.match(main, /registerSystemIpcHandlers\(/)
+  // main 通过 registerDomainIpcHandlers 集中注册；领域 register* 在 register-domain-handlers 内调用
+  assert.match(main, /registerDomainIpcHandlers\(/)
   assert.match(main, /createUpdateHandlers\(/)
+  assert.match(registerDomain, /registerLlmIpcHandlers\(/)
+  assert.match(registerDomain, /registerPromptStreamIpcHandlers\(/)
+  assert.match(registerDomain, /registerPromptSyncIpcHandlers\(/)
+  assert.match(registerDomain, /registerModelIpcHandlers\(/)
+  assert.match(registerDomain, /registerImageIpcHandlers\(/)
+  assert.match(registerDomain, /registerTemplateIpcHandlers\(/)
+  assert.match(registerDomain, /registerHistoryIpcHandlers\(/)
+  assert.match(registerDomain, /registerFavoriteIpcHandlers\(/)
+  assert.match(registerDomain, /registerContextIpcHandlers\(/)
+  assert.match(registerDomain, /registerDataIpcHandlers\(/)
+  assert.match(registerDomain, /registerPreferenceIpcHandlers\(/)
+  assert.match(registerDomain, /registerSystemIpcHandlers\(/)
   assert.doesNotMatch(main, /registerSensitiveIpc\(\s*'llm-/)
   assert.doesNotMatch(main, /registerSensitiveIpc\(\s*'prompt-[^']*Stream'/)
+  assert.doesNotMatch(main, /registerSensitiveIpc\(\s*'image-understanding-understand'/)
   assert.doesNotMatch(main, /ipcMain\.handle\(\s*'model-/)
-  assert.doesNotMatch(main, /ipcMain\.handle\(\s*'image-(?!understanding)/)
+  assert.doesNotMatch(main, /ipcMain\.handle\(\s*'image-/)
   assert.doesNotMatch(main, /ipcMain\.handle\(\s*'template-/)
   assert.doesNotMatch(main, /ipcMain\.handle\(\s*'history-/)
   assert.doesNotMatch(main, /ipcMain\.handle\(\s*'favorite-/)
@@ -127,6 +131,7 @@ test('desktop composition root delegates domain handlers to backend modules', ()
   assert.match(promptSyncModule, /registerSensitiveIpc\(\s*'prompt-optimizePrompt'/)
   assert.match(modelModule, /registerSensitiveIpc\(\s*'model-getAllModels'/)
   assert.match(imageModule, /registerSensitiveIpc\(\s*'image-generate'/)
+  assert.match(imageModule, /registerSensitiveIpc\(\s*'image-understanding-understand'/)
   assert.match(templateModule, /registerSensitiveIpc\(\s*'template-getTemplates'/)
   assert.match(historyModule, /registerSensitiveIpc\(\s*'history-getHistory'/)
   assert.match(favoriteModule, /registerSensitiveIpc\(\s*'favorite-addFavorite'/)
@@ -429,15 +434,17 @@ test('desktop remote storage implementation avoids renderer fetch/WebDAV XML pat
 })
 
 test('desktop preference bridge exposes only registered preference handlers', () => {
-  // preference 已拆到独立 module；契约仍要求完整 channel 集合可用。
+  // preference 已拆到独立 module；经 register-domain-handlers 挂到 main。
   const preferenceModule = readText('packages/desktop/config/ipc/preference-handlers.js')
   const main = readText('packages/desktop/main.js')
+  const registerDomain = readText('packages/desktop/config/ipc/register-domain-handlers.js')
   const preferenceHandlers = collectMatches(preferenceModule, [
     /ipcMain\.handle\(\s*['"]([^'"]+)['"]/g,
     /registerSensitiveIpc\(\s*['"]([^'"]+)['"]/g,
   ])
 
-  assert.match(main, /registerPreferenceIpcHandlers\(/)
+  assert.match(main, /registerDomainIpcHandlers\(/)
+  assert.match(registerDomain, /registerPreferenceIpcHandlers\(/)
 
   for (const channel of [
     'preference-get',

@@ -38,3 +38,7 @@ services:
       # Basic auth (optional). Empty ACCESS_PASSWORD disables auth.
       - ACCESS_USERNAME=${ACCESS_USERNAME:-admin}
       - ACCESS_PASSWORD=${ACCESS_PASSWORD:-}
+
+    # Optional non-root (same as prod compose comments):
+    # user: "10001:10001"
+    # + NGINX_PORT=8080 and ports "28082:8080"

@@ -121,6 +121,28 @@ docker build -t prompt-optimizer:local .
 docker run -d -p 8081:80 --name prompt-optimizer-local prompt-optimizer:local
 ```
 
+## 非 root 运行
+
+镜像内用户 **`app` / uid `10001`**。默认入口仍可为 root（兼容绑 80）；supervisord 中 **MCP 以 `user=app` 降权**。
+
+整容器非 root 时必须使用高位端口（**不要**映射到容器 80）：
+
+```bash
+docker run -d \
+  --user 10001:10001 \
+  -e NGINX_PORT=8080 \
+  -e MCP_AUTH_TOKEN=your_token \
+  -e ACCESS_PASSWORD=your_password \
+  -p 8081:8080 \
+  --security-opt no-new-privileges:true \
+  --name prompt-optimizer-nonroot \
+  prompt-optimizer:local
+```
+
+- Healthcheck：`curl -fsS http://localhost:8080/healthz`（容器内）或宿主 `8081`。
+- MCP 仍走 nginx `/mcp`；容器内 MCP 为 `127.0.0.1:3000`。
+- 详细安全说明见仓库 `docs/user/deployment/docker-runtime-security.md`。
+
 ## 更适合放进 `.env.local` 的内容
 
 如果你长期在本地开发，建议把这类变量放进 `.env.local`，再配合 `docker/docker-compose.dev.yml`：

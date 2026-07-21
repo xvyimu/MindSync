@@ -1,26 +1,93 @@
 /**
  * Desktop 核心服务装配容器。
- * 将 initializeServices 的创建顺序与依赖关系从 main.js 抽出，
- * main 只负责环境探测、代理与 IPC 绑定。
+ * 业务工厂与创建顺序的唯一入口：storage → preference → managers → LLM/Prompt/Image → data。
+ * main 只做 composition root（Electron 路径 / proxy / nativeImage 注入）。
  */
 
 const { createElectronSafeStorageCodec } = require('./safe-storage-secrets');
 
+/** 静态 VITE_* 探测列表（仅日志，不参与装配）。 */
+const STATIC_ENV_VARS = [
+  'VITE_OPENAI_API_KEY',
+  'VITE_GEMINI_API_KEY',
+  'VITE_ANTHROPIC_API_KEY',
+  'VITE_DEEPSEEK_API_KEY',
+  'VITE_SILICONFLOW_API_KEY',
+  'VITE_ZHIPU_API_KEY',
+  'VITE_DASHSCOPE_API_KEY',
+  'VITE_OPENROUTER_API_KEY',
+  'VITE_MODELSCOPE_API_KEY',
+  'VITE_CUSTOM_API_KEY',
+  'VITE_CUSTOM_API_BASE_URL',
+  'VITE_CUSTOM_API_MODEL',
+  'VITE_CUSTOM_API_PARAMS',
+  'VITE_CUSTOM_API_HEADERS',
+];
+
+/**
+ * 扫描 env 中是否已配置 API 相关变量（仅日志）。
+ * @param {NodeJS.ProcessEnv} env
+ * @param {{ CUSTOM_API_PATTERN?: RegExp, SUFFIX_PATTERN?: RegExp, MAX_SUFFIX_LENGTH?: number }} patterns
+ * @param {(msg: string, ...args: any[]) => void} log
+ */
+function probeApiKeyEnv(env, patterns, log) {
+  log('[Main Process] Checking environment variables...');
+
+  const {
+    CUSTOM_API_PATTERN,
+    SUFFIX_PATTERN,
+    MAX_SUFFIX_LENGTH = 32,
+  } = patterns || {};
+
+  let dynamicEnvVars = [];
+  if (CUSTOM_API_PATTERN && SUFFIX_PATTERN) {
+    dynamicEnvVars = Object.keys(env).filter((key) => {
+      const match = key.match(CUSTOM_API_PATTERN);
+      if (!match) return false;
+      const [, , suffix] = match;
+      return suffix && suffix.length <= MAX_SUFFIX_LENGTH && SUFFIX_PATTERN.test(suffix);
+    });
+  }
+
+  const allEnvVars = [...STATIC_ENV_VARS, ...dynamicEnvVars];
+  let hasApiKeys = false;
+  allEnvVars.forEach((envVar) => {
+    if (env[envVar]) {
+      log(`[Main Process] Found ${envVar}: [CONFIGURED]`);
+      hasApiKeys = true;
+    } else if (STATIC_ENV_VARS.includes(envVar)) {
+      log(`[Main Process] Missing ${envVar}`);
+    }
+  });
+
+  if (dynamicEnvVars.length > 0) {
+    log(`[Main Process] Found ${dynamicEnvVars.length} dynamic custom model environment variables`);
+  }
+
+  if (!hasApiKeys) {
+    console.warn('[Main Process] No API keys found in environment variables.');
+    console.warn('[Main Process] Please set environment variables before starting the desktop app.');
+  }
+}
+
 /**
  * @param {object} deps
  * @param {() => string} deps.getUserDataPath
- * @param {object} deps.core — 从 @prompt-optimizer/core require 的工厂集合
- * @param {Function} deps.initializePreferenceService
- * @param {Function} deps.setupGlobalProxyDispatcherFromSystem
- * @param {Function} deps.convertImageInputWithElectronNativeImage
- * @param {import('electron').safeStorage} [deps.safeStorage] — Electron safeStorage
+ * @param {import('electron').safeStorage} [deps.safeStorage]
+ * @param {() => Promise<void>} [deps.setupGlobalProxyDispatcherFromSystem]
+ * @param {(input: any) => Promise<any>} [deps.convertImageInputWithElectronNativeImage]
  * @param {(msg: string, ...args: any[]) => void} [deps.log]
+ * @param {NodeJS.ProcessEnv} [deps.env] — default process.env；用于 API key 探测日志
+ * @param {object} [deps.core] — **仅测试**：覆盖 `@prompt-optimizer/core` 工厂；生产勿传
  * @returns {Promise<{ ok: true, services: object } | { ok: false, error: Error }>}
  */
 async function createCoreServices(deps) {
   const log = deps.log || console.log.bind(console);
+  const env = deps.env || process.env;
+
+  const core = deps.core || require('@prompt-optimizer/core');
   const {
-    PreferenceService: _PreferenceService,
+    PreferenceService,
     createModelManager,
     createTemplateManager,
     createHistoryManager,
@@ -38,9 +105,15 @@ async function createCoreServices(deps) {
     createSecretAwareStorageProvider,
     runStorageStartupSafetyCheck,
     writeStartupRepairReport,
-  } = deps.core;
+    CUSTOM_API_PATTERN,
+    SUFFIX_PATTERN,
+    MAX_SUFFIX_LENGTH,
+  } = core;
 
   try {
+    log('[Main Process] Initializing core services...');
+    probeApiKeyEnv(env, { CUSTOM_API_PATTERN, SUFFIX_PATTERN, MAX_SUFFIX_LENGTH }, log);
+
     log('[DESKTOP] Creating file storage provider for desktop environment');
     const userDataPath = deps.getUserDataPath();
     log('[DESKTOP] Using user data directory:', userDataPath);
@@ -73,15 +146,14 @@ async function createCoreServices(deps) {
       }
     }
 
-    await deps.initializePreferenceService(storageProvider);
-    // preferenceService 由 initializePreferenceService 挂到全局/闭包；此处不重复创建
+    log('[DESKTOP] Initializing PreferenceService with the provided storage provider...');
+    const preferenceService = new PreferenceService(storageProvider);
+    log('[DESKTOP] PreferenceService initialized.');
 
     log('[DESKTOP] Creating model manager...');
     const modelManager = createModelManager(storageProvider);
 
     log('[DESKTOP] Creating template language service...');
-    // preferenceService 必须由调用方在 initializePreferenceService 后提供
-    const preferenceService = deps.getPreferenceService();
     const templateLanguageService = createTemplateLanguageService(preferenceService);
     await templateLanguageService.initialize();
 
@@ -99,7 +171,9 @@ async function createCoreServices(deps) {
     const imageModelManager = createImageModelManager(storageProvider, imageAdapterRegistry);
     await imageModelManager.ensureInitialized();
 
-    await deps.setupGlobalProxyDispatcherFromSystem();
+    if (typeof deps.setupGlobalProxyDispatcherFromSystem === 'function') {
+      await deps.setupGlobalProxyDispatcherFromSystem();
+    }
 
     log('[DESKTOP] Creating LLM service...');
     const llmService = createLLMService(modelManager);
@@ -170,4 +244,7 @@ async function createCoreServices(deps) {
 
 module.exports = {
   createCoreServices,
+  // 测试/文档用
+  STATIC_ENV_VARS,
+  probeApiKeyEnv,
 };

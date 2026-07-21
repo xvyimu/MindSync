@@ -1,363 +1,429 @@
-# Spec: PromptOptimizer 本地可用 Desktop + Fork 可续开发
+# Spec: D3 ServiceContainer 瘦 main + D4 非 root Docker 里程碑
 
 ## OPEN QUESTIONS
 
-无阻塞项。以下采用合理默认（Coder 按此执行，勿再追问）：
+**无阻塞 OPEN QUESTIONS。** 下列采用规划默认，Coder 按此执行，勿再追问：
 
 | 项 | 默认 |
 |----|------|
-| Node 版本 | 环境现为 Node **v24.16.0**；`package.json` engines 为 `^22.0.0` 且 `.npmrc` `engine-strict=true`。优先**不改 engines**；若 `pnpm` 脚本因 engines 拒绝执行，则**仅临时**用 `pnpm config set engine-strict false` 于本机或在命令前 `pnpm --config.engine-strict=false ...`，**禁止**为过 engines 联网装 Node22。 |
-| 启动路径 | **优先离线生产路径**：Electron 直接加载已有 `packages/desktop/web-dist`（不设 `NODE_ENV=development`），避免依赖 Vite dev server 与额外端口。 |
-| API | **不配置** `.env.local`、不调用真实模型；启动到主窗口 + 本地存储初始化即可判为可用。 |
-| Git 推送 | **默认不 push / 不 commit**；仅配置 remote 与文档化推送步骤，等用户明确要求后再执行。 |
-| 历史对齐 | 本地当前为 `main` + 2 个已有 commit + 大量未提交改动；fork 默认分支为 `develop`。**不 reset/rebase/clean**；用独立工作分支承载现状，push 策略见 §6。 |
+| D3 深度 | **增量**：只抽「业务服务装配 / 偏好初始化 / 残余业务 IPC」；不重写窗口、菜单、更新、退出落盘、proxy。 |
+| D3 模块边界 | 装配真相源继续是 `packages/desktop/config/service-container.js`；IPC 域注册列表可抽到 `packages/desktop/config/ipc/register-domain-handlers.js`（新建）。 |
+| D4 兼容 | **默认对外端口语义保持可映射到容器 80**；非 root 作为**可文档化 + 镜像已支持**的路径（默认 `NGINX_PORT=8080` 时整容器非 root），不强制破坏现有 `28081:80` 用户习惯。 |
+| D4 实现策略 | **分两层**：(A) 镜像内创建非 root 用户 + supervisord 子进程降权；(B) 文档 + compose 示例说明「整容器 USER 非 root」需高位端口。不引入 K8s/Helm。 |
+| 测试 | 无 Docker 时 D4 以静态检查 + 文档验收为主；有 Docker 则可选 build 烟测。D3 以现有 desktop node:test 契约为准。 |
+| 提交/推送 | 本任务**不**要求 commit/push（由后续流程决定）。 |
 
 ---
 
-## 1. 目标与非目标
+## 1. Goals
 
-### 目标
+### D3 — ServiceContainer continue slim main
 
-1. 在**现有 `node_modules` / 已装 Electron / 已有 dist** 条件下，把当前工作树做成**可本地启动的 Desktop 应用**。
-2. 用户改动（IPC 领域拆分、流取消、AbortSignal 贯通、runtime/window/ipc 安全、core electron 子路径等）**全部保留**，仅修阻塞启动/测试的缺口。
-3. 配置 Git remote 指向 `xvyimu/prompt-optimizer`（fork）与上游 `linshenkx/prompt-optimizer`，并写清**如何推到 fork 分支**（不自动 push）。
-4. 给出可重复的验证命令（单测 + typecheck 子集 + Desktop 启动烟测）。
+1. Desktop `main.js` **不再持有** core 业务服务的创建顺序与依赖装配细节。
+2. `createCoreServices`（ServiceContainer）成为唯一业务装配入口：storage → preference → managers → LLM/Prompt/Image → data。
+3. `main.js` 只做 composition root：环境、生命周期、窗口、安全 IPC 胶水、把装配结果交给 domain handlers。
+4. 验收语义对齐 backlog：**main 无业务装配细节**（允许保留 register 调用列表，但列表可下沉到模块）。
 
-### 非目标
+### D4 — non-root Docker milestone
 
-- 不 Docker、不联网 `pnpm install` / 不装新依赖。
-- 不调用真实 LLM/图像 API；不做 e2e 全量、不做 release 签名/NSIS 发布必需项。
-- 不 `git commit` / `push` / `merge` / `rebase` / `reset` / `clean`（除非用户后续明确要求）。
-- 不改用户已改业务逻辑的意图；不为「完美对齐上游 develop」重写历史。
-- 不实现新功能（仅让现有改动可运行、可验证、可挂 fork）。
+1. 镜像具备**非 root 运行能力**（用户/目录权限/文档齐全）。
+2. 默认部署路径仍可用；非 root 路径有明确 compose/文档与端口约定。
+3. 现有安全基线不回退：`MCP_AUTH_TOKEN` 必填、public `config.js` 过滤、`no-new-privileges`、Basic Auth 文件权限。
 
 ---
 
-## 2. 现状摘要（规划时已核实）
+## 2. Non-goals / Explicit won't-do
 
-| 项 | 值 |
-|----|-----|
-| 工作根 | `C:\Users\yuanjia\Documents\Codex\2026-07-17\dui\work\source-extract\prompt-optimizer-develop` |
-| 本地分支 | `main`（2 commit；HEAD `2c1f4ba`） |
-| remotes | **无**（`.git/config` 无 remote） |
-| 未提交 | ~75 路径（M + ??），含 desktop IPC 拆分、core abort/signal、electron 入口等 |
-| Fork | `https://github.com/xvyimu/prompt-optimizer` 已存在，`isFork: true`，parent `linshenkx/prompt-optimizer`，default branch **`develop`** |
-| gh | 已登录 `xvyimu` |
-| Node / pnpm | Node `v24.16.0`，pnpm `10.6.1` |
-| 依赖 | 根 `node_modules`、`packages/desktop/node_modules/electron`、core workspace link **已存在** |
-| dist | `packages/core/dist`、`ui/dist`、`web/dist`、`desktop/web-dist` **均存在** |
-| 过期风险 | `packages/core/src/**` 时间戳（2026-07-18）**新于** `packages/core/dist`（2026-07-17 19:59）→ **必须先 rebuild core** 再跑 Desktop，否则 main 加载的 CJS 不含 abort 等改动 |
-| 启动逻辑 | `packages/desktop/main.js`：`NODE_ENV=development` → `http://localhost:18181`；否则 → `web-dist/index.html` |
-| 环境变量 | 无 `.env.local` / 无 `packages/desktop/.env`（符合「不调真实 API」） |
+以下 **禁止** 实现或顺手改掉（即使看起来相关）：
 
-### 用户改动主轴（Coder 不得回退）
-
-- Desktop：`main.js` 作 composition root；`config/ipc/*` 领域 handler；`stream-registry` + `owned-stream-runner`；`ipc-security` / `window-security` / `runtime-security`。
-- Core：provider `AbortSignal`；`src/electron.ts` + package exports `./electron`；SDK lazy load 相关。
-- 契约测试：`scripts/desktop-ipc-handlers.test.mjs`、`packages/desktop/config/*.test.js`、core `provider-cancellation` / `sdk-loaders` 单测。
+| 禁止项 | 说明 |
+|--------|------|
+| 主安装默认 auto-optimize **ON** | D2 已默认关；不得改默认 |
+| Auto-optimize 作为主 CTA | 不改优化完成主按钮语义 |
+| 无限轮、无预算自动搜索 | 不扩 D2 预算/轮次策略 |
+| 破坏 local-first | 不引入云同步为默认 |
+| 破坏导出默认脱敏 | 不改 `exportAllData` 默认 |
+| 破坏 Web 无 S3 规则 | 不把 `@aws-sdk` 拉回 Web/UI |
+| 大重构 main 生命周期 | 不拆 `createWindow` / 菜单 / autoUpdater 整文件迁移（除非为编译所必需的最小移动） |
+| K8s / 多租户 / 计费 | backlog won't |
+| 为 D4 强制改 upstream 镜像名 / CI 推送目标 | 可本地/文档验证；不强制改 Docker Hub 账号逻辑 |
+| 新增 runtime 依赖 | 不 `pnpm add` 新包 |
 
 ---
 
-## 3. 文件创建 / 修改
+## 3. Current state (verified)
 
-### 3.1 必须创建
+### D3
 
-| 路径 | 说明 |
-|------|------|
-| `.pipeline/spec.md` | 本文件（Planner 已写；Coder 可读更新「验证结果」附注，勿删 OPEN QUESTIONS 表） |
-| `.pipeline/verify-notes.md` | **Coder 执行后**写：实际跑通的命令、失败项、Desktop 是否弹出主窗口。禁止写实现代码。 |
+| 事实 | 路径/说明 |
+|------|-----------|
+| 已有雏形 | `packages/desktop/config/service-container.js` 导出 `createCoreServices(deps)` |
+| main 仍做装配胶水 | `packages/desktop/main.js`：`initializeServices` ~L593–702 仍 require 一堆 core 工厂、env 探测、解构绑定全局 |
+| preference 仍在 main | `initializePreferenceService` 写模块级 `preferenceService`，再经 `getPreferenceService` 回调进 container |
+| IPC 域已拆 | `packages/desktop/config/ipc/*-handlers.js`；`setupIPC` 仅装配调用 |
+| 残余业务 IPC 在 main | `image-understanding-understand` 内联于 `setupIPC`（~L835–838） |
+| 契约测 | `packages/desktop/config/ipc-domain-handlers.test.js` 等；**尚无** service-container 单测 |
 
-### 3.2 允许修改（仅当验证失败时最小修复）
+### D4
 
-| 路径 | 何时改 | 约束 |
-|------|--------|------|
-| `packages/core/**`（已改源） | rebuild 后单测/typecheck 失败 | 只修编译/类型/abort 契约缺口；不扩 scope |
-| `packages/desktop/main.js` | 离线启动崩溃 | 保持 domain register 模式；参考现有 `register*IpcHandlers` 装配 |
-| `packages/desktop/config/**` | 契约测试失败 | 与 `preload.js` channel 对齐；更新 `channel-manifest.js` 若增 channel |
-| `packages/desktop/preload.js` | channel 与 main 不一致 | 与 `scripts/desktop-ipc-handlers.test.mjs` 契约一致 |
-| `packages/core/package.json` exports / build scripts | electron 子路径缺失导致 UI/Desktop 解析失败 | 保持 `"."` + `"./electron"` 双入口 |
-| `packages/ui/src/composables/system/useAppInitializer.ts` | Electron 动态 import `@prompt-optimizer/core/electron` 失败 | 跟现有 isRunningInElectron 分支，不改 Web 路径 |
-| 根 `package.json` scripts | **仅**可增加可选本地脚本别名（如 `desktop:offline`），**禁止**删改既有 script 语义 | 新脚本必须用已有依赖 |
-
-### 3.3 禁止修改 / 禁止操作
-
-- **禁止** `git reset` / `clean -fd` / 覆盖或丢弃未提交文件。
-- **禁止** `pnpm install`、改 `pnpm-lock.yaml`、新增 dependency。
-- **禁止** 改 `docker/**` 作为交付路径（即使用户 tree 里有 docker 改动，也不作为本任务验证入口）。
-- **禁止** 提交含密钥的 `.env.local`。
-- **禁止** 在未获用户确认时 `git push`。
-
-### 3.4 不要求改、仅参考
-
-- `docs/architecture/electron-adapter-entrypoint.md`
-- `docs/architecture/llm-sdk-lazy-loading.md`
-- `env.local.example`（用户要真 API 时自拷；本任务不建 `.env.local`）
+| 事实 | 路径/说明 |
+|------|-----------|
+| 镜像 root 入口 | 根 `Dockerfile` final stage 无 `USER`；`CMD sh /start-services.sh` |
+| 启动需写特权路径 | `docker/start-services.sh`：写 nginx conf、`/var/log/supervisor`、entrypoint 脚本 |
+| supervisord 注释已预留降权 | `docker/supervisord.conf` 注释写明 prefer per-program drop |
+| compose 已有 | `security_opt: no-new-privileges:true`（prod compose） |
+| 文档 | `docs/user/deployment/docker-runtime-security.md`（config 过滤/Auth）；mkdocs docker-basic/advanced **未**写非 root |
+| 默认端口 | `NGINX_PORT=80` → 非 root 绑定需 cap 或改高端口 |
 
 ---
 
-## 4. 接口 / 脚本 / 命令
+## 4. Design
 
-### 4.1 本地可用：推荐顺序（Coder 默认）
+### D3 设计（最小增量）
 
-在仓库根目录执行。全程 **cwd = 工作根**。不联网。
+**目标形态：**
 
-```text
-# 0) 可选：若 pnpm 报 engines 不兼容
-pnpm --config.engine-strict=false -F @prompt-optimizer/core build
+```
+main.js
+  ├── require('./config/service-container')  // createCoreServices only needs electron/env deps
+  ├── initializeServices() → thin: call createCoreServices + assign module refs
+  ├── setupIPC() → registerSensitiveIpc factory + registerDomainIpcHandlers(...)
+  └── window / lifecycle / proxy / update (unchanged ownership)
 
-# 1) 必做：core 源新于 dist，重建 CJS/ESM（electron 子路径一并产出）
-pnpm -F @prompt-optimizer/core build
-# 等价：pnpm run build:core
+service-container.js
+  ├── require('@prompt-optimizer/core') factories internally (prefer)
+  ├── create PreferenceService inside container (no main callback mutation)
+  ├── env key presence logging (optional helper)
+  └── return services bag (same shape as today)
 
-# 2) 契约 + 桌面配置单测（不启 GUI）
-node --test scripts/desktop-ipc-handlers.test.mjs
-pnpm -F @prompt-optimizer/desktop test
-
-# 3) core 取消/加载相关单测（已有 fixture，不打外网）
-pnpm -F @prompt-optimizer/core exec vitest run tests/unit/llm/provider-cancellation.test.ts tests/unit/llm/sdk-loaders.test.ts
-
-# 4) typecheck core（源已改）
-pnpm run typecheck:core
-
-# 5) Desktop 离线启动（不设 NODE_ENV=development → loadFile web-dist）
-pnpm -F @prompt-optimizer/desktop exec electron .
+ipc/register-domain-handlers.js  (new, optional but preferred)
+  └── one function that calls all register*IpcHandlers + image-understanding channel
 ```
 
-**成功标准（§5）**：步骤 2–4 退出码 0；步骤 5 进程存活且主窗口加载 `web-dist/index.html`（日志含 `Loading web app from:`，无 `Web dist not found`）。
-
-### 4.2 可选：开发双进程（需要本地已有 web dev 能力）
-
-仅当用户要热更新 UI 时：
-
-```text
-pnpm run dev:desktop
-```
-
-依赖：`packages/web` Vite 在 `18181`；`packages/desktop` `NODE_ENV=development`。若端口/构建失败，**回退 4.1**，不阻塞交付。
-
-### 4.3 可选：打包可行性（不强制成功）
-
-```text
-# 仅检查 electron-builder 配置与文件清单是否指向现有路径；可 --dir 避免完整安装包
-pnpm -F @prompt-optimizer/desktop exec electron-builder --dir --publish never
-```
-
-- 若缺 icon/签名/耗时长 → 记入 `verify-notes.md` 为「打包未验证」，**不**阻塞「可启动」交付。
-- **不要** `build:desktop` 全链路除非 4.1 已绿且时间允许（会 rebuild web）。
-
-### 4.4 若 web-dist 与 UI 改动严重不一致
-
-仅当离线启动后**空白页/明显缺 UI 改动**且改动在 `packages/ui` 或 `packages/web`：
-
-```text
-pnpm run build:ui
-pnpm -F @prompt-optimizer/desktop run build:web
-```
-
-使用已有 vite/依赖；失败则记录，仍以 core+desktop main 进程可起为准。
-
-### 4.5 建议可选 script（非必须）
-
-若 Coder 加根 `package.json` 脚本，仅允许：
-
-```json
-"desktop:offline": "pnpm -F @prompt-optimizer/desktop exec electron ."
-```
-
-### 4.6 关键运行时接口（已实现，Coder 保持契约）
-
-**Stream 取消**
-
-- Preload：`cancelStream(streamId)` → `ipcRenderer.invoke('stream-cancel', streamId)`
-- Main：`stream-cancel` 经 secure IPC + `streamRegistry.cancel(sender, streamId)`
-- Domain：`runOwnedStream(..., operation(handlers, signal))` 将同一 `AbortSignal` 传入 core service
-
-**Core**
-
-- LLM 请求选项含 `signal?: AbortSignal`（`packages/core/src/services/llm/types.ts`）
-- 各 adapter 应在 abort 时停止/抛取消类错误（单测：`provider-cancellation.test.ts`）
-
-**Electron 入口**
-
-- `@prompt-optimizer/core`：浏览器域
-- `@prompt-optimizer/core/electron`：renderer proxies（`packages/core/src/electron.ts`）
-- UI：`useAppInitializer` 在 Electron 下动态 import 子路径
-
-**IPC 装配模式（跟随）**
+**接口（Coder 必须保持/落地）：**
 
 ```js
-// packages/desktop/main.js
-registerLlmIpcHandlers({ ...deps });
-registerPromptStreamIpcHandlers({ ...deps });
-// ... 其余 register*IpcHandlers
+// packages/desktop/config/service-container.js
+/**
+ * @param {object} deps
+ * @param {() => string} deps.getUserDataPath
+ * @param {import('electron').safeStorage} [deps.safeStorage]
+ * @param {() => Promise<void>} [deps.setupGlobalProxyDispatcherFromSystem]
+ * @param {(input: any) => Promise<any>} [deps.convertImageInputWithElectronNativeImage]
+ * @param {(msg: string, ...args: any[]) => void} [deps.log]
+ * @param {NodeJS.ProcessEnv} [deps.env] — default process.env；用于 API key 探测日志
+ * @returns {Promise<{ ok: true, services: DesktopCoreServices } | { ok: false, error: Error }>}
+ */
+async function createCoreServices(deps)
+
+// DesktopCoreServices 至少包含（与现 return 对齐）:
+// storageProvider, modelManager, templateLanguageService, templateManager,
+// historyManager, imageAdapterRegistry, imageModelManager, llmService,
+// imageUnderstandingService, promptService, imageService, contextRepo,
+// favoriteManager, dataManager, preferenceService
 ```
 
-新 handler 放 `packages/desktop/config/ipc/<domain>-handlers.js`，导出 `registerXxxIpcHandlers`，**不要**把大块逻辑塞回 `main.js`。
+**main 侧 `initializeServices` 目标形态（示意，非抄写强制）：**
+
+```js
+async function initializeServices() {
+  const result = await createCoreServices({
+    getUserDataPath: () => app.getPath('userData'),
+    safeStorage,
+    setupGlobalProxyDispatcherFromSystem,
+    convertImageInputWithElectronNativeImage,
+    env: process.env,
+  });
+  if (!result.ok) return false;
+  Object.assign(/* module-level service vars */, result.services);
+  // 或显式解构赋值，保持现有标识符供 setupIPC 使用
+  return true;
+}
+```
+
+**必须从 main 移除的业务装配细节：**
+
+1. `require('@prompt-optimizer/core')` 中的 **业务工厂列表**（`createModelManager`…）——下沉到 service-container（main 可保留仅当仍被别处需要的符号；当前目标是 main 不再为装配解构工厂）。
+2. `initializePreferenceService` 实现 —— 迁入 container；删除 main 对 `new PreferenceService` 的直接创建。
+3. env static/dynamic API key 扫描循环 —— 迁入 container 或 `config/env-probe.js`（新建仅当更干净）。
+4. 内联 `image-understanding-understand` —— 迁入 `config/ipc/image-handlers.js`（或极小 `image-understanding-handlers.js`，优先并入 image-handlers 以少文件）。
+
+**允许仍留在 main 的：**
+
+- `safeSerialize` / IPC response helpers（多处 IPC 依赖）
+- `setupGlobalProxyDispatcherFromSystem`（Electron session 耦合）
+- `convertImageInputWithElectronNativeImage`（nativeImage 耦合；作为 **deps 注入** container）
+- `createWindow`、菜单、zoom、flush、update handlers 工厂、streamRegistry
+- `registerSensitiveIpc` 闭包工厂（依赖 mainWindow/session 选项）
+
+**模式复制自：**
+
+- 现有 `packages/desktop/config/service-container.js`（装配返回 bag）
+- 现有 `packages/desktop/config/ipc/*-handlers.js` + `ipc-domain-handlers.test.js`（域注册与契约）
+
+### D4 设计（文档 + 安全镜像变更）
+
+**两层里程碑（都要交付）：**
+
+#### Layer A — 镜像内非 root 用户 + 子进程降权（默认路径仍可 root 入口）
+
+1. `Dockerfile` final stage：
+   - 创建用户/组，例如 `app` / uid **10001** gid **10001**（固定数字，便于 K8s/compose `user:`）。
+   - 预建并 `chown` 运行期可写路径：
+     - `/var/log/supervisor`
+     - `/var/run`（或专用 `/var/run/prompt-optimizer`；若改 sock 路径需同步 supervisord）
+     - `/usr/share/nginx/html`（`config.js` 生成）
+     - `/etc/nginx/http.d`、`/etc/nginx/auth`（auth.conf / htpasswd）
+     - nginx 临时/缓存目录（alpine nginx 常用 `/var/lib/nginx`、`/var/log/nginx`、`/run/nginx`）
+   - **不要**在默认路径强行 `USER app` 若仍默认 `NGINX_PORT=80` 且无 cap（会绑端口失败）。
+2. `docker/supervisord.conf`：
+   - `[program:mcp-server]` 增加 `user=app`（或 `uid`/`gid` 兼容写法；以 alpine supervisord 支持为准）。
+   - nginx：若 alpine 的 nginx master 需 root 绑 80，可保持 nginx 由 root 起、worker 自降权；**至少 MCP 非 root**。
+   - 若 Layer B 启用整容器非 root，nginx 与 mcp 均 `user=app` 且端口 ≥1024。
+3. `docker/start-services.sh` / `generate-*.sh`：
+   - 避免假设仅 root；`mkdir -p` 失败时给出明确错误。
+   - 权限：auth 文件保持 `0640` + 组可读；在 app 用户场景下组/属主与 nginx 读权限一致。
+4. `docker/docker-compose.yml`（prod）：
+   - 保留 `security_opt: no-new-privileges:true`。
+   - 可选注释块展示 `user: "10001:10001"` + `NGINX_PORT=8080` + ports `28081:8080`（默认注释掉，避免 silent break）。
+
+#### Layer B — 整容器非 root 文档 + 可切换默认高端口支持
+
+1. 当 `NGINX_PORT` ≥ 1024 且目录属主正确时，支持：
+   - Dockerfile 可选 `USER app` **仅当**通过 build-arg 启用，例如：
+     - `ARG RUN_AS_NONROOT=false`
+     - `RUN if [ "$RUN_AS_NONROOT" = "true" ]; then ...; fi` 不推荐复杂 shell；更简单：**文档指导** `docker run --user 10001:10001 -e NGINX_PORT=8080 -p 8081:8080`，镜像不强制 USER。
+   - **推荐默认交付**：镜像内用户存在 + 权限正确 + **不**强制 `USER`（兼容 80）；文档给非 root 一键示例。
+2. 文档必须写清：
+   - 非 root 时 **不要** 映射到容器 80；用 `NGINX_PORT=8080`。
+   - healthcheck 使用 `${NGINX_PORT}`。
+   - MCP 仍经 nginx `/mcp`；容器内 MCP 仍 `127.0.0.1:3000`。
+   - 与现有 public config / ACCESS_PASSWORD / MCP_AUTH_TOKEN 规则的关系。
+
+**D4 不要求：** 改 Docker Hub 推送 CI 的 registry 账号；不要求 multi-stage 彻底去掉 apk 工具链 root build（build stage root 可接受）。
 
 ---
 
-## 5. 边缘情况
+## 5. Files to create or modify
 
-| 场景 | 处理 |
+### D3
+
+| 路径 | 动作 | 说明 |
+|------|------|------|
+| `packages/desktop/config/service-container.js` | **modify** | 内聚 core require + PreferenceService 创建；去掉对 main `initializePreferenceService`/`getPreferenceService` 的双向耦合；可选 env probe |
+| `packages/desktop/main.js` | **modify** | 瘦 `initializeServices`；删除业务工厂 require 与 preference 初始化；`setupIPC` 改调 register-domain（若新建） |
+| `packages/desktop/config/ipc/image-handlers.js` | **modify** | 接收 `imageUnderstandingService`，注册 `image-understanding-understand` |
+| `packages/desktop/config/ipc/register-domain-handlers.js` | **create（推荐）** | 集中 `register*IpcHandlers` 调用；签名见下 |
+| `packages/desktop/config/service-container.test.js` | **create** | 对 createCoreServices 做 **mock core** 单测：调用顺序/返回 bag/失败 ok:false |
+| `packages/desktop/config/ipc-domain-handlers.test.js` | **modify** | 覆盖 image-understanding channel 若迁入 image-handlers |
+| `docs/project/BACKLOG-90D-2026-07-21.md` | **modify** | D3 → `done` + 短备注（commit 时或本变更一并） |
+| `docs/project/CURRENT.md` | **modify（轻）** | 能力摘要一行：ServiceContainer 装配下沉 |
+
+### D4
+
+| 路径 | 动作 | 说明 |
+|------|------|------|
+| `Dockerfile` | **modify** | 创建 `app` 用户 10001；chown 可写路径；注释/ARG 说明非 root |
+| `docker/supervisord.conf` | **modify** | MCP（及可行时 nginx）`user=app`；更新注释 |
+| `docker/start-services.sh` | **modify** | 权限友好；非 root 失败信息清晰 |
+| `docker/generate-auth.sh` | **modify** | chown/chmod 兼容 app 用户与 nginx 读 |
+| `docker/docker-compose.yml` | **modify** | 注释非 root 示例；可选 `read_only` **不要**默认开（config 生成需写） |
+| `docker/docker-compose.dev.yml` | **modify（可选）** | 同步注释示例；dev 可不强制 |
+| `docs/user/deployment/docker-runtime-security.md` | **modify** | 新增「非 root 运行」小节 |
+| `mkdocs/docs/zh/deployment/docker-advanced.md` | **modify** | 非 root 示例（与实现一致） |
+| `mkdocs/docs/en/deployment/docker-advanced.md` | **modify** | 同上英文 |
+| `docs/project/BACKLOG-90D-2026-07-21.md` | **modify** | D4 → `done` |
+| `docs/project/CURRENT.md` | **modify（轻）** | Docker 非 root 里程碑一句 |
+
+### 禁止触碰（除非编译断裂的最小修复）
+
+- `packages/ui/**` 产品 CTA / auto-optimize 默认
+- `packages/core` 导出脱敏 / Web S3 边界
+- `.github/workflows/docker.yml` registry secrets（可不改；若仅加注释可）
+
+---
+
+## 6. Function / interface signatures
+
+### D3
+
+```js
+// register-domain-handlers.js
+/**
+ * @param {object} ctx
+ * @param {(channel: string, handler: Function, validateArgs?: Function) => void} ctx.registerSensitiveIpc
+ * @param {object} ctx.services — DesktopCoreServices 字段
+ * @param {object} ctx.streamRegistry
+ * @param {Function} ctx.runOwnedStream
+ * @param {Function} ctx.safeSerialize
+ * @param {Function} ctx.assertValidStreamId
+ * @param {typeof import('electron').app} ctx.app
+ * @param {typeof import('electron').shell} ctx.shell
+ * @param {object} ctx.consoleLogger
+ * @param {Function} ctx.getPublicRuntimeConfig
+ * @param {Function} ctx.isSafeExternalUrl
+ * @param {Function} ctx.createIpcError
+ * @param {(locale: string|null) => void} ctx.setUiLocale
+ * @param {Function} ctx.normalizeUiLocale
+ * @param {Function} [ctx.setupUpdateHandlers]
+ */
+function registerDomainIpcHandlers(ctx)
+```
+
+`createCoreServices`：**删除** deps 中的：
+
+- `core` 工厂 bag（改为 container 内部 require）
+- `initializePreferenceService`
+- `getPreferenceService`
+
+**保留/新增** deps：
+
+- `getUserDataPath`（必填）
+- `safeStorage`（可选）
+- `setupGlobalProxyDispatcherFromSystem`（可选；在 LLM 创建前调用，与现序一致）
+- `convertImageInputWithElectronNativeImage`（可选）
+- `log` / `env`（可选）
+
+### D4
+
+无新对外 TS API。运维契约：
+
+| 变量/约定 | 值 |
+|-----------|-----|
+| 非 root uid:gid | `10001:10001`（用户名 `app`） |
+| 非 root 推荐端口 | `NGINX_PORT=8080` |
+| 必填 | `MCP_AUTH_TOKEN`（不变） |
+| compose 示例 | `user: "10001:10001"` + port map host→8080 |
+
+---
+
+## 7. Edge cases
+
+### D3
+
+1. `createSecretAwareStorageProvider` 不存在时回退 `FileStorageProvider`（保持现逻辑）。
+2. `safeStorage` 不可用：明文落盘日志警告仍在 container。
+3. `ensureSecretsSealed` 迁移失败：warn 不阻断启动。
+4. `createCoreServices` 抛错：返回 `{ ok:false, error }`；main 退出，不半初始化 IPC。
+5. PreferenceService 必须在 templateLanguageService 之前创建且同一 storageProvider。
+6. Proxy setup 失败不得阻断服务创建（现 proxy 函数已吞错；调用序保持在 LLM 创建前）。
+7. IPC channel 名 **不得** 改名（契约/preload 依赖）。
+8. `setupUpdateHandlers` 仍依赖 preferenceService getter；装配完成后、窗口前注册顺序不变：`initializeServices` → `setupIPC` → `createWindow`。
+
+### D4
+
+1. `NGINX_PORT=80` + `--user 10001`：应失败或文档标明不支持；不要静默坏掉。
+2. 只读根文件系统：本里程碑 **不** 默认 `read_only: true`（需写 config.js/auth）。
+3. Windows 行尾：保留 `dos2unix`。
+4. auth 关闭（空 `ACCESS_PASSWORD`）：仍可启动；compose prod 仍要求密码 env 的 `:?` 语义不削弱。
+5. healthcheck 必须用实际 `NGINX_PORT`。
+6. 权限：nginx 需读 htpasswd；mcp 不需读 htpasswd。
+7. 现有 `linshen/prompt-optimizer:latest` 拉取用户：文档说明自建/ fork 镜像差异即可，不强制改镜像名。
+
+---
+
+## 8. Acceptance criteria
+
+### D3
+
+- [ ] `main.js` 中 **无** `createModelManager` / `createLLMService` / `new PreferenceService` / `new FileStorageProvider` 等业务构造（grep 清零）。
+- [ ] `createCoreServices` 可在不加载完整 Electron app 生命周期的情况下被单测 mock 调用。
+- [ ] `image-understanding-understand` 不在 `main.js` 内联。
+- [ ] 现有 desktop 契约测试绿：`pnpm -F @prompt-optimizer/desktop test`（或等价 `node --test packages/desktop/config/*.test.js`）。
+- [ ] IPC 契约：`node --test scripts/desktop-ipc-handlers.test.mjs` 绿（若仓库仍用该脚本）。
+- [ ] 行为不变：服务创建顺序与返回字段兼容现 IPC handlers。
+
+### D4
+
+- [ ] 镜像构建定义中存在固定 uid `10001` 用户 `app`。
+- [ ] 运行期可写路径属主允许该用户写入 `config.js` / supervisor 日志 / auth 生成物。
+- [ ] MCP 进程在 supervisord 配置中以非 root 用户运行（Layer A）。
+- [ ] 文档（`docker-runtime-security.md` + zh/en advanced）包含非 root 一键示例与端口注意。
+- [ ] prod compose 保留 `no-new-privileges`；非 root 示例以注释或独立 snippet 提供。
+- [ ] 未引入「默认自动优化开」等 won't-do。
+
+---
+
+## 9. Test plan
+
+### D3（必须）
+
+```text
+# 工作根：D:\PromtOptimizer\src\prompt-optimizer
+pnpm -F @prompt-optimizer/desktop test
+# 或：
+node --test packages/desktop/config/*.test.js
+node --test scripts/desktop-ipc-handlers.test.mjs
+```
+
+新增 `service-container.test.js` 最小断言：
+
+1. mock `FileStorageProvider` / factories：成功路径返回 `ok:true` 且含 `preferenceService`、`promptService`。
+2. 工厂抛错 → `ok:false`。
+3. **不**启动 Electron GUI。
+
+可选烟测：`pnpm -F @prompt-optimizer/desktop exec electron .`（生产 web-dist）进程不秒崩。
+
+### D4（有 Docker 则跑；无则静态）
+
+```text
+# 静态
+# - Dockerfile 含 app/10001
+# - supervisord 含 user=app（mcp）
+# - docs 含 NGINX_PORT=8080 示例
+
+# 可选构建（耗时长，非阻塞若环境无 Docker）
+docker build -t prompt-optimizer:d4 .
+docker run --rm -e MCP_AUTH_TOKEN=test -e ACCESS_PASSWORD=test -e NGINX_PORT=8080 --user 10001:10001 -p 18081:8080 prompt-optimizer:d4
+# curl health via published port / 或 docker exec curl localhost:8080/healthz
+```
+
+**不要**在测试中调用真实模型 API。
+
+---
+
+## 10. Implementation order (Coder)
+
+1. **D3 service-container 内聚** + 单测 mock。
+2. **D3 main 瘦身** + image-understanding 下沉 +（推荐）register-domain-handlers。
+3. 跑 desktop 契约测试，修回归。
+4. **D4 Dockerfile 用户/权限** + supervisord MCP user。
+5. 调整 start/generate 脚本权限兼容。
+6. 写/改三处文档 + backlog/CURRENT 状态。
+7. 若有 Docker，可选非 root 烟测。
+
+---
+
+## 11. Risks
+
+| 风险 | 缓解 |
 |------|------|
-| Node 24 vs engines `^22` | 用 `pnpm --config.engine-strict=false`；不改 lock、不装 Node |
-| core dist 过期 | **先** `build:core`；Desktop `require('@prompt-optimizer/core')` 走 `dist/index.cjs` |
-| 无 API key | 允许；设置页可显示未配置；连接测试失败不视为启动失败 |
-| `web-dist` 缺失 | 错误日志已有；用 `desktop run build:web` 或复制 web dist；禁止 Docker |
-| `NODE_ENV=development` 但 18181 未起 | 白屏；离线路径**不要**设 development |
-| 流 cancel 非 owner / 重复 streamId | `stream-registry` 抛 `IPC_STREAM_*`；测试覆盖 |
-| sender 销毁 | registry 观察 sender，清理 active streams |
-| Windows 路径 | 全部命令在 PowerShell/Git Bash 均可；路径含空格时用引号；本仓库路径无空格 |
-| 杀软/GPU | Electron 起不来时记日志路径：`%APPDATA%\PromptOptimizer\logs`（见 desktop package scripts `logs:view`） |
-| 与上游历史 divergent | 不 force-push main 到 fork develop；用独立分支（§6） |
-| 用户已有 dirty tree | 任何 git 操作前 `git status`；只 `remote add`/`fetch`/`branch` 不碰工作区文件 |
+| D3 循环依赖 / main 解构遗漏导致 IPC undefined | 单测 + 启动顺序不变；handlers 入参显式 |
+| PreferenceService 双实例 | 禁止 main 再 `new`；只从 bag 取 |
+| D4 非 root 绑 80 失败 | 文档强制高端口；默认镜像不强制 USER |
+| nginx 读不到 auth 文件 | generate-auth 后统一 chown/chmod 矩阵写进脚本注释 |
+| supervisord sock 权限 | 预建 `/var/run` 属主；或把 sock 放到 app 可写目录 |
+| 改动面过大拖垮 review | 严格按本 spec 文件表；不做窗口/更新迁移 |
+| 文档与镜像漂移 | CURRENT/BACKLOG 各一行；security 文档与 Dockerfile 同 PR |
 
 ---
 
-## 6. Git：Fork 远程与分支策略
+## 12. Patterns to follow
 
-### 6.1 一次性挂载 remote（允许执行）
-
-```bash
-cd "C:/Users/yuanjia/Documents/Codex/2026-07-17/dui/work/source-extract/prompt-optimizer-develop"
-
-# 若已存在同名 remote 则跳过 add，改为 set-url
-git remote add origin https://github.com/xvyimu/prompt-optimizer.git
-git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
-
-git remote -v
-git fetch origin
-git fetch upstream
-```
-
-- `origin` → 用户 fork（推送目标）
-- `upstream` → 只读跟踪上游（后续同步用；本任务不 merge）
-
-### 6.2 分支命名（默认）
-
-| 分支 | 用途 |
-|------|------|
-| 本地 `main` | 保持不动（含既有 2 commit + dirty） |
-| 建议工作分支 `work/desktop-hardening` | **用户确认 commit 后**从当前 HEAD 创建：`git switch -c work/desktop-hardening` |
-| fork `develop` | 上游默认线；**不要**用 force 覆盖 |
-| 推送目标 | `origin work/desktop-hardening`（用户确认后） |
-
-### 6.3 推送步骤（文档 only；Coder 默认不执行 push/commit）
-
-用户确认后建议：
-
-```bash
-# 1. 用户或经确认的会话：暂存并提交（勿用 --no-verify 除非用户要求）
-git status
-git add -A   # 再检查无 .env.local / 密钥
-git commit -m "feat(desktop): ipc domain split, stream cancel, provider abort signal"
-
-# 2. 建分支（若还在 main）
-git switch -c work/desktop-hardening
-
-# 3. 推送到 fork（需用户明确说 push）
-git push -u origin work/desktop-hardening
-```
-
-若 `git push` 被拒（non-fast-forward）：
-
-- **禁止** `--force` 到 `develop` / `main`
-- 可对**个人工作分支**在用户确认后 `git push --force-with-lease origin work/desktop-hardening`
-- 或开 PR：`gh pr create --repo xvyimu/prompt-optimizer --base develop --head work/desktop-hardening`
-
-### 6.4 与上游对齐（本任务不做，仅记录）
-
-```bash
-git fetch upstream
-# 以后：git merge upstream/develop 或 rebase（用户决定）
-```
-
-当前本地历史可能**不等于** fork/upstream 的 `develop` tip；首次 push 用独立分支最安全。
+| 模式 | 复制/对齐文件 |
+|------|----------------|
+| 服务 bag 返回 | `packages/desktop/config/service-container.js`（现有） |
+| 域 IPC 注册 | `packages/desktop/config/ipc/model-handlers.js` 等 |
+| 域契约测试 | `packages/desktop/config/ipc-domain-handlers.test.js` |
+| safeStorage 包装 | `packages/desktop/config/safe-storage-secrets.js` |
+| Docker public config 过滤 | `docker/generate-config.sh` + `packages/desktop/config/runtime-security.js` |
+| Compose 安全基线 | `docker/docker-compose.yml`（`no-new-privileges`、必填 token/password） |
 
 ---
 
-## 7. 跟随的现有模式（复制源）
+## 13. Done definition
 
-| 模式 | 参考文件 |
-|------|----------|
-| Desktop composition root + 领域 IPC 注册 | `packages/desktop/main.js`（`registerLlmIpcHandlers` 等） |
-| Secure IPC 包装 | `packages/desktop/config/ipc-security.js` |
-| 流注册表 / 所有权取消 | `packages/desktop/config/stream-registry.js` |
-| 流执行器（signal 贯通） | `packages/desktop/config/ipc/owned-stream-runner.js` |
-| LLM 领域 handler | `packages/desktop/config/ipc/llm-handlers.js` |
-| Channel 清单 | `packages/desktop/config/ipc/channel-manifest.js` |
-| Preload ↔ Main 契约测试 | `scripts/desktop-ipc-handlers.test.mjs` |
-| Desktop 配置单测风格 | `packages/desktop/config/stream-registry.test.js`、`ipc-security.test.js` |
-| Core electron 子路径 | `packages/core/src/electron.ts` + `packages/core/package.json` `exports["./electron"]` |
-| UI Electron 初始化 | `packages/ui/src/composables/system/useAppInitializer.ts` |
-| Abort 类型与 adapter | `packages/core/src/services/llm/types.ts`、各 `adapters/*-adapter.ts` |
-| 架构说明 | `docs/architecture/electron-adapter-entrypoint.md` |
-| monorepo 脚本编排 | 根 `package.json` `scripts` + `scripts/run-many.js` |
-| 环境变量加载顺序 | `packages/desktop/README.md` / `README-env-config.md` |
-
----
-
-## 8. 验证方式（Coder / Tester 共用）
-
-### 8.1 必过
-
-1. `pnpm -F @prompt-optimizer/core build` 成功，且存在：
-   - `packages/core/dist/index.cjs`
-   - `packages/core/dist/electron.cjs`（或 package exports 指向的 electron 产物）
-2. `node --test scripts/desktop-ipc-handlers.test.mjs` 退出 0  
-   - 覆盖：preload channel 均有 main handler；`stream-cancel`；main 委托 domain modules
-3. `pnpm -F @prompt-optimizer/desktop test` 退出 0
-4. `pnpm -F @prompt-optimizer/core exec vitest run tests/unit/llm/provider-cancellation.test.ts tests/unit/llm/sdk-loaders.test.ts` 退出 0
-5. `pnpm run typecheck:core` 退出 0
-6. Desktop 离线启动：
-   - 命令：`pnpm -F @prompt-optimizer/desktop exec electron .`
-   - 预期：无 `Web dist not found`；窗口打开；主进程日志可见服务初始化（无 uncaughtException 闪退）
-   - 验证后可正常退出进程
-
-### 8.2 建议（失败不阻塞「可启动」）
-
-- `pnpm run typecheck:ui`（若 UI 改动导致类型错再修）
-- `pnpm run test:repo` 中与 desktop IPC 相关子集（已含在 8.1.2）
-- `electron-builder --dir` 可行性
-
-### 8.3 明确不做
-
-- Playwright e2e / 真实 API 优化请求
-- Docker compose
-- 全量 `pnpm test`（过慢且可能触网）
-
----
-
-## 9. Coder 执行清单（有序）
-
-1. 确认 cwd 为工作根；`git status` 备份认知（不 clean）。
-2. `git remote -v`；缺失则按 §6.1 添加 `origin`/`upstream` 并 `fetch`（fetch 需网络；**仅 git 元数据**，非 pnpm install）。若用户环境禁网导致 fetch 失败：仍可 `remote add`，记入 notes，不阻塞本地启动。
-3. Rebuild core（§4.1 步骤 1）。
-4. 跑 §8.1 测试；失败则**最小修复**后重跑，禁止大范围重构。
-5. 离线启动 Desktop；记录结果到 `.pipeline/verify-notes.md`。
-6. **停止**：不 commit、不 push。在 notes 写上用户一键 push 命令（§6.3）。
-
----
-
-## 10. 交付定义（DoD）
-
-- [ ] Desktop 可在无新依赖、无 Docker、无真实 API 下本地启动并显示主界面  
-- [ ] core dist 与当前 src 同步（含 abort / electron 入口）  
-- [ ] IPC 契约测试 + desktop config 测试 + provider-cancellation 通过  
-- [ ] `typecheck:core` 通过  
-- [ ] 用户改动文件均保留  
-- [ ] `origin`/`upstream` 已配置（或 notes 说明 fetch 因网络未完成）  
-- [ ] `.pipeline/verify-notes.md` 含实跑命令与结果  
-- [ ] 无擅自 commit/push  
-
----
-
-## 11. 关键绝对路径
-
-- 仓库根：`C:\Users\yuanjia\Documents\Codex\2026-07-17\dui\work\source-extract\prompt-optimizer-develop`
-- Spec：`...\prompt-optimizer-develop\.pipeline\spec.md`
-- Desktop 入口：`...\packages\desktop\main.js`
-- 离线 UI：`...\packages\desktop\web-dist\index.html`
-- Core 入口产物：`...\packages\core\dist\index.cjs`
-- Fork：`https://github.com/xvyimu/prompt-optimizer`
-- Upstream：`https://github.com/linshenkx/prompt-optimizer`
+- D3 + D4 验收框均可勾选。
+- BACKLOG 表 D3/D4 状态为 `done`。
+- 无 won't-do 项被实现。
+- Coder 在 `.pipeline/changes.md` 记录实际改动文件与验证命令（由 Coder 阶段写；Planner 不写代码）。

@@ -42,3 +42,25 @@ services:
 2. Pick the custom model in the UI.
 3. Send a message.
 4. Inspect the outgoing request body in browser DevTools.
+
+## Non-root runtime
+
+The image ships a fixed user **`app` (uid/gid `10001`)** and chowns writable runtime paths. By default the entrypoint may still be root so nginx can bind port **80**; the **MCP** program drops to `user=app` in supervisord.
+
+For a fully non-root container, use a high port (do **not** map container port 80):
+
+```bash
+docker run -d \
+  --user 10001:10001 \
+  -e NGINX_PORT=8080 \
+  -e MCP_AUTH_TOKEN=your_token \
+  -e ACCESS_PASSWORD=your_password \
+  -p 8081:8080 \
+  --security-opt no-new-privileges:true \
+  --name prompt-optimizer-nonroot \
+  prompt-optimizer:local
+```
+
+- Healthcheck must use the real `NGINX_PORT` (e.g. `8080`).
+- MCP remains behind nginx at `/mcp`; in-container MCP listens on `127.0.0.1:3000`.
+- See `docs/user/deployment/docker-runtime-security.md` for public config filtering and auth rules.

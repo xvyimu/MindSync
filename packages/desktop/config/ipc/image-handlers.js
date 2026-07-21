@@ -10,6 +10,7 @@ function registerImageIpcHandlers({
   imageModelManager,
   imageService,
   imageAdapterRegistry,
+  imageUnderstandingService,
   safeSerialize,
   streamRegistry,
   assertValidStreamId,
@@ -118,6 +119,13 @@ function registerImageIpcHandlers({
   registerSensitiveIpc('image-getDynamicModels', async (_event, providerId, connectionConfig) => {
     return imageAdapterRegistry.getDynamicModels(providerId, safeSerialize(connectionConfig));
   });
+
+  // multimodal evaluation：图像理解走主进程，避免 renderer 直连供应商。
+  if (imageUnderstandingService && typeof imageUnderstandingService.understand === 'function') {
+    registerSensitiveIpc('image-understanding-understand', async (_event, request) => {
+      return imageUnderstandingService.understand(safeSerialize(request));
+    });
+  }
 }
 
 module.exports = {
