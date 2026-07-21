@@ -37,7 +37,7 @@
 这是我们可访问性功能的核心，提供完整的可访问性支持：
 
 ```typescript
-import { useAccessibility } from '@prompt-optimizer/ui'
+import { useAccessibility } from '@mindsync/ui'
 
 const {
   keyboard,      // 键盘导航
@@ -67,7 +67,7 @@ const {
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useAccessibility } from '@prompt-optimizer/ui'
+import { useAccessibility } from '@mindsync/ui'
 
 const items = ref([
   { id: 1, name: '选项1' },
@@ -114,7 +114,7 @@ onMounted(() => {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAccessibility } from '@prompt-optimizer/ui'
+import { useAccessibility } from '@mindsync/ui'
 
 const { aria, announce } = useAccessibility('SaveButton')
 const statusMessage = ref('')
@@ -152,7 +152,7 @@ const handleSave = () => {
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useFocusManager } from '@prompt-optimizer/ui'
+import { useFocusManager } from '@mindsync/ui'
 
 const containerRef = ref<HTMLElement>()
 const inputValue = ref('')
@@ -238,7 +238,7 @@ const cancel = () => {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ScreenReaderSupport } from '@prompt-optimizer/ui'
+import { ScreenReaderSupport } from '@mindsync/ui'
 
 const screenReader = ref<InstanceType<typeof ScreenReaderSupport>>()
 const showNavHelp = ref(false)
@@ -286,7 +286,7 @@ const handleError = () => {
 ```vue
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useAccessibilityTesting } from '@prompt-optimizer/ui'
+import { useAccessibilityTesting } from '@mindsync/ui'
 
 const testResults = ref<any>(null)
 const isLoading = ref(false)
@@ -512,7 +512,7 @@ const handleTabKeydown = (e: KeyboardEvent) => {
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useAccessibility } from '@prompt-optimizer/ui'
+import { useAccessibility } from '@mindsync/ui'
 
 const { announce } = useAccessibility('ContactForm')
 

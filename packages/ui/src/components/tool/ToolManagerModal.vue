@@ -273,7 +273,7 @@ import {
     NText,
     NAlert,
 } from 'naive-ui'
-import type { ToolDefinition } from '@prompt-optimizer/core'
+import type { ToolDefinition } from '@mindsync/core'
 import type {
     ToolManagerModalProps,
 } from '../../types/components'

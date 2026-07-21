@@ -18,7 +18,7 @@ import type {
   IFavoriteManager,
   IImageStorageService,
   PromptRecordChain,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import { useToast } from '../ui/useToast'
 import { isValidVariableName } from '../../types/variable'

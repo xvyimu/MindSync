@@ -277,7 +277,7 @@ import {
   type HistoryStorageUsage,
   type PromptRecord,
   type PromptRecordChain,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { useConfirmDialog } from '../composables/ui/useConfirmDialog'
 import { useToast } from '../composables/ui/useToast'
 import SourceAssetBadge from './source/SourceAssetBadge.vue'

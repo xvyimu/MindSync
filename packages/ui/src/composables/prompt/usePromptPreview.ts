@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue'
 
-import { PREDEFINED_VARIABLES, type ContextMode } from "@prompt-optimizer/core";
+import { PREDEFINED_VARIABLES, type ContextMode } from "@mindsync/core";
 
 import {
   findMissingVariables,

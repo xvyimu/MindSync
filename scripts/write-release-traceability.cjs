@@ -46,7 +46,7 @@ const installFiles = [
   'D:/PromtOptimizer/PromptOptimizer/resources/app/main.js',
   'D:/PromtOptimizer/PromptOptimizer/resources/app/preload.js',
   'D:/PromtOptimizer/PromptOptimizer/resources/app/config/ipc/channel-manifest.js',
-  'D:/PromtOptimizer/PromptOptimizer/resources/app/node_modules/@prompt-optimizer/core/dist/electron.cjs',
+  'D:/PromtOptimizer/PromptOptimizer/resources/app/node_modules/@mindsync/core/dist/electron.cjs',
 ];
 
 const lines = [];

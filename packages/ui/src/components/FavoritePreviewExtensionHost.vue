@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, shallowRef } from 'vue'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import {
   loadEnabledFavoritePreviewPlugins,

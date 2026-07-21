@@ -27,7 +27,7 @@
 - `packages/core/package.json` (scripts):
   `"build": "tsup src/index.ts src/services/trpc/router.ts --format cjs,esm --dts"`
 - `packages/desktop/main.js` (import):
-  `const { createAppRouter } = require('@prompt-optimizer/core/dist/services/trpc/router.cjs');`
+  `const { createAppRouter } = require('@mindsync/core/dist/services/trpc/router.cjs');`
 
 **结论**: 这种"公共API + 内部路径"的策略，优雅地解决了前后端对同一个包的不同需求，保证了Vite构建的顺利进行，也维持了后端功能的可用性。
 
@@ -45,7 +45,7 @@
     - 在 `@core` 包的 `package.json` 中，使用 `exports` 字段**明确声明所有**需要被外部访问的路径，无论是给前端还是后端使用。
     - 使用 `tsup` 等工具进行多入口点构建，确保 `exports` 中声明的每个路径都有对应的编译产物。
 3.  **所有消费者都使用标准路径**:
-    - 无论是前端还是后端，都应该通过 `exports` 中声明的标准路径来导入模块 (e.g., `'@prompt-optimizer/core'` 或 `'@prompt-optimizer/core/trpc-router'`)。
+    - 无论是前端还是后端，都应该通过 `exports` 中声明的标准路径来导入模块 (e.g., `'@mindsync/core'` 或 `'@mindsync/core/trpc-router'`)。
     - **禁止**任何包从另一个包的内部文件路径（如 `dist/...`）进行导入。
 
 **代码示例 (最终正确配置)**:
@@ -60,7 +60,7 @@
   }
   ```
 - `packages/desktop/main.js`:
-  `const { createAppRouter } = require('@prompt-optimizer/core/trpc-router');`
+  `const { createAppRouter } = require('@mindsync/core/trpc-router');`
 
 **结论**: 这个标准化的解决方案保证了 `@core` 包的强封装性，同时为不同环境的消费者提供了清晰、稳定、唯一的访问接口。如果在此基础上Vite仍然构建失败，那么下一步应该去调整Vite自身的配置（如 `resolve.alias` 或 `optimizeDeps.exclude`），而不是破坏包的封装规则。
 

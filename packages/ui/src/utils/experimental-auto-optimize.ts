@@ -9,7 +9,7 @@ import {
   normalizeExperimentalAutoOptimizeSettings,
   type ExperimentalAutoOptimizeSettings,
   type IPreferenceService,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 export {
   EXPERIMENTAL_AUTO_OPTIMIZE_PREF_KEY,

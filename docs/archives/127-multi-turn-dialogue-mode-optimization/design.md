@@ -683,8 +683,8 @@ await applyToConversation();
 ```typescript
 // packages/ui/src/composables/conversation/useConversationOptimization.ts
 import { ref, computed, onUnmounted } from 'vue';
-import type { ConversationMessage } from '@prompt-optimizer/core';
-import type { IHistoryManager, PromptRecord } from '@prompt-optimizer/core';
+import type { ConversationMessage } from '@mindsync/core';
+import type { IHistoryManager, PromptRecord } from '@mindsync/core';
 import { message } from 'naive-ui';
 
 export function useConversationOptimization(

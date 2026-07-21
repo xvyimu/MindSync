@@ -131,7 +131,7 @@ import {
   Share,
   Tag
 } from '@vicons/tabler';
-import type { FavoritePrompt, FavoriteCategory } from '@prompt-optimizer/core';
+import type { FavoritePrompt, FavoriteCategory } from '@mindsync/core';
 
 interface Props {
   favorite: FavoritePrompt;

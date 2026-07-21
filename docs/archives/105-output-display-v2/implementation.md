@@ -90,8 +90,8 @@ const compareService = createCompareService();
 3. **导出配置**
 ```typescript
 // packages/ui/src/index.ts
-export { createCompareService } from '@prompt-optimizer/core'
-export type { ICompareService } from '@prompt-optimizer/core'
+export { createCompareService } from '@mindsync/core'
+export type { ICompareService } from '@mindsync/core'
 ```
 
 #### 第二步：修复父组件

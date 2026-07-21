@@ -19,7 +19,7 @@ import type {
   PromptAssetBinding,
   PromptSessionOrigin,
   ToolDefinition,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { AppServices } from '../../types/services'
 import { useFunctionMode, type FunctionMode } from '../mode'
 import { withHistorySourceBindingMetadata } from '../../utils/history-source-binding'
@@ -50,7 +50,7 @@ export function usePromptOptimizer(
   optimizationMode: OptimizationModeSource,    // 必需参数，接受 computed
   selectedOptimizeModel?: Ref<string>,                 // 优化模型选择
   selectedTestModel?: Ref<string>,                     // 测试模型选择
-  contextMode?: Ref<import('@prompt-optimizer/core').ContextMode>,  // 上下文模式
+  contextMode?: Ref<import('@mindsync/core').ContextMode>,  // 上下文模式
   bindings?: {
     prompt?: Ref<string>
     optimizedPrompt?: Ref<string>

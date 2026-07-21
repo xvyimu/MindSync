@@ -18,7 +18,7 @@
 - [x] `experience.md` - 开发经验总结（包含在implementation.md中）
 
 ## 相关代码变更
-- 影响包：@prompt-optimizer/ui, @prompt-optimizer/core
+- 影响包：@mindsync/ui, @mindsync/core
 - 主要变更：
   - 输出显示界面重新设计（统一顶层工具栏）
   - 交互体验优化（智能视图切换）

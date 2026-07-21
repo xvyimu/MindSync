@@ -1,7 +1,7 @@
 import { ref, computed, inject, type Ref } from 'vue'
 
 import type { AppServices } from '../../types/services';
-import { TagTypeConverter } from '@prompt-optimizer/core';
+import { TagTypeConverter } from '@mindsync/core';
 
 export interface TagSuggestion {
   label: string;

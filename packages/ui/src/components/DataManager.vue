@@ -784,7 +784,7 @@ import {
   NCollapse, NCollapseItem,
   type UploadFileInfo,
 } from 'naive-ui'
-import { isRunningInElectron } from '@prompt-optimizer/core'
+import { isRunningInElectron } from '@mindsync/core'
 import { ChevronDown, Clipboard, Download, ExternalLink, Folder, Refresh, Trash, Upload } from '@vicons/tabler'
 import { useToast } from '../composables/ui/useToast'
 import { useConfirmDialog } from '../composables/ui/useConfirmDialog'

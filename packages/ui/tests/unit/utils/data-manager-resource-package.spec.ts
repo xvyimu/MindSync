@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { strToU8, unzipSync, zipSync } from 'fflate'
-import type { FullImageData } from '@prompt-optimizer/core'
+import type { FullImageData } from '@mindsync/core'
 
 import {
   DATA_MANAGER_RESOURCE_PACKAGE_SCHEMA_VERSION,

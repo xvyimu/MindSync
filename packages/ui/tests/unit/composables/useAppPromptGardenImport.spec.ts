@@ -6,7 +6,7 @@ import type {
   RouteLocationRaw,
   Router,
 } from 'vue-router'
-import type { ConversationMessage, FavoritePrompt, PromptRecord, PromptRecordChain } from '@prompt-optimizer/core'
+import type { ConversationMessage, FavoritePrompt, PromptRecord, PromptRecordChain } from '@mindsync/core'
 import type { MessageReactive } from 'naive-ui'
 
 import { createTestPinia } from '../../utils/pinia-test-helpers'

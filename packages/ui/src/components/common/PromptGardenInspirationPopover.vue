@@ -171,7 +171,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch, type Ref } from 'vue'
 import { NButton, NIcon, NPopover, NSpin, NTag, NText } from 'naive-ui'
 import { ExternalLink, FileImport, Plant2, Refresh } from '@vicons/tabler'
 import { useI18n } from 'vue-i18n'
-import { getEnvVar } from '@prompt-optimizer/core'
+import { getEnvVar } from '@mindsync/core'
 import { openExternalUrl } from '../../utils/open-external-url'
 import type { PromptGardenImportRequest } from '../../utils/prompt-garden-import'
 import {

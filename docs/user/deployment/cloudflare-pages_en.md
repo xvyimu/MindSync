@@ -75,7 +75,7 @@ If your Cloudflare Dashboard still shows **Create application** -> **Pages** -> 
 | --- | --- |
 | Framework preset | `None` or empty |
 | Root directory | `/` or empty |
-| Build command | `pnpm -F @prompt-optimizer/core build && pnpm -F @prompt-optimizer/ui build && pnpm -F @prompt-optimizer/web build` |
+| Build command | `pnpm -F @mindsync/core build && pnpm -F @mindsync/ui build && pnpm -F @mindsync/web build` |
 | Build output directory | `packages/web/dist` |
 
 ### Optional: access control

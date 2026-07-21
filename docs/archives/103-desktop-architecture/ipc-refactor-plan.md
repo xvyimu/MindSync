@@ -26,7 +26,7 @@
 
 ### 2. 改造 `main.js`
 - [ ] 使其成为服务提供者
-- [ ] 通过 `require('@prompt-optimizer/core')` 直接消费 `core` 包
+- [ ] 通过 `require('@mindsync/core')` 直接消费 `core` 包
 - [ ] 在主进程中实例化 `LLMService` 等核心服务
 - [ ] 建立服务管理和生命周期控制
 
@@ -75,7 +75,7 @@
 ### 主进程架构
 ```javascript
 // main.js
-const { LLMService, StorageProvider } = require('@prompt-optimizer/core');
+const { LLMService, StorageProvider } = require('@mindsync/core');
 
 class MainProcessServices {
   constructor() {

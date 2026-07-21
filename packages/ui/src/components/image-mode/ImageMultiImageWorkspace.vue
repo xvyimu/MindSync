@@ -643,7 +643,7 @@ import {
   type PromptRecordChain,
   type PromptRecordType,
   type Template,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { AppServices } from '../../types/services'
 import { useImageMultiImageSession, type TestColumnCount, type TestPanelVersionValue, type TestVariantId } from '../../stores/session/useImageMultiImageSession'
 import { useImageGeneration } from '../../composables/image/useImageGeneration'

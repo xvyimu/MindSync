@@ -166,7 +166,7 @@ export { clickOutside } from "./directives/clickOutside";
 export * from "./composables";
 
 // 领域工厂 / Electron Proxy / 运行时检测：请直接从
-// `@prompt-optimizer/core` 或 `@prompt-optimizer/core/electron` 导入。
+// `@mindsync/core` 或 `@mindsync/core/electron` 导入。
 // UI 包只导出组件、composable、插件与类型，不再 re-export 工厂，以保持包边界。
 
 // 类型 re-export：类型擦除后无运行时依赖，保留以便 UI 消费者单入口拿类型
@@ -203,7 +203,7 @@ export type {
   IImageModelManager,
   IImageService,
   ImageModelConfig,
-} from "@prompt-optimizer/core";
+} from "@mindsync/core";
 
 // 导出新增的类型和服务
 export * from "./types";

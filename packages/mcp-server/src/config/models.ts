@@ -3,7 +3,7 @@
  * 完全复用 core 包的模型管理功能
  */
 
-import { ModelManager, type TextModelConfig } from '@prompt-optimizer/core';
+import { ModelManager, type TextModelConfig } from '@mindsync/core';
 
 function getProviderIdentity(config: TextModelConfig): string {
   return String(
@@ -23,7 +23,7 @@ export async function setupDefaultModel(
   preferredProvider?: string
 ): Promise<void> {
   // 动态导入 defaultModels，确保环境变量已经加载
-  const { defaultModels } = await import('@prompt-optimizer/core');
+  const { defaultModels } = await import('@mindsync/core');
 
   // 获取所有可用的默认模型（已启用的）
   const availableModels = Object.entries(defaultModels).filter(([_, config]) => config.enabled);

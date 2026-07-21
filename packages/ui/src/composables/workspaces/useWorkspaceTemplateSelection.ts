@@ -15,7 +15,7 @@
 import { computed, ref, watch, type Ref } from 'vue'
 import type { AppServices } from '../../types/services'
 import type { TemplateSelectOption } from '../../types/select-options'
-import type { Template } from '@prompt-optimizer/core'
+import type { Template } from '@mindsync/core'
 import { DataTransformer } from '../../utils/data-transformer'
 
 type WorkspaceTemplateType = Parameters<AppServices['templateManager']['listTemplatesByType']>[0]

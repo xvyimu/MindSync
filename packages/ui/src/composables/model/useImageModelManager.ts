@@ -11,7 +11,7 @@ import type {
   IImageAdapterRegistry,
   IImageModelManager,
   IImageService
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { useModelAdvancedParameters } from './useModelAdvancedParameters'
 import { computeConnectionConfig, normalizeProviderChangeOptions } from './useConnectionConfig'
 

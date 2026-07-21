@@ -216,7 +216,7 @@ const providerMapping = {
 
 ### 参数验证API
 ```typescript
-import { validateLLMParams } from '@prompt-optimizer/core';
+import { validateLLMParams } from '@mindsync/core';
 
 const validation = validateLLMParams(llmParams, provider);
 

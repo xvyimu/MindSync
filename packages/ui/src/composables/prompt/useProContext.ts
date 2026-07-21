@@ -6,7 +6,7 @@
  */
 
 import { provide, inject, type InjectionKey, type Ref, type ComputedRef } from 'vue'
-import type { ProEvaluationContext } from '@prompt-optimizer/core'
+import type { ProEvaluationContext } from '@mindsync/core'
 
 /**
  * ProContext 的 InjectionKey，保证类型安全

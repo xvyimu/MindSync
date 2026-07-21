@@ -17,7 +17,7 @@
 - [ ] `experience.md` - 重构实施经验
 
 ## 相关代码变更
-- 影响包：@prompt-optimizer/ui, @prompt-optimizer/web
+- 影响包：@mindsync/ui, @mindsync/web
 - 主要变更：
   - 测试面板UI重构
   - 测试功能增强

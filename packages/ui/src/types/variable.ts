@@ -99,7 +99,7 @@ export class VariableError extends Error {
   }
 }
 
-import { PREDEFINED_VARIABLES as CORE_PREDEFINED_VARIABLES } from '@prompt-optimizer/core';
+import { PREDEFINED_VARIABLES as CORE_PREDEFINED_VARIABLES } from '@mindsync/core';
 
 // 预定义变量常量（从core导入，保证一致性）
 export const PREDEFINED_VARIABLES = CORE_PREDEFINED_VARIABLES;

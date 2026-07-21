@@ -1,4 +1,4 @@
-import type { EvaluationResponse, EvaluationType, StructuredCompareRole } from '@prompt-optimizer/core'
+import type { EvaluationResponse, EvaluationType, StructuredCompareRole } from '@mindsync/core'
 
 /**
  * Persisted evaluation results for a single workspace/submode.

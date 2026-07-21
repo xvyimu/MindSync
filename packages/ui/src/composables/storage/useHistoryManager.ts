@@ -2,7 +2,7 @@ import { reactive, type Ref } from 'vue'
 
 import type { AppServices } from '../../types/services'
 
-import type { PromptRecordChain, PromptRecord } from '@prompt-optimizer/core'
+import type { PromptRecordChain, PromptRecord } from '@mindsync/core'
 
 export interface HistoryManagerHooks {
   showHistory: boolean

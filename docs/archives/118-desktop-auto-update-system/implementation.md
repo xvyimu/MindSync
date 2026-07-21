@@ -94,10 +94,10 @@
 
 #### 5.1. 环境检测
 
-使用 `@prompt-optimizer/core` 包中的 `isRunningInElectron()` 函数进行环境检测：
+使用 `@mindsync/core` 包中的 `isRunningInElectron()` 函数进行环境检测：
 
 ```typescript
-import { isRunningInElectron } from '@prompt-optimizer/core'
+import { isRunningInElectron } from '@mindsync/core'
 
 // 仅在 Electron 环境中显示更新组件
 <div v-if="isRunningInElectron()">

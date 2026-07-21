@@ -201,7 +201,7 @@ import { type PropType } from 'vue'
 
 import { useI18n } from 'vue-i18n'
 import { NButton, NCard, NTag, NText, NSpace } from 'naive-ui'
-import { isRunningInElectron, type TextModelConfig } from '@prompt-optimizer/core'
+import { isRunningInElectron, type TextModelConfig } from '@mindsync/core'
 import { getProviderDisplayName, getTextModelConfigDisplayName } from '../utils/provider-display'
 
 const { models, isTestingConnectionFor, isDefaultModel } = defineProps({

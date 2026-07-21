@@ -1,6 +1,6 @@
 import type { OptionalIntegration } from './types'
 
-import { getEnvVar } from '@prompt-optimizer/core'
+import { getEnvVar } from '@mindsync/core'
 
 export const integration: OptionalIntegration = {
   id: 'prompt-garden',

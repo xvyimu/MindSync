@@ -4,7 +4,7 @@ import type {
   IFavoriteManager,
   IImageStorageService,
   ImageMetadata,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import {
   DEFAULT_DATA_MANAGER_PACKAGE_SECTIONS,

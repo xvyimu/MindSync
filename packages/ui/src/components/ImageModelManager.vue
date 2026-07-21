@@ -173,7 +173,7 @@ import { useImageModelManager } from '../composables/model/useImageModelManager'
 import { useConfirmDialog } from '../composables/ui/useConfirmDialog'
 import { useToast } from '../composables/ui/useToast'
 import { getI18nErrorMessage } from '../utils/error'
-import { isRunningInElectron, type IImageService, type ImageModel } from '@prompt-optimizer/core'
+import { isRunningInElectron, type IImageService, type ImageModel } from '@mindsync/core'
 import { getProviderDisplayName } from '../utils/provider-display'
 import AppPreviewImage from './media/AppPreviewImage.vue'
 

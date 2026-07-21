@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { defineComponent, h, ref } from 'vue'
-import type { TextModelConfig } from '@prompt-optimizer/core'
+import type { TextModelConfig } from '@mindsync/core'
 
 import TextModelQuickSwitch from '../../../src/components/TextModelQuickSwitch.vue'
 import type { ModelSelectOption } from '../../../src/types/select-options'

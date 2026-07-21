@@ -66,7 +66,7 @@ export type ImageSubMode = "text2image" | "image2image"
 import { ref, readonly, type Ref } from 'vue'
 import type { AppServices } from '../types/services'
 import { usePreferences } from './usePreferenceManager'
-import { UI_SETTINGS_KEYS, type BasicSubMode } from '@prompt-optimizer/core'
+import { UI_SETTINGS_KEYS, type BasicSubMode } from '@mindsync/core'
 
 interface UseBasicSubModeApi {
   basicSubMode: Ref<BasicSubMode>
@@ -213,7 +213,7 @@ import {
     useProSubMode,
     useImageSubMode,
     // ... 其他导入
-} from '@prompt-optimizer/ui'
+} from '@mindsync/ui'
 
 // 功能模式
 const { functionMode, setFunctionMode } = useFunctionMode(services as any)
@@ -276,7 +276,7 @@ onMounted(async () => {
         await ensureInitialized();
         selectedOptimizationMode.value = proSubMode.value as OptimizationMode;
         await handleContextModeChange(
-            proSubMode.value as import("@prompt-optimizer/core").ContextMode,
+            proSubMode.value as import("@mindsync/core").ContextMode,
         );
         console.log(`[App] 上下文模式子模式已恢复: ${proSubMode.value}`);
     } else if (functionMode.value === "image") {
@@ -292,26 +292,26 @@ onMounted(async () => {
 ```typescript
 // 基础模式子模式变更处理器
 const handleBasicSubModeChange = async (mode: OptimizationMode) => {
-    await setBasicSubMode(mode as import("@prompt-optimizer/core").BasicSubMode);
+    await setBasicSubMode(mode as import("@mindsync/core").BasicSubMode);
     selectedOptimizationMode.value = mode;
     console.log(`[App] 基础模式子模式已切换并持久化: ${mode}`);
 };
 
 // 上下文模式子模式变更处理器
 const handleProSubModeChange = async (mode: OptimizationMode) => {
-    await setProSubMode(mode as import("@prompt-optimizer/core").ProSubMode);
+    await setProSubMode(mode as import("@mindsync/core").ProSubMode);
     selectedOptimizationMode.value = mode;
     
     if (services.value?.contextMode.value !== mode) {
         await handleContextModeChange(
-            mode as import("@prompt-optimizer/core").ContextMode,
+            mode as import("@mindsync/core").ContextMode,
         );
     }
     console.log(`[App] 上下文模式子模式已切换并持久化: ${mode}`);
 };
 
 // 图像模式子模式变更处理器
-const handleImageSubModeChange = async (mode: import("@prompt-optimizer/core").ImageSubMode) => {
+const handleImageSubModeChange = async (mode: import("@mindsync/core").ImageSubMode) => {
     await setImageSubMode(mode);
     console.log(`[App] 图像模式子模式已切换并持久化: ${mode}`);
     
@@ -378,7 +378,7 @@ import {
   IMAGE_MODE_KEYS,
   UI_SETTINGS_KEYS,  // ✅ 新增
   // ...
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 // 2. 修改 restoreSelections 方法
 const restoreSelections = async () => {

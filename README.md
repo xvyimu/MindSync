@@ -1,35 +1,28 @@
-# Prompt Optimizer 🚀
+# MindSync 🚀
 
-> **Repository identity:** [xvyimu/MindSync](https://github.com/xvyimu/MindSync) (formerly `xvyimu/prompt-optimizer`, **left the upstream fork network**).  
-> **Product name** remains **Prompt Optimizer**. Upstream reference: [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer) via `upstream` remote.  
-> **License:** AGPL-3.0-only (see [LICENSE](LICENSE)).
-
+> **Repository:** [xvyimu/MindSync](https://github.com/xvyimu/MindSync) — independent product distribution.  
+> **Product UI name:** Prompt Optimizer（提示词优化器）.  
+> **License:** AGPL-3.0-only (see [LICENSE](LICENSE)).  
+> **Attribution:** Derived from [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer); original copyright retained in `LICENSE`. This repo does **not** track an `upstream` remote.
 
 <div align="center">
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-[![GitHub stars](https://img.shields.io/github/stars/linshenkx/prompt-optimizer)](https://github.com/linshenkx/prompt-optimizer/stargazers)
-![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/cakkkhboolfnadechdlgdcnjammejlna?style=flat&label=Chrome%20Users&link=https%3A%2F%2Fchromewebstore.google.com%2Fdetail%2F%25E6%258F%2590%25E7%25A4%25BA%25E8%25AF%258D%25E4%25BC%2598%25E5%258C%2596%25E5%2599%25A8%2Fcakkkhboolfnadechdlgdcnjammejlna)
-
-<a href="https://trendshift.io/repositories/13813" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13813" alt="linshenkx%2Fprompt-optimizer | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-
+[![GitHub stars](https://img.shields.io/github/stars/xvyimu/MindSync)](https://github.com/xvyimu/MindSync/stargazers)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
-[![Docker Pulls](https://img.shields.io/docker/pulls/linshen/prompt-optimizer)](https://hub.docker.com/r/linshen/prompt-optimizer)
-![GitHub forks](https://img.shields.io/github/forks/linshenkx/prompt-optimizer?style=flat)
-[![Deploy with Vercel](https://img.shields.io/badge/Vercel-indigo?style=flat&logo=vercel)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flinshenkx%2Fprompt-optimizer)
+[![GitHub issues](https://img.shields.io/github/issues/xvyimu/MindSync)](https://github.com/xvyimu/MindSync/issues)
+[![Deploy with Vercel](https://img.shields.io/badge/Vercel-indigo?style=flat&logo=vercel)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fxvyimu%2FMindSync)
 
-[Website](https://always200.com) | [Online Optimizer](https://prompt.always200.com) | [Prompt Garden](https://garden.always200.com) | [Docs](https://docs.always200.com) | [Quick Start](#quick-start) | [Chrome Extension](https://chromewebstore.google.com/detail/prompt-optimizer/cakkkhboolfnadechdlgdcnjammejlna) | [💖 Support](https://ko-fi.com/linshenkx)
-
-[Development Docs](docs/developer/development.md) | [Vercel Deployment Guide](docs/user/deployment/vercel_en.md) | [Cloudflare Deployment Guide](docs/user/deployment/cloudflare-pages_en.md) | [MCP Deployment Guide](docs/user/mcp-server_en.md) | [DeepWiki Docs](https://deepwiki.com/linshenkx/prompt-optimizer) | [ZRead Docs](https://zread.ai/linshenkx/prompt-optimizer)
+[Quick Start](#quick-start) · [Development Docs](docs/developer/development.md) · [Vercel](docs/user/deployment/vercel_en.md) · [Cloudflare](docs/user/deployment/cloudflare-pages_en.md) · [MCP](docs/user/mcp-server_en.md)
 
 </div>
 
 ## 📖 Project Introduction
 
-Prompt Optimizer is a powerful AI prompt optimization tool that helps you write better AI prompts and improve the quality of AI outputs. It supports four usage methods: web application, desktop application, Chrome extension, and Docker deployment.
+**MindSync** is an independent AGPL distribution of an AI prompt optimization workbench (UI product name: **Prompt Optimizer**). It helps you write better AI prompts and improve the quality of AI outputs. It supports four usage methods: web application, desktop application, Chrome extension, and Docker deployment.
 
-Prompts can start from manual writing, templates, local imports, or sources such as [Prompt Garden](https://garden.always200.com). Prompt Optimizer is where those prompts are optimized, tested, evaluated, and saved as reusable prompt assets.
+Prompts can start from manual writing, templates, local imports, or external libraries. MindSync is where those prompts are optimized, tested, evaluated, and saved as reusable prompt assets.
 
 ### 🎥 Feature Demonstration
 

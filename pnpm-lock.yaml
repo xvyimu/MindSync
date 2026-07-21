@@ -78,7 +78,7 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1044.0
         version: 3.1044.0
-      '@prompt-optimizer/core':
+      '@mindsync/core':
         specifier: workspace:*
         version: link:../core
       dotenv:
@@ -109,10 +109,10 @@ importers:
 
   packages/extension:
     dependencies:
-      '@prompt-optimizer/core':
+      '@mindsync/core':
         specifier: workspace:*
         version: link:../core
-      '@prompt-optimizer/ui':
+      '@mindsync/ui':
         specifier: workspace:*
         version: link:../ui
       vue:
@@ -146,7 +146,7 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.28.0
         version: 1.28.0(zod@4.3.6)
-      '@prompt-optimizer/core':
+      '@mindsync/core':
         specifier: workspace:*
         version: link:../core
       debug:
@@ -207,7 +207,7 @@ importers:
       '@codemirror/view':
         specifier: ^6.40.0
         version: 6.40.0
-      '@prompt-optimizer/core':
+      '@mindsync/core':
         specifier: workspace:*
         version: link:../core
       '@vicons/tabler':
@@ -316,10 +316,10 @@ importers:
 
   packages/web:
     dependencies:
-      '@prompt-optimizer/core':
+      '@mindsync/core':
         specifier: workspace:*
         version: link:../core
-      '@prompt-optimizer/ui':
+      '@mindsync/ui':
         specifier: workspace:*
         version: link:../ui
       vue:

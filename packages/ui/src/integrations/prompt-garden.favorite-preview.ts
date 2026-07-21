@@ -1,4 +1,4 @@
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import PromptGardenFavoritePreviewPanel from '../components/PromptGardenFavoritePreviewPanel.vue'
 import { parseFavoriteGardenSnapshotPreview } from '../utils/garden-snapshot-preview'

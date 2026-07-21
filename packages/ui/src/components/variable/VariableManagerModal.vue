@@ -371,7 +371,7 @@ import type {
 } from "../../types/components";
 import { isValidVariableName, type VariableSource } from "../../types/variable";
 import type { VariableManagerHooks } from '../../composables/prompt/useVariableManager';
-import type { VariableExportData, VariableImportOptions } from '@prompt-optimizer/core';
+import type { VariableExportData, VariableImportOptions } from '@mindsync/core';
 import VariableEditor from "./VariableEditor.vue";
 import VariableImporter from "./VariableImporter.vue";
 

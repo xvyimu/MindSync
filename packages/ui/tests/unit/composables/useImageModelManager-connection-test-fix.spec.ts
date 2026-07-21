@@ -7,7 +7,7 @@ import type {
   ImageModel,
   ImageModelConfig,
   IImageProviderAdapter
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 // Mock the useImageModelManager composable logic
 describe('Image Model Manager Connection Test Fix', () => {

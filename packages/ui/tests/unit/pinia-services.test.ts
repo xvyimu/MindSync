@@ -4,7 +4,7 @@
  * 测试 getPiniaServices() 与 session store 的集成
  */
 
-import type { IPreferenceService } from '@prompt-optimizer/core'
+import type { IPreferenceService } from '@mindsync/core'
 import { useBasicUserSession } from '../../src/stores/session/useBasicUserSession'
 import { createTestPinia, createPreferenceServiceStub } from '../utils/pinia-test-helpers'
 

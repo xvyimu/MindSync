@@ -19,9 +19,9 @@
 ## 2. 启动方式
 
 ```powershell
-pnpm -F @prompt-optimizer/core build
-pnpm -F @prompt-optimizer/ui build
-pnpm -F @prompt-optimizer/web dev --port 18181
+pnpm -F @mindsync/core build
+pnpm -F @mindsync/ui build
+pnpm -F @mindsync/web dev --port 18181
 ```
 
 打开：

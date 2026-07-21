@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, type Ref } from 'vue'
-import { createCompareService, type ChangeType, type TextFragment, type ICompareService } from '@prompt-optimizer/core'
+import { createCompareService, type ChangeType, type TextFragment, type ICompareService } from '@mindsync/core'
 import type { AppServices } from '../../types/services'
 
 const props = defineProps<{

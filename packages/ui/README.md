@@ -1,4 +1,4 @@
-# @prompt-optimizer/ui
+# @mindsync/ui
 
 Prompt Optimizer的Vue 3用户界面组件库，基于Naive UI设计系统构建的现代化UI组件集合。
 
@@ -14,7 +14,7 @@ Prompt Optimizer的Vue 3用户界面组件库，基于Naive UI设计系统构建
 ## 安装
 
 ```bash
-pnpm add @prompt-optimizer/ui @prompt-optimizer/core naive-ui
+pnpm add @mindsync/ui @mindsync/core naive-ui
 ```
 
 ## 快速开始
@@ -23,7 +23,7 @@ pnpm add @prompt-optimizer/ui @prompt-optimizer/core naive-ui
 
 ```typescript
 import { createApp } from 'vue'
-import { installI18n } from '@prompt-optimizer/ui'
+import { installI18n } from '@mindsync/ui'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -47,7 +47,7 @@ app.mount('#app')
 
 <script setup>
 import { NConfigProvider, NMessageProvider } from 'naive-ui'
-import { useNaiveTheme } from '@prompt-optimizer/ui'
+import { useNaiveTheme } from '@mindsync/ui'
 
 const { naiveTheme, themeOverrides } = useNaiveTheme()
 </script>
@@ -187,7 +187,7 @@ const { naiveTheme, themeOverrides } = useNaiveTheme()
 ### 主题管理
 
 ```typescript
-import { useNaiveTheme } from '@prompt-optimizer/ui'
+import { useNaiveTheme } from '@mindsync/ui'
 
 const {
   naiveTheme,       // Naive UI主题对象
@@ -201,7 +201,7 @@ const {
 ### 响应式布局
 
 ```typescript
-import { useResponsiveTestLayout } from '@prompt-optimizer/ui'
+import { useResponsiveTestLayout } from '@mindsync/ui'
 
 const {
   isMobile,           // 是否为移动端
@@ -217,7 +217,7 @@ const {
 ### 测试模式配置
 
 ```typescript
-import { useTestModeConfig } from '@prompt-optimizer/ui'
+import { useTestModeConfig } from '@mindsync/ui'
 
 const {
   showTestInput,          // 是否显示测试输入
@@ -332,7 +332,7 @@ import type {
   ITemplateManager,
   ILLMService,
   IPromptService
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 // TestArea组件类型
 export interface TestAreaConfig {
@@ -373,29 +373,29 @@ pnpm install
 pnpm dev
 
 # 构建UI包
-pnpm -F @prompt-optimizer/ui build
+pnpm -F @mindsync/ui build
 
 # 运行测试
-pnpm -F @prompt-optimizer/ui test
+pnpm -F @mindsync/ui test
 
 # 类型检查
-pnpm -F @prompt-optimizer/ui exec tsc --noEmit
+pnpm -F @mindsync/ui exec tsc --noEmit
 ```
 
 ### 测试
 
 ```bash
 # 运行所有测试
-pnpm -F @prompt-optimizer/ui test
+pnpm -F @mindsync/ui test
 
 # 运行特定组件测试
-pnpm -F @prompt-optimizer/ui test -- TestAreaPanel
+pnpm -F @mindsync/ui test -- TestAreaPanel
 
 # 运行集成测试
-pnpm -F @prompt-optimizer/ui test -- test-area-integration
+pnpm -F @mindsync/ui test -- test-area-integration
 
 # 运行端到端测试  
-pnpm -F @prompt-optimizer/ui test -- test-area-e2e
+pnpm -F @mindsync/ui test -- test-area-e2e
 ```
 
 ### 组件开发指南
@@ -413,7 +413,7 @@ pnpm -F @prompt-optimizer/ui test -- test-area-e2e
 
 - **Vue 3.x** - 渐进式JavaScript框架
 - **Naive UI 2.x** - Vue 3设计系统组件库
-- **@prompt-optimizer/core** - 核心业务逻辑
+- **@mindsync/core** - 核心业务逻辑
 - **Vue I18n** - Vue国际化插件
 
 ### 开发依赖

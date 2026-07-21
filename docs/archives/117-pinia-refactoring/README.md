@@ -25,7 +25,7 @@
 
 ### 第一次提交：引入Pinia并修复竞态条件
 **Commit**: `267ae17`
-- 影响包：@prompt-optimizer/ui
+- 影响包：@mindsync/ui
 - 主要变更：
   - 引入6+1 session store架构（6个子模式store + 1个coordinator）
   - 修复Pro-system session恢复时序问题
@@ -37,7 +37,7 @@
 
 ### 第二次提交：移除$services并统一服务访问
 **Commit**: `7a43ff7`
-- 影响包：@prompt-optimizer/ui
+- 影响包：@mindsync/ui
 - 主要变更：
   - 完全移除 `$services` 服务注入机制
   - 统一使用 `getPiniaServices()` 作为唯一服务访问入口

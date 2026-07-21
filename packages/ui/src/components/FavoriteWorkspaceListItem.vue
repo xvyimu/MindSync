@@ -154,7 +154,7 @@ import {
 } from 'naive-ui'
 import { Copy, DotsVertical, Edit, PlayerPlay, Trash } from '@vicons/tabler'
 import { useI18n } from 'vue-i18n'
-import type { FavoriteCategory, FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoriteCategory, FavoritePrompt } from '@mindsync/core'
 
 import type { AppServices } from '../types/services'
 import { resolveAssetIdToDataUrl } from '../utils/image-asset-storage'

@@ -11,7 +11,7 @@ import type {
   ConversationMessage,
   ToolDefinition,
   ContextEditorState as CoreContextEditorState,
-} from "@prompt-optimizer/core";
+} from "@mindsync/core";
 import type { AppServices } from "../../types/services";
 import type { VariableManagerHooks } from "../prompt/useVariableManager";
 
@@ -42,7 +42,7 @@ export function useContextManagement(options: ContextManagementOptions) {
 
   // 上下文模式
   const contextMode =
-    ref<import("@prompt-optimizer/core").ContextMode>("system");
+    ref<import("@mindsync/core").ContextMode>("system");
 
   // 优化阶段上下文状态
   const optimizationContext = ref<ConversationMessage[]>([]);
@@ -262,7 +262,7 @@ export function useContextManagement(options: ContextManagementOptions) {
   // ==================== 上下文模式切换 ====================
 
   const handleContextModeChange = async (
-    mode: import("@prompt-optimizer/core").ContextMode,
+    mode: import("@mindsync/core").ContextMode,
   ) => {
     if (!services.value) {
       console.warn("[useContextManagement] Services not ready");

@@ -19,7 +19,7 @@
 - [ ] `experience.md` - 开发经验总结（待从experience.md中提取）
 
 ## 相关代码变更
-- 影响包：@prompt-optimizer/core, @prompt-optimizer/ui, @prompt-optimizer/web, @prompt-optimizer/extension
+- 影响包：@mindsync/core, @mindsync/ui, @mindsync/web, @mindsync/extension
 - 主要变更：
   - 模板管理功能实现
   - 异步操作优化

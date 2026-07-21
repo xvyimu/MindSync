@@ -19,7 +19,7 @@ import {
   prepareChromeBuiltInModel,
   resolveTextModelMetadata,
   validateCustomRequestHeaders
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import {
   classifyLlmTransportError,
   formatErrorSummary,

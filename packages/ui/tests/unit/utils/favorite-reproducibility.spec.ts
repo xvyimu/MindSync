@@ -15,7 +15,7 @@ import {
   createPromptContract,
   type FavoritePrompt,
   type PromptAsset,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 const createFavorite = (overrides: Partial<FavoritePrompt> = {}): FavoritePrompt => ({
   id: 'fav-1',

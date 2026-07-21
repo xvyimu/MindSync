@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import EvaluationPanel from '../../../src/components/evaluation/EvaluationPanel.vue'
 
-vi.mock('@prompt-optimizer/core', () => ({
+vi.mock('@mindsync/core', () => ({
   createCompareService: vi.fn(() => ({
     compareTexts: vi.fn(() => ({
       fragments: [],

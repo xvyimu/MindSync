@@ -22,7 +22,7 @@
 ├─────────────────────────────────────────────────────────────┤
 │                  主进程 (main.js) - 服务端                   │
 │  - 窗口管理                                                  │
-│  - **直接消费 @prompt-optimizer/core 包**                      │
+│  - **直接消费 @mindsync/core 包**                      │
 │  - **实例化并持有核心服务 (LLMService, ModelManager)**         │
 │  - **作为后端，通过 IPC 提供高层服务接口 (如 testConnection)** │
 ├─────────────────────────────────────────────────────────────┤
@@ -119,7 +119,7 @@ const {
     createLLMService, 
     createModelManager,
     // ... 其他服务
-} = require('@prompt-optimizer/core');
+} = require('@mindsync/core');
 
 // 在主进程启动时实例化服务
 let llmService;

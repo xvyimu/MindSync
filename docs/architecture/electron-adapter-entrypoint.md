@@ -5,15 +5,15 @@ Date: 2026-07-17
 
 ## Context
 
-`@prompt-optimizer/core` previously exported browser domain modules and Electron
+`@mindsync/core` previously exported browser domain modules and Electron
 renderer proxies from the same package entry. Web and Extension builds therefore
 had no explicit platform seam and could retain Electron-only implementations in
 their initial dependency graph.
 
 ## Decision
 
-- Browser-neutral domain modules remain available from `@prompt-optimizer/core`.
-- Electron renderer adapters are exported from `@prompt-optimizer/core/electron`.
+- Browser-neutral domain modules remain available from `@mindsync/core`.
+- Electron renderer adapters are exported from `@mindsync/core/electron`.
 - `useAppInitializer` dynamically imports the Electron entry only after runtime
   detection confirms that the Electron bridge is available.
 - The Core package emits ESM, CJS, and declarations for both entries.

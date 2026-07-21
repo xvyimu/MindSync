@@ -109,7 +109,7 @@ import {
 import { useToast } from '../composables/ui/useToast';
 import { getI18nErrorMessage } from '../utils/error';
 import { Star, Stars } from '@vicons/tabler';
-import type { FavoriteCategory } from '@prompt-optimizer/core';
+import type { FavoriteCategory } from '@mindsync/core';
 import type { AppServices } from '../types/services';
 
 interface Props {

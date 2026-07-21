@@ -5,7 +5,7 @@ import {
   type PromptAsset,
   type PromptContent,
   type PromptModeKey,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import {
   createFavoriteReproducibilityProjection,

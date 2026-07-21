@@ -37,7 +37,7 @@ import { ref } from 'vue'
 
 import { useI18n } from 'vue-i18n'
 import { NButton, NBadge } from 'naive-ui'
-import { isRunningInElectron } from '@prompt-optimizer/core'
+import { isRunningInElectron } from '@mindsync/core'
 import { useUpdater } from '../composables/system/useUpdater'
 import UpdaterModal from './UpdaterModal.vue'
 

@@ -14,7 +14,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, watch, type Ref } from 'vue'
-import { UI_SETTINGS_KEYS } from '@prompt-optimizer/core'
+import { UI_SETTINGS_KEYS } from '@mindsync/core'
 import { getPiniaServices } from '../../plugins/pinia'
 
 export type FunctionMode = 'basic' | 'pro' | 'image'

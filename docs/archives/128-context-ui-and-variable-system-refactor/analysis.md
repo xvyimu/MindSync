@@ -327,7 +327,7 @@ packages/ui/src/composables/
 </template>
 
 <script setup lang="ts">
-import type { ContextMode } from '@prompt-optimizer/core'
+import type { ContextMode } from '@mindsync/core'
 
 defineProps<{
   contextMode: ContextMode

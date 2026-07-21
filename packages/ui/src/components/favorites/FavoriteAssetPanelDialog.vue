@@ -51,7 +51,7 @@
 import { computed } from 'vue'
 import { NModal } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { FavoriteCategory, FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoriteCategory, FavoritePrompt } from '@mindsync/core'
 
 import FavoriteDetailPanel from '../FavoriteDetailPanel.vue'
 import FavoriteEditorForm from '../FavoriteEditorForm.vue'

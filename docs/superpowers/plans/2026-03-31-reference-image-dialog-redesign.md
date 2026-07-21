@@ -87,7 +87,7 @@ Note:
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/composables/useReferencePromptDialog.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/composables/useReferencePromptDialog.spec.ts
 ```
 
 Expected:
@@ -133,7 +133,7 @@ Rules:
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/composables/useReferencePromptDialog.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/composables/useReferencePromptDialog.spec.ts
 ```
 
 Expected:
@@ -177,7 +177,7 @@ expect(source).not.toMatch(/undoBanner/)
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
 ```
 
 Expected:
@@ -270,7 +270,7 @@ Delete:
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
 ```
 
 Expected:
@@ -310,7 +310,7 @@ expect(source).not.toMatch(/replicateOnly/)
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
 ```
 
 Expected:
@@ -342,7 +342,7 @@ Do not leave `zh-TW` and `en-US` behind even if the main product language is Chi
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/image/reference-image-theme-guards.spec.ts
 ```
 
 Expected:
@@ -395,7 +395,7 @@ it('caps extracted variables at 5 entries', async () => {
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/services/ImageStyleExtractor.reference-migration.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/services/ImageStyleExtractor.reference-migration.spec.ts
 ```
 
 Expected:
@@ -439,7 +439,7 @@ return {
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/services/ImageStyleExtractor.reference-migration.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/services/ImageStyleExtractor.reference-migration.spec.ts
 ```
 
 Expected:
@@ -465,7 +465,7 @@ git commit -m "refactor(image): cap reference dialog variables"
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui test -- tests/unit/composables/useReferencePromptDialog.spec.ts tests/unit/image/reference-image-theme-guards.spec.ts tests/unit/services/ImageStyleExtractor.reference-migration.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/composables/useReferencePromptDialog.spec.ts tests/unit/image/reference-image-theme-guards.spec.ts tests/unit/services/ImageStyleExtractor.reference-migration.spec.ts
 ```
 
 Expected:
@@ -476,7 +476,7 @@ Expected:
 Run:
 
 ```powershell
-pnpm -F @prompt-optimizer/ui typecheck
+pnpm -F @mindsync/ui typecheck
 ```
 
 Expected:

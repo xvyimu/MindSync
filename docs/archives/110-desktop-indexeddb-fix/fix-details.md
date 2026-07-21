@@ -6,7 +6,7 @@
 
 1. **缺少必要依赖**
    - dotenv: main.js第8行require('dotenv')，但package.json中未声明
-   - @prompt-optimizer/core: main.js第27行require('@prompt-optimizer/core')，但package.json中未声明
+   - @mindsync/core: main.js第27行require('@mindsync/core')，但package.json中未声明
 
 2. **构建配置不一致**
    - build-desktop.bat使用electron-version=33.0.0
@@ -30,7 +30,7 @@
 ### 阶段1：修复关键依赖问题
 - [x] 1.1 更新package.json添加缺少的依赖
   - 添加了dotenv: ^16.0.0
-  - 添加了@prompt-optimizer/core: workspace:*
+  - 添加了@mindsync/core: workspace:*
 - [x] 1.2 验证依赖版本兼容性
   - 依赖安装成功，无版本冲突
 
@@ -73,7 +73,7 @@
 "dependencies": {
   "node-fetch": "^2.7.0",
   "dotenv": "^16.0.0",           // 新增
-  "@prompt-optimizer/core": "workspace:*"  // 新增
+  "@mindsync/core": "workspace:*"  // 新增
 }
 ```
 

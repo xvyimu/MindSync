@@ -318,7 +318,7 @@ import type {
     PatchOperation,
     PromptRecord,
     Template,
-} from "@prompt-optimizer/core";
+} from "@mindsync/core";
 
 type SourceFeedbackTone = "change" | "error";
 
@@ -383,7 +383,7 @@ const props = defineProps({
         default: "",
     },
     optimizationMode: {
-        type: String as () => import("@prompt-optimizer/core").OptimizationMode,
+        type: String as () => import("@mindsync/core").OptimizationMode,
         required: true,
     },
     advancedModeEnabled: {

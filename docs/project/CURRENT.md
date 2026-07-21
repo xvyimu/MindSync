@@ -10,9 +10,12 @@
 | **日期** | 2026-07-21 |
 | **分支** | `develop` |
 | **远端 tip** | 以 `git log -1 --oneline` 为准 |
-| **本仓** | https://github.com/xvyimu/MindSync（原 `prompt-optimizer`，**已脱离 fork 网络并改名**） |
-| **策略** | **独立仓 / 不默认向上游开 PR**（仍可手动 `upstream` 同步） |
-| **上游 remote** | `upstream` → `linshenkx/prompt-optimizer`（可拉取，不默认贡献） |
+| **本仓** | https://github.com/xvyimu/MindSync（独立仓；**仅 `origin`**） |
+| **策略** | **独立产品开发 / 不跟踪原上游 / 不默认开 PR 到 linshenkx** |
+| **上游 remote** | **已移除**（2026-07-21）。安全补丁改为手工补丁，不恢复 `upstream` 除非维护者书面决定 |
+| **身份 SSOT** | [`GITHUB_IDENTITY.md`](../../GITHUB_IDENTITY.md) |
+| **包名/appId 重命名** | 方案见 [`PACKAGE-RENAME-PLAN-2026-07-21.md`](./PACKAGE-RENAME-PLAN-2026-07-21.md)（默认未执行） |
+| **许可** | AGPL-3.0-only（`LICENSE` 正文保留；抬头含独立维护说明） |
 
 ---
 
@@ -20,7 +23,7 @@
 
 | 用途 | 路径 |
 |------|------|
-| 源码 | `D:\PromtOptimizer\src\prompt-optimizer` |
+| 源码 | `D:\PromtOptimizer\src\mindsync` |
 | **运行安装** | **`D:\PromtOptimizer\app\PromptOptimizer.exe`** |
 | 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` · `nsis-2026-07-21-e1` · **`nsis-2026-07-21-ipc`** |
 | 工具链 | **Node ^24**（本机系统 Node 即可；旧 portable `tools\node-v22.*` 可弃用） |
@@ -101,9 +104,9 @@
 ```powershell
 cd D:\PromtOptimizer\src\prompt-optimizer
 # Node 24（engines ^24）
-pnpm -F @prompt-optimizer/core build
-pnpm -F @prompt-optimizer/ui build:bundle
-pnpm -F @prompt-optimizer/desktop build:ci
+pnpm -F @mindsync/core build
+pnpm -F @mindsync/ui build:bundle
+pnpm -F @mindsync/desktop build:ci
 
 node --test packages/desktop/config/*.test.js
 node --test scripts/desktop-ipc-handlers.test.mjs

@@ -27,7 +27,7 @@
   
   <script setup lang="ts">
 import { NTag, NCard, NFlex, NScrollbar } from 'naive-ui'
-import type { CompareResult, ChangeType } from '@prompt-optimizer/core'
+import type { CompareResult, ChangeType } from '@mindsync/core'
   
   interface Props {
     /** 原始文本 */

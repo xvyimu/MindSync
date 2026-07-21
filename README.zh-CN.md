@@ -1,35 +1,28 @@
-# Prompt Optimizer (提示词优化器) 🚀
+# MindSync 🚀
 
-> **仓库身份：** [xvyimu/MindSync](https://github.com/xvyimu/MindSync)（原 `xvyimu/prompt-optimizer`，**已脱离 upstream fork 网络**）。  
-> **产品名**仍为 **Prompt Optimizer（提示词优化器）**。上游参考：[linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer)（remote `upstream`）。  
-> **许可：** AGPL-3.0-only（见 [LICENSE](LICENSE)）。
-
+> **仓库：** [xvyimu/MindSync](https://github.com/xvyimu/MindSync) — 独立产品仓。  
+> **产品 UI 名：** Prompt Optimizer（提示词优化器）。  
+> **许可：** AGPL-3.0-only（见 [LICENSE](LICENSE)）。  
+> **归属：** 衍生自 [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer)；原版权保留于 `LICENSE`。本仓**不再**配置 `upstream` remote。
 
 <div align="center">
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-[![GitHub stars](https://img.shields.io/github/stars/linshenkx/prompt-optimizer)](https://github.com/linshenkx/prompt-optimizer/stargazers)
-![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/cakkkhboolfnadechdlgdcnjammejlna?style=flat&label=Chrome%20Users&link=https%3A%2F%2Fchromewebstore.google.com%2Fdetail%2F%25E6%258F%2590%25E7%25A4%25BA%25E8%25AF%258D%25E4%25BC%2598%25E5%258C%2596%25E5%2599%25A8%2Fcakkkhboolfnadechdlgdcnjammejlna)
-
-<a href="https://trendshift.io/repositories/13813" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13813" alt="linshenkx%2Fprompt-optimizer | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-
+[![GitHub stars](https://img.shields.io/github/stars/xvyimu/MindSync)](https://github.com/xvyimu/MindSync/stargazers)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
-[![Docker Pulls](https://img.shields.io/docker/pulls/linshen/prompt-optimizer)](https://hub.docker.com/r/linshen/prompt-optimizer)
-![GitHub forks](https://img.shields.io/github/forks/linshenkx/prompt-optimizer?style=flat)
-[![Deploy with Vercel](https://img.shields.io/badge/Vercel-indigo?style=flat&logo=vercel)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flinshenkx%2Fprompt-optimizer)
+[![GitHub issues](https://img.shields.io/github/issues/xvyimu/MindSync)](https://github.com/xvyimu/MindSync/issues)
+[![Deploy with Vercel](https://img.shields.io/badge/Vercel-indigo?style=flat&logo=vercel)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fxvyimu%2FMindSync)
 
-[官网](https://always200.com) | [在线优化器](https://prompt.always200.com) | [提示词库](https://garden.always200.com) | [文档站](https://docs.always200.com) | [快速开始](#快速开始) | [Chrome插件](https://chromewebstore.google.com/detail/prompt-optimizer/cakkkhboolfnadechdlgdcnjammejlna) | [💖赞助支持](images/other/sponsor_wx.jpg)
-
-[开发文档](docs/developer/development.md) | [Vercel部署指南](docs/user/deployment/vercel.md) | [Cloudflare部署指南](docs/user/deployment/cloudflare-pages.md) | [MCP部署使用说明](docs/user/mcp-server.md) | [DeepWiki文档](https://deepwiki.com/linshenkx/prompt-optimizer) | [ZRead文档](https://zread.ai/linshenkx/prompt-optimizer)
+[快速开始](#快速开始) · [开发文档](docs/developer/development.md) · [Vercel](docs/user/deployment/vercel.md) · [Cloudflare](docs/user/deployment/cloudflare-pages.md) · [MCP](docs/user/mcp-server.md)
 
 </div>
 
 ## 📖 项目简介
 
-Prompt Optimizer是一个强大的AI提示词优化工具，帮助你编写更好的AI提示词，提升AI输出质量。支持Web应用、桌面应用、Chrome插件和Docker部署四种使用方式。
+**MindSync** 是 AI 提示词优化工作台的独立 AGPL 发行版（UI 产品名仍为 **Prompt Optimizer / 提示词优化器**）。帮助编写更好的 AI 提示词、提升输出质量。支持 Web、桌面、Chrome 插件与 Docker 四种使用方式。
 
-提示词可以来自手写、模板、本地导入，也可以来自 [Prompt Garden 提示词库](https://garden.always200.com) 这样的来源。Prompt Optimizer 负责把这些提示词继续优化、测试、评估，并沉淀为可复用的提示词资产。
+提示词可来自手写、模板、本地导入或外部库。MindSync 负责优化、测试、评估，并沉淀为可复用的提示词资产。
 
 ### 🎥 功能演示
 

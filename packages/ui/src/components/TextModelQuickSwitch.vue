@@ -65,7 +65,7 @@ import {
   type ModelOption,
   type TextModel,
   type TextModelConfig,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import { useToast } from '../composables/ui/useToast'
 import { getProviderDisplayName } from '../utils/provider-display'

@@ -1,6 +1,6 @@
 import { ref, type ComputedRef, type Ref } from 'vue'
 
-import type { ContextMode } from '@prompt-optimizer/core'
+import type { ContextMode } from '@mindsync/core'
 
 import { usePromptPreview } from './usePromptPreview'
 

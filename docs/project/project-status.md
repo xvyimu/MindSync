@@ -16,7 +16,7 @@ Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编�
 
 ## 3. 功能完成情况
 
-### 3.1 核心包（@prompt-optimizer/core）
+### 3.1 核心包（@mindsync/core）
 - ✅ 基础架构搭建
   - ✅ 项目结构设计
   - ✅ 多包工作区配置
@@ -42,7 +42,7 @@ Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编�
   - ✅ 流式响应支持
   - ✅ 错误处理优化
 
-### 3.2 Web 包（@prompt-optimizer/web）
+### 3.2 Web 包（@mindsync/web）
 - ✅ UI 重构
   - ✅ 组件模块化
   - ✅ UI 包抽取
@@ -82,7 +82,7 @@ Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编�
   - ✅ 媒体支持
   - ✅ 完整备份/导入
 
-### 3.3 Chrome 插件（@prompt-optimizer/extension）
+### 3.3 Chrome 插件（@mindsync/extension）
 - ✅ 基础框架
   - ✅ 插件架构设计
   - ✅ 核心功能移植
@@ -95,7 +95,7 @@ Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编�
   - ✅ 配置管理
   - ✅ Prompt Garden 支持（v2.10.0）
 
-### 3.4 桌面应用（@prompt-optimizer/desktop）
+### 3.4 桌面应用（@mindsync/desktop）
 - ✅ Electron 架构
   - ✅ 主进程架构
   - ✅ 预加载脚本
@@ -109,7 +109,7 @@ Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编�
   - ✅ Electron proxy 序列化
   - ✅ 收藏提示词资产版本 API
 
-### 3.5 MCP 服务器（@prompt-optimizer/mcp-server）
+### 3.5 MCP 服务器（@mindsync/mcp-server）
 - ✅ MCP 协议支持
   - ✅ 工具定义
   - ✅ 资源管理

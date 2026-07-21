@@ -7,7 +7,7 @@ import type {
   HistoryStorageUsage,
   PromptRecordChain,
   PromptRecord,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { AppServices } from '../../types/services'
 
 type PromptChain = PromptRecordChain

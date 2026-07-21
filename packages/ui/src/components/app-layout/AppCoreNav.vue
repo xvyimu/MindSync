@@ -68,7 +68,7 @@ import { NSpace } from 'naive-ui'
 import FunctionModeSelector from '../FunctionModeSelector.vue'
 import OptimizationModeSelectorUI from '../OptimizationModeSelector.vue'
 import ImageModeSelector from '../image-mode/ImageModeSelector.vue'
-import type { FunctionMode, BasicSubMode, ProSubMode, ImageSubMode } from '@prompt-optimizer/core'
+import type { FunctionMode, BasicSubMode, ProSubMode, ImageSubMode } from '@mindsync/core'
 
 type SubMode = BasicSubMode | ProSubMode
 

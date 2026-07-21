@@ -1,4 +1,4 @@
-import type { FavoriteCategory, IFavoriteManager } from '@prompt-optimizer/core'
+import type { FavoriteCategory, IFavoriteManager } from '@mindsync/core'
 
 export type FavoriteCategoryPathManager = Pick<IFavoriteManager, 'getCategories' | 'addCategory'>
 

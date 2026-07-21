@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 const routerPush = vi.hoisted(() => vi.fn())
 const currentRoute = vi.hoisted(() => ({

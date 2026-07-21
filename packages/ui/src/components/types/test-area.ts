@@ -1,6 +1,6 @@
 import type { Slot } from 'vue'
 
-import type { OptimizationMode, ToolCallResult } from '@prompt-optimizer/core'
+import type { OptimizationMode, ToolCallResult } from '@mindsync/core'
 
 // 基础尺寸类型
 export type ComponentSize = 'small' | 'medium' | 'large'

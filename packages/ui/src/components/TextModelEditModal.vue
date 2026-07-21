@@ -304,7 +304,7 @@ import { computed, inject, nextTick, h } from 'vue'
 
 import { useI18n } from 'vue-i18n'
 import { useToast } from '../composables/ui/useToast'
-import { isRunningInElectron, validateCustomRequestHeaders, type CustomRequestHeaderInput } from '@prompt-optimizer/core'
+import { isRunningInElectron, validateCustomRequestHeaders, type CustomRequestHeaderInput } from '@mindsync/core'
 import {
   NModal,
   NForm,

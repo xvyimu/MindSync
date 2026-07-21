@@ -642,7 +642,7 @@ import {
   NCode,
   NGrid, NGridItem, NEl
 } from 'naive-ui'
-import { TemplateProcessor, type Template, type MessageTemplate, type ITemplateManager, TemplateLanguageService } from '@prompt-optimizer/core'
+import { TemplateProcessor, type Template, type MessageTemplate, type ITemplateManager, TemplateLanguageService } from '@mindsync/core'
 import { useConfirmDialog } from '../composables/ui/useConfirmDialog'
 import { useToast } from '../composables/ui/useToast'
 import MarkdownRenderer from './MarkdownRenderer.vue'

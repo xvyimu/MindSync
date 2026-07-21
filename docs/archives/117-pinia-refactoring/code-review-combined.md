@@ -415,7 +415,7 @@ context.store.$services = servicesRef as unknown as AppServices | null
 
 ```bash
 # 1. 运行所有测试
-pnpm -F @prompt-optimizer/ui test
+pnpm -F @mindsync/ui test
 
 # 2. 验证入口时序
 # 确认 installPinia(app) 在任何 store 使用之前完成

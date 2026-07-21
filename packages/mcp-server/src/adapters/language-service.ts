@@ -4,7 +4,7 @@
  * 提供简单的语言偏好管理，通过环境变量配置
  */
 
-import { BuiltinTemplateLanguage, ITemplateLanguageService } from '@prompt-optimizer/core';
+import { BuiltinTemplateLanguage, ITemplateLanguageService } from '@mindsync/core';
 
 export class SimpleLanguageService implements ITemplateLanguageService {
   private currentLanguage: BuiltinTemplateLanguage;

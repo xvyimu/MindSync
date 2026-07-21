@@ -113,7 +113,7 @@ import {
   useMessage,
   createDiscreteApi
 } from 'naive-ui'
-import { isSafeCustomKey, parseCustomValue, type UnifiedParameterDefinition } from '@prompt-optimizer/core'
+import { isSafeCustomKey, parseCustomValue, type UnifiedParameterDefinition } from '@mindsync/core'
 import ModelParameterEditor from './ModelParameterEditor.vue'
 
 const props = defineProps({

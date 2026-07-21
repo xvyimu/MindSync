@@ -12,7 +12,7 @@ import type {
   ImportMode,
   ImportResult,
   ContextMode
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import type { RemoteStorageIpcApi } from '../utils/remote-backup'
 
 // 基础响应类型

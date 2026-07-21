@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import type { TemplateMetadata } from '@prompt-optimizer/core'
+import type { TemplateMetadata } from '@mindsync/core'
 
 export type TemplateManagerTemplateType = Exclude<
   TemplateMetadata['templateType'],

@@ -6,7 +6,7 @@ import type {
   EvaluationTarget,
   EvaluationTestCase,
   StructuredCompareRole,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 export interface CompareEvaluationTestCaseDraft {
   id: string

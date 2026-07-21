@@ -15,8 +15,8 @@
 
 | 区 | 结果 | 备注 |
 |----|------|------|
-| 机器 typecheck | **pass** | `pnpm -F @prompt-optimizer/ui typecheck` · vue-tsc exit 0 |
-| 机器 UI unit | **pass** | `pnpm -F @prompt-optimizer/ui test` · 929 passed \| 4 skipped \| 1 todo · ~50s |
+| 机器 typecheck | **pass** | `pnpm -F @mindsync/ui typecheck` · vue-tsc exit 0 |
+| 机器 UI unit | **pass** | `pnpm -F @mindsync/ui test` · 929 passed \| 4 skipped \| 1 todo · ~50s |
 | data-testid 静态 | **pass** | 全部命中 packages/ui/src（见下表） |
 | 硬约束 `@aws-sdk` | **pass** | packages/web 无命中；packages/ui 仅 tests unit remote-backup.spec.ts |
 | 硬约束 includeSecrets | **pass** | core data manager / types / export-secrets 仍在 |

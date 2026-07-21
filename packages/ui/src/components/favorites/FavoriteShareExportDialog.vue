@@ -151,7 +151,7 @@ import {
   NText,
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 import { useToast } from '../../composables/ui/useToast'
 import type { AppServices } from '../../types/services'

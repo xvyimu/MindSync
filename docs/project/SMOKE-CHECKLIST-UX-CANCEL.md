@@ -8,7 +8,7 @@ Source run: Node 24 + pnpm desktop package
 ## Preflight
 - [ ] `node -v` is v22.x (portable path if needed)
 - [ ] `git checkout develop && git pull`
-- [ ] Optional: `pnpm --filter @prompt-optimizer/core test` green
+- [ ] Optional: `pnpm --filter @mindsync/core test` green
 
 ## UX quiet-workbench
 - [ ] Open Basic System / Basic User

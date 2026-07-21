@@ -21,7 +21,7 @@ import type {
   IVariableExtractionService,
   IVariableValueGenerationService,
   IImageStorageService
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 /**
  * 统一的应用服务接口定义

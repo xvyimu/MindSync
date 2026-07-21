@@ -38,17 +38,17 @@ export default defineConfig(({ mode, command }) => {
   const packageAliases: Record<string, string> = {
     '@': resolve(__dirname, 'src'),
     // style 始终用已构建 CSS
-    '@prompt-optimizer/ui/dist/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
-    '@prompt-optimizer/ui/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
+    '@mindsync/ui/dist/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
+    '@mindsync/ui/style.css': path.resolve(__dirname, '../ui/dist/style.css'),
   }
 
   if (!isBuild) {
     Object.assign(packageAliases, {
-      '@prompt-optimizer/core/electron': path.resolve(__dirname, '../core/src/electron.ts'),
-      '@prompt-optimizer/core': path.resolve(__dirname, '../core/src/index.ts'),
-      '@prompt-optimizer/ui': path.resolve(__dirname, '../ui/src/index.ts'),
-      '@prompt-optimizer/web': path.resolve(__dirname, '../web'),
-      '@prompt-optimizer/extension': path.resolve(__dirname, '../extension'),
+      '@mindsync/core/electron': path.resolve(__dirname, '../core/src/electron.ts'),
+      '@mindsync/core': path.resolve(__dirname, '../core/src/index.ts'),
+      '@mindsync/ui': path.resolve(__dirname, '../ui/src/index.ts'),
+      '@mindsync/web': path.resolve(__dirname, '../web'),
+      '@mindsync/extension': path.resolve(__dirname, '../extension'),
     })
   }
 
@@ -65,7 +65,7 @@ export default defineConfig(({ mode, command }) => {
       hmr: true,
       watch: {
         // 确保监视monorepo中其他包的变化
-        ignored: ['!**/node_modules/@prompt-optimizer/**']
+        ignored: ['!**/node_modules/@mindsync/**']
       }
     },
     build: {

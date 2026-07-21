@@ -269,7 +269,7 @@ import {
   NTag,
   NText,
 } from 'naive-ui'
-import type { EvaluationSnapshot, StructuredCompareRole } from '@prompt-optimizer/core'
+import type { EvaluationSnapshot, StructuredCompareRole } from '@mindsync/core'
 import type { PersistedCompareSnapshotRoles } from '../../types/evaluation'
 import {
   analyzeStructuredComparePlan,

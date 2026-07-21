@@ -657,7 +657,7 @@ import {
     type PromptRecordChain,
     type Template,
     type ProUserEvaluationContext,
-} from "@prompt-optimizer/core";
+} from "@mindsync/core";
 import type { TestAreaPanelInstance } from "../types/test-area";
 import type { IteratePayload, SaveFavoritePayload } from "../../types/workspace";
 import type { AppServices } from '../../types/services';

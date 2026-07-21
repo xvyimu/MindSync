@@ -7,7 +7,7 @@
         - 渲染 PromptOptimizerApp 主组件
 
         说明:
-        - 所有核心逻辑已迁移至 @prompt-optimizer/ui 的 PromptOptimizerApp
+        - 所有核心逻辑已迁移至 @mindsync/ui 的 PromptOptimizerApp
         - 此文件仅作为应用壳，减少代码重复
     -->
     <PromptOptimizerApp />
@@ -21,5 +21,5 @@
  * 轻量级入口组件，渲染 PromptOptimizerApp 主应用。
  * 所有业务逻辑、状态管理和事件处理均在 PromptOptimizerApp 中实现。
  */
-import { PromptOptimizerApp } from "@prompt-optimizer/ui";
+import { PromptOptimizerApp } from "@mindsync/ui";
 </script>

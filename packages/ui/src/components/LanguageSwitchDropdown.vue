@@ -60,7 +60,7 @@ import { computed, inject, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NButton, NDropdown, type DropdownOption } from 'naive-ui'
 import { i18n, type SupportedLocale } from '../plugins/i18n'
-import { UI_SETTINGS_KEYS } from '@prompt-optimizer/core'
+import { UI_SETTINGS_KEYS } from '@mindsync/core'
 import { usePreferences } from '../composables/storage/usePreferenceManager'
 import type { AppServices } from '../types/services'
 

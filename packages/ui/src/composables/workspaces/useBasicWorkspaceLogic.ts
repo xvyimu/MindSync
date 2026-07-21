@@ -20,7 +20,7 @@ import type {
   PromptRecordChain,
   PromptRecordType,
   PromptSessionOrigin,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { v4 as uuidv4 } from 'uuid'
 import { useToast } from '../ui/useToast'
 import { useI18n } from 'vue-i18n'

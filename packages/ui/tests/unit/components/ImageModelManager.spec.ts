@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import ImageModelManager from '../../../src/components/ImageModelManager.vue'
 
 // Mock dependencies
-vi.mock('@prompt-optimizer/core', () => ({}))
+vi.mock('@mindsync/core', () => ({}))
 
 // Mock i18n
 vi.mock('vue-i18n', async (importOriginal) => {

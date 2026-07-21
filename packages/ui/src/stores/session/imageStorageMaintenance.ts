@@ -1,4 +1,4 @@
-import type { IImageStorageService, IPreferenceService } from '@prompt-optimizer/core'
+import type { IImageStorageService, IPreferenceService } from '@mindsync/core'
 
 // Session snapshot keys (single source of truth)
 export const BASIC_SYSTEM_SESSION_KEY = 'session/v1/basic-system'

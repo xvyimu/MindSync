@@ -93,7 +93,7 @@ import {
   NCollapse, NCollapseItem, NSpace, NIcon, NText, NTag, NCard, 
   NCode, NAlert
 } from 'naive-ui'
-import type { ToolCallResult } from '@prompt-optimizer/core'
+import type { ToolCallResult } from '@mindsync/core'
 
 const { t } = useI18n()
 

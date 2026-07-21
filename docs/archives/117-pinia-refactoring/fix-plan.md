@@ -176,7 +176,7 @@ import { createApp } from 'vue'
 import { setPiniaServices } from '../../src/plugins/pinia'
 import { piniaServicesPlugin } from '../../src/plugins/pinia-services-plugin'
 import type { AppServices } from '../../src/types/services'
-import type { IPreferenceService } from '@prompt-optimizer/core'
+import type { IPreferenceService } from '@mindsync/core'
 
 /**
  * 创建 PreferenceService stub（可复用的默认实现）

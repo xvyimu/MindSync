@@ -1,5 +1,5 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
-import type { StructuredCompareRole } from '@prompt-optimizer/core'
+import type { StructuredCompareRole } from '@mindsync/core'
 import type {
   PersistedCompareSnapshotRoles,
   PersistedCompareSnapshotRoleSignatures,

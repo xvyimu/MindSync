@@ -375,7 +375,7 @@ import { PREDEFINED_VARIABLES } from "../../types/variable";
 import type {
     ConversationManagerProps,
 } from "../../types/components";
-import type { ConversationMessage } from "@prompt-optimizer/core";
+import type { ConversationMessage } from "@mindsync/core";
 
 const { t } = useI18n();
 const toast = useToast();

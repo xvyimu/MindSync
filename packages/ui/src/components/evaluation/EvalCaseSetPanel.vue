@@ -171,7 +171,7 @@ import {
   NTag,
   NText,
 } from 'naive-ui'
-import type { EvalCase, EvalCaseSet, EvalEvidenceBundle } from '@prompt-optimizer/core'
+import type { EvalCase, EvalCaseSet, EvalEvidenceBundle } from '@mindsync/core'
 
 const props = defineProps<{
   show: boolean

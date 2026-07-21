@@ -57,7 +57,7 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-vi.mock('@prompt-optimizer/core', () => ({
+vi.mock('@mindsync/core', () => ({
   getEnvVar: (key: string) => {
     if (key === 'VITE_ENABLE_PROMPT_GARDEN_IMPORT') return '1'
     if (key === 'VITE_PROMPT_GARDEN_BASE_URL') return 'https://garden.always200.com/'

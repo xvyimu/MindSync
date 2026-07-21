@@ -18,7 +18,7 @@
 - [ ] `experience.md` - 重构过程中的经验总结（待从experience.md中提取）
 
 ## 相关代码变更
-- 影响包：@prompt-optimizer/web, @prompt-optimizer/extension
+- 影响包：@mindsync/web, @mindsync/extension
 - 主要变更：
   - 修复应用启动失败问题
   - 完全对齐上层应用与底层服务架构

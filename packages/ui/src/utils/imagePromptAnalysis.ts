@@ -1,4 +1,4 @@
-import type { PromptRecordChain, PromptRecordType } from '@prompt-optimizer/core'
+import type { PromptRecordChain, PromptRecordType } from '@mindsync/core'
 import { v4 as uuidv4 } from 'uuid'
 
 export const createImagePromptAnalysisVersion = (

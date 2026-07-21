@@ -26,7 +26,7 @@ import {
   promptExampleFromTestRun,
   type PromptSession,
   type PromptTestRun,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 
 import { useToast } from '../composables/ui/useToast'
 import ThemedTooltip from './common/ThemedTooltip.vue'

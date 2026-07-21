@@ -34,7 +34,7 @@
 import { computed } from 'vue'
 import { NButton, NCard, NInput, NModal } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import type { PromptContentVersion } from '@prompt-optimizer/core'
+import type { PromptContentVersion } from '@mindsync/core'
 
 import { promptContentToEditableText } from '../../utils/favorite-prompt-versions'
 

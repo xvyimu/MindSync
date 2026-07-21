@@ -75,7 +75,7 @@ Cloudflare 适合部署 Prompt Optimizer 的 **Web 前端**。当前 Cloudflare 
 | --- | --- |
 | Framework preset | `None` 或留空 |
 | Root directory | `/` 或留空 |
-| Build command | `pnpm -F @prompt-optimizer/core build && pnpm -F @prompt-optimizer/ui build && pnpm -F @prompt-optimizer/web build` |
+| Build command | `pnpm -F @mindsync/core build && pnpm -F @mindsync/ui build && pnpm -F @mindsync/web build` |
 | Build output directory | `packages/web/dist` |
 
 ### 可选：访问控制

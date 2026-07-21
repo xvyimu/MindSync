@@ -15,8 +15,8 @@
     "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@prompt-optimizer/ui": ["../ui/src/index.ts"],
-      "@prompt-optimizer/ui/*": ["../ui/src/*"]
+      "@mindsync/ui": ["../ui/src/index.ts"],
+      "@mindsync/ui/*": ["../ui/src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],

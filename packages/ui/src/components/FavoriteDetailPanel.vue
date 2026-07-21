@@ -459,7 +459,7 @@ import {
   Trash,
 } from '@vicons/tabler'
 import { useI18n } from 'vue-i18n'
-import type { FavoriteCategory, FavoritePrompt, PromptContentVersion } from '@prompt-optimizer/core'
+import type { FavoriteCategory, FavoritePrompt, PromptContentVersion } from '@mindsync/core'
 
 import type { AppServices } from '../types/services'
 import { parseFavoriteMediaMetadata } from '../utils/favorite-media'

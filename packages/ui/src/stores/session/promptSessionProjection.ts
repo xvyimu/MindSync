@@ -7,7 +7,7 @@ import {
   type PromptSession,
   type PromptSessionRegistry,
   type PromptSessionSummary,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import { SESSION_SUB_MODE_KEYS, type SubModeKey } from './sessionKeys'
 import type { BasicSystemSessionApi } from './useBasicSystemSession'
 import type { BasicUserSessionApi } from './useBasicUserSession'

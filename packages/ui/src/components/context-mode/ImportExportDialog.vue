@@ -240,7 +240,7 @@ import {
     NText,
 } from "naive-ui";
 import { useContextEditor } from '../../composables/context/useContextEditor';
-import type { ConversationMessage, ToolDefinition } from "@prompt-optimizer/core";
+import type { ConversationMessage, ToolDefinition } from "@mindsync/core";
 import type { StandardPromptData } from "../../types";
 
 // 类型定义

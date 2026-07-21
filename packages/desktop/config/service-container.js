@@ -78,14 +78,14 @@ function probeApiKeyEnv(env, patterns, log) {
  * @param {(input: any) => Promise<any>} [deps.convertImageInputWithElectronNativeImage]
  * @param {(msg: string, ...args: any[]) => void} [deps.log]
  * @param {NodeJS.ProcessEnv} [deps.env] — default process.env；用于 API key 探测日志
- * @param {object} [deps.core] — **仅测试**：覆盖 `@prompt-optimizer/core` 工厂；生产勿传
+ * @param {object} [deps.core] — **仅测试**：覆盖 `@mindsync/core` 工厂；生产勿传
  * @returns {Promise<{ ok: true, services: object } | { ok: false, error: Error }>}
  */
 async function createCoreServices(deps) {
   const log = deps.log || console.log.bind(console);
   const env = deps.env || process.env;
 
-  const core = deps.core || require('@prompt-optimizer/core');
+  const core = deps.core || require('@mindsync/core');
   const {
     PreferenceService,
     createModelManager,

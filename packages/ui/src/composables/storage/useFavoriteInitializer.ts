@@ -1,5 +1,5 @@
 import { useI18n } from 'vue-i18n';
-import type { IFavoriteManager } from '@prompt-optimizer/core';
+import type { IFavoriteManager } from '@mindsync/core';
 
 /**
  * 收藏功能初始化器

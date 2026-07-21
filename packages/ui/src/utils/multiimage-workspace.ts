@@ -1,4 +1,4 @@
-import type { ImageInputRef } from '@prompt-optimizer/core'
+import type { ImageInputRef } from '@mindsync/core'
 
 import { hashString, hashVariables } from './prompt-variables'
 

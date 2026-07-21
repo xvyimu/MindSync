@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { nextTick, ref } from 'vue'
-import type { FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoritePrompt } from '@mindsync/core'
 
 const toastMock = vi.hoisted(() => ({
   success: vi.fn(),

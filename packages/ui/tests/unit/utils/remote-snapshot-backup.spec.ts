@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { FullImageData } from '@prompt-optimizer/core'
+import type { FullImageData } from '@mindsync/core'
 
 import {
   REMOTE_SNAPSHOT_SCHEMA_VERSION,

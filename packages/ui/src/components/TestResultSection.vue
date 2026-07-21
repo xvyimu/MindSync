@@ -202,7 +202,7 @@ import { useI18n } from 'vue-i18n'
 import { NFlex, NCard, NText } from 'naive-ui'
 import ToolCallDisplay from './ToolCallDisplay.vue'
 import { AnalyzeActionIcon, EvaluationScoreBadge, FocusAnalyzeButton } from './evaluation'
-import type { AdvancedTestResult, EvaluationResponse, EvaluationType, PatchOperation } from '@prompt-optimizer/core'
+import type { AdvancedTestResult, EvaluationResponse, EvaluationType, PatchOperation } from '@mindsync/core'
 import type { ScoreLevel } from './evaluation/types'
 
 const { t } = useI18n()

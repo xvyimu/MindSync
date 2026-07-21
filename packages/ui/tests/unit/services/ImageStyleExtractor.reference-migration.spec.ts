@@ -5,9 +5,9 @@ const { mockUnderstand, mockProcessTemplate } = vi.hoisted(() => ({
   mockProcessTemplate: vi.fn(),
 }))
 
-vi.mock('@prompt-optimizer/core', async () => {
-  const actual = await vi.importActual<typeof import('@prompt-optimizer/core')>(
-    '@prompt-optimizer/core',
+vi.mock('@mindsync/core', async () => {
+  const actual = await vi.importActual<typeof import('@mindsync/core')>(
+    '@mindsync/core',
   )
 
   return {

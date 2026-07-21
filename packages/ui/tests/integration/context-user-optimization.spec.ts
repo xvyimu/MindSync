@@ -24,7 +24,7 @@ vi.mock('../../src/composables/ui/useToast', () => ({
 }))
 
 import type { AppServices } from '../../src/types/services'
-import type { Template } from '@prompt-optimizer/core'
+import type { Template } from '@mindsync/core'
 import { useContextUserOptimization } from '../../src/composables/prompt/useContextUserOptimization'
 
 describe('ContextUser optimization (integration)', () => {

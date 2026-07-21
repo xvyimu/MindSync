@@ -180,12 +180,12 @@ Prompt Optimizer 是一个强大的 AI 提示词优化工具，帮助用户编�
 - Pinia 状态管理
 
 ### 6.2 包结构
-- @prompt-optimizer/core - 核心逻辑
-- @prompt-optimizer/ui - UI 组件
-- @prompt-optimizer/web - Web 应用
-- @prompt-optimizer/extension - Chrome 插件
-- @prompt-optimizer/desktop - 桌面应用
-- @prompt-optimizer/mcp-server - MCP 服务器
+- @mindsync/core - 核心逻辑
+- @mindsync/ui - UI 组件
+- @mindsync/web - Web 应用
+- @mindsync/extension - Chrome 插件
+- @mindsync/desktop - 桌面应用
+- @mindsync/mcp-server - MCP 服务器
 
 ### 6.3 部署架构
 - Vercel 部署

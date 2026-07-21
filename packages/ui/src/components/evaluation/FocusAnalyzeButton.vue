@@ -139,7 +139,7 @@ import {
   NText,
   NTooltip,
 } from 'naive-ui'
-import type { EvaluationType } from '@prompt-optimizer/core'
+import type { EvaluationType } from '@mindsync/core'
 import { Focus2 } from '@vicons/tabler'
 import FeedbackEditor from './FeedbackEditor.vue'
 import AnalyzeActionIcon from './AnalyzeActionIcon.vue'

@@ -1,5 +1,5 @@
 {
-  "name": "@prompt-optimizer/web",
+  "name": "@mindsync/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,8 +14,8 @@
     "test:unit": "vitest run tests/unit"
   },
   "dependencies": {
-    "@prompt-optimizer/core": "workspace:*",
-    "@prompt-optimizer/ui": "workspace:*",
+    "@mindsync/core": "workspace:*",
+    "@mindsync/ui": "workspace:*",
     "vue": "^3.5.31"
   },
   "devDependencies": {

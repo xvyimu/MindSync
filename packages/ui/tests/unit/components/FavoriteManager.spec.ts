@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { ref } from 'vue'
 
-import type { FavoriteCategory, FavoritePrompt } from '@prompt-optimizer/core'
+import type { FavoriteCategory, FavoritePrompt } from '@mindsync/core'
 
 import FavoriteLibraryWorkspace from '../../../src/components/FavoriteLibraryWorkspace.vue'
 import FavoriteManager from '../../../src/components/FavoriteManager.vue'

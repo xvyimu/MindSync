@@ -25,7 +25,7 @@ node ../../node_modules/tsup/dist/cli-default.js src/index.ts src/electron.ts --
 - CJS/ESM/DTS：**成功**
 - 产物：`dist/index.cjs`、`dist/electron.cjs`、对应 `.d.ts`
 
-说明：`pnpm -F @prompt-optimizer/core build` 因 PATH 找不到 `tsup` 失败；改用直接 node 调 tsup CLI。
+说明：`pnpm -F @mindsync/core build` 因 PATH 找不到 `tsup` 失败；改用直接 node 调 tsup CLI。
 
 ### 2) Desktop IPC 契约
 

@@ -36,7 +36,7 @@ upstream	https://github.com/linshenkx/prompt-optimizer.git (push)
 - `D:/PromtOptimizer/PromptOptimizer/resources/app/main.js`: `34f573520afea224654d0cc9fc0c72b2e4b5824dd24cb3084429375cb5f2b57b`
 - `D:/PromtOptimizer/PromptOptimizer/resources/app/preload.js`: `1856deece0aa709d4fbef39d1ce444db602443f2deed478940ff8d28c2c3d58d`
 - `D:/PromtOptimizer/PromptOptimizer/resources/app/config/ipc/channel-manifest.js`: `6725db2745b459fc7d1d1192d5152048fa8b69b7411c3f5a457edb8f6522eb39`
-- `D:/PromtOptimizer/PromptOptimizer/resources/app/node_modules/@prompt-optimizer/core/dist/electron.cjs`: `2d313986fde639047be0de21ebfac504e4db2d3fad3546b0c20c70e44cdc07c3`
+- `D:/PromtOptimizer/PromptOptimizer/resources/app/node_modules/@mindsync/core/dist/electron.cjs`: `2d313986fde639047be0de21ebfac504e4db2d3fad3546b0c20c70e44cdc07c3`
 
 ## notes
 

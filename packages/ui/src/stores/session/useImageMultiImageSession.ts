@@ -10,7 +10,7 @@ import {
   type ImageInputRef,
   type PromptAssetBinding,
   type PromptSessionOrigin,
-} from '@prompt-optimizer/core'
+} from '@mindsync/core'
 import {
   normalizeImageSourceToPayload,
   persistImagePayloadAsAssetId,

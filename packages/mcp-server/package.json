@@ -1,5 +1,5 @@
 {
-  "name": "@prompt-optimizer/mcp-server",
+  "name": "@mindsync/mcp-server",
   "version": "0.1.0",
   "description": "MCP (Model Context Protocol) server for prompt-optimizer",
   "type": "module",
@@ -27,7 +27,7 @@
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.28.0",
-    "@prompt-optimizer/core": "workspace:*",
+    "@mindsync/core": "workspace:*",
     "debug": "^4.4.3",
     "dotenv": "^17.3.1",
     "express": "^5.2.1"

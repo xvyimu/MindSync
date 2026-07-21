@@ -43,8 +43,8 @@ TestArea组件系统采用模块化架构，由以下核心组件组成：
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TestAreaPanel, ModelSelectUI } from '@prompt-optimizer/ui'
-import type { OptimizationMode } from '@prompt-optimizer/core'
+import { TestAreaPanel, ModelSelectUI } from '@mindsync/ui'
+import type { OptimizationMode } from '@mindsync/core'
 
 const optimizationMode = ref<OptimizationMode>('system')
 const isTestRunning = ref(false)
@@ -118,7 +118,7 @@ import {
   ModelSelectUI, 
   OutputDisplay,
   useResponsiveTestLayout 
-} from '@prompt-optimizer/ui'
+} from '@mindsync/ui'
 
 // 响应式布局配置
 const { 
@@ -276,7 +276,7 @@ const enableCompareMode = computed(() => !isMobile.value)
 响应式布局管理hook，根据屏幕尺寸自动调整组件配置。
 
 ```ts
-import { useResponsiveTestLayout } from '@prompt-optimizer/ui'
+import { useResponsiveTestLayout } from '@mindsync/ui'
 
 const {
   isMobile,           // 是否为移动端
@@ -294,7 +294,7 @@ const {
 测试模式配置管理hook，处理不同优化模式下的显示逻辑。
 
 ```ts
-import { useTestModeConfig } from '@prompt-optimizer/ui'
+import { useTestModeConfig } from '@mindsync/ui'
 
 const {
   currentModeConfig,      // 当前模式配置
@@ -432,20 +432,20 @@ TestArea组件提供完整的测试覆盖：
 
 ```bash
 # 运行组件单元测试
-pnpm -F @prompt-optimizer/ui test -- tests/unit/components/TestAreaPanel.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/components/TestAreaPanel.spec.ts
 
 # 运行集成测试
-pnpm -F @prompt-optimizer/ui test -- tests/unit/components/test-area-integration.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/components/test-area-integration.spec.ts
 
 # 运行端到端测试
-pnpm -F @prompt-optimizer/ui test -- tests/unit/components/test-area-e2e.spec.ts
+pnpm -F @mindsync/ui test -- tests/unit/components/test-area-e2e.spec.ts
 ```
 
 ### 测试用例
 
 ```ts
 import { mount } from '@vue/test-utils'
-import { TestAreaPanel } from '@prompt-optimizer/ui'
+import { TestAreaPanel } from '@mindsync/ui'
 
 describe('TestAreaPanel', () => {
   it('应该正确处理模式切换', async () => {
@@ -483,7 +483,7 @@ A: 确认是否使用了useResponsiveTestLayout hook，并正确传递了布局�
 A: 检查services是否正确通过provide/inject机制注入，确保promptService可用。
 
 **Q: TypeScript类型错误？**  
-A: 确认导入了正确的类型定义，检查@prompt-optimizer/core和@prompt-optimizer/ui的版本兼容性。
+A: 确认导入了正确的类型定义，检查@mindsync/core和@mindsync/ui的版本兼容性。
 
 ### 调试工具
 
