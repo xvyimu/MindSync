@@ -7,4 +7,5 @@
 
 export { default as AppHeaderActions } from './AppHeaderActions.vue'
 export { default as AppCoreNav } from './AppCoreNav.vue'
+export { default as AppSideNav } from './AppSideNav.vue'
 export { default as PromptOptimizerApp } from './PromptOptimizerApp.vue'

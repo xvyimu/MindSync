@@ -1,69 +1,112 @@
 <template>
   <!-- 使用ToastUI包装整个布局以提供NMessageProvider -->
   <ToastUI>
-    <NLayout style="position: fixed; inset: 0; width: 100vw; height: 100vh;
-    max-height: 100vh;
-    overflow: hidden; display: flex; min-height: 0;"
-    content-style="height: 100%; max-height: 100%; min-height: 0; overflow: hidden;"
+    <!--
+      R0 redesign shell (feature flag, default OFF):
+      Naive UI Admin skeleton = thin header + left sider + content.
+      When flag is off, layout is byte-equivalent to pre-redesign (legacy path).
+      Enable: localStorage ui:redesign-shell=1  or  ?redesignShell=1
+    -->
+    <NLayout
+      class="main-layout-root"
+      :has-sider="redesignShell"
+      content-style="height: 100%; max-height: 100%; min-height: 0; overflow: hidden;"
     >
-
-      <NFlex vertical style="position: fixed; inset: 0; width: 100vw; max-height: 100vh; height: 100vh; min-height: 0;">
-      <!-- 顶部导航栏 -->
-      <NLayoutHeader class="theme-header nav-header-enhanced">
-        <NFlex justify="space-between" align="center" class="w-full nav-content" :wrap="false" :size="[16, 12]">
-          <!-- 左侧：Logo + 标题 + 核心导航 -->
-          <NFlex align="center" :size="16" :wrap="false">
-            <!-- Logo + 标题 -->
-            <NButton
-              text
-              class="brand-link"
-              @click="openBrandWebsite"
-            >
-              <NFlex align="center" :size="8" :wrap="false">
-                <AppPreviewImage
-                  :src="logoSrc"
-                  alt="Logo"
-                  :width="logoSize"
-                  :height="logoSize"
-                  object-fit="cover"
-                  class="logo-image"
-                  :show-toolbar="false"
-                  :preview-disabled="true"
-                  :fallback-src="fallbackLogoSrc"
-                />
-                <NText class="text-lg sm:text-xl font-bold theme-title" tag="h2">
-                  <slot name="title">{{ t('common.appName') }}</slot>
-                </NText>
+      <!-- ===== Redesign shell: sider + column (Naive UI Admin) ===== -->
+      <template v-if="redesignShell">
+        <AppSideNav />
+        <NLayout class="main-layout-column">
+          <NLayoutHeader class="theme-header nav-header-enhanced nav-header-shell">
+            <NFlex justify="space-between" align="center" class="w-full nav-content" :wrap="false" :size="[16, 8]">
+              <NFlex align="center" :size="16" :wrap="false">
+                <NButton text class="brand-link" @click="openBrandWebsite">
+                  <NFlex align="center" :size="8" :wrap="false">
+                    <AppPreviewImage
+                      :src="logoSrc"
+                      alt="Logo"
+                      :width="logoSize"
+                      :height="logoSize"
+                      object-fit="cover"
+                      class="logo-image"
+                      :show-toolbar="false"
+                      :preview-disabled="true"
+                      :fallback-src="fallbackLogoSrc"
+                    />
+                    <NText class="text-lg sm:text-xl font-bold theme-title" tag="h2">
+                      <slot name="title">{{ t('common.appName') }}</slot>
+                    </NText>
+                  </NFlex>
+                </NButton>
+                <!-- R0: keep core-nav so app stays fully usable; R2 moves modes into sider -->
+                <div class="core-navigation">
+                  <slot name="core-nav"></slot>
+                </div>
               </NFlex>
-            </NButton>
-
-            <!-- 核心导航元素 -->
-            <div class="core-navigation">
-              <slot name="core-nav"></slot>
+              <NFlex align="center" :size="8" :wrap="true" justify="end" class="nav-actions">
+                <slot name="actions"></slot>
+              </NFlex>
+            </NFlex>
+          </NLayoutHeader>
+          <NLayoutContent
+            class="main-layout-content main-layout-content--shell"
+            content-style="height: 100%; max-height: 100%; min-height: 0; box-sizing: border-box; padding: 24px 16px 32px; display: flex; flex-direction: column; align-items: stretch; overflow: hidden;"
+          >
+            <div class="main-content-wrapper">
+              <slot name="main"></slot>
             </div>
-          </NFlex>
+          </NLayoutContent>
+        </NLayout>
+      </template>
 
-          <!-- 右侧：操作按钮 -->
-          <NFlex align="center" :size="8" :wrap="true" justify="end" class="nav-actions">
-            <slot name="actions"></slot>
-          </NFlex>
-        </NFlex>
-      </NLayoutHeader>
-
-      <!-- 主要内容区域 - 严格控制在剩余空间内 -->
-      <NLayoutContent has-sider
-        style="flex: 1; min-height: 0; overflow: hidden;"
-        content-style="height: 100%; max-height: 100%; min-height: 0; box-sizing: border-box; padding: 24px clamp(16px, 2vw, 48px) 40px; display: flex; flex-direction: column; align-items: stretch; overflow: hidden;"
+      <!-- ===== Legacy shell: single header (default, flag OFF) ===== -->
+      <NFlex
+        v-else
+        vertical
+        class="main-layout-legacy"
       >
-        <div class="main-content-wrapper">
-          <slot name="main"></slot>
-        </div>
-      </NLayoutContent>
+        <NLayoutHeader class="theme-header nav-header-enhanced">
+          <NFlex justify="space-between" align="center" class="w-full nav-content" :wrap="false" :size="[16, 12]">
+            <NFlex align="center" :size="16" :wrap="false">
+              <NButton text class="brand-link" @click="openBrandWebsite">
+                <NFlex align="center" :size="8" :wrap="false">
+                  <AppPreviewImage
+                    :src="logoSrc"
+                    alt="Logo"
+                    :width="logoSize"
+                    :height="logoSize"
+                    object-fit="cover"
+                    class="logo-image"
+                    :show-toolbar="false"
+                    :preview-disabled="true"
+                    :fallback-src="fallbackLogoSrc"
+                  />
+                  <NText class="text-lg sm:text-xl font-bold theme-title" tag="h2">
+                    <slot name="title">{{ t('common.appName') }}</slot>
+                  </NText>
+                </NFlex>
+              </NButton>
+              <div class="core-navigation">
+                <slot name="core-nav"></slot>
+              </div>
+            </NFlex>
+            <NFlex align="center" :size="8" :wrap="true" justify="end" class="nav-actions">
+              <slot name="actions"></slot>
+            </NFlex>
+          </NFlex>
+        </NLayoutHeader>
+        <NLayoutContent
+          has-sider
+          class="main-layout-content"
+          content-style="height: 100%; max-height: 100%; min-height: 0; box-sizing: border-box; padding: 24px clamp(16px, 2vw, 48px) 40px; display: flex; flex-direction: column; align-items: stretch; overflow: hidden;"
+        >
+          <div class="main-content-wrapper">
+            <slot name="main"></slot>
+          </div>
+        </NLayoutContent>
       </NFlex>
 
       <!-- 弹窗插槽 -->
       <slot name="modals"></slot>
-
     </NLayout>
   </ToastUI>
 </template>
@@ -76,9 +119,14 @@ import { NButton, NLayout, NLayoutHeader, NLayoutContent, NFlex, NText } from 'n
 import ToastUI from './Toast.vue'
 import logoImage from '../assets/logo.png'
 import AppPreviewImage from './media/AppPreviewImage.vue'
+import AppSideNav from './app-layout/AppSideNav.vue'
+import { isRedesignShellEnabled } from '../config/redesign-shell'
 import { openExternalUrl } from '../utils/open-external-url'
 
 const { t } = useI18n()
+
+/** R0: Naive UI Admin shell behind flag (default false). */
+const redesignShell = isRedesignShellEnabled()
 
 // Logo图片配置
 const logoSrc = logoImage
@@ -131,6 +179,40 @@ const openBrandWebsite = async () => {
 </script>
 
 <style>
+/* Root fills viewport (replaces previous inline fixed positioning). */
+.main-layout-root {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  min-height: 0;
+}
+
+.main-layout-legacy {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  max-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+}
+
+.main-layout-column {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-layout-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .main-content-wrapper {
   width: 100%;
   margin: 0;
@@ -151,6 +233,12 @@ const openBrandWebsite = async () => {
 .nav-header-enhanced {
   min-height: 64px !important;
   padding: 12px 16px !important;
+}
+
+/* Shell header: slightly tighter vertical padding (token 8). */
+.nav-header-shell {
+  min-height: 56px !important;
+  padding: 8px 16px !important;
 }
 
 /* Paper theme: flat hairline header, slightly roomier horizontal padding. */
