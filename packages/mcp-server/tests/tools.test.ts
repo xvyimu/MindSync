@@ -52,8 +52,10 @@ describe('MCP Server Tools', () => {
     });
 
     it('truncates long tool results', () => {
-      const long = 'x'.repeat(ParameterValidator.DEFAULT_RESULT_MAX_CHARS + 10);
+      const max = ParameterValidator.DEFAULT_RESULT_MAX_CHARS;
+      const long = 'x'.repeat(max + 10);
       const truncated = ParameterValidator.truncateResult(long);
+      expect(truncated.length).toBeLessThanOrEqual(max);
       expect(truncated.length).toBeLessThan(long.length);
       expect(truncated).toContain('[truncated:');
       expect(ParameterValidator.truncateResult('short')).toBe('short');

@@ -316,7 +316,6 @@ const emit = defineEmits<{
   (e: 'setMaxRecords', max: number): void
 }>()
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _toast = useToast()
 const confirmDialog = useConfirmDialog()
 const expandedVersions = ref<Record<string, boolean>>({})

@@ -56,6 +56,7 @@ export class ParameterValidator {
 
   /**
    * 截断过长工具结果；超限时附加 truncated 标记。
+   * 最终长度不超过 maxChars（为标记预留空间）。
    */
   static truncateResult(
     text: string,
@@ -63,6 +64,8 @@ export class ParameterValidator {
   ): string {
     if (typeof text !== 'string') return String(text);
     if (text.length <= maxChars) return text;
-    return `${text.slice(0, maxChars)}\n\n[truncated: output exceeded ${maxChars} characters]`;
+    const marker = `\n\n[truncated: output exceeded ${maxChars} characters]`;
+    const keep = Math.max(0, maxChars - marker.length);
+    return `${text.slice(0, keep)}${marker}`;
   }
 }
