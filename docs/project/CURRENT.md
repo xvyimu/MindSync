@@ -41,8 +41,10 @@
 | 全面扫描建议 | `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
 | **全面扫描+规划（2026-07-21）** | `D:\PromtOptimizer\docs\FULL-SCAN-PLAN-RECOMMENDATIONS-2026-07-21.md` |
 | **整合决策调研（tip 对齐 R2）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21.md` |
+| **整合决策调研（R3 · 90d 收工后）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md` |
 | **下一刀规格（Cut-R2a C2）** | [`NEXT-CUT-SPEC-2026-07-21-R2-C2.md`](./NEXT-CUT-SPEC-2026-07-21-R2-C2.md) |
 | **手测清单（15 min 闭环）** | [`HANDTEST-CHECKLIST-2026-07-21.md`](./HANDTEST-CHECKLIST-2026-07-21.md) |
+| **E0/E1/E2 规格（R3 表单）** | [`NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md`](./NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md) |
 | **B6/D1/D2 规格** | [`NEXT-CUT-SPEC-2026-07-21-B6-D1-D2.md`](./NEXT-CUT-SPEC-2026-07-21-B6-D1-D2.md) |
 | **竞品/架构调研（万字）** | `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md` |
 | **决策简报（目标/约束/验收）** | [`COMPETITIVE-BRIEF.md`](./COMPETITIVE-BRIEF.md) |
@@ -86,8 +88,9 @@
 - **D3 ServiceContainer**：业务装配下沉 `createCoreServices`；main 仅 composition root + IPC 胶水  
 - **D4 Docker 非 root 里程碑**：镜像用户 `app`/10001；MCP 子进程降权；整容器非 root 需 `NGINX_PORT=8080`（文档）  
 - **B5 远程备份边界**：UI 移除 `@aws-sdk/client-s3`；Web 仅 Google Drive；S3/R2/WebDAV 仅 Desktop IPC  
+- **E1 入口铺全（R3）**：PostOptimize CTA + EvalCase 面板 + 双模型一键覆盖 **Basic System/User + Context System/User**（同一 `useEvalCaseSet` / `seedDualModelKeys`）  
 - **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
-- **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`（本地优先工作台定位，非 LLMOps 平台）  
+- **战略文档**：竞品/架构调研见 `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`；**R3 决策**见 `INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md`  
 
 ---
 

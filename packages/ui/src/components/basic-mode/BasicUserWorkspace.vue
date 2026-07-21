@@ -5,6 +5,23 @@
         data-mode="basic-user"
     >
         <div class="workspace-page-tools">
+            <ThemedTooltip :label="t('evalCase.open')" placement="left">
+                <NButton
+                    class="workspace-utility-button"
+                    size="small"
+                    secondary
+                    circle
+                    data-testid="basic-user-eval-case-open"
+                    :aria-label="t('evalCase.open')"
+                    @click="openEvalCasePanel"
+                >
+                    <template #icon>
+                        <NIcon>
+                            <ClipboardList />
+                        </NIcon>
+                    </template>
+                </NButton>
+            </ThemedTooltip>
             <WorkspaceUtilityMenu
                 :disabled="unwrappedLogicProps.isOptimizing || unwrappedLogicProps.isIterating || isAnyVariantRunning"
                 :source="resolveSourceAssetRef(session.origin, session.assetBinding)"
@@ -484,6 +501,23 @@
             @clear="handleClearEvaluation"
             @retry="handleReEvaluateActive"
         />
+        <EvalCaseSetPanel
+            v-model:show="evalCaseSet.showPanel.value"
+            :case-set="evalCaseSet.caseSet.value"
+            :model-key="evalCaseModelKey"
+            :is-running="evalCaseSet.isRunning.value"
+            :can-run="evalCaseSet.canRun.value"
+            :last-bundle="evalCaseSet.lastBundle.value"
+            :error="evalCaseSet.error.value"
+            :is-saving="evalCaseSaving"
+            :save-generation="evalCaseSaveGeneration"
+            @add="handleEvalCaseAdd"
+            @remove="handleEvalCaseRemove"
+            @run="handleEvalCaseRun"
+            @cancel="evalCaseSet.cancel()"
+            @export="handleEvalCaseExport"
+            @export-promptfoo="handleEvalCaseExportPromptfoo"
+        />
         <CompareRoleConfigDialog
             v-model="compareRoleConfig.showDialog.value"
             :entries="compareRoleConfig.entries.value"
@@ -526,10 +560,12 @@ import { useBasicWorkspaceLogic } from '../../composables/workspaces/useBasicWor
 import { useWorkspaceModelSelection } from '../../composables/workspaces/useWorkspaceModelSelection'
 import { useWorkspaceTemplateSelection } from '../../composables/workspaces/useWorkspaceTemplateSelection'
 import { useEvaluationHandler } from '../../composables/prompt/useEvaluationHandler'
+import { useEvalCaseSet } from '../../composables/prompt/useEvalCaseSet'
 import { useCompareRoleConfig, useTestSourceAreaFeedback, useTestVariantSourceFeedback } from '../../composables/prompt'
 import { buildCompareEvaluationPayload } from '../../composables/prompt/compareEvaluation'
 import { provideEvaluation } from '../../composables/prompt/useEvaluationContext'
 import { NButton, NCard, NFlex, NIcon, NText, NRadioGroup, NRadioButton, NTag } from 'naive-ui'
+import { ClipboardList } from '@vicons/tabler'
 import InputPanelUI from '../InputPanel.vue'
 import PromptPanelUI from '../PromptPanel.vue'
 import WorkspaceUtilityMenu from '../common/WorkspaceUtilityMenu.vue'
@@ -543,6 +579,7 @@ import {
   CompareHelpButton,
   CompareRoleBadge,
   CompareRoleConfigDialog,
+  EvalCaseSetPanel,
   EvaluationPanel,
   EvaluationScoreBadge,
   FocusAnalyzeButton,
@@ -1402,6 +1439,110 @@ const handlePostOptimizeEvaluate = async () => {
     toast.error(e instanceof Error ? e.message : String(e))
   }
 }
+
+// E1: EvalCaseSet entry parity with Basic System
+const preferenceServiceRef = computed(() => services.value?.preferenceService ?? null)
+const llmServiceRef = computed(() => services.value?.llmService ?? null)
+const evalCaseModelKeyRef = computed(() => {
+  return (
+    (logic.selectedOptimizeModelKey?.value as string | undefined)
+    || (logic.selectedTestModelKey?.value as string | undefined)
+    || ''
+  )
+})
+const evalCaseExportPromptRef = computed(
+  () => logic.optimizedPrompt.value || logic.prompt.value || '',
+)
+const evalCaseExportSecondaryPromptRef = computed(() => logic.prompt.value || '')
+const evalCaseSet = useEvalCaseSet({
+  preferenceService: preferenceServiceRef,
+  llmService: llmServiceRef,
+  modelKey: evalCaseModelKeyRef,
+  exportPrompt: evalCaseExportPromptRef,
+  exportSecondaryPrompt: evalCaseExportSecondaryPromptRef,
+})
+const evalCaseModelKey = evalCaseModelKeyRef
+const evalCaseSaving = ref(false)
+const evalCaseSaveGeneration = ref(0)
+
+const openEvalCasePanel = async () => {
+  await evalCaseSet.load()
+  evalCaseSet.showPanel.value = true
+}
+
+const handleEvalCaseAdd = async (payload: {
+  id?: string
+  name: string
+  input: string
+  systemPrompt?: string
+  contains: string
+}) => {
+  evalCaseSaving.value = true
+  try {
+    await evalCaseSet.upsertCase(payload)
+    evalCaseSaveGeneration.value += 1
+    toast.success(t('evalCase.saved'))
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    if (/max cases/i.test(message)) {
+      toast.error(t('evalCase.maxCases', { max: 20 }))
+    } else {
+      toast.error(message)
+    }
+  } finally {
+    evalCaseSaving.value = false
+  }
+}
+
+const handleEvalCaseRemove = async (id: string) => {
+  try {
+    await evalCaseSet.removeCase(id)
+    toast.success(t('evalCase.removed'))
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    toast.error(message)
+  }
+}
+
+const handleEvalCaseRun = async () => {
+  if (!evalCaseModelKeyRef.value) {
+    toast.warning(t('evalCase.needModel'))
+    return
+  }
+  try {
+    await evalCaseSet.runAll()
+    toast.success(t('evalCase.runDone'))
+  } catch (e) {
+    if (e instanceof Error && e.name === 'AbortError') return
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    toast.error(message)
+  }
+}
+
+const handleEvalCaseExport = () => {
+  if (evalCaseSet.downloadEvidence()) {
+    toast.success(t('evalCase.exportDone'))
+  } else {
+    toast.warning(t('evalCase.exportEmpty'))
+  }
+}
+
+const handleEvalCaseExportPromptfoo = () => {
+  if (evalCaseSet.downloadPromptfooYaml()) {
+    toast.success(t('evalCase.exportPromptfooDone'))
+  } else {
+    toast.warning(t('evalCase.exportPromptfooEmpty'))
+  }
+}
+
+watch(services, (s) => {
+  if (s?.preferenceService) {
+    void evalCaseSet.load()
+  }
+}, { immediate: true })
 
 const panelProps = evaluationHandler.panelProps
 const getResultEvaluationProps = (variantId: string) => evaluationHandler.getResultEvaluationProps(variantId)

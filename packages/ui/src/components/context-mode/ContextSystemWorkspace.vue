@@ -1,6 +1,23 @@
 <template>
     <div class="context-system-workspace" data-testid="workspace" data-mode="pro-multi">
         <div class="workspace-page-tools">
+            <ThemedTooltip :label="t('evalCase.open')" placement="left">
+                <NButton
+                    class="workspace-utility-button"
+                    size="small"
+                    secondary
+                    circle
+                    data-testid="pro-multi-eval-case-open"
+                    :aria-label="t('evalCase.open')"
+                    @click="openEvalCasePanel"
+                >
+                    <template #icon>
+                        <NIcon>
+                            <ClipboardList />
+                        </NIcon>
+                    </template>
+                </NButton>
+            </ThemedTooltip>
             <WorkspaceUtilityMenu
                 :disabled="displayAdapter.displayedIsOptimizing.value || isIterating || isAnyVariantRunning"
                 :source="resolveSourceAssetRef(proMultiSession.origin, proMultiSession.assetBinding)"
@@ -175,6 +192,13 @@
                                  @apply-patch="handleApplyLocalPatch"
                                  @save-local-edit="handleSaveLocalEdit"
                              />
+                            <PostOptimizeActions
+                                :show="showPostOptimizeCta"
+                                @test="handlePostOptimizeTest"
+                                @evaluate="handlePostOptimizeEvaluate"
+                                @favorite="handlePostOptimizeFavorite"
+                                @dismiss="showPostOptimizeCta = false"
+                            />
                         </template>
                         <template v-else>
                             <NEmpty
@@ -236,6 +260,17 @@
                             </NFlex>
 
                             <NFlex align="center" justify="end" :size="8" :wrap="false">
+                                <ThemedTooltip :label="t('test.layout.dualModelHint')">
+                                    <NButton
+                                        size="small"
+                                        secondary
+                                        :disabled="isAnyVariantRunning"
+                                        data-testid="pro-multi-test-dual-model"
+                                        @click="applyDualModelCompare"
+                                    >
+                                        {{ t('test.layout.dualModel') }}
+                                    </NButton>
+                                </ThemedTooltip>
                                 <NButton
                                     type="primary"
                                     size="small"
@@ -467,6 +502,23 @@
             </div>
         </div>
 
+        <EvalCaseSetPanel
+            v-model:show="evalCaseSet.showPanel.value"
+            :case-set="evalCaseSet.caseSet.value"
+            :model-key="evalCaseModelKey"
+            :is-running="evalCaseSet.isRunning.value"
+            :can-run="evalCaseSet.canRun.value"
+            :last-bundle="evalCaseSet.lastBundle.value"
+            :error="evalCaseSet.error.value"
+            :is-saving="evalCaseSaving"
+            :save-generation="evalCaseSaveGeneration"
+            @add="handleEvalCaseAdd"
+            @remove="handleEvalCaseRemove"
+            @run="handleEvalCaseRun"
+            @cancel="evalCaseSet.cancel()"
+            @export="handleEvalCaseExport"
+            @export-promptfoo="handleEvalCaseExportPromptfoo"
+        />
         <EvaluationPanel
             v-model:show="evaluation.isPanelVisible.value"
             :is-evaluating="panelProps.isEvaluating"
@@ -540,10 +592,12 @@ import {
     NButton,
     NText,
     NEmpty,
+    NIcon,
     NRadioGroup,
     NRadioButton,
     NTag,
 } from "naive-ui";
+import { ClipboardList } from '@vicons/tabler'
 import PromptPanelUI from "../PromptPanel.vue";
 import PromptPreviewPanel from "../PromptPreviewPanel.vue";
 import ConversationTestPanel from "./ConversationTestPanel.vue";
@@ -561,13 +615,17 @@ import {
     CompareHelpButton,
     CompareRoleBadge,
     CompareRoleConfigDialog,
+    EvalCaseSetPanel,
     EvaluationPanel,
     EvaluationScoreBadge,
     FocusAnalyzeButton,
 } from '../evaluation'
 import { buildCompareToolbarStatus } from '../evaluation/compare-ui'
 import WorkspaceUtilityMenu from '../common/WorkspaceUtilityMenu.vue'
+import PostOptimizeActions from '../common/PostOptimizeActions.vue'
 import ThemedTooltip from '../common/ThemedTooltip.vue'
+import { useEvalCaseSet } from '../../composables/prompt/useEvalCaseSet'
+import { seedDualModelKeys } from '../../utils/dual-model-seed'
 import { resolveSourceAssetRef } from '../../utils/source-asset'
 import { useConversationOptimization } from '../../composables/prompt/useConversationOptimization'
 import { usePromptDisplayAdapter } from '../../composables/prompt/usePromptDisplayAdapter'
@@ -1624,6 +1682,204 @@ const runAllVariants = async () => {
     } else {
         toast.error(t('toast.error.testFailed'))
     }
+}
+
+// E1: PostOptimize CTA + EvalCase + dual-model (parity with Basic System)
+const showPostOptimizeCta = ref(false)
+watch(
+  () => conversationOptimization.isOptimizing.value,
+  (optimizing, was) => {
+    if (optimizing && !was) {
+      showPostOptimizeCta.value = false
+    }
+    if (!optimizing && was) {
+      const hasOptimized = !!(
+        displayAdapter.displayedOptimizedPrompt.value
+        || conversationOptimization.optimizedPrompt.value
+      ).trim()
+      if (hasOptimized) {
+        showPostOptimizeCta.value = true
+      }
+    }
+  },
+)
+
+const preferenceServiceRef = computed(() => servicesRef.value?.preferenceService ?? null)
+const llmServiceRef = computed(() => servicesRef.value?.llmService ?? null)
+const evalCaseModelKeyRef = computed(() => {
+  return (
+    modelSelection.selectedOptimizeModelKey.value
+    || variantBModelKeyModel.value
+    || variantAModelKeyModel.value
+    || ''
+  )
+})
+const evalCaseExportPromptRef = computed(
+  () =>
+    displayAdapter.displayedOptimizedPrompt.value
+    || conversationOptimization.optimizedPrompt.value
+    || '',
+)
+const evalCaseExportSecondaryPromptRef = computed(
+  () =>
+    conversationOptimization.selectedMessage.value?.originalContent
+    || conversationOptimization.selectedMessage.value?.content
+    || '',
+)
+const evalCaseSet = useEvalCaseSet({
+  preferenceService: preferenceServiceRef,
+  llmService: llmServiceRef,
+  modelKey: evalCaseModelKeyRef,
+  exportPrompt: evalCaseExportPromptRef,
+  exportSecondaryPrompt: evalCaseExportSecondaryPromptRef,
+})
+const evalCaseModelKey = evalCaseModelKeyRef
+const evalCaseSaving = ref(false)
+const evalCaseSaveGeneration = ref(0)
+
+const openEvalCasePanel = async () => {
+  await evalCaseSet.load()
+  evalCaseSet.showPanel.value = true
+}
+
+const handleEvalCaseAdd = async (payload: {
+  id?: string
+  name: string
+  input: string
+  systemPrompt?: string
+  contains: string
+}) => {
+  evalCaseSaving.value = true
+  try {
+    await evalCaseSet.upsertCase(payload)
+    evalCaseSaveGeneration.value += 1
+    toast.success(t('evalCase.saved'))
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    if (/max cases/i.test(message)) {
+      toast.error(t('evalCase.maxCases', { max: 20 }))
+    } else {
+      toast.error(message)
+    }
+  } finally {
+    evalCaseSaving.value = false
+  }
+}
+
+const handleEvalCaseRemove = async (id: string) => {
+  try {
+    await evalCaseSet.removeCase(id)
+    toast.success(t('evalCase.removed'))
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    toast.error(message)
+  }
+}
+
+const handleEvalCaseRun = async () => {
+  if (!evalCaseModelKeyRef.value) {
+    toast.warning(t('evalCase.needModel'))
+    return
+  }
+  try {
+    await evalCaseSet.runAll()
+    toast.success(t('evalCase.runDone'))
+  } catch (e) {
+    if (e instanceof Error && e.name === 'AbortError') return
+    const message = e instanceof Error ? e.message : String(e)
+    evalCaseSet.error.value = message
+    toast.error(message)
+  }
+}
+
+const handleEvalCaseExport = () => {
+  if (evalCaseSet.downloadEvidence()) {
+    toast.success(t('evalCase.exportDone'))
+  } else {
+    toast.warning(t('evalCase.exportEmpty'))
+  }
+}
+
+const handleEvalCaseExportPromptfoo = () => {
+  if (evalCaseSet.downloadPromptfooYaml()) {
+    toast.success(t('evalCase.exportPromptfooDone'))
+  } else {
+    toast.warning(t('evalCase.exportPromptfooEmpty'))
+  }
+}
+
+watch(servicesRef, (s) => {
+  if (s?.preferenceService) {
+    void evalCaseSet.load()
+  }
+}, { immediate: true })
+
+const applyDualModelCompare = () => {
+  if (isAnyVariantRunning.value) return
+
+  const available = (modelSelection.textModelOptions.value || [])
+    .map((o) => String(o.value ?? ''))
+    .filter(Boolean)
+
+  const seeded = seedDualModelKeys({
+    currentA: variantAModelKeyModel.value,
+    currentB: variantBModelKeyModel.value,
+    availableModelKeys: available,
+    preferredPrimary: modelSelection.selectedOptimizeModelKey.value || undefined,
+  })
+
+  if (seeded.reason === 'no-models') {
+    toast.warning(t('test.layout.dualModelNoModels'))
+    return
+  }
+
+  testColumnCountModel.value = 2
+  proMultiSession.updateTestVariant('a', { version: 'workspace', modelKey: seeded.modelA })
+  proMultiSession.updateTestVariant('b', { version: 'workspace', modelKey: seeded.modelB })
+  void proMultiSession.saveSession()
+
+  if (!seeded.isDual) {
+    toast.warning(t('test.layout.dualModelNeedTwo'))
+    return
+  }
+  toast.success(t('test.layout.dualModelReady'))
+}
+
+const handlePostOptimizeTest = () => {
+  showPostOptimizeCta.value = false
+  const el = testPaneRef.value
+  if (el && typeof el.scrollIntoView === 'function') {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  void runAllVariants()
+}
+
+const handlePostOptimizeEvaluate = async () => {
+  showPostOptimizeCta.value = false
+  try {
+    await openEvalCasePanel()
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : String(e))
+  }
+}
+
+const handlePostOptimizeFavorite = () => {
+  showPostOptimizeCta.value = false
+  const content =
+    displayAdapter.displayedOptimizedPrompt.value
+    || conversationOptimization.optimizedPrompt.value
+    || ''
+  const original =
+    conversationOptimization.selectedMessage.value?.originalContent
+    || conversationOptimization.selectedMessage.value?.content
+    || ''
+  if (!content && !original) {
+    toast.warning(t('toast.error.noContentToSave'))
+    return
+  }
+  handleSaveFavorite({ content, originalContent: original })
 }
 
 // 🆕 构建 Pro-System 评估上下文（基于 A/B 的消息版本）
