@@ -22,7 +22,7 @@
 |------|------|
 | 源码 | `D:\PromtOptimizer\src\prompt-optimizer` |
 | **运行安装** | **`D:\PromtOptimizer\app\PromptOptimizer.exe`** |
-| 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` · **`nsis-2026-07-21-e1`** |
+| 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` · `nsis-2026-07-21-e1` · **`nsis-2026-07-21-ipc`** |
 | 工具链 | **Node ^24**（本机系统 Node 即可；旧 portable `tools\node-v22.*` 可弃用） |
 | 用户模板 | `D:\PromtOptimizer\custom-templates\`（勿删） |
 | Desktop IPC 协议 | `packages/desktop/config/ipc/channel-manifest.js` · **1.1.0** |

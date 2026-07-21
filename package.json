@@ -85,10 +85,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "AGPL-3.0-only",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "electron"
-    ]
-  }
+  "license": "AGPL-3.0-only"
 }

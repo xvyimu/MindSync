@@ -13,6 +13,17 @@ const {
 const { assertTrustedRendererSender } = require('../ipc-security');
 const { assertKnownInvokeChannel } = require('./channel-manifest');
 
+/** Missing channel file / 404 on latest.yml — expected for fork without published desktop feed. */
+function isBenignUpdaterChannelError(error) {
+  if (!error) return false;
+  const code = typeof error.code === 'string' ? error.code : '';
+  const message = error instanceof Error ? error.message : String(error);
+  if (code === 'ERR_UPDATER_CHANNEL_FILE_NOT_FOUND') return true;
+  if (/Cannot find latest\.yml/i.test(message)) return true;
+  if (/latest\.yml/i.test(message) && /\b404\b/.test(message)) return true;
+  return false;
+}
+
 function createUpdateHandlers(ctx) {
   const {
     ipcMain,
@@ -240,6 +251,15 @@ function createUpdateHandlers(ctx) {
     });
 
     autoUpdater.on('error', (error) => {
+      // Fork builds often have no published latest.yml; treat as expected noise.
+      if (isBenignUpdaterChannelError(error)) {
+        console.warn(
+          '[Updater] No update channel metadata (latest.yml) on GitHub releases — skipped. ' +
+            'Publish a desktop release with latest.yml, or use manual download from Releases.',
+        );
+        return;
+      }
+
       console.error('[Updater] Update error:', error);
 
       // 如果是 403 错误，提供基本的调试信息
@@ -420,6 +440,19 @@ function createUpdateHandlers(ctx) {
 
         return createSuccessResponse(responseData);
       } catch (error) {
+        if (isBenignUpdaterChannelError(error)) {
+          console.warn('[Updater] Update channel missing (latest.yml); no update available');
+          const currentVersion = require('../../package.json').version;
+          return createSuccessResponse({
+            checkResult: null,
+            currentVersion,
+            hasUpdate: false,
+            remoteVersion: null,
+            remoteReleaseUrl: null,
+            message: 'No published update channel (latest.yml) for this fork build',
+            noVersionFound: true,
+          });
+        }
         console.error('[Updater] Check update failed:', error);
         const detailedResponse = createDetailedErrorResponse(error);
         console.error('[DEBUG] Detailed error response being sent:', detailedResponse);
@@ -538,15 +571,27 @@ function createUpdateHandlers(ctx) {
           const stableResult = await autoUpdater.checkForUpdates();
           results.stable = processResult(stableResult, 'stable');
         } catch (error) {
-          console.error('[Updater] Stable version check failed:', error);
-          results.stable = {
-            hasUpdate: false,
-            remoteVersion: null,
-            remoteReleaseUrl: null,
-            message: `Stable version check failed: ${error.message}`,
-            versionType: 'stable',
-            error: error.message
-          };
+          if (isBenignUpdaterChannelError(error)) {
+            console.warn('[Updater] Stable channel file missing (no published latest.yml); treating as no update');
+            results.stable = {
+              hasUpdate: false,
+              remoteVersion: null,
+              remoteReleaseUrl: null,
+              message: 'No published update channel (latest.yml) for this fork build',
+              versionType: 'stable',
+              noVersionFound: true,
+            };
+          } else {
+            console.error('[Updater] Stable version check failed:', error);
+            results.stable = {
+              hasUpdate: false,
+              remoteVersion: null,
+              remoteReleaseUrl: null,
+              message: `Stable version check failed: ${error.message}`,
+              versionType: 'stable',
+              error: error.message
+            };
+          }
         }
 
         // 2. 延迟后检查预览版（避免状态冲突）
@@ -555,20 +600,32 @@ function createUpdateHandlers(ctx) {
 
         console.log('[Updater] Checking prerelease version...');
         autoUpdater.allowPrerelease = true;
-      
+
         try {
           const prereleaseResult = await autoUpdater.checkForUpdates();
           results.prerelease = processResult(prereleaseResult, 'prerelease');
         } catch (error) {
-          console.error('[Updater] Prerelease version check failed:', error);
-          results.prerelease = {
-            hasUpdate: false,
-            remoteVersion: null,
-            remoteReleaseUrl: null,
-            message: `Prerelease version check failed: ${error.message}`,
-            versionType: 'prerelease',
-            error: error.message
-          };
+          if (isBenignUpdaterChannelError(error)) {
+            console.warn('[Updater] Prerelease channel file missing; treating as no prerelease update');
+            results.prerelease = {
+              hasUpdate: false,
+              remoteVersion: null,
+              remoteReleaseUrl: null,
+              message: 'No published prerelease update channel for this fork build',
+              versionType: 'prerelease',
+              noVersionFound: true,
+            };
+          } else {
+            console.error('[Updater] Prerelease version check failed:', error);
+            results.prerelease = {
+              hasUpdate: false,
+              remoteVersion: null,
+              remoteReleaseUrl: null,
+              message: `Prerelease version check failed: ${error.message}`,
+              versionType: 'prerelease',
+              error: error.message
+            };
+          }
         }
 
         // 3. 恢复用户偏好设置
