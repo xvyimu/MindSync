@@ -649,18 +649,21 @@ interface Props {
     evaluationModelKey?: string;
 
     // --- 测试数据 ---
-    /** 是否启用对比模式 */
-    isCompareMode: boolean;
+    /**
+     * 对比模式（兼容旧父组件透传）。
+     * 路由直挂 /pro/variable 时无父级 props；工作区已自管多列测试，此 prop 仅保留兼容。
+     */
+    isCompareMode?: boolean;
     /** 是否正在执行测试（兼容性保留，实际由内部管理）*/
     isTestRunning?: boolean;
     /** 🆕 是否正在执行AI变量提取 */
     isExtracting?: boolean;
 
     // --- 变量数据 ---
-    /** 全局变量 (持久化存储) - 保留，用于变量检测 */
-    globalVariables: Record<string, string>;
-    /** 预定义变量 (系统内置) - 保留，用于变量检测 */
-    predefinedVariables: Record<string, string>;
+    /** 全局变量 (持久化存储) - 保留，用于变量检测；路由直挂时默认空对象 */
+    globalVariables?: Record<string, string>;
+    /** 预定义变量 (系统内置) - 保留，用于变量检测；路由直挂时默认空对象 */
+    predefinedVariables?: Record<string, string>;
 
     // --- 响应式布局配置 ---
     /** 按钮尺寸 */
@@ -680,6 +683,7 @@ interface ContextUserHistoryPayload {
 const props = withDefaults(defineProps<Props>(), {
     testModelName: undefined,
     evaluationModelKey: undefined,
+    isCompareMode: true,
     isTestRunning: false,
     isExtracting: false,
     globalVariables: () => ({}),
