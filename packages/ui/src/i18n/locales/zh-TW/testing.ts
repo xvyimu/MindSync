@@ -76,7 +76,12 @@ const messages = {
       "latest": "最新",
       "runAll": "測試全部",
       "runThisColumn": "測試此列",
-      "stale": "配置已變更"
+      "stale": "配置已變更",
+      "dualModel": "雙模型",
+      "dualModelHint": "兩列同一提示版本，兩個不同測試模型並排",
+      "dualModelReady": "已設為雙模型對照（同提示 · 兩模型）",
+      "dualModelNeedTwo": "至少需要兩個已啟用模型才能雙模型對照",
+      "dualModelNoModels": "請先啟用測試模型"
     },
     "originalResult": "結果 A",
     "optimizedResult": "結果 B",

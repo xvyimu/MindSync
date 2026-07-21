@@ -76,7 +76,12 @@ const messages = {
       "latest": "Latest",
       "runAll": "Run All",
       "runThisColumn": "Run This Column",
-      "stale": "Config Changed"
+      "stale": "Config Changed",
+      "dualModel": "Dual models",
+      "dualModelHint": "Two columns, same prompt version, two different test models",
+      "dualModelReady": "Dual-model compare ready (same prompt · two models)",
+      "dualModelNeedTwo": "Enable at least two models for dual-model compare",
+      "dualModelNoModels": "Enable a test model first"
     },
     "originalResult": "Result A",
     "optimizedResult": "Result B",

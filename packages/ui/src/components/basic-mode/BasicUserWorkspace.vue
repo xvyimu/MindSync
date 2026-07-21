@@ -224,6 +224,17 @@
                             </NFlex>
 
                             <NFlex align="center" justify="end" :size="8" :wrap="false">
+                                <ThemedTooltip :label="t('test.layout.dualModelHint')">
+                                    <NButton
+                                        size="small"
+                                        secondary
+                                        :disabled="isAnyVariantRunning"
+                                        data-testid="basic-user-test-dual-model"
+                                        @click="applyDualModelCompare"
+                                    >
+                                        {{ t('test.layout.dualModel') }}
+                                    </NButton>
+                                </ThemedTooltip>
                                 <NButton
                                     type="primary"
                                     size="small"
@@ -556,6 +567,7 @@ import { applyPatchOperationsToText, type EvaluationType, type PatchOperation, t
 import type { PersistedCompareSnapshotRoles } from '../../types/evaluation'
 import { useElementSize } from '@vueuse/core'
 import { runTasksWithExecutionMode } from '../../utils/runTasksSequentially'
+import { seedDualModelKeys } from '../../utils/dual-model-seed'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -1136,6 +1148,41 @@ const runAllVariants = async () => {
   } else {
     toast.error(t('toast.error.testFailed'))
   }
+}
+
+/** C1: one-click dual-model layout (same prompt version, two modelKeys). */
+const applyDualModelCompare = () => {
+  if (isAnyVariantRunning.value) return
+
+  const available = (modelSelection.textModelOptions.value || [])
+    .map((o) => String(o.value ?? ''))
+    .filter(Boolean)
+
+  const seeded = seedDualModelKeys({
+    currentA: originalTestModelKeyModel.value,
+    currentB: optimizedTestModelKeyModel.value,
+    availableModelKeys: available,
+    preferredPrimary: logic.selectedTestModelKey.value || undefined,
+  })
+
+  if (seeded.reason === 'no-models') {
+    toast.warning(t('test.layout.dualModelNoModels'))
+    return
+  }
+
+  testColumnCountModel.value = 2
+  session.updateTestVariant('a', { version: 'workspace', modelKey: seeded.modelA })
+  session.updateTestVariant('b', { version: 'workspace', modelKey: seeded.modelB })
+  if (seeded.modelA) {
+    logic.selectedTestModelKey.value = seeded.modelA
+  }
+  void session.saveSession()
+
+  if (!seeded.isDual) {
+    toast.warning(t('test.layout.dualModelNeedTwo'))
+    return
+  }
+  toast.success(t('test.layout.dualModelReady'))
 }
 
 // 组件引用（用于触发迭代对话框、刷新迭代下拉等）
