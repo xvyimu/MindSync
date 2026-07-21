@@ -22,7 +22,7 @@
 |------|------|
 | 源码 | `D:\PromtOptimizer\src\prompt-optimizer` |
 | **运行安装** | **`D:\PromtOptimizer\app\PromptOptimizer.exe`** |
-| 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` |
+| 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` · **`nsis-2026-07-21-e1`** |
 | 工具链 | **Node ^24**（本机系统 Node 即可；旧 portable `tools\node-v22.*` 可弃用） |
 | 用户模板 | `D:\PromtOptimizer\custom-templates\`（勿删） |
 | Desktop IPC 协议 | `packages/desktop/config/ipc/channel-manifest.js` · **1.1.0** |
@@ -44,6 +44,7 @@
 | **整合决策调研（R3 · 90d 收工后）** | `D:\PromtOptimizer\docs\INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md` |
 | **下一刀规格（Cut-R2a C2）** | [`NEXT-CUT-SPEC-2026-07-21-R2-C2.md`](./NEXT-CUT-SPEC-2026-07-21-R2-C2.md) |
 | **手测清单（15 min 闭环）** | [`HANDTEST-CHECKLIST-2026-07-21.md`](./HANDTEST-CHECKLIST-2026-07-21.md) |
+| **手测状态 E1（机器+human）** | [`HANDTEST-STATUS-2026-07-21-E1.md`](./HANDTEST-STATUS-2026-07-21-E1.md) |
 | **E0/E1/E2 规格（R3 表单）** | [`NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md`](./NEXT-CUT-SPEC-2026-07-21-E0-E1-E2.md) |
 | **B6/D1/D2 规格** | [`NEXT-CUT-SPEC-2026-07-21-B6-D1-D2.md`](./NEXT-CUT-SPEC-2026-07-21-B6-D1-D2.md) |
 | **竞品/架构调研（万字）** | `D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md` |
