@@ -13,8 +13,13 @@ function isSafeExternalUrl(value) {
 
 /** 判断候选文件路径是否位于指定应用根目录内。 */
 function isPathWithin(candidatePath, rootPath) {
-  const candidate = path.resolve(candidatePath);
-  const root = path.resolve(rootPath);
+  // Normalize so Windows drive case / separators / trailing sep don't fail trust.
+  let candidate = path.resolve(candidatePath);
+  let root = path.resolve(rootPath);
+  if (process.platform === 'win32') {
+    candidate = candidate.toLowerCase();
+    root = root.toLowerCase();
+  }
   return candidate === root || candidate.startsWith(`${root}${path.sep}`);
 }
 

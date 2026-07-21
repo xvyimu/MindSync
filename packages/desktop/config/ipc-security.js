@@ -37,6 +37,23 @@ function getSenderUrl(event) {
   return typeof getUrl === 'function' ? getUrl.call(event.sender) : '';
 }
 
+/**
+ * 是否为「明确的非主 frame」。
+ * Electron 各版本/场景下 senderFrame 可能缺失，或 isMainFrame 未暴露；
+ * 仅在 **明确为 false** 时拒绝，避免误杀合法 renderer 的全部 IPC。
+ */
+function isExplicitNonMainFrame(event) {
+  const frame = event?.senderFrame;
+  if (!frame || typeof frame !== 'object') {
+    // 无 senderFrame：回退到 sender URL 校验（仍有路径门闩）
+    return false;
+  }
+  if (!Object.prototype.hasOwnProperty.call(frame, 'isMainFrame')) {
+    return false;
+  }
+  return frame.isMainFrame === false;
+}
+
 /** 判断 IPC 是否来自应用允许的未销毁主 frame renderer。 */
 function isTrustedRendererSender(event, options) {
   const sender = event?.sender;
@@ -48,8 +65,10 @@ function isTrustedRendererSender(event, options) {
     return false;
   }
 
-  // IPC from subframes must never inherit the main renderer's privileged bridge.
-  if (event?.senderFrame?.isMainFrame !== true) {
+  // Only reject when the frame is *known* to be a subframe.
+  // Missing senderFrame / missing isMainFrame must not fail-closed on init IPC
+  // (Electron 41+ can omit the flag on legitimate main-frame senders).
+  if (isExplicitNonMainFrame(event)) {
     return false;
   }
 

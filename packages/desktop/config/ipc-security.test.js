@@ -55,6 +55,48 @@ test('IPC sender trust accepts only the app main frame', () => {
   );
 });
 
+test('IPC sender trust tolerates missing senderFrame or isMainFrame (Electron variance)', () => {
+  // No senderFrame: path still validated via sender.getURL
+  const noFrame = {
+    sender: {
+      id: 1,
+      getURL: () => 'file:///C:/app/web-dist/index.html',
+      isDestroyed: () => false,
+    },
+  };
+  assert.equal(isTrustedRendererSender(noFrame, options), true);
+
+  // senderFrame without isMainFrame property
+  const noFlag = createEvent();
+  delete noFrame.senderFrame;
+  const frameNoFlag = {
+    sender: {
+      id: 2,
+      getURL: () => 'file:///C:/app/web-dist/index.html',
+      isDestroyed: () => false,
+    },
+    senderFrame: {
+      url: 'file:///C:/app/web-dist/index.html',
+    },
+  };
+  assert.equal(isTrustedRendererSender(frameNoFlag, options), true);
+
+  // explicit false still rejected
+  assert.equal(isTrustedRendererSender(createEvent({ isMainFrame: false }), options), false);
+
+  // missing frame + bad url still rejected
+  const bad = {
+    sender: {
+      id: 3,
+      getURL: () => 'https://attacker.example',
+      isDestroyed: () => false,
+    },
+  };
+  assert.equal(isTrustedRendererSender(bad, options), false);
+
+  void noFlag; // silence unused if lint
+});
+
 test('IPC sender trust accepts only the configured development origin', () => {
   const developmentOptions = { ...options, isDevelopment: true };
 
