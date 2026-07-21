@@ -313,6 +313,15 @@ export {
   createEvalEvidenceFileName,
 } from './services/evaluation/eval-case-runner'
 export type { EvalCaseRunnerDeps } from './services/evaluation/eval-case-runner'
+export {
+  exportPromptfooYaml,
+  createPromptfooExportFileName,
+  assertPromptfooYamlHasNoSecrets,
+} from './services/evaluation/promptfoo-export'
+export type {
+  PromptfooExportInput,
+  PromptfooExportResult,
+} from './services/evaluation/promptfoo-export'
 
 // 导出图像理解服务相关
 export * from './services/image-understanding/types'
