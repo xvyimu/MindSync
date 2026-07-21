@@ -29,7 +29,7 @@
 | 文档怎么分层 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` · [`docs/README.md`](./README.md) |
 | 历史 hardening / ship | §2 + `.pipeline/`（**非规范**）+ `CLOSEOUT.md` |
 | 跑测试 | §5；Desktop 契约见 FULL-AUDIT §8 |
-| 推送到 GitHub | §6（fork-only · 默认 `develop`） |
+| 推送到 GitHub | §6（独立仓 MindSync · 默认 `develop`） |
 | 优化债务 | FULL-AUDIT §10 · CURRENT |
 
 ---
@@ -196,7 +196,7 @@ node --test scripts/desktop-ipc-handlers.test.mjs
 ### 4.2 环境
 
 - engines：Node `^22`；推荐 portable 22，避免系统 Node 24 踩 engines  
-- fork-only；高风险 push/删除先确认
+- 独立仓 MindSync；高风险 push/删除先确认
 
 ---
 
@@ -269,7 +269,7 @@ node scripts/run-e2e-group.js gate
 
 **源码根（唯一）：** `D:\PromtOptimizer\src\prompt-optimizer`  
 **日常分支：** `develop`（功能用 `feat/*` 再合入）  
-**策略：** fork-only · 默认 **不**向上游开 PR  
+**策略：** 独立仓 `xvyimu/MindSync` · 默认 **不**向上游开 PR  
 
 ```powershell
 cd D:\PromtOptimizer\src\prompt-optimizer
