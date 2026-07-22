@@ -24,14 +24,16 @@
 
 | 用途 | 路径 |
 |------|------|
-| 源码 | `D:\PromtOptimizer\src\mindsync` |
-| **运行安装** | **`D:\PromtOptimizer\app\PromptOptimizer.exe`** |
-| 安装包归档 | **仅** `D:\PromtOptimizer\nsis-2026-07-21-ipc\`（旧 paper/ux/e1 归档已清） |
+| 源码 | `D:\MindSync\src\mindsync`（入口 `D:\projects\MindSync`） |
+| **运行安装** | **`D:\MindSync\app\PromptOptimizer.exe`** |
+| 安装包归档 | **仅** `D:\MindSync\nsis-2026-07-21-ipc\`（旧 paper/ux/e1 归档已清） |
 | 工具链 | **Node ^24**（系统 Node；`tools\` 空目录，portable Node22 已删） |
-| 用户模板 | `D:\PromtOptimizer\custom-templates\`（勿删） |
+| 用户模板 | `D:\MindSync\custom-templates\`（勿删） |
 | Desktop IPC 协议 | `packages/desktop/config/ipc/channel-manifest.js` · **1.1.0** |
 
-旧热替换树 `D:\PromtOptimizer\PromptOptimizer\` **已废弃**（清理表见 [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md)）。
+旧热替换树 `PromptOptimizer\` **已废弃**（清理表见 [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md)）。
+
+安装侧 README 若缺省，以本表路径与快捷方式 `D:\MindSync\app\PromptOptimizer.exe` 为准。
 
 ---
 
@@ -39,7 +41,7 @@
 
 | 你想… | 打开 |
 |--------|------|
-| 安装/启动 | `D:\PromtOptimizer\README.md` |
+| 安装/启动 | `D:\MindSync\app\PromptOptimizer.exe` · 本表路径 |
 | 开发/模块/测试 | [`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) |
 | 全面检查/安全/模块审计 | `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md` |
 | 全面扫描建议 | `docs/project/archives/install-side-2026-07/FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
@@ -103,7 +105,7 @@
 ## 构建 / 验证（摘要）
 
 ```powershell
-cd D:\PromtOptimizer\src\mindsync
+cd D:\MindSync\src\mindsync
 # Node 24（engines ^24）
 pnpm -F @mindsync/core build
 pnpm -F @mindsync/ui build:bundle

@@ -1,7 +1,7 @@
 # 项目文档索引
 
 > **文档体系：方案 C — 双层真相源 + 冻结噪音**  
-> 规划全文：`D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`  
+> 规划全文：`docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-2026-07-20.md`  
 > **现行版本/路径一页纸：** [`project/CURRENT.md`](./project/CURRENT.md)
 
 ---
@@ -10,9 +10,9 @@
 
 | 你是… | 你想… | 打开 |
 |--------|--------|------|
-| 本机使用者 | 启动软件 / 安装在哪 | `D:\PromtOptimizer\README.md` |
+| 本机使用者 | 启动软件 / 安装在哪 | `D:\MindSync\app\PromptOptimizer.exe` · [`project/CURRENT.md`](./project/CURRENT.md) |
 | 开发维护者 | 改代码 / 测试 / 模块 | [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md) |
-| 审计 / 排障 | 边界、安全、模块全景 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
+| 审计 / 排障 | 边界、安全、模块全景 | `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md` |
 | 任何人 | 当前版本与策略 | [`project/CURRENT.md`](./project/CURRENT.md) |
 
 ---

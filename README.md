@@ -93,7 +93,7 @@ This is a pure frontend project with all data stored locally in your browser and
 
 #### Vercel Deployment
 Method 1: One-click deployment to your own Vercel:
-   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flinshenkx%2Fprompt-optimizer)
+   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fxvyimu%2FMindSync)
 
 Method 2: Fork the project and import to Vercel (Recommended):
    - First fork the project to your GitHub account

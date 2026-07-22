@@ -1,0 +1,29 @@
+MindSync Notices
+================
+
+MindSync (https://github.com/xvyimu/MindSync) is an independently maintained
+derivative distribution of AGPL-3.0 software.
+
+Upstream project
+----------------
+  Name:    prompt-optimizer
+  Source:  https://github.com/linshenkx/prompt-optimizer
+  Copyright (C) 2025 linshenkx
+
+This distribution
+-----------------
+  Product / repository: MindSync
+  Maintainer:           xvyimu
+  Copyright (C) 2026 xvyimu (modifications, packaging, product identity)
+
+License
+-------
+  GNU Affero General Public License v3.0 only — see LICENSE for full text.
+  Detaching the GitHub fork network and renaming packages does **not** change
+  AGPL obligations (including network-use / corresponding-source duties where
+  applicable).
+
+Attribution
+-----------
+  Original copyright notices in source files and in LICENSE must be preserved.
+  Do not relicense this tree to MIT/proprietary.

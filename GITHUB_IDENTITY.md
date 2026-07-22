@@ -12,7 +12,8 @@
 | **Electron** | `appId` `com.xvyimu.mindsync` · `productName` `MindSync` · userData migration from legacy paths |
 | **License** | AGPL-3.0-only |
 | **Default branch** | `develop` |
-| **Local path (maintainer)** | `D:\PromtOptimizer\src\mindsync` |
+| **Local path (maintainer)** | `D:\MindSync\src\mindsync`（入口 `D:\projects\MindSync`） |
+| **NOTICE** | [NOTICE](./NOTICE) — upstream + maintainer attribution |
 
 ## Rules
 
@@ -29,5 +30,6 @@ MindSync is an **independent distribution of AGPL-3.0 code** derived from
 does **not** change license obligations:
 
 - `LICENSE` keeps the full AGPL-3.0 text and the original `Copyright (C) 2025 linshenkx`.
+- `NOTICE` records upstream project link and maintainer modifications.
 - The AGPL network-use / source-offer obligations still apply.
 - "Independence" means repo identity + process + package names — **not** a license change.
