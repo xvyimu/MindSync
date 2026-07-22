@@ -1,0 +1,3 @@
+# Orca worktree setup — git root is this package (D:\MindSync\src\mindsync).
+scripts:
+  setup: pnpm install
