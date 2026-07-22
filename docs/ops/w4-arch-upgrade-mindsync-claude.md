@@ -9,7 +9,8 @@
 | **Worktree** | `C:\Users\yuanjia\orca\workspaces\mindsync\w4-ms-claude` |
 | **Branch** | `xvyimu/w4-ms-claude` |
 | **Tip（开工）** | `f1ff0c2` · W3 Mode A healthState + local-model flag + CURRENT tip gate |
-| **Tip（本波结束）** | 以最终 `git rev-parse --short HEAD` 为准（CURRENT tip 与 HEAD 同前缀时 `check:docs-tip` 为 0） |
+| **Tip（内容）** | `b94d794` · uv.lock + stack-matrix + CURRENT 交叉 |
+| **Tip（本波 HEAD）** | 交付后 `git rev-parse --short HEAD`；CURRENT tip 与 HEAD 同前缀时 `check:docs-tip` 为 0 |
 | **主线** | `develop`（合入 / push 由总控） |
 | **题单** | `portfolio-arch-upgrade-2026h2/prompts/w4-ms.md` + `w4-shared.md` |
 | **进度 tip 基线** | `docs/orca-closed-loop/state/progress.json` · MindSync `f1ff0c2` |
@@ -45,11 +46,13 @@
 
 | 命令 | Exit | 结果 |
 |------|-----:|------|
-| `pnpm check:docs` | **0** | 9 子脚本（含 tip） |
+| `pnpm check:docs` | **0** | 9 子脚本（含 tip；实测 tip=`277594f`↔HEAD 对齐态） |
 | `uv sync --extra dev` + `pytest services/ai-core/tests -q` | **0** | 9 passed（uv 锁装通） |
 | `node --test packages/desktop/config/ai-core-config.test.js packages/desktop/config/ai-core-client.test.js` | **0** | 10/10 |
 | `node --test scripts/desktop-ipc-handlers.test.mjs` | **0** | 11/11 |
 | `pnpm -F @mindsync/core test -- tests/unit/llm/local-model-adapter.test.ts` | **0** | 5/5 |
+
+> **tip 自指：** `check-docs-current-tip` 要求文档 hash 为 `HEAD` 前缀。把 tip 写进 commit 后 HEAD 前移，干净树上 tip 会滞后 1 次提交（与 W3 `e6d113c`↔`f1ff0c2` 同类）。合 `develop` 前若 CI 强制 tip 门闩：改 CURRENT 一行再 commit。
 
 ---
 
