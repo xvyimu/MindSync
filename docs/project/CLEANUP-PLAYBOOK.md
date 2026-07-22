@@ -44,9 +44,8 @@ esourcespp.asar.bak-pre-*` | asar 热修备份（确认现行 asar 后） |
 | `D:\PromtOptimizer\app\` | **现行** NSIS 安装根（`PromptOptimizer.exe` + `resources\app.asar`） |
 | `D:\PromtOptimizer\tools\` | 历史 portable Node 等（Node 基线已升 **^24**，系统 Node 优先） |
 | `D:\PromtOptimizer\custom-templates\` | 用户模板数据 |
-| `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` | Paper 主题安装包归档 |
-| `D:\PromtOptimizer\nsis-2026-07-20-develop-ux\` | UX 安装包归档 |
-| `D:\PromtOptimizer\docs\` | 安装侧审计 / 文档规划（含 FULL-AUDIT、DOC-SYSTEM-PLAN*） |
+| `D:\PromtOptimizer\nsis-2026-07-21-ipc\` | **最新** NSIS 可回滚归档（旧 paper/ux/e1 已删） |
+| `D:\PromtOptimizer\docs\` | 安装侧 **仅索引** `README.md`；正文在仓 `docs/project/archives/install-side-2026-07/` |
 | `D:\PromtOptimizer\CLOSEOUT.md` | 历史收口清单（L2，勿当现行 wiki，但勿删证据） |
 | `D:\PromtOptimizer\README.md` | 安装侧 L0 入口 |
 | `docs/PROJECT_HANDOFF.md` · `docs/project/CURRENT.md` | 工程 L0 / 版本 SSOT |
@@ -71,9 +70,8 @@ Test-Path 'D:\PromtOptimizer\app\PromptOptimizer.exe'
 Test-Path 'D:\PromtOptimizer\app\resources\app.asar'
 Test-Path 'D:\PromtOptimizer\app\resources\app-update.yml'
 
-# 现行 NSIS 归档（至少一类存在即可）
-Test-Path 'D:\PromtOptimizer\nsis-2026-07-20-paper-theme'
-Test-Path 'D:\PromtOptimizer\nsis-2026-07-20-develop-ux'
+# 现行 NSIS 归档
+Test-Path 'D:\PromtOptimizer\nsis-2026-07-21-ipc'
 
 # 源码与 SSOT
 Test-Path 'D:\PromtOptimizer\src\mindsync\docs\project\CURRENT.md'

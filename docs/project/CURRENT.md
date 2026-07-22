@@ -7,14 +7,15 @@
 | 项 | 值 |
 |----|-----|
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
-| **日期** | 2026-07-21 |
+| **日期** | 2026-07-22 |
 | **分支** | `develop` |
-| **远端 tip** | 以 `git log -1 --oneline` 为准 |
+| **远端 tip** | **`ac6687c`**（Merge PR#12 R4；以 `git log -1 --oneline` 复核） |
 | **本仓** | https://github.com/xvyimu/MindSync（独立仓；**仅 `origin`**） |
 | **策略** | **独立产品开发 / 不跟踪原上游 / 不默认开 PR 到 linshenkx** |
 | **上游 remote** | **已移除**（2026-07-21）。安全补丁改为手工补丁，不恢复 `upstream` 除非维护者书面决定 |
 | **身份 SSOT** | [`GITHUB_IDENTITY.md`](../../GITHUB_IDENTITY.md) |
-| **包名/appId 重命名** | 方案见 [`PACKAGE-RENAME-PLAN-2026-07-21.md`](./PACKAGE-RENAME-PLAN-2026-07-21.md)（默认未执行） |
+| **包 scope / Electron** | 根 `mindsync` · `@mindsync/*` · appId `com.xvyimu.mindsync` · productName `MindSync`（见 PR#7） |
+| **Redesign** | R0–R4 已合 develop（PR#8–#12）；shell flag 默认 OFF；下一刀 R5 |
 | **许可** | AGPL-3.0-only（`LICENSE` 正文保留；抬头含独立维护说明） |
 
 ---
@@ -25,8 +26,8 @@
 |------|------|
 | 源码 | `D:\PromtOptimizer\src\mindsync` |
 | **运行安装** | **`D:\PromtOptimizer\app\PromptOptimizer.exe`** |
-| 安装包归档 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` · `nsis-2026-07-21-e1` · **`nsis-2026-07-21-ipc`** |
-| 工具链 | **Node ^24**（本机系统 Node 即可；旧 portable `tools\node-v22.*` 可弃用） |
+| 安装包归档 | **仅** `D:\PromtOptimizer\nsis-2026-07-21-ipc\`（旧 paper/ux/e1 归档已清） |
+| 工具链 | **Node ^24**（系统 Node；`tools\` 空目录，portable Node22 已删） |
 | 用户模板 | `D:\PromtOptimizer\custom-templates\`（勿删） |
 | Desktop IPC 协议 | `packages/desktop/config/ipc/channel-manifest.js` · **1.1.0** |
 
