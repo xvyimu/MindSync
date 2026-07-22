@@ -7,7 +7,7 @@
 | **Worktree（绝对路径）** | `C:\Users\yuanjia\orca\workspaces\mindsync\w2-ms-claude` |
 | **Branch** | `xvyimu/w2-ms-claude` |
 | **Tip（开工）** | `2b7cd413a8bc2f21ef7063b5041250fc7fdc927d` · `chore(docs): W1 stack-matrix + CURRENT tip + pnpm align` |
-| **Tip（本波结束）** | 以 `git rev-parse HEAD` 为准（若已 commit） |
+| **Tip（本波结束）** | 功能 tip **`a621e7a`** · `feat(ops): W2 AI-Core distribution ADR + IPC lastHealth + S3 lazy load`；文档 tip 对齐以 `git rev-parse --short HEAD` 为准 |
 | **主线** | `develop`（合入 / push 由总控） |
 | **Remote** | `origin` → `git@github.com:xvyimu/MindSync.git` |
 | **题单** | `D:\orca\.planning\portfolio-arch-upgrade-2026h2\prompts\w2-ms.md` + `w2-shared.md` |
