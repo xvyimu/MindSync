@@ -2,7 +2,8 @@
 
 > **L1：** 仅下列文档视为「现行架构事实」。  
 > 同目录其他 md 可能过期，排障时可参考，**实现以代码为准**。  
-> 文档体系：方案 C — 见 `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md`
+> 文档体系：方案 C — 见 `docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-2026-07-20.md`  
+> 顶层测绘：[`../ARCHITECTURE_ASIS.md`](../ARCHITECTURE_ASIS.md) · [`../ARCHITECTURE_TARGET.md`](../ARCHITECTURE_TARGET.md)
 
 ## 白名单（现行）
 
@@ -27,9 +28,11 @@
 
 ## 相关
 
-- 模块与边界总览：[`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) · FULL-AUDIT
+- 模块与边界总览：[`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) · FULL-AUDIT（归档）
 - 现行版本：[`../project/CURRENT.md`](../project/CURRENT.md)
+- 目标架构 / 发行：[`../ARCHITECTURE_TARGET.md`](../ARCHITECTURE_TARGET.md) · [`../ops/ai-core-distribution-contract.md`](../ops/ai-core-distribution-contract.md)
+- 品牌素材：[`../brand-assets.md`](../brand-assets.md)
 - 决策简报：[`../project/COMPETITIVE-BRIEF.md`](../project/COMPETITIVE-BRIEF.md)
 - 90 天 backlog：[`../project/BACKLOG-90D-2026-07-21.md`](../project/BACKLOG-90D-2026-07-21.md)
 - 下一刀规格：[`../project/NEXT-CUT-SPEC-2026-07-21.md`](../project/NEXT-CUT-SPEC-2026-07-21.md)
-- 竞品调研（全文）：`D:\PromtOptimizer\docs\COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`
+- 竞品调研（全文）：`docs/project/archives/install-side-2026-07/COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`

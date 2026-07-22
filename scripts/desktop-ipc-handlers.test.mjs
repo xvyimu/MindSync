@@ -40,6 +40,8 @@ test('desktop preload IPC channels have main-process handlers', () => {
     readText('packages/desktop/config/ipc/preference-handlers.js'),
     readText('packages/desktop/config/ipc/system-handlers.js'),
     readText('packages/desktop/config/ipc/update-handlers.js'),
+    // Optional AI-Core probe domain (runtime-registered when getAiCore* deps present)
+    readText('packages/desktop/config/ipc/ai-core-handlers.js'),
   ].join('\n')
 
   const preloadChannels = collectMatches(preload, [
@@ -95,6 +97,7 @@ test('desktop composition root delegates domain handlers to backend modules', ()
   const dataModule = readText('packages/desktop/config/ipc/data-handlers.js')
   const preferenceModule = readText('packages/desktop/config/ipc/preference-handlers.js')
   const systemModule = readText('packages/desktop/config/ipc/system-handlers.js')
+  const aiCoreModule = readText('packages/desktop/config/ipc/ai-core-handlers.js')
 
   // main 通过 registerDomainIpcHandlers 集中注册；领域 register* 在 register-domain-handlers 内调用
   assert.match(main, /registerDomainIpcHandlers\(/)
@@ -111,6 +114,7 @@ test('desktop composition root delegates domain handlers to backend modules', ()
   assert.match(registerDomain, /registerDataIpcHandlers\(/)
   assert.match(registerDomain, /registerPreferenceIpcHandlers\(/)
   assert.match(registerDomain, /registerSystemIpcHandlers\(/)
+  assert.match(registerDomain, /registerAiCoreIpcHandlers\(/)
   assert.doesNotMatch(main, /registerSensitiveIpc\(\s*'llm-/)
   assert.doesNotMatch(main, /registerSensitiveIpc\(\s*'prompt-[^']*Stream'/)
   assert.doesNotMatch(main, /registerSensitiveIpc\(\s*'image-understanding-understand'/)
@@ -139,6 +143,9 @@ test('desktop composition root delegates domain handlers to backend modules', ()
   assert.match(dataModule, /registerSensitiveIpc\(\s*'data-exportAllData'/)
   assert.match(preferenceModule, /registerSensitiveIpc\(\s*'preference-get'/)
   assert.match(systemModule, /registerSensitiveIpc\(\s*'config-getEnvironmentVariables'/)
+  assert.match(aiCoreModule, /registerSensitiveIpc\(\s*'ai-core-get-status'/)
+  assert.match(aiCoreModule, /registerSensitiveIpc\(\s*'ai-core-probe-health'/)
+  assert.match(aiCoreModule, /registerSensitiveIpc\(\s*'ai-core-run-evaluation'/)
   const updateModule = readText('packages/desktop/config/ipc/update-handlers.js')
   assert.match(updateModule, /function createUpdateHandlers/)
   assert.match(updateModule, /secureHandle\s*\(/)
@@ -161,6 +168,7 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
     PROMPT_CHANNELS,
     LLM_CHANNELS,
     SYSTEM_CHANNELS,
+    AI_CORE_CHANNELS,
     UPDATE_CHANNELS,
     IPC_PROTOCOL_VERSION,
     isKnownInvokeChannel,
@@ -180,10 +188,15 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
   assert.ok(PROMPT_CHANNELS.includes('prompt-optimizePromptStream'))
   assert.ok(LLM_CHANNELS.includes('stream-cancel'))
   assert.ok(SYSTEM_CHANNELS.includes('shell-openExternal'))
+  assert.ok(AI_CORE_CHANNELS.includes('ai-core-get-status'))
+  assert.ok(AI_CORE_CHANNELS.includes('ai-core-probe-health'))
+  assert.ok(AI_CORE_CHANNELS.includes('ai-core-run-evaluation'))
   assert.ok(UPDATE_CHANNELS.includes('updater-check-update'))
   assert.match(String(IPC_PROTOCOL_VERSION), /^\d+\.\d+\.\d+$/)
   assert.equal(isKnownInvokeChannel('llm-sendMessage'), true)
+  assert.equal(isKnownInvokeChannel('ai-core-get-status'), true)
   assert.equal(getChannelMeta('llm-sendMessageStream')?.kind, 'stream')
+  assert.equal(getChannelMeta('ai-core-run-evaluation')?.domain, 'ai-core')
   assert.throws(() => assertKnownInvokeChannel('definitely-not-a-channel'), /Unknown IPC invoke channel/)
 
   const handlerSources = [
@@ -200,6 +213,7 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
     readText('packages/desktop/config/ipc/preference-handlers.js'),
     readText('packages/desktop/config/ipc/system-handlers.js'),
     readText('packages/desktop/config/ipc/update-handlers.js'),
+    readText('packages/desktop/config/ipc/ai-core-handlers.js'),
     // 仍由 main / remote-storage 直接注册的 channel（未下沉 domain 模块）
     readText('packages/desktop/main.js'),
     readText('packages/desktop/remote-storage.js'),

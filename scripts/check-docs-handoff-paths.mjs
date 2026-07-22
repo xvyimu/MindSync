@@ -22,7 +22,19 @@ const rules = [
   {
     id: 'stale-codex-path',
     re: /Documents[/\\]Codex|source-extract[/\\]prompt-optimizer-develop/i,
-    hint: 'Use D:\\PromtOptimizer\\src\\prompt-optimizer (see CURRENT.md)',
+    hint: 'Use D:\\MindSync\\src\\mindsync (see CURRENT.md)',
+  },
+  {
+    id: 'stale-promtoptimizer-as-ssot',
+    // Forbid D:\PromtOptimizer\... as live path; allow the bare token only in "已废弃/旧路径" prose without a trailing path root.
+    re: /D:\\PromtOptimizer\\(?:src|app|docs|nsis|tools|custom-templates|PromptOptimizer)/i,
+    hint: 'Active paths are D:\\MindSync\\... (see CURRENT.md / GITHUB_IDENTITY)',
+  },
+  {
+    id: 'claim-upstream-remote-active',
+    // Forbid presenting git remote "upstream" as currently configured (attribution URL alone is OK).
+    re: /\|\s*upstream\s*\|\s*https?:\/\/github\.com\/linshenkx/i,
+    hint: 'No upstream remote; list only origin (see GITHUB_IDENTITY.md)',
   },
   {
     id: 'push-hardening-branch',
@@ -32,17 +44,17 @@ const rules = [
   {
     id: 'stale-nsis-2026-07-18',
     re: /nsis-2026-07-18/i,
-    hint: 'Current NSIS archives are nsis-2026-07-20-* (see CLEANUP-PLAYBOOK)',
+    hint: 'Current NSIS archive is nsis-2026-07-21-ipc (see CURRENT.md)',
   },
   {
     id: 'deprecated-tree-self-check',
     re: /Test-Path[^\n]*PromptOptimizer[/\\]/i,
-    hint: 'Self-check against app\\ and nsis-2026-07-20-*; see CLEANUP-PLAYBOOK',
+    hint: 'Self-check against D:\\MindSync\\app\\ and nsis-2026-07-21-*; see CLEANUP-PLAYBOOK',
   },
   {
     id: 'deprecated-tree-as-app-resources',
     re: /PromptOptimizer[/\\]resources[/\\]app/i,
-    hint: 'Deprecated hot-swap tree is not the install root; use app\\resources\\app.asar',
+    hint: 'Deprecated hot-swap tree is not the install root; use D:\\MindSync\\app\\resources\\app.asar',
   },
 ];
 

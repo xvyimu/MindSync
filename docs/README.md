@@ -12,6 +12,8 @@
 |--------|--------|------|
 | 本机使用者 | 启动软件 / 安装在哪 | `D:\MindSync\app\PromptOptimizer.exe` · [`project/CURRENT.md`](./project/CURRENT.md) |
 | 开发维护者 | 改代码 / 测试 / 模块 | [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md) |
+| 架构 / 发行 | 目标边界 · AI-Core 是否进包 | [`ARCHITECTURE_TARGET.md`](./ARCHITECTURE_TARGET.md) · [`ops/ai-core-distribution-contract.md`](./ops/ai-core-distribution-contract.md) |
+| 品牌 / 素材 | logo · 命名 · 镜像名 | [`brand-assets.md`](./brand-assets.md) |
 | 审计 / 排障 | 边界、安全、模块全景 | `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md` |
 | 任何人 | 当前版本与策略 | [`project/CURRENT.md`](./project/CURRENT.md) |
 
@@ -54,9 +56,17 @@
 - [`prd.md`](./project/prd.md) — 产品范围  
 - [`DEV-WORKFLOW.md`](./project/DEV-WORKFLOW.md) · 冒烟清单等  
 
-### 架构 · [`architecture/`](./architecture/)
+### 架构 · [`architecture/`](./architecture/) · 顶层测绘
 
-仅 [`architecture/README.md`](./architecture/README.md) **白名单**篇视为现行；其余可能过期。
+| 文档 | 主题 |
+|------|------|
+| [`ARCHITECTURE_ASIS.md`](./ARCHITECTURE_ASIS.md) | 现状测绘 |
+| [`ARCHITECTURE_TARGET.md`](./ARCHITECTURE_TARGET.md) | **目标边界**（P1 · Vue 不动 · AI-Core 旁路 · 发行） |
+| [`phase2-ai-core-extract-map.md`](./phase2-ai-core-extract-map.md) | AI-Core 抽离地图 |
+| [`ops/ai-core-distribution-contract.md`](./ops/ai-core-distribution-contract.md) | AI-Core **发行契约**（模式 A 自启 sidecar） |
+| [`brand-assets.md`](./brand-assets.md) | 品牌 / logo / 镜像命名 |
+
+仅 [`architecture/README.md`](./architecture/README.md) **白名单**篇 + 上表视为现行；其余可能过期。
 
 ### 测试 · [`testing/`](./testing/)
 

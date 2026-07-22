@@ -3,7 +3,8 @@
 **Status**: scaffold + **draft OpenAPI** + **evaluation stub** + **prompt optimize stub** · **2026-07-22**  
 **SSOT (types)**: `packages/core/src/services/evaluation/types.ts`, `packages/core/src/services/prompt/types.ts`  
 **SSOT (extract plan)**: `docs/phase2-ai-core-extract-map.md`  
-**Does not**: change Vue panel, Electron IPC, or production traffic.
+**Distribution contract**: `docs/ops/ai-core-distribution-contract.md` · **Target**: `docs/ARCHITECTURE_TARGET.md`  
+**Does not**: ship inside Desktop asar / Docker Web image; change Vue panel; enable production traffic by default.
 
 ## Layout
 

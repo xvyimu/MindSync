@@ -1,18 +1,20 @@
-# PromptOptimizer 项目交接总册（PROJECT_HANDOFF）
+# MindSync 项目交接总册（PROJECT_HANDOFF）
 
-> 单一真相入口。更新代码后优先改本文相关章节；安装侧见 `D:\PromtOptimizer\README.md`。
+> 单一真相入口。更新代码后优先改本文相关章节。  
+> **路径 / 版本 SSOT：** [`project/CURRENT.md`](./project/CURRENT.md) · **身份 SSOT：** [`../GITHUB_IDENTITY.md`](../GITHUB_IDENTITY.md)
 
-**最后更新：** 2026-07-20 文档体系方案 C + 产品态收口  
+**最后更新：** 2026-07-22 Dual-B 身份/路径对齐 + AI-Core 文档边界  
 **产品版本：** Desktop **2.11.7**（权威快照：[`project/CURRENT.md`](./project/CURRENT.md)）  
 **维护分支：** **`develop`**（tip 以 `git log -1` 为准）  
 **本仓：** https://github.com/xvyimu/MindSync（原 `prompt-optimizer`，已脱离 fork 网络并改名）  
-**上游：** https://github.com/linshenkx/prompt-optimizer（`upstream`，仅拉取）  
+**上游项目（归属，非 git remote）：** https://github.com/linshenkx/prompt-optimizer — **不**配置 `upstream` remote  
 **贡献策略：** **独立仓 / 不默认向上游开 PR**  
-**文档分层：** L0 本文 + 安装 README · L1 CURRENT/AUDIT/user · L2 archives/workspace/.pipeline  
-**本机安装：** `D:\PromtOptimizer\app\PromptOptimizer.exe`  
-**全面检查：** `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md`  
-**文档规划：** `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` · C2：`DOC-SYSTEM-PLAN-C2-2026-07-20.md`  
-**文档策略 / 漂移台账 / 清理：** [`DOCS_POLICY.md`](./DOCS_POLICY.md) · [`project/DOC-DRIFT-REGISTRY.md`](./project/DOC-DRIFT-REGISTRY.md) · [`project/CLEANUP-PLAYBOOK.md`](./project/CLEANUP-PLAYBOOK.md)
+**文档分层：** L0 本文 + CURRENT · L1 project/user/developer · L2 archives/workspace/.pipeline  
+**本机安装：** `D:\MindSync\app\PromptOptimizer.exe`  
+**全面检查（归档）：** `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md`  
+**文档规划（归档）：** `docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-2026-07-20.md` · C2 同目录  
+**文档策略 / 漂移台账 / 清理：** [`DOCS_POLICY.md`](./DOCS_POLICY.md) · [`project/DOC-DRIFT-REGISTRY.md`](./project/DOC-DRIFT-REGISTRY.md) · [`project/CLEANUP-PLAYBOOK.md`](./project/CLEANUP-PLAYBOOK.md)  
+**目标架构 / 发行：** [`ARCHITECTURE_TARGET.md`](./ARCHITECTURE_TARGET.md) · [`ops/ai-core-distribution-contract.md`](./ops/ai-core-distribution-contract.md) · [`brand-assets.md`](./brand-assets.md)
 
 ---
 
@@ -21,16 +23,16 @@
 | 你想… | 去哪里 |
 |--------|--------|
 | **现行版本/路径一页纸** | [`project/CURRENT.md`](./project/CURRENT.md) |
-| 改代码 | `D:\PromtOptimizer\src\prompt-optimizer`（本文后续章节） |
-| 打开软件 | `D:\PromtOptimizer\app\PromptOptimizer.exe` |
-| 安装侧入口 | `D:\PromtOptimizer\README.md` |
-| 安装包 | `D:\PromtOptimizer\nsis-2026-07-20-paper-theme\` 等 |
-| 全面检查 | `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` |
-| 文档怎么分层 | `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` · [`docs/README.md`](./README.md) |
-| 历史 hardening / ship | §2 + `.pipeline/`（**非规范**）+ `CLOSEOUT.md` |
-| 跑测试 | §5；Desktop 契约见 FULL-AUDIT §8 |
-| 推送到 GitHub | §6（独立仓 MindSync · 默认 `develop`） |
-| 优化债务 | FULL-AUDIT §10 · CURRENT |
+| 改代码 | `D:\MindSync\src\mindsync`（本文后续章节） |
+| 打开软件 | `D:\MindSync\app\PromptOptimizer.exe` |
+| 安装包归档 | `D:\MindSync\nsis-2026-07-21-ipc\`（见 CURRENT） |
+| 全面检查 | `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md` |
+| 文档怎么分层 | [`docs/README.md`](./README.md) · 归档 DOC-SYSTEM-PLAN |
+| 历史 hardening / ship | §2 + `.pipeline/`（**非规范**） |
+| 跑测试 | §5 |
+| 推送到 GitHub | §6（独立仓 MindSync · 默认 `develop`） · **无 upstream remote** |
+| 优化债务 | FULL-AUDIT（归档）· CURRENT |
+| AI-Core 旁路 | [`ops/ai-core-distribution-contract.md`](./ops/ai-core-distribution-contract.md) · `services/ai-core/README.md` |
 
 ---
 
@@ -39,7 +41,7 @@
 ### 1.1 源码工作区（真相源）
 
 ```
-D:\PromtOptimizer\src\prompt-optimizer\
+D:\MindSync\src\mindsync\
 ├── packages/
 │   ├── core/          # LLM/Prompt/模型领域；AbortSignal；electron 子路径
 │   ├── desktop/       # Electron main/preload；config/ipc/* 领域拆分；icons/**
@@ -47,6 +49,8 @@ D:\PromtOptimizer\src\prompt-optimizer\
 │   ├── web/           # Web 入口（Desktop 用 web-dist）
 │   ├── extension/     # 浏览器扩展
 │   └── mcp-server/    # MCP
+├── services/
+│   └── ai-core/       # Python AI-Core scaffold（默认 OFF；不进 asar）
 ├── scripts/           # IPC 契约、e2e smoke、溯源
 ├── docs/              # 含本 HANDOFF
 ├── .pipeline/         # Ship/优化/验证过程文档
@@ -56,31 +60,26 @@ D:\PromtOptimizer\src\prompt-optimizer\
 ### 1.2 本机安装（日常运行）
 
 ```
-D:\PromtOptimizer\
+D:\MindSync\
 ├── app\                               # 现行 NSIS 安装根
-│   ├── PromptOptimizer.exe
+│   ├── PromptOptimizer.exe            # 历史可执行名；productName=MindSync
 │   └── resources\
-│       ├── app.asar                   # 业务 + web-dist + icons
+│       ├── app.asar                   # 业务 + web-dist + icons（不含 Python AI-Core）
 │       └── app-update.yml
-├── docs\FULL-AUDIT-REPORT-2026-07-20.md
-├── README.md                          # 安装侧入口
-├── CLOSEOUT.md                        # 2026-07-18 历史收口
-├── nsis-2026-07-20-paper-theme\       # Paper 主题安装包
-├── nsis-2026-07-20-develop-ux\        # UX 安装包
-├── src\prompt-optimizer\              # 源码
-├── tools\                             # portable Node 等
+├── nsis-2026-07-21-ipc\               # 现行安装包归档（见 CURRENT）
+├── src\mindsync\                      # 源码
 └── custom-templates\                  # 用户模板（勿删）
 ```
 
-**重要：** 旧热替换树 `PromptOptimizer\` 已不是真相源。asar 热修前可有 `app.asar.bak-pre-icons-*` 备份；完整回滚仍靠源码/fork/nsis 归档。
+**重要：** 旧路径 `D:\PromtOptimizer\...` 与热替换树 `PromptOptimizer\` **已废弃**，不是真相源。完整回滚靠源码 / NSIS 归档。
 
 ### 1.3 远程 Git
 
 | remote | URL | 用途 |
 |--------|-----|------|
-| origin | https://github.com/xvyimu/MindSync.git | 本仓（独立，非 fork） |
-| upstream | https://github.com/linshenkx/prompt-optimizer.git | 官方 |
+| origin | https://github.com/xvyimu/MindSync.git | **唯一**远程（独立仓，非 fork） |
 
+- **无 `upstream` remote**（2026-07-21 已移除）。安全补丁手工移植；勿重新 `git remote add upstream` 除非维护者书面决定。见 [`GITHUB_IDENTITY.md`](../GITHUB_IDENTITY.md)。
 - **日常分支：`develop`**（功能用 `feat/*` 再合入）
 - 历史工作分支名 `work/desktop-hardening*` 仅作考古，不再作为主路径
 - 勿 force 推 `develop`/`main`
@@ -90,7 +89,6 @@ D:\PromtOptimizer\
 $env:HTTP_PROXY='http://127.0.0.1:7890'; $env:HTTPS_PROXY='http://127.0.0.1:7890'
 git push origin develop
 ```
-
 ### 1.4 提交历史（关键）
 
 以 `git log -8 --oneline` 为准。近年要点：
@@ -120,7 +118,7 @@ git push origin develop
 
 | 文件 | 职责 |
 |------|------|
-| `channel-manifest.js` | 协议版本 **1.1.0** + CHANNEL_META + 域 channel 清单 |
+| `channel-manifest.js` | 协议版本 **1.1.0** + CHANNEL_META + 域 channel 清单（含 `AI_CORE_CHANNELS`） |
 | `llm-handlers.js` | LLM 域（含 secure/sensitive 注册路径） |
 | `prompt-stream-handlers.js` | Prompt 流式 |
 | `prompt-sync-handlers.js` | Prompt 同步调用 |
@@ -133,6 +131,7 @@ git push origin develop
 | `data-handlers.js` | 导入导出 / 存储信息 |
 | `preference-handlers.js` | 偏好 |
 | `system-handlers.js` | 系统（日志目录等） |
+| `ai-core-handlers.js` | 可选 AI-Core 旁路（status/health/evaluation；默认 OFF） |
 | `update-handlers.js` | 自动更新（`createUpdateHandlers(ctx)`） |
 | `owned-stream-runner.js` | 流所有权 + AbortSignal |
 
@@ -150,10 +149,11 @@ git push origin develop
 
 ### 2.4 安装形态（现行）
 
-- **安装根：** `D:\PromtOptimizer\app`
-- **加载：** `resources/app.asar`（NSIS；含 web-dist + icons）
+- **安装根：** `D:\MindSync\app`
+- **加载：** `resources/app.asar`（NSIS；含 web-dist + icons；**不含** Python AI-Core）
 - 缺 API key 时仅警告，可启动
 - 打包清单含 `icons/**/*`；主题可选 **纸感 Paper**
+- AI-Core：开发者自启 sidecar，见 [`ops/ai-core-distribution-contract.md`](./ops/ai-core-distribution-contract.md)
 
 ---
 
@@ -175,15 +175,15 @@ git push origin develop
 
 ### 4.1 改 Core / Desktop（推荐）
 
-1. 在 `D:\PromtOptimizer\src\prompt-optimizer` 改代码  
-2. 使用 **Node 24**（engines `^24`；系统 Node 即可）  
+1. 在 `D:\MindSync\src\mindsync` 改代码  
+2. 使用 **Node 24**（根 `package.json` engines `^24`；系统 Node 即可）  
 3. 构建并重装：
 
 ```powershell
 pnpm -F @mindsync/core build
 pnpm -F @mindsync/ui build:bundle   # 若 vue-tsc 失败可跳过 types
 pnpm -F @mindsync/desktop build:ci
-# 安装生成的 NSIS 到 D:\PromtOptimizer\app
+# 安装生成的 NSIS 到 D:\MindSync\app
 ```
 
 4. 契约抽测：
@@ -195,8 +195,8 @@ node --test scripts/desktop-ipc-handlers.test.mjs
 
 ### 4.2 环境
 
-- engines：Node `^22`；推荐 portable 22，避免系统 Node 24 踩 engines  
-- 独立仓 MindSync；高风险 push/删除先确认
+- engines：Node `^24`（与 CI 一致；Docker 基镜像仍可能为 Node 22，属已知漂移，见 TARGET）  
+- 独立仓 MindSync；**无** `upstream` remote；高风险 push/删除先确认
 
 ---
 
@@ -267,12 +267,12 @@ node scripts/run-e2e-group.js gate
 
 ## 6. Git 工作流
 
-**源码根（唯一）：** `D:\PromtOptimizer\src\prompt-optimizer`  
+**源码根（唯一）：** `D:\MindSync\src\mindsync`  
 **日常分支：** `develop`（功能用 `feat/*` 再合入）  
-**策略：** 独立仓 `xvyimu/MindSync` · 默认 **不**向上游开 PR  
+**策略：** 独立仓 `xvyimu/MindSync` · **无** `upstream` remote · 默认 **不**向上游开 PR  
 
 ```powershell
-cd D:\PromtOptimizer\src\prompt-optimizer
+cd D:\MindSync\src\mindsync
 $env:HTTP_PROXY='http://127.0.0.1:7890'; $env:HTTPS_PROXY='http://127.0.0.1:7890'
 git status -sb
 git log -5 --oneline
@@ -280,8 +280,8 @@ git push origin develop
 ```
 
 - 历史分支名 `work/desktop-hardening*` **仅考古**，不要再 `push` 作主路径  
-- 上游 PR #324 等为历史记录；现行以 fork `develop` 为准  
-- fork 已合 PR：#1 #2（及后续）  
+- 上游项目 PR 等为历史记录；现行以独立仓 `develop` 为准  
+- 已合 PR：#1 #2 及后续（以 GitHub 为准）  
 
 ---
 
@@ -292,30 +292,32 @@ git push origin develop
 
 摘要：
 
-| 现行安装 | `D:\PromtOptimizer\app\`（`app.asar`） |
+| 现行安装 | `D:\MindSync\app\`（`app.asar`） |
 |----------|----------------------------------------|
-| 现行 NSIS 归档 | `nsis-2026-07-20-paper-theme\` · `nsis-2026-07-20-develop-ux\` |
-| 已废弃 | `D:\PromtOptimizer\PromptOptimizer\` 热替换树（**不是**运行安装） |
+| 现行 NSIS 归档 | `D:\MindSync\nsis-2026-07-21-ipc\`（见 CURRENT） |
+| 已废弃 | 旧热替换树 / 旧 `PromtOptimizer` 路径（**不是**运行安装） |
 
-机检：`node scripts/check-docs-handoff-paths.mjs`（禁止本文再写入废弃自检路径）。
+机检：`node scripts/check-docs-handoff-paths.mjs`（禁止本文再把废弃路径写成 SSOT）。
 
 ---
 
 ## 8. 未决与可选债
 
-1. **上游 PR #324** 等待 review/merge  
+1. **历史上游 PR #324** 不再作为本仓阻塞项（独立仓策略）  
 2. **代码签名 NSIS**：本机已能打未签名包；签名需证书/CI  
-3. **Playwright extended**：非日常门禁（gate 已 12/12）  
+3. **Playwright extended**：非日常门禁  
 4. **API 密钥**：安装启动无 key 仅警告，需用户配置模型  
+5. **Docker 官方镜像名** `xvyimu/mindsync` 发布流水线启用前，compose 可临时 pin 对照镜像（须文档标明）  
+6. **AI-Core**：模式 A 自启 sidecar；不进 asar（见发行契约）
 
-细节见 `.pipeline/OPTIMIZATION_PLAN.md`、`D:\PromtOptimizer\CLOSEOUT.md`。
+细节见 `.pipeline/OPTIMIZATION_PLAN.md` · CURRENT · ARCHITECTURE_TARGET。
 
 ---
 
 ## 9. 相关记忆（Claude）
 
-- `prompt-optimizer-2026-07-18-delivery.md`
-- `prompt-optimizer-remaining-todos.md`
+- 身份 / 路径 SSOT：`GITHUB_IDENTITY.md` · `docs/project/CURRENT.md`
+- Dual-B 报告：`docs/ops/wave6-dual-b-mindsync-claude.md`
 
 ---
 
@@ -324,21 +326,24 @@ git push origin develop
 | 日期 | 变更 |
 |------|------|
 | 2026-07-18 | 初版：路径/能力/测试/清理/Git 全细节交接 |
-| 2026-07-18 晚 | 收口：upstream merge、PR#324、NSIS、gate 12/12、CLOSEOUT 入口 |
+| 2026-07-18 晚 | 收口：历史 merge、PR#324、NSIS、gate、CLOSEOUT 入口 |
 | 2026-07-20 | 文档体系方案 C：CURRENT / DOCS_POLICY / 冻结横幅 / check:docs 雏形 |
 | 2026-07-20 | **C2-A**：§6 源码路径与 `develop` push；§7 改链 CLEANUP-PLAYBOOK；§2.2 IPC 文件名对齐磁盘；漂移台账 DOC-DRIFT-REGISTRY；`check-docs-handoff-paths.mjs` |
 | 2026-07-20 | **C2-B**：RELEASE-RUNBOOK；`release:notes:*` package 别名；version-sync 双文件；pnpm-script-refs / version-sync-list / version-consistency 入 check:docs |
 | 2026-07-20 | **C2-C**：archives 索引=磁盘；developer README；README EN/ZH fork clone；PRD 图像取消；FULL-AUDIT §6.5 CURRENT SSOT；archive-index + source-readme-fork；freeze+pipeline；REGISTRY open=0 |
+| 2026-07-22 | **Dual-B**：身份/路径对齐 MindSync；去掉 active upstream remote 表；AI-Core 发行契约与 TARGET 链接；IPC 域表补 `ai-core-handlers` |
 
 ## 11. 文档体系摘要
 
 | 文档 | 角色 |
 |------|------|
 | [`project/CURRENT.md`](./project/CURRENT.md) | 版本/路径/策略 SSOT |
+| [`../GITHUB_IDENTITY.md`](../GITHUB_IDENTITY.md) | 仓身份 / 无 upstream |
 | [`DOCS_POLICY.md`](./DOCS_POLICY.md) | 写哪里 / 禁止 |
 | [`project/DOC-DRIFT-REGISTRY.md`](./project/DOC-DRIFT-REGISTRY.md) | DOC 债台账 |
 | [`project/CLEANUP-PLAYBOOK.md`](./project/CLEANUP-PLAYBOOK.md) | 磁盘清理 |
-| `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-2026-07-20.md` | 方案 C |
-| `D:\PromtOptimizer\docs\DOC-SYSTEM-PLAN-C2-2026-07-20.md` | 方案 C2 |
-| `D:\PromtOptimizer\docs\FULL-AUDIT-REPORT-2026-07-20.md` | 深度审计 |
-| `D:\PromtOptimizer\docs\FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` | 全面扫描建议 |
+| [`ARCHITECTURE_TARGET.md`](./ARCHITECTURE_TARGET.md) | 目标边界 |
+| [`ops/ai-core-distribution-contract.md`](./ops/ai-core-distribution-contract.md) | AI-Core 发行 |
+| [`brand-assets.md`](./brand-assets.md) | 品牌素材 |
+| `docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-2026-07-20.md` | 方案 C（归档） |
+| `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md` | 深度审计（归档） |

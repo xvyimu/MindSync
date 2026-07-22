@@ -131,25 +131,29 @@ Cloudflare 上的访问控制和访问分析建议分别使用 Cloudflare Access
 2. 点击图标即可打开提示词优化器
 
 ### 5. Docker部署
+
+> **镜像身份（MindSync）：**  
+> - **正式目标名（维护者启用发布后）：** `xvyimu/mindsync`  
+> - **当前推荐：** 从本仓构建（`docker build -t mindsync:local .`）  
+> - **`linshen/prompt-optimizer`：** 仅上游/历史**对照**镜像，**不是** MindSync 产品承诺名  
+> 详见 [`docs/ARCHITECTURE_TARGET.md`](docs/ARCHITECTURE_TARGET.md) · [`docs/ops/ai-core-distribution-contract.md`](docs/ops/ai-core-distribution-contract.md)。Web 镜像**不含** Python AI-Core。
+
 <details>
 <summary>点击查看 Docker 部署命令</summary>
 
 ```bash
-# 运行容器（默认配置）
-docker run -d -p 8081:80 --restart unless-stopped --name prompt-optimizer linshen/prompt-optimizer
+# 推荐：从本仓构建 MindSync Web+MCP 镜像
+git clone https://github.com/xvyimu/MindSync.git
+cd MindSync
+docker build -t mindsync:local .
+docker run -d -p 8081:80 --restart unless-stopped --name mindsync mindsync:local
 
-# 运行容器（配置API密钥和访问密码）
-docker run -d -p 8081:80 \
-  -e VITE_OPENAI_API_KEY=your_key \
-  -e ACCESS_USERNAME=your_username \  # 可选，默认为"admin"
-  -e ACCESS_PASSWORD=your_password \  # 设置访问密码
-  --restart unless-stopped \
-  --name prompt-optimizer \
-  linshen/prompt-optimizer
+# 可选：上游/历史对照镜像（非 MindSync 官方）
+# docker run -d -p 8081:80 --restart unless-stopped --name prompt-optimizer linshen/prompt-optimizer
 ```
 </details>
 
-> **国内镜像**: 如果Docker Hub访问较慢，可以将上述命令中的 `linshen/prompt-optimizer` 替换为 `registry.cn-guangzhou.aliyuncs.com/prompt-optimizer/prompt-optimizer`
+> **国内对照镜像**：若仍使用对照镜像且 Docker Hub 较慢，可将 `linshen/prompt-optimizer` 换为 `registry.cn-guangzhou.aliyuncs.com/prompt-optimizer/prompt-optimizer`（仍**不是** MindSync 官方名）。
 
 ### 6. Docker Compose部署
 <details>
@@ -158,7 +162,7 @@ docker run -d -p 8081:80 \
 ```bash
 # 1. 克隆仓库
 git clone https://github.com/xvyimu/MindSync.git
-cd prompt-optimizer
+cd MindSync
 
 # 2. 创建 .env 文件配置 API 密钥和访问认证
 cp env.local.example .env
@@ -166,6 +170,7 @@ cp env.local.example .env
 # docker-compose.yml 位于 docker/ 目录下，所以后续命令显式传入根目录 .env
 
 # 3. 启动服务
+# 推荐本地 build；compose 在启用 xvyimu/mindsync 发布前可能仍 pin 对照镜像
 docker compose --env-file .env -f docker/docker-compose.yml up -d
 
 # 4. 查看日志
@@ -184,11 +189,14 @@ MCP 服务器：http://localhost:8081/mcp
 ```yaml
 services:
   prompt-optimizer:
-    # 使用Docker Hub镜像
+    # 发布启用后优先：image: xvyimu/mindsync:latest
+    # 或源码构建：
+    # build: { context: .., dockerfile: Dockerfile }
+    # 临时对照 pin（非 MindSync 官方产品名）：
     image: linshen/prompt-optimizer:latest
-    # 或使用阿里云镜像（国内用户推荐）
+    # 国内对照：
     # image: registry.cn-guangzhou.aliyuncs.com/prompt-optimizer/prompt-optimizer:latest
-    container_name: prompt-optimizer
+    container_name: mindsync
     restart: unless-stopped
     ports:
       - "8081:80"  # Web应用端口（包含MCP服务器，通过/mcp路径访问）

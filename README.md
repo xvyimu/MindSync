@@ -131,20 +131,24 @@ Download the latest version from [GitHub Releases](https://github.com/xvyimu/Min
 2. Click the icon to open the Prompt Optimizer
 
 ### 5. Docker Deployment
+
+> **Image identity (MindSync):**  
+> - **Official target name (when maintainer enables publish):** `xvyimu/mindsync`  
+> - **Preferred now:** build from this repo (`docker build -t mindsync:local .`)  
+> - **`linshen/prompt-optimizer`:** upstream/legacy **comparison** image only — **not** the MindSync product promise. Compose may still reference it until MindSync images are published.  
+> See [`docs/ARCHITECTURE_TARGET.md`](docs/ARCHITECTURE_TARGET.md) and [`docs/ops/ai-core-distribution-contract.md`](docs/ops/ai-core-distribution-contract.md). Web image does **not** include Python AI-Core.
+
 <details>
 <summary>Click to view Docker deployment commands</summary>
 ```bash
-# Run container (default configuration)
-docker run -d -p 8081:80 --restart unless-stopped --name prompt-optimizer linshen/prompt-optimizer
+# Preferred: build MindSync Web+MCP image from this repository
+git clone https://github.com/xvyimu/MindSync.git
+cd MindSync
+docker build -t mindsync:local .
+docker run -d -p 8081:80 --restart unless-stopped --name mindsync mindsync:local
 
-# Run container (with API key configuration and password protection)
-docker run -d -p 8081:80 \
-  -e VITE_OPENAI_API_KEY=your_key \
-  -e ACCESS_USERNAME=your_username \  # Optional, defaults to "admin"
-  -e ACCESS_PASSWORD=your_password \  # Set access password
-  --restart unless-stopped \
-  --name prompt-optimizer \
-  linshen/prompt-optimizer
+# Optional: upstream/legacy comparison image (NOT MindSync official)
+# docker run -d -p 8081:80 --restart unless-stopped --name prompt-optimizer linshen/prompt-optimizer
 ```
 </details>
 
@@ -154,7 +158,7 @@ docker run -d -p 8081:80 \
 ```bash
 # 1. Clone the repository
 git clone https://github.com/xvyimu/MindSync.git
-cd prompt-optimizer
+cd MindSync
 
 # 2. Create .env file for API keys and authentication
 cat > .env << EOF
@@ -174,6 +178,9 @@ EOF
 # Because the compose file is under docker/, pass the root .env explicitly.
 
 # 3. Start the service
+# Prefer building: set build: in compose, or docker build -t mindsync:local .
+# Current docker/docker-compose.yml may still pin linshen/prompt-optimizer as a
+# temporary comparison image until xvyimu/mindsync publish is enabled.
 docker compose --env-file .env -f docker/docker-compose.yml up -d
 
 # 4. View logs
@@ -192,9 +199,12 @@ You can also directly edit the docker/docker-compose.yml file to customize your 
 ```yaml
 services:
   prompt-optimizer:
-    # Use Docker Hub image
+    # Preferred after publish: image: xvyimu/mindsync:latest
+    # Or build from source:
+    # build: { context: .., dockerfile: Dockerfile }
+    # Temporary comparison pin (not MindSync official product name):
     image: linshen/prompt-optimizer:latest
-    container_name: prompt-optimizer
+    container_name: mindsync
     restart: unless-stopped
     ports:
       - "8081:80"  # Web application port (MCP server accessible via /mcp path)

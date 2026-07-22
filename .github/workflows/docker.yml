@@ -7,11 +7,14 @@ on:
   workflow_dispatch:
 
 env:
-  # Docker Hub 配置
+  # MindSync official target (enable when DOCKERHUB_* secrets + publish policy ready):
+  # DOCKERHUB_IMAGE_NAME: xvyimu/mindsync
+  # Temporary: workflow still pins upstream/legacy comparison name — NOT product promise.
+  # See docs/ARCHITECTURE_TARGET.md · docs/ops/ai-core-distribution-contract.md
   DOCKERHUB_REGISTRY: docker.io
   DOCKERHUB_IMAGE_NAME: linshen/prompt-optimizer
 
-  # 阿里云容器镜像服务配置
+  # 阿里云容器镜像服务配置（对照/历史；非 MindSync 官方名）
   ALIYUN_REGISTRY: registry.cn-guangzhou.aliyuncs.com
   ALIYUN_IMAGE_NAME: prompt-optimizer/prompt-optimizer
 
