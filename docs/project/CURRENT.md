@@ -8,9 +8,9 @@
 |----|-----|
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
 | **日期** | 2026-07-23 |
-| **分支** | `xvyimu/w3-ms-claude`（W3 架构深化 feature；主线仍 `develop`） |
-| **本仓 tip（SSOT）** | **`e6d113c`**（W3 开工 tip；交付后以 `git rev-parse --short HEAD` + `pnpm check:docs-tip` 复核） |
-| **远端 develop tip（参考）** | 以 `git log -1 --oneline origin/develop` 复核（W2 未 push） |
+| **分支** | `xvyimu/w4-ms-claude`（W4 收口 feature；主线仍 `develop`） |
+| **本仓 tip（SSOT）** | **`f1ff0c2`**（W4 开工 tip；交付 commit 后以 `git rev-parse --short HEAD` + `pnpm check:docs-tip` 复核） |
+| **远端 develop tip（参考）** | 以 `git log -1 --oneline origin/develop` 复核（W4 未 push） |
 | **本仓** | https://github.com/xvyimu/MindSync（独立仓；**仅 `origin`**） |
 | **策略** | **独立产品开发 / 不跟踪原上游 / 不默认开 PR 到 linshenkx** |
 | **上游 remote** | **已移除**（2026-07-21）。安全补丁改为手工补丁，不恢复 `upstream` 除非维护者书面决定 |
@@ -99,8 +99,9 @@
 - **D4 Docker 非 root 里程碑**：镜像用户 `app`/10001；MCP 子进程降权；整容器非 root 需 `NGINX_PORT=8080`（文档）  
 - **B5 远程备份边界**：UI 移除 `@aws-sdk/client-s3`；Web 仅 Google Drive；S3/R2/WebDAV 仅 Desktop IPC  
 - **E1 入口铺全（R3）**：PostOptimize CTA + EvalCase 面板 + 双模型一键覆盖 **Basic System/User + Context System/User**（同一 `useEvalCaseSet` / `seedDualModelKeys`）  
-- **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）  
-- **战略文档**：竞品/架构调研见 `docs/project/archives/install-side-2026-07/COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`；**R3 决策**见 `INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md`  
+- **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）· pnpm **11.5.3**  
+- **架构收口（W1–W4）**：AI-Core **Mode A** sidecar（`AI_CORE_URL` 默认 OFF · `uv.lock` 可复现）· IPC `healthState` · **本地模型 flag 默认 OFF**（`MINDSYNC_LOCAL_MODEL_ADAPTER` / `VITE_LOCAL_MODEL_ADAPTER`；见 [`../ops/local-model-adapter-flag-w3.md`](../ops/local-model-adapter-flag-w3.md)）· CURRENT tip 门闩 `pnpm check:docs-tip` · **ASAR 未执行**  
+- **战略文档**：竞品/架构调研见 `docs/project/archives/install-side-2026-07/COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`；**R3 决策**见 `INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md` · 栈矩阵 [`../ops/stack-matrix-2026-07.md`](../ops/stack-matrix-2026-07.md)  
 
 ---
 

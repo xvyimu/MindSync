@@ -73,10 +73,22 @@ python -c "import yaml; d=yaml.safe_load(open('services/ai-core/openapi/prompt.v
 
 ## Run (local)
 
+**Preferred (W4 · locked deps):** [`uv.lock`](./uv.lock) + [uv](https://github.com/astral-sh/uv) (`pyproject.toml` is source of truth).
+
+```bash
+cd services/ai-core
+uv sync --extra dev
+uv run uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+# GET http://127.0.0.1:8091/health
+# uv run pytest tests -q
+```
+
+**Fallback (no uv):** editable pip install (versions float; prefer lock for CI/repro).
+
 ```bash
 cd services/ai-core
 python -m venv .venv
-# Windows: .venv\Scriptsctivate
+# Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
 # GET http://127.0.0.1:8091/health
@@ -109,15 +121,15 @@ uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
 
    ```bash
    cd services/ai-core
-   python -m venv .venv
-   # Windows: .venv\Scripts\activate
-   pip install -e ".[dev]"
+   # Preferred (locked):
+   uv sync --extra dev
    # Option A — local scaffold (no bearer):
    set AI_CORE_LOCAL_DEV=1
-   uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+   uv run uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
    # Option B — pin bearer (matches desktop):
    # set AI_CORE_BEARER=dev-token
-   # uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+   # uv run uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+   # Fallback without uv: python -m venv .venv && pip install -e ".[dev]" && uvicorn …
    ```
 
 2. **Point desktop main at stub** (repo root `.env.local`, never commit secrets):

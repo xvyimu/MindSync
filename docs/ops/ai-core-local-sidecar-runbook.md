@@ -14,7 +14,9 @@
 
 ## 0. 前置
 
-- Python **≥ 3.11**、`pip`
+- Python **≥ 3.11**
+- **推荐** [uv](https://github.com/astral-sh/uv)（W4：`services/ai-core/uv.lock` 可复现安装）
+- 无 uv 时：`pip` + venv（版本浮动，仅应急）
 - 仓库根：含 `services/ai-core/`
 - 端口 **8091** 空闲（可改，须与 `AI_CORE_URL` 一致）
 
@@ -24,11 +26,16 @@
 
 ```powershell
 cd services/ai-core
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
+# 推荐 · 锁文件（W4）
+uv sync --extra dev
 $env:AI_CORE_LOCAL_DEV = '1'   # 仅本机脚手架；禁止生产/共享主机
-uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+uv run uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+
+# 应急 · 无 uv：
+# python -m venv .venv
+# .\.venv\Scripts\Activate.ps1
+# pip install -e ".[dev]"
+# uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
 ```
 
 另开终端：
@@ -68,11 +75,10 @@ node packages/desktop/scripts/ai-core-smoke.cjs --eval
 
 ```bash
 cd services/ai-core
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
+uv sync --extra dev
 export AI_CORE_LOCAL_DEV=1
-uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+uv run uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+# fallback: python3 -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]" && uvicorn …
 ```
 
 ```bash
@@ -122,6 +128,8 @@ AI_CORE_URL=http://127.0.0.1:8091 node packages/desktop/scripts/ai-core-smoke.cj
 在**仓库根**（无需起 uvicorn 即可跑单测）：
 
 ```powershell
+# 锁文件路径（推荐）：
+# cd services/ai-core; uv sync --extra dev; uv run pytest tests -q
 python -m pytest services/ai-core/tests -q
 node --test packages/desktop/config/ai-core-config.test.js packages/desktop/config/ai-core-client.test.js
 # 全量 IPC（含 S3/WebDAV/AI-Core fail-closed + lastHealth）；W2 S3 懒加载后装载模块不再依赖 top-level SDK

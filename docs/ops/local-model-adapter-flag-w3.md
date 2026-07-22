@@ -1,13 +1,14 @@
-# 可选本地模型适配器 · Feature Flag（W3）
+# 可选本地模型适配器 · Feature Flag（W3 · W4 交叉）
 
 | 项 | 值 |
 |----|-----|
 | **状态** | Stub 已实现 · **默认 OFF** |
 | **日期** | 2026-07-23 |
-| **波次** | portfolio-arch-upgrade-2026h2 · **W3** |
+| **波次** | portfolio-arch-upgrade-2026h2 · **W3 实现 · W4 文档交叉** |
 | **代码** | `packages/core/src/services/llm/local-model-flag.ts` · `adapters/local-model-adapter.ts` |
 | **Provider id** | `local-model` |
 | **Model id** | `local-model-stub` |
+| **活快照交叉** | [`../project/CURRENT.md`](../project/CURRENT.md) 能力摘要一句（默认 OFF · 勿复制 flag 语义） |
 
 ## 1. 开关（默认 OFF）
 
@@ -47,5 +48,12 @@ $env:MINDSYNC_LOCAL_MODEL_ADAPTER = '1'
 
 ## 5. 变更流程
 
-1. 改 flag 语义 → 同步本文件 + 单测  
+1. 改 flag 语义 → 同步本文件 + 单测 + CURRENT 一句  
 2. 若将来接真本地 runtime → 新 ADR + 仍默认 OFF + 禁密钥进仓  
+
+## 6. W4 收口备忘
+
+- **不**将 flag 默认改为 ON；**不**绑生产密钥/runtime  
+- 栈矩阵：[`stack-matrix-2026-07.md`](./stack-matrix-2026-07.md) §0 / §4  
+- 下半年若接真本地推理：仍走本文件 §5.2 · 与 Ollama 独立 adapter 并存  
+
