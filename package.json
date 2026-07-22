@@ -2,7 +2,7 @@
   "name": "mindsync",
   "version": "2.11.7",
   "private": true,
-  "packageManager": "pnpm@10.6.1",
+  "packageManager": "pnpm@11.5.3",
   "engines": {
     "node": "^24.0.0",
     "npm": "Please use pnpm instead of npm",
