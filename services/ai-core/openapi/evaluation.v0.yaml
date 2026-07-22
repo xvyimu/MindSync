@@ -9,6 +9,12 @@ info:
     This document is a JSON-serializable **mirror**, not a second source of truth.
 
     **Status**: draft / non-production. Not wired to Vue, Electron IPC, or production traffic.
+
+    **Implementation requirements (v0)**:
+    - Bind **loopback only** (`127.0.0.1`), never `0.0.0.0` / public interfaces.
+    - `POST /v1/evaluation/run` **must** enforce `desktopBearer` (or equivalent)
+      before any model call when leaving pure-local scaffold.
+    - No API keys in request bodies; desktop Main / BFF holds secrets.
   contact:
     name: MindSync
   license:
@@ -17,13 +23,19 @@ info:
   x-status: draft
   x-ssot: packages/core/src/services/evaluation/types.ts
   x-task: T-MS-001
+  x-implementation-requirements:
+    - loopback-only-bind
+    - bearer-before-model-calls
+    - no-api-keys-in-body
 
-# Localhost scaffold: no public auth scheme in v0 (desktop Main injects token later).
-security: []
+# Local scaffold may omit Authorization; production-shaped runs use desktopBearer.
+security:
+  - {}
+  - desktopBearer: []
 
 servers:
   - url: http://127.0.0.1:8091
-    description: Local scaffold only (uvicorn ai_core.main:app)
+    description: Local scaffold only (uvicorn ai_core.main:app) — loopback
 
 tags:
   - name: health
@@ -197,6 +209,15 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 
 components:
+  securitySchemes:
+    desktopBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: |
+        Desktop Main or same-host BFF injects an opaque bearer.
+        **Required** before any model-backed evaluation call outside pure local scaffold.
+        Local `uvicorn` health checks may omit Authorization (`security: [{}]`).
   schemas:
     HealthResponse:
       type: object

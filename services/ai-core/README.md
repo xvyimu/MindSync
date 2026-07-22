@@ -63,6 +63,12 @@ If Redocly is unavailable offline, rely on the YAML self-check and manual review
 | Compare graph | Full nested TS interfaces | Full nested schemas in YAML; Pydantic keeps compare nested as `dict` loosely |
 | camelCase | Yes | Yes (JSON field names match TS) |
 | Secrets | `evaluationModelKey` only | Same; **never** API keys in body |
+| Auth | N/A (in-process TS) | Optional `desktopBearer`; loopback-only bind; see OpenAPI `security` + `x-implementation-requirements` |
+
+### Auth / bind (implementors)
+
+- **Bind** `127.0.0.1` only for scaffold; do not advertise `0.0.0.0`.
+- Global `security` is optional bearer **or** empty (local). Any implementation that can spend model quota **must** reject unauthenticated `POST /v1/evaluation/run` when not in an explicit local-dev mode.
 
 ## Run (local)
 
