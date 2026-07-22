@@ -38,7 +38,8 @@ export interface GlobalSettingsState {
 const STORAGE_KEY = 'global-settings/v1'
 
 const createDefaultState = (): GlobalSettingsState => ({
-  selectedThemeId: 'auto',
+  // R1 product default visual = Paper (design constitution). Users may still pick auto/others.
+  selectedThemeId: 'paper',
   preferredLanguage: 'zh-CN',
   builtinTemplateLanguage: 'zh-CN',
   functionMode: 'basic',
