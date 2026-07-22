@@ -9,7 +9,7 @@
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
 | **日期** | 2026-07-23 |
 | **分支** | `xvyimu/w1-ms-claude`（W1 栈升级 feature；主线仍 `develop`） |
-| **本仓 tip（SSOT）** | **`bed4ac4`**（开工基线 = `git rev-parse --short HEAD`；合入前以本分支 tip 为准，发版/合 develop 后再改本格） |
+| **本仓 tip（SSOT）** | **`6aa09e7`**（W1 交付 tip = `git rev-parse --short HEAD`；合 develop / 发版后改本格） |
 | **远端 develop tip（参考）** | 以 `git log -1 --oneline origin/develop` 复核（W1 未 push） |
 | **本仓** | https://github.com/xvyimu/MindSync（独立仓；**仅 `origin`**） |
 | **策略** | **独立产品开发 / 不跟踪原上游 / 不默认开 PR 到 linshenkx** |

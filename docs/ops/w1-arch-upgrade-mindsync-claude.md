@@ -7,7 +7,7 @@
 | **Worktree（绝对路径）** | `C:\Users\yuanjia\orca\workspaces\mindsync\w1-ms-claude` |
 | **Branch** | `xvyimu/w1-ms-claude` |
 | **Tip（开工）** | `bed4ac4aca53812a7805c41bc67b01dbbb19e0f8` · `docs(ops): wave8 AI-Core local sidecar runbook (mode A)` |
-| **Tip（本波结束）** | 见 commit 后 `git rev-parse HEAD`（本文件随 commit 落盘） |
+| **Tip（本波结束）** | `6aa09e7a3fd03b688cf5af68eaa2c7b61d319e5e` · `docs(ops): W1 stack-matrix + pnpm 11.5.3 + CURRENT tip SSOT`（若随后有 tip 对齐 commit，以 `git rev-parse HEAD` 为准） |
 | **主线** | `develop`（合入 / push 由总控） |
 | **Remote** | `origin` → `git@github.com:xvyimu/MindSync.git` |
 | **题单** | `D:\orca\.planning\portfolio-arch-upgrade-2026h2\prompts\w1-ms.md` + `w1-shared.md` |
