@@ -220,4 +220,29 @@ describe('AppHeaderActions about menu layout hooks', () => {
 
     expect(wrapper.emitted('open-data-manager')).toHaveLength(1)
   })
+
+  it('hides management groups in compact (shell) mode and keeps aux chrome', () => {
+    const wrapper = mount(AppHeaderActions, {
+      props: {
+        appVersion: 'v2.7.0',
+        compact: true,
+      },
+      global: {
+        renderStubDefaultSlot: true,
+        mocks: {
+          $t: (key: string) => key,
+        },
+        stubs: {
+          ThemeToggleUI: true,
+          LanguageSwitchDropdown: true,
+          UpdaterIcon: true,
+          ActionButtonUI: true,
+        },
+      },
+    })
+
+    expect(wrapper.find('[data-testid="header-page-destinations"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="header-modal-actions"]').exists()).toBe(false)
+    expect(wrapper.find('.about-panel').exists()).toBe(true)
+  })
 })

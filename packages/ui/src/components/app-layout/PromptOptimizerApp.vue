@@ -56,9 +56,25 @@
                     />
                 </template>
 
-                <!-- Actions Slot -->
+                <!-- R3: management entries in sider when redesign shell is on -->
+                <template #manage="{ collapsed }">
+                    <AppManageNav
+                        :collapsed="collapsed"
+                        :favorites-active="isFavoritesRoute"
+                        :backup-reminder-due="dataBackupReminderDue"
+                        @open-templates="openTemplateManager"
+                        @open-history="historyManager.showHistory = true"
+                        @open-model-manager="modelManager.showConfig = true"
+                        @open-favorites="openFavoritesPage"
+                        @open-data-manager="showDataManager = true"
+                        @open-variables="handleOpenVariableManager()"
+                    />
+                </template>
+
+                <!-- Actions Slot: full on legacy header; compact aux-only on shell -->
                 <template #actions>
                     <AppHeaderActions
+                        :compact="redesignShellEnabled"
                         @open-templates="openTemplateManager"
                         @open-history="historyManager.showHistory = true"
                         @open-model-manager="modelManager.showConfig = true"
@@ -293,6 +309,8 @@ import ContextEditor from '../context-mode/ContextEditor.vue'
 import PromptPreviewPanel from '../PromptPreviewPanel.vue'
 import AppHeaderActions from './AppHeaderActions.vue'
 import AppCoreNav from './AppCoreNav.vue'
+import AppManageNav from './AppManageNav.vue'
+import { isRedesignShellEnabled } from '../../config/redesign-shell'
 import { createWorkspaceRouteSwitchController } from './workspaceRouteSwitch'
 import { favoritesPageActionsKey } from '../favorites/favorites-page-context'
 import rootPackageJson from '../../../../../package.json'
@@ -519,6 +537,9 @@ const lastWorkspacePath = ref<string | null>(
 )
 
 const isFavoritesRoute = computed(() => routerInstance.currentRoute.value.path === '/favorites')
+
+/** R3: shell ON → header compact; manage nav in sider. Read once at setup (same as MainLayout). */
+const redesignShellEnabled = isRedesignShellEnabled()
 
 watch(
   () => routerInstance.currentRoute.value.fullPath,

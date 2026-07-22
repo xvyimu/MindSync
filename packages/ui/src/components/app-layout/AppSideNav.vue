@@ -4,8 +4,8 @@
 
     Naive UI Admin pattern:
     - Fixed sider, collapsible to icon rail
-    - Upper: workspace modes (R2 — reuses core-nav slot / AppCoreNav)
-    - Lower: management entries (placeholder until R3)
+    - Upper: workspace modes (R2 — core-nav / AppCoreNav)
+    - Lower: management entries (R3 — manage slot / AppManageNav)
 
     Flag-gated by parent MainLayout via isRedesignShellEnabled().
   -->
@@ -41,9 +41,16 @@
 
       <div class="app-side-nav__section" data-testid="app-side-nav-manage">
         <span v-if="!collapsed" class="app-side-nav__label">{{ t('nav.manage') }}</span>
-        <span class="app-side-nav__placeholder">
-          {{ collapsed ? '···' : t('nav.managePlaceholder') }}
-        </span>
+        <div
+          class="app-side-nav__manage"
+          :class="{ 'app-side-nav__manage--collapsed': collapsed }"
+        >
+          <slot name="manage" :collapsed="collapsed">
+            <span class="app-side-nav__placeholder">
+              {{ collapsed ? '···' : t('nav.managePlaceholder') }}
+            </span>
+          </slot>
+        </div>
       </div>
     </div>
   </NLayoutSider>
@@ -52,8 +59,8 @@
 <script setup lang="ts">
 /**
  * Side navigation for redesign shell.
- * R2: modes slot hosts AppCoreNav (same router logic as legacy header).
- * R3: management entries + drawer wiring.
+ * R2: modes slot hosts AppCoreNav.
+ * R3: manage slot hosts AppManageNav (slot props: collapsed).
  */
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -93,14 +100,16 @@ const collapsed = ref(false)
   color: var(--n-text-color-3, #94a3b8);
 }
 
-.app-side-nav__modes {
+.app-side-nav__modes,
+.app-side-nav__manage {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
 }
 
-.app-side-nav__modes--collapsed {
+.app-side-nav__modes--collapsed,
+.app-side-nav__manage--collapsed {
   align-items: center;
 }
 

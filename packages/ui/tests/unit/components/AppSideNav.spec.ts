@@ -37,7 +37,7 @@ vi.mock('naive-ui', async (importOriginal) => {
 
 import AppSideNav from '../../../src/components/app-layout/AppSideNav.vue'
 
-describe('AppSideNav (R2)', () => {
+describe('AppSideNav (R2/R3)', () => {
   it('renders modes slot content inside the modes section', () => {
     const wrapper = mount(AppSideNav, {
       slots: {
@@ -51,10 +51,32 @@ describe('AppSideNav (R2)', () => {
     expect(wrapper.get('[data-testid="app-side-nav-manage"]').exists()).toBe(true)
   })
 
-  it('shows placeholder when modes slot is empty', () => {
+  it('renders manage slot and passes collapsed prop', () => {
+    const wrapper = mount(AppSideNav, {
+      slots: {
+        manage: (props: { collapsed: boolean }) =>
+          h(
+            'div',
+            { 'data-testid': 'manage-slot', 'data-collapsed': String(props.collapsed) },
+            'manage',
+          ),
+      },
+    })
+
+    const manage = wrapper.get('[data-testid="app-side-nav-manage"]')
+    expect(manage.find('[data-testid="manage-slot"]').exists()).toBe(true)
+    expect(manage.find('[data-testid="manage-slot"]').attributes('data-collapsed')).toBe(
+      'false',
+    )
+  })
+
+  it('shows placeholders when slots are empty', () => {
     const wrapper = mount(AppSideNav)
     expect(wrapper.get('[data-testid="app-side-nav-modes"]').text()).toContain(
       'nav.modesPlaceholder',
+    )
+    expect(wrapper.get('[data-testid="app-side-nav-manage"]').text()).toContain(
+      'nav.managePlaceholder',
     )
   })
 })

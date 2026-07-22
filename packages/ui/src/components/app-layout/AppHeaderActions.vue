@@ -3,16 +3,18 @@
         App 头部操作按钮组件
 
         职责:
-        - 核心功能按钮: 模板管理、历史记录、模型管理、收藏夹、数据管理
-        - 辅助功能: 主题切换、GitHub 链接、语言切换、更新检查
+        - full: 管理入口 + 辅助区（legacy 顶栏）
+        - compact (R3 shell): 仅辅助区；管理入口在 AppManageNav / 侧栏
 
         设计说明:
-        - 从 App.vue 的 #actions slot 提取出来
-        - 所有操作通过 emits 通知父组件处理
-        - 收藏夹是页面型目的地，其余管理入口保持弹窗型交互
+        - 收藏夹是页面型目的地，其余管理入口保持弹窗/抽屉型交互（父组件打开）
     -->
-    <!-- 页面型管理入口：会接管主内容区 -->
-    <div class="page-destination-group" data-testid="header-page-destinations">
+    <!-- 页面型管理入口：会接管主内容区（legacy full only） -->
+    <div
+        v-if="!compact"
+        class="page-destination-group"
+        data-testid="header-page-destinations"
+    >
         <ActionButtonUI
             icon="⭐"
             :text="$t('nav.favorites')"
@@ -28,8 +30,12 @@
         />
     </div>
 
-    <!-- 弹窗型管理/配置入口 -->
-    <div class="modal-action-group" data-testid="header-modal-actions">
+    <!-- 弹窗型管理/配置入口（legacy full only；shell 见侧栏 AppManageNav） -->
+    <div
+        v-if="!compact"
+        class="modal-action-group"
+        data-testid="header-modal-actions"
+    >
         <ActionButtonUI
             icon="📝"
             :text="$t('nav.templates')"
@@ -79,7 +85,7 @@
             :round="true"
         />
     </div>
-    <!-- 辅助功能区 - 使用简化样式降低视觉权重 -->
+    <!-- 辅助功能区 - 使用简化样式降低视觉权重（shell + legacy 均保留） -->
     <ThemeToggleUI />
     <div class="aux-icon-group">
         <NButton
@@ -228,11 +234,17 @@ interface Props {
     appVersion: string
     favoritesActive?: boolean
     backupReminderDue?: boolean
+    /**
+     * R3 redesign shell: hide management entries (they live in the sider).
+     * Legacy header keeps full=false.
+     */
+    compact?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
     favoritesActive: false,
     backupReminderDue: false,
+    compact: false,
 })
 
 // ========================
@@ -291,8 +303,8 @@ const handleOpenDocs = () => {
 .aux-icon-group {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    margin-left: 6px;
+    gap: 4px;
+    margin-left: 8px;
 }
 
 .page-destination-group,
