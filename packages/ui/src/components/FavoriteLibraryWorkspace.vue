@@ -28,7 +28,7 @@
         </div>
 
         <div class="favorites-manager-toolbar-row favorites-manager-toolbar-row--controls">
-          <NSpace :size="12" align="center" wrap class="favorites-manager-filters">
+          <NSpace :size="8" align="center" wrap class="favorites-manager-filters">
             <CategoryTreeSelect
               v-model="selectedCategory"
               :placeholder="t('favorites.manager.allCategories')"
@@ -177,7 +177,7 @@
             />
           </div>
 
-          <NSpace v-else vertical :size="12" class="favorites-manager-list">
+          <NSpace v-else vertical :size="8" class="favorites-manager-list">
             <FavoriteWorkspaceListItem
               v-for="favorite in paginatedFavorites"
               :key="favorite.id"
@@ -1096,9 +1096,9 @@ onBeforeUnmount(() => {
   height: min(90vh, 920px);
   min-height: 620px;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   overflow: hidden;
-  padding: 20px;
+  padding: 16px;
 }
 
 .favorites-manager-shell--page {
@@ -1113,7 +1113,7 @@ onBeforeUnmount(() => {
 
 .favorites-manager-toolbar-row {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
 }
@@ -1145,7 +1145,7 @@ onBeforeUnmount(() => {
 
 .favorites-manager-count {
   min-width: max-content;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 
 .favorites-manager-filters {
@@ -1186,7 +1186,7 @@ onBeforeUnmount(() => {
 }
 
 .favorites-manager-filter-count {
-  margin-left: 6px;
+  margin-left: 4px;
   opacity: 0.7;
 }
 
@@ -1235,7 +1235,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .favorites-manager-scroll {
@@ -1253,7 +1253,7 @@ onBeforeUnmount(() => {
   min-height: 0;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   grid-auto-rows: 184px;
-  gap: 12px;
+  gap: 8px;
   align-items: stretch;
 }
 

@@ -494,7 +494,7 @@ const handleOpenImport = () => {
   width: min(360px, calc(100vw - 32px));
   display: grid;
   gap: 8px;
-  padding: 10px;
+  padding: 8px;
 }
 
 .prompt-garden-inspiration-popover__header,
@@ -510,7 +510,7 @@ const handleOpenImport = () => {
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  gap: 6px;
+  gap: 4px;
   color: color-mix(in srgb, var(--n-success-color) 78%, var(--n-text-color-2));
 }
 

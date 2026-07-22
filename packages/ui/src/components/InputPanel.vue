@@ -45,7 +45,7 @@
                     </div>
                 </NPopover>
             </NFlex>
-            <NFlex align="center" :size="12">
+            <NFlex align="center" :size="8">
                 <!-- 🆕 AI提取变量按钮（带文字） -->
                 <NButton
                     v-if="enableVariableExtraction && showExtractButton"

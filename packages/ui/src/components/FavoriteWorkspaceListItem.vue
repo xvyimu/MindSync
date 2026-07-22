@@ -410,12 +410,12 @@ const formatDate = (timestamp: number) => {
   width: 100%;
   min-width: 0;
   grid-template-columns: 72px minmax(0, 1fr);
-  gap: 12px;
+  gap: 8px;
   align-items: flex-start;
   border: 1px solid var(--n-border-color);
   border-radius: 10px;
   background: var(--n-card-color);
-  padding: 10px;
+  padding: 8px;
   text-align: left;
   transition: border-color 0.2s ease, background-color 0.2s ease;
   cursor: pointer;
@@ -448,7 +448,7 @@ const formatDate = (timestamp: number) => {
   min-width: 0;
   max-width: 100%;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   overflow: hidden;
 }
 
@@ -465,7 +465,7 @@ const formatDate = (timestamp: number) => {
 .favorite-workspace-list-item__header-actions {
   display: flex;
   flex: 0 0 auto;
-  gap: 6px;
+  gap: 4px;
   align-items: flex-start;
 }
 
@@ -547,7 +547,7 @@ const formatDate = (timestamp: number) => {
   max-height: none;
   align-content: flex-start;
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px;
 }
 
 .favorite-workspace-list-item--card .favorite-workspace-list-item__header {
@@ -559,11 +559,11 @@ const formatDate = (timestamp: number) => {
 }
 
 .favorite-workspace-list-item--card .favorite-workspace-list-item__content {
-  gap: 7px;
+  gap: 8px;
 }
 
 .favorite-workspace-list-item--card .favorite-workspace-list-item__header {
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-workspace-list-item--card .favorite-workspace-list-item__header-actions {
@@ -577,7 +577,7 @@ const formatDate = (timestamp: number) => {
 @media (max-width: 767px) {
   .favorite-workspace-list-item {
     grid-template-columns: 64px minmax(0, 1fr);
-    gap: 12px;
+    gap: 8px;
   }
 
   .favorite-workspace-list-item__image,

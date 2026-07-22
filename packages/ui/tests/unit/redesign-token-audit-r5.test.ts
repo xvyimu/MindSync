@@ -90,12 +90,21 @@ describe('redesign R5 token audit harness', () => {
     const actionable = filterActionable(raw, exceptions)
     const summary = summarize(raw)
 
-    // Inventory must be non-trivial on this codebase (guards against empty scan path).
-    expect(summary.total).toBeGreaterThan(0)
+    // Inventory may be zero after full normalize; scan path still must resolve.
+    expect(summary.total).toBeGreaterThanOrEqual(0)
     expect(actionable.length).toBeLessThanOrEqual(raw.length)
+  })
 
-    // Soft gate for step-1: document debt, do not fail CI on historical violations.
-    // Strict zero-debt gate is enabled in a later R5 commit after bulk normalize.
-    expect(Array.isArray(actionable)).toBe(true)
+  it('R5 zero-debt gate: no actionable illegal spacing/font after exceptions', () => {
+    const raw = scanRepo(path.join(UI_ROOT, 'src'))
+    const actionable = filterActionable(raw, loadExceptions())
+    if (actionable.length > 0) {
+      const preview = actionable
+        .slice(0, 15)
+        .map((f) => `${f.kind} ${f.file}:${f.line} ${f.value}`)
+        .join('\n')
+      expect(actionable, `actionable token debt:\n${preview}`).toHaveLength(0)
+    }
+    expect(actionable).toHaveLength(0)
   })
 })

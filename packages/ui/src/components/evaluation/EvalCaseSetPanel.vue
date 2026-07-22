@@ -311,7 +311,7 @@ const handleRemove = (id: string) => {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 6px 0;
+  padding: 4px 0;
   border-bottom: 1px solid var(--n-border-color);
 }
 </style>

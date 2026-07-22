@@ -27,7 +27,7 @@
           >
             <NUploadDragger>
               <div style="text-align:center; padding: 24px;">
-                <NIcon size="48" style="display:block; margin: 0 auto 12px;">
+                <NIcon size="48" style="display:block; margin: 0 auto 8px;">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                   </svg>
@@ -79,7 +79,7 @@
               type="textarea"
               :placeholder="getTextInputPlaceholder()"
               :autosize="{ minRows: 10, maxRows: 15 }"
-              :input-props="{ style: 'font-family: Monaco, Consolas, monospace; font-size: 13px;' }"
+              :input-props="{ style: 'font-family: Monaco, Consolas, monospace; font-size: 12px;' }"
             />
             <template #feedback>
               <NText depth="3" style="font-size: 12px;">

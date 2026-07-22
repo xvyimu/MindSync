@@ -111,7 +111,7 @@
             :segmented="{ content: true }"
           >
             <NRadioGroup v-model:value="mergeStrategy">
-              <NSpace vertical :size="12" class="favorite-import-panel__strategy-list">
+              <NSpace vertical :size="8" class="favorite-import-panel__strategy-list">
                 <label class="favorite-import-panel__strategy-option">
                   <NRadio value="skip">{{ t('favorites.manager.importDialog.skipDuplicate') }}</NRadio>
                   <NText depth="3">{{ t('favorites.manager.importDialog.resultHintSkip') }}</NText>
@@ -441,7 +441,7 @@ const handleImportConfirm = async () => {
 }
 
 .favorite-import-panel__content {
-  padding: 20px;
+  padding: 16px;
 }
 
 .favorite-import-panel__section,
@@ -452,15 +452,15 @@ const handleImportConfirm = async () => {
 
 .favorite-import-panel__garden {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .favorite-import-panel__garden-guide {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
-  padding: 12px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: color-mix(in srgb, var(--n-success-color) 5%, transparent);
@@ -473,14 +473,14 @@ const handleImportConfirm = async () => {
 }
 
 .favorite-import-panel__upload {
-  padding: 18px 12px;
+  padding: 16px 8px;
 }
 
 .favorite-import-panel__strategy-option {
   display: flex;
   width: 100%;
-  padding: 10px 12px;
-  gap: 10px;
+  padding: 8px 8px;
+  gap: 8px;
   align-items: flex-start;
   border: 1px solid var(--n-border-color);
   border-radius: 12px;
@@ -494,7 +494,7 @@ const handleImportConfirm = async () => {
   z-index: 2;
   border-top: 1px solid var(--n-divider-color);
   background: var(--n-card-color);
-  padding: 16px 20px;
+  padding: 16px 16px;
 }
 
 .favorite-import-panel__action-row {
@@ -512,7 +512,7 @@ const handleImportConfirm = async () => {
   }
 
   .favorite-import-panel__actions {
-    padding: 14px 16px;
+    padding: 16px 16px;
   }
 
   .favorite-import-panel__garden-guide {

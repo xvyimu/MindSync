@@ -68,11 +68,11 @@ const segmented = computed(() => (props.title ? { content: true } : false))
 
 .favorite-surface-section :deep(.n-card-header) {
   min-height: 44px;
-  padding: 12px 16px 8px;
+  padding: 8px 16px 8px;
 }
 
 .favorite-surface-section :deep(.n-card__content) {
-  padding: 14px 16px 16px;
+  padding: 16px 16px 16px;
 }
 
 .favorite-surface-section--flush :deep(.n-card__content) {

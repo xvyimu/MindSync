@@ -6,7 +6,7 @@
       :description="t('favorites.manager.preview.reproducibility.empty')"
     />
 
-    <NSpace v-else vertical :size="12">
+    <NSpace v-else vertical :size="8">
       <NSpace :size="8" align="center" wrap>
         <NTag
           v-if="showVariables && reproducibility.variableCount > 0"
@@ -292,7 +292,7 @@ const getParameterEntries = (example: FavoriteReproducibilityExample) =>
 .favorite-reproducibility-display__example-header {
   display: flex;
   min-width: 0;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
 }
@@ -308,7 +308,7 @@ const getParameterEntries = (example: FavoriteReproducibilityExample) =>
 .favorite-reproducibility-display__example-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(240px, 0.85fr);
-  gap: 12px;
+  gap: 8px;
   align-items: start;
 }
 
@@ -324,14 +324,14 @@ const getParameterEntries = (example: FavoriteReproducibilityExample) =>
 }
 
 .favorite-reproducibility-display__example-output {
-  padding: 10px;
+  padding: 8px;
   border: 1px solid color-mix(in srgb, var(--n-border-color) 76%, transparent);
   border-radius: 8px;
   background: var(--n-color-embedded);
 }
 
 .favorite-reproducibility-display__example-context {
-  padding: 10px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
 }
@@ -340,7 +340,7 @@ const getParameterEntries = (example: FavoriteReproducibilityExample) =>
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(84px, 0.8fr) minmax(0, 1.2fr);
-  gap: 6px;
+  gap: 4px;
   align-items: start;
 }
 
@@ -351,7 +351,7 @@ const getParameterEntries = (example: FavoriteReproducibilityExample) =>
 }
 
 .favorite-reproducibility-display__parameter-key {
-  padding: 4px 6px;
+  padding: 4px 4px;
   border-radius: 6px;
   background: color-mix(in srgb, var(--n-color) 80%, var(--n-primary-color) 20%);
 }
@@ -360,7 +360,7 @@ const getParameterEntries = (example: FavoriteReproducibilityExample) =>
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-reproducibility-display__image-grid {

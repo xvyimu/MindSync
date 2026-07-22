@@ -285,7 +285,7 @@ const hasAnyData = computed(() => hasInputData.value || hasOutputData.value || t
 .image-token-usage {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     padding: 4px 0;
     width: 100%;
     overflow: hidden;
@@ -298,7 +298,7 @@ const hasAnyData = computed(() => hasInputData.value || hasOutputData.value || t
 }
 
 .section-label {
-    font-size: 11px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     min-width: 48px;
@@ -307,7 +307,7 @@ const hasAnyData = computed(() => hasInputData.value || hasOutputData.value || t
 .usage-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 4px;
     flex: 1;
     min-width: 0;
 }

@@ -418,12 +418,12 @@ export function existingVariableTooltip(
         const borderRadius = theme.borderRadius || '12px'
         const textColor = theme.textColor || '#4c4f69'
 
-        dom.style.padding = '12px 16px'
+        dom.style.padding = '16px'
         dom.style.background = surfaceOverlay
         dom.style.border = `1px solid ${borderColor}`
         dom.style.borderRadius = borderRadius
         dom.style.boxShadow = shadow
-        dom.style.fontSize = '13px'
+        dom.style.fontSize = '12px'
         dom.style.color = textColor
         dom.style.maxWidth = '420px'
         dom.style.lineHeight = '1.6'
@@ -435,7 +435,7 @@ export function existingVariableTooltip(
               : labels.sourcePredefined
 
         const sourceTag = document.createElement('span')
-        sourceTag.style.fontSize = '11px'
+        sourceTag.style.fontSize = '12px'
         sourceTag.style.fontWeight = '600'
         sourceTag.style.padding = '2px 8px'
         sourceTag.style.borderRadius = '999px'
@@ -454,14 +454,14 @@ export function existingVariableTooltip(
         const valueSection = document.createElement('div')
         valueSection.style.display = 'flex'
         valueSection.style.flexDirection = 'column'
-        valueSection.style.gap = '6px'
-        valueSection.style.padding = '10px 12px'
+        valueSection.style.gap = '4px'
+        valueSection.style.padding = '8px'
         valueSection.style.background = withAlpha(accentColor, 0.08, 'rgba(0, 0, 0, 0.04)')
         valueSection.style.borderRadius = '8px'
         valueSection.style.border = `1px solid ${withAlpha(accentColor, 0.18, borderColor)}`
 
         const valueElement = document.createElement('div')
-        valueElement.style.fontSize = '13px'
+        valueElement.style.fontSize = '12px'
         valueElement.style.color = textColor
         valueElement.style.fontWeight = '500'
         valueElement.style.whiteSpace = 'pre-wrap'
@@ -557,7 +557,7 @@ export function missingVariableTooltip(
         const primaryColor = theme.primaryColor || '#18a058'
         const primaryColorHover = theme.primaryColorHover || '#36ad6a'
 
-        dom.style.padding = '8px 12px'
+        dom.style.padding = '8px'
         dom.style.background = backgroundColor
         dom.style.border = `1px solid ${borderColor}`
         dom.style.borderRadius = borderRadius
@@ -572,7 +572,7 @@ export function missingVariableTooltip(
 
         const button = document.createElement('button')
         button.className = 'n-button n-button--primary-type n-button--small-type'
-        button.style.padding = '4px 12px'
+        button.style.padding = '4px 8px'
         button.style.background = primaryColor
         button.style.color = '#ffffff'
         button.style.border = 'none'

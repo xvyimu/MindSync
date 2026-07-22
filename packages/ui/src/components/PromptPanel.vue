@@ -19,7 +19,7 @@
             <NFlex justify="space-between" align="flex-start" :wrap="false">
                 <!-- 左侧：标题和版本 -->
                 <NSpace vertical :size="8" class="flex-1 min-w-0">
-                    <NSpace align="center" :size="12">
+                    <NSpace align="center" :size="8">
                         <NText class="text-lg font-semibold">{{
                             t("prompt.optimized")
                         }}</NText>

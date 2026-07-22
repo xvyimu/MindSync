@@ -77,7 +77,7 @@
     :negative-text="t('common.cancel')"
     @positive-click="handleConfirmCustom"
   >
-    <NSpace vertical :size="12">
+    <NSpace vertical :size="8">
       <NFormItem :label="t('modelManager.advancedParameters.customKeyPlaceholder')">
         <NInput v-model:value="customForm.key" size="small" :placeholder="t('modelManager.advancedParameters.customKeyPlaceholder')" />
       </NFormItem>
@@ -307,7 +307,7 @@ function resolveMessageApi(): MessageApi {
 .advanced-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .advanced-control {

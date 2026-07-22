@@ -188,6 +188,36 @@ html[data-app-theme='paper'] .version-tag-clickable {
   color: var(--paper-ink-3);
 }
 
+/* R5 spacing utilities (only legal steps 4/8/16/24/32) */
+.paper-m-0 { margin: 0; }
+.paper-m-1 { margin: var(--paper-space-1); }
+.paper-m-2 { margin: var(--paper-space-2); }
+.paper-m-3 { margin: var(--paper-space-3); }
+.paper-m-4 { margin: var(--paper-space-4); }
+.paper-m-5 { margin: var(--paper-space-5); }
+.paper-mt-1 { margin-top: var(--paper-space-1); }
+.paper-mt-2 { margin-top: var(--paper-space-2); }
+.paper-mt-3 { margin-top: var(--paper-space-3); }
+.paper-mb-1 { margin-bottom: var(--paper-space-1); }
+.paper-mb-2 { margin-bottom: var(--paper-space-2); }
+.paper-mb-3 { margin-bottom: var(--paper-space-3); }
+.paper-p-1 { padding: var(--paper-space-1); }
+.paper-p-2 { padding: var(--paper-space-2); }
+.paper-p-3 { padding: var(--paper-space-3); }
+.paper-p-4 { padding: var(--paper-space-4); }
+.paper-gap-1 { gap: var(--paper-space-1); }
+.paper-gap-2 { gap: var(--paper-space-2); }
+.paper-gap-3 { gap: var(--paper-space-3); }
+.paper-gap-4 { gap: var(--paper-space-4); }
+
+/* Decorative empty-state glyph (not body type scale) */
+.paper-glyph-empty {
+  /* 2rem ≈ 32px at default root; avoid hard illegal font-size token */
+  font-size: 2rem;
+  line-height: 1;
+  display: inline-block;
+}
+
 /*
  * R4 workspace card layout (design constitution §3 / §4.5).
  * Applied under redesign shell; modules remain NCard-based.

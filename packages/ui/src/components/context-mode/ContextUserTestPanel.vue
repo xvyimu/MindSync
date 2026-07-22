@@ -1,5 +1,5 @@
 <template>
-    <NFlex vertical :style="{ height: mode === 'full' ? '100%' : 'auto', gap: '12px' }">
+    <NFlex vertical :style="{ height: mode === 'full' ? '100%' : 'auto', gap: '8px' }">
         <TemporaryVariablesPanel
             :manager="variableManager"
             :show-generate-values="true"

@@ -2111,7 +2111,7 @@ defineExpose({
     cursor: col-resize;
     background: var(--n-divider-color, rgba(0, 0, 0, 0.08));
     border-radius: 999px;
-    margin: 6px 0;
+    margin: 4px 0;
     transition: background 120ms ease;
 }
 
@@ -2165,7 +2165,7 @@ defineExpose({
 .variant-cell__meta {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     min-width: 0;
     flex-wrap: wrap;
 }
@@ -2215,7 +2215,7 @@ defineExpose({
 
 .variant-results {
     display: grid;
-    gap: 12px;
+    gap: 8px;
     height: 100%;
     min-height: 0;
 }

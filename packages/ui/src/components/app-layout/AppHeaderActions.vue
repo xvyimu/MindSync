@@ -326,7 +326,7 @@ const handleOpenDocs = () => {
 .about-panel {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     min-width: 220px;
     max-width: 260px;
 }
@@ -343,7 +343,7 @@ const handleOpenDocs = () => {
 .about-link-button {
     width: 100%;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
 }
 
 .about-link-copy {
@@ -356,7 +356,7 @@ const handleOpenDocs = () => {
 
 .about-link-label {
     flex-shrink: 0;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--n-text-color-3);
 }
 

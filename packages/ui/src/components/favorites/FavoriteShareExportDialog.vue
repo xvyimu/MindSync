@@ -15,7 +15,7 @@
       <div class="favorite-share-export-dialog__body">
         <div class="favorite-share-export-dialog__controls">
           <NCard size="small" :title="t('favorites.share.sectionsTitle')" :segmented="{ content: true }">
-            <NSpace vertical :size="12">
+            <NSpace vertical :size="8">
               <div class="favorite-share-export-dialog__fixed-list">
                 <NTag
                   v-for="section in fixedSectionLabels"
@@ -468,7 +468,7 @@ const handleExport = async (format: 'html' | 'png') => {
 .favorite-share-export-dialog__section-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .favorite-share-export-dialog__preview-card {
@@ -495,7 +495,7 @@ const handleExport = async (format: 'html' | 'png') => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .favorite-share-export-dialog__preview-frame {
@@ -515,7 +515,7 @@ const handleExport = async (format: 'html' | 'png') => {
 
 .favorite-share-export-dialog__preview-hint {
   display: block;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 @media (max-width: 900px) {

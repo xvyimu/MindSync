@@ -1006,12 +1006,12 @@ defineExpose({
 
 /* 为右上角清空按钮、右下角计数预留空间，避免内容被遮挡 */
 .codemirror-container.vai-has-clear :deep(.cm-content) {
-    padding-right: 36px;
+    padding-right: 32px;
 }
 
 .codemirror-container.vai-has-count :deep(.cm-content) {
-    padding-right: 56px;
-    padding-bottom: 28px;
+    padding-right: 32px;
+    padding-bottom: 32px;
 }
 
 .vai-clear {

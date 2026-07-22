@@ -232,7 +232,7 @@ const toggleOverflow = () => {
 .provider-pill-select__pill {
   max-width: 100%;
   min-height: 32px;
-  padding: 5px 13px;
+  padding: 4px 16px;
   border: 1px solid var(--n-border-color);
   border-radius: 999px;
   background: var(--n-color);

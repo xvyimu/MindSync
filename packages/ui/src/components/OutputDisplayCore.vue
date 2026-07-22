@@ -127,7 +127,7 @@
                   {{ t('common.reasoning') }}
                 </NText>
                 <NFlex v-if="isReasoningStreaming" align="center" :size="4">
-                  <NSpin :size="12" />
+                  <NSpin :size="8" />
                   <NText class="text-xs">{{ t('common.generating') }}</NText>
                 </NFlex>
               </NFlex>
@@ -707,7 +707,7 @@ defineExpose({ resetReasoningState, forceRefreshContent, forceExitEditing })
 .output-copy-split-button :deep(.n-button.output-copy-split-primary) {
   min-width: 29px;
   width: 29px;
-  padding: 0 6px;
+  padding: 0 4px;
 }
 
 .output-copy-split-button :deep(.n-button.output-copy-split-menu) {

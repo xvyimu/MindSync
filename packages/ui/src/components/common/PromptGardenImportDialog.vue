@@ -73,7 +73,7 @@ const handleConfirm = () => {
 <style scoped>
 .prompt-garden-import-dialog {
   display: grid;
-  gap: 12px;
+  gap: 8px;
   max-width: 360px;
 }
 

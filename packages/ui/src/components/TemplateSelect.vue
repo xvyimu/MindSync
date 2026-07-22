@@ -330,7 +330,7 @@ defineExpose({
 }
 
 .template-select-empty {
-  padding: 12px 0;
+  padding: 8px 0;
 }
 
 .template-select-empty__text {
@@ -348,7 +348,7 @@ defineExpose({
 }
 
 .template-select-action {
-  padding: 8px 12px;
+  padding: 8px 8px;
 }
 </style>
 

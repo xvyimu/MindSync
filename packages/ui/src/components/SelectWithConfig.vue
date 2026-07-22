@@ -219,10 +219,10 @@ const emitConfig = () => emit('config')
   white-space: normal;
 }
 .swc-empty {
-  padding: 12px 0;
+  padding: 8px 0;
 }
 .swc-action {
-  padding: 8px 12px;
+  padding: 8px 8px;
 }
 .swc-config-btn {
   cursor: pointer;

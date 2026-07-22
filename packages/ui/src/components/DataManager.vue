@@ -2033,7 +2033,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 }
 
 .data-manager-section {
-  padding: 14px 0 16px;
+  padding: 16px 0 16px;
   border-bottom: 1px solid var(--n-border-color);
   min-width: 0;
 }
@@ -2052,7 +2052,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   min-width: 0;
 }
 
@@ -2062,7 +2062,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 
 .section-title {
   display: block;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.3;
 }
 
@@ -2075,14 +2075,14 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .storage-cards-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   align-items: start;
 }
 
 .storage-stat-card {
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px;
   background: var(--n-color-embedded);
   min-width: 0;
   box-sizing: border-box;
@@ -2100,7 +2100,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 }
 
 .storage-stat-value {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.1;
   margin-top: 4px;
@@ -2109,7 +2109,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .storage-note {
   display: block;
   font-size: 12px;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .desktop-storage-row {
@@ -2138,7 +2138,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 
 .storage-desktop-stat {
   min-width: 140px;
-  padding: 10px 12px;
+  padding: 8px 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color-embedded);
@@ -2153,7 +2153,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-backup-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.92fr);
-  gap: 12px;
+  gap: 8px;
   align-items: start;
   min-width: 0;
 }
@@ -2161,11 +2161,11 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-config-panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px;
   background: var(--n-color-embedded);
   box-sizing: border-box;
 }
@@ -2173,7 +2173,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -2196,16 +2196,16 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-two-column {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .remote-provider-summary {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
+  gap: 8px;
   align-items: start;
   min-width: 0;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color);
@@ -2231,12 +2231,12 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-provider-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
 .remote-connection-card {
-  padding: 10px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color);
@@ -2257,7 +2257,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-connection-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
+  gap: 8px;
   align-items: start;
   min-width: 0;
 }
@@ -2269,7 +2269,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-steps {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -2278,7 +2278,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color);
@@ -2293,7 +2293,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 }
 
 .remote-step + .remote-step {
-  padding-top: 10px;
+  padding-top: 8px;
 }
 
 .remote-step-header {
@@ -2354,7 +2354,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-action-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   min-width: 0;
 }
@@ -2384,9 +2384,9 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .remote-progress {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
-  padding: 8px 10px;
+  padding: 8px 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color);
@@ -2402,9 +2402,9 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .local-transfer-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 12px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color-embedded);
@@ -2414,7 +2414,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .local-transfer-row {
   display: grid;
   grid-template-columns: minmax(180px, 0.72fr) minmax(260px, 1fr) minmax(132px, auto);
-  gap: 12px;
+  gap: 8px;
   align-items: center;
   min-width: 0;
 }
@@ -2438,7 +2438,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 }
 
 .local-transfer-description {
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .local-scope-row,
@@ -2456,7 +2456,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
   align-items: center;
   min-height: 30px;
   max-width: 100%;
-  padding: 0 10px;
+  padding: 0 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color);
@@ -2476,9 +2476,9 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 .local-import-selected {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-height: 48px;
-  padding: 8px 10px;
+  padding: 8px 8px;
   text-align: left;
 }
 
@@ -2503,24 +2503,24 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
 }
 
 .local-import-settings :deep(.n-collapse-item__header) {
-  padding: 8px 10px;
+  padding: 8px 8px;
   font-size: 12px;
 }
 
 .local-import-settings :deep(.n-collapse-item__content-inner) {
-  padding: 0 10px 10px;
+  padding: 0 8px 8px;
 }
 
 .local-import-settings-body {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .local-settings-title {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   font-size: 12px;
 }
 
@@ -2585,7 +2585,7 @@ const getStorageItemDetail = (item: Pick<StorageBreakdownItem, 'key' | 'count'>)
   }
 
   .local-transfer-panel {
-    padding: 10px;
+    padding: 8px;
   }
 
   .local-scope-row,

@@ -9,7 +9,7 @@
     <NFlex vertical :size="16">
       <!-- 变量统计信息 -->
       <NCard size="small" :title="$t('contextMode.preview.stats')">
-        <NFlex :size="12" :wrap="true">
+        <NFlex :size="8" :wrap="true">
           <NTag :bordered="false" type="info">
             {{ $t('contextMode.preview.totalVars') }}: {{ variableStats.total }}
           </NTag>
@@ -40,7 +40,7 @@
           </NTag>
         </NFlex>
         <template #footer>
-          <NText depth="3" :style="{ fontSize: '13px' }">
+          <NText depth="3" :style="{ fontSize: '12px' }">
             {{ $t('contextMode.preview.missingVarsHint') }}
           </NText>
         </template>
@@ -143,7 +143,7 @@ watch(visible, (newValue) => {
   font-family: var(--n-font-family-mono);
   font-size: 14px;
   line-height: 1.6;
-  padding: 12px;
+  padding: 8px;
   background-color: var(--n-color-embedded);
   border-radius: 4px;
 }

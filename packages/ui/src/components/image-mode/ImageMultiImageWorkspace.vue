@@ -353,7 +353,7 @@
       />
 
       <div ref="testPaneRef" class="split-pane" style="min-width: 0; height: 100%; overflow: hidden;">
-        <NFlex vertical :style="{ height: '100%', gap: '12px' }">
+        <NFlex vertical :style="{ height: '100%', gap: '8px' }">
           <TemporaryVariablesPanel
             :manager="temporaryVariablePanelManager"
             :disabled="optimizing || isAnyVariantRunning"
@@ -498,7 +498,7 @@
                 <div class="result-container">
                   <div class="result-body">
                   <template v-if="hasVariantResult(id)">
-                    <NSpace vertical :size="12" style="padding: 12px;">
+                    <NSpace vertical :size="8" style="padding: 8px;">
                       <NFlex justify="end" align="center">
                         <SaveTestResultExampleButton
                           sub-mode-key="image-multiimage"
@@ -559,7 +559,7 @@
                       </NSpace>
                     </NSpace>
                   </template>
-                  <NEmpty v-else :description="t('imageWorkspace.results.noGenerationResult')" style="padding: 24px 12px;" />
+                  <NEmpty v-else :description="t('imageWorkspace.results.noGenerationResult')" style="padding: 24px 8px;" />
                   </div>
                 </div>
               </NCard>
@@ -2091,10 +2091,10 @@ onUnmounted(() => {
 <style scoped>
 .image-multiimage-workspace { position: relative; height: 100%; min-height: 0; overflow: visible; }
 .workspace-page-tools { display: contents; }
-.image-multiimage-split { display: grid; gap: 12px; height: 100%; min-height: 0; overflow: hidden; }
+.image-multiimage-split { display: grid; gap: 8px; height: 100%; min-height: 0; overflow: hidden; }
 .split-pane { min-height: 0; min-width: 0; overflow: hidden; }
 .hidden-input { display: none; }
-.image-card-list { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; overscroll-behavior-x: contain; overscroll-behavior-y: contain; touch-action: pan-y; }
+.image-card-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; overscroll-behavior-x: contain; overscroll-behavior-y: contain; touch-action: pan-y; }
 .image-card { display: flex; flex-direction: column; gap: 8px; width: 116px; padding: 8px; border: 1px solid var(--n-border-color); border-radius: 14px; background: var(--n-color); transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, opacity 0.18s ease; }
 .image-card:hover { border-color: var(--n-border-color-hover); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06); }
 .image-card--dragging { opacity: 0.68; transform: scale(0.98); }
@@ -2161,8 +2161,8 @@ onUnmounted(() => {
 .image-upload-card:hover { border-color: var(--n-border-color-hover); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); transform: translateY(-1px); }
 .image-upload-card:focus-visible { outline: none; border-color: var(--n-primary-color); box-shadow: 0 0 0 2px var(--n-primary-color-suppl); }
 .image-upload-card--drop-target { border-color: var(--n-primary-color); box-shadow: 0 0 0 2px var(--n-primary-color-suppl); color: var(--n-primary-color); }
-.image-upload-card__icon { font-size: 28px; line-height: 1; font-weight: 300; }
-.image-upload-card__text { font-size: 13px; line-height: 1.4; }
+.image-upload-card__icon { font-size: 18px; line-height: 1; font-weight: 300; }
+.image-upload-card__text { font-size: 12px; line-height: 1.4; }
 .split-divider {
   cursor: col-resize;
   background: var(--n-divider-color, rgba(0, 0, 0, 0.08));
@@ -2176,9 +2176,9 @@ onUnmounted(() => {
   background: var(--n-primary-color, rgba(59, 130, 246, 0.5));
   outline: none;
 }
-.test-area-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.test-area-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .test-area-label { white-space: nowrap; }
-.variant-deck { display: grid; gap: 12px; width: 100%; }
+.variant-deck { display: grid; gap: 8px; width: 100%; }
 .variant-cell { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .variant-cell__controls {
   display: flex;
@@ -2197,7 +2197,7 @@ onUnmounted(() => {
 .variant-cell__meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
   flex-wrap: wrap;
 }
@@ -2215,7 +2215,7 @@ onUnmounted(() => {
 }
 .variant-cell__support {
   display: block;
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 12px;
   line-height: 1.35;
 }
@@ -2224,7 +2224,7 @@ onUnmounted(() => {
   display: inline-flex;
 }
 .variant-results-wrap { flex: 1; min-height: 0; overflow: hidden; }
-.variant-results { display: grid; gap: 12px; height: 100%; min-height: 0; }
+.variant-results { display: grid; gap: 8px; height: 100%; min-height: 0; }
 .variant-result-card { height: 100%; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
 .variant-result-card :deep(.n-card__content) { height: 100%; max-height: 100%; overflow: hidden; }
 .result-container {
@@ -2242,7 +2242,7 @@ onUnmounted(() => {
 @media (max-width: 900px) {
   .image-multiimage-split { grid-template-columns: minmax(0, 1fr) !important; }
   .split-divider { display: none; }
-  .image-card-list { gap: 10px; }
+  .image-card-list { gap: 8px; }
   .image-card,
   .image-upload-card { width: calc(50% - 5px); min-width: 132px; }
 }

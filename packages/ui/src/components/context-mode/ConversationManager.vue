@@ -11,7 +11,7 @@
                 <!-- 右侧：统计信息和操作按钮 -->
                 <NSpace :size="8" align="center">
                     <!-- 消息数量 -->
-                    <NText v-if="messages.length > 0" :depth="3" style="font-size: 13px">
+                    <NText v-if="messages.length > 0" :depth="3" style="font-size: 12px">
                         💬 {{ t("conversation.stats.messages") }}: {{ messages.length }}
                     </NText>
 
@@ -19,7 +19,7 @@
                     <NText
                         v-if="showVariablePreview && allUsedVariables.length > 0"
                         :depth="3"
-                        style="font-size: 13px"
+                        style="font-size: 12px"
                     >
                         🏷️ {{ t("conversation.stats.variables") }}: {{ allUsedVariables.length }}
                     </NText>
@@ -28,7 +28,7 @@
                     <NText
                         v-if="allMissingVariables.length > 0"
                         :depth="3"
-                        style="font-size: 13px; color: var(--warning-color)"
+                        style="font-size: 12px; color: var(--warning-color)"
                     >
                         ⚠️ {{ t("conversation.stats.missing") }}: {{ allMissingVariables.length }}
                     </NText>
@@ -37,7 +37,7 @@
                     <NText
                         v-if="enableToolManagement"
                         :depth="3"
-                        style="font-size: 13px; cursor: pointer"
+                        style="font-size: 12px; cursor: pointer"
                         @click="emit('open-tool-manager')"
                         :title="t('contextEditor.toolsTab')"
                     >

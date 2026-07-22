@@ -13,7 +13,7 @@
         text
         block
         @click="handleOpenManager"
-        style="justify-content: flex-start; padding: 8px 12px;"
+        style="justify-content: flex-start; padding: 8px 8px;"
       >
         <template #icon>
           <NIcon><Folder /></NIcon>

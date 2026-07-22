@@ -1,5 +1,5 @@
 <template>
-  <NFlex align="center" :wrap="false" :size="12">
+  <NFlex align="center" :wrap="false" :size="8">
     <!-- 快捷操作按钮 -->
     <!-- 工具管理 -->
     <NButton

@@ -20,7 +20,7 @@
             <n-icon><Search /></n-icon>
           </template>
         </n-input>
-        <n-space align="center" :size="12">
+        <n-space align="center" :size="8">
           <n-text depth="3">
             {{ t('favorites.manager.tagManager.totalTags', { count: filteredTags.length }) }}
           </n-text>
@@ -51,7 +51,7 @@
       :negative-text="t('favorites.manager.tagManager.addDialog.cancel')"
       @positive-click="handleAddConfirm"
     >
-      <n-space vertical :size="12">
+      <n-space vertical :size="8">
         <n-input
           v-model:value="newTagName"
           :placeholder="t('favorites.manager.tagManager.addDialog.tagNamePlaceholder')"
@@ -69,7 +69,7 @@
       :negative-text="t('favorites.manager.tagManager.renameDialog.cancel')"
       @positive-click="handleRenameConfirm"
     >
-      <n-space vertical :size="12">
+      <n-space vertical :size="8">
         <n-text>{{ t('favorites.manager.tagManager.renameDialog.currentName', { name: currentTag?.name }) }}</n-text>
         <n-input
           v-model:value="newTagName"
@@ -88,7 +88,7 @@
       :negative-text="t('favorites.manager.tagManager.mergeDialog.cancel')"
       @positive-click="handleMergeConfirm"
     >
-      <n-space vertical :size="12">
+      <n-space vertical :size="8">
         <n-text>{{ t('favorites.manager.tagManager.mergeDialog.sourceTag', { name: currentTag?.name }) }}</n-text>
         <n-select
           v-model:value="mergeTargetTag"

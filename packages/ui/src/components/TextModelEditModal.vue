@@ -23,8 +23,8 @@
             <NCheckbox v-model:checked="form.enabled"></NCheckbox>
           </NFormItem>
 
-          <NDivider style="margin: 12px 0 8px 0;" />
-          <NH4 style="margin: 0 0 12px 0; font-size: 14px;">{{ t('modelManager.provider.section') }}</NH4>
+          <NDivider style="margin: 8px 0 8px 0;" />
+          <NH4 style="margin: 0 0 8px 0; font-size: 14px;">{{ t('modelManager.provider.section') }}</NH4>
 
           <NFormItem :label="t('modelManager.provider.label')">
             <ProviderPillSelect
@@ -38,7 +38,7 @@
             />
           </NFormItem>
 
-          <NText v-if="currentProviderHint" depth="3" style="display: block; margin: -8px 0 12px 0; line-height: 1.5;">
+          <NText v-if="currentProviderHint" depth="3" style="display: block; margin: -8px 0 8px 0; line-height: 1.5;">
             {{ currentProviderHint }}
           </NText>
 
@@ -199,8 +199,8 @@
             </div>
           </NFormItem>
 
-          <NDivider style="margin: 12px 0 8px 0;" />
-          <NH4 style="margin: 0 0 12px 0; font-size: 14px;">{{ t('modelManager.model.section') }}</NH4>
+          <NDivider style="margin: 8px 0 8px 0;" />
+          <NH4 style="margin: 0 0 8px 0; font-size: 14px;">{{ t('modelManager.model.section') }}</NH4>
 
           <NFormItem :label="t('modelManager.selectModel')">
             <NSpace align="center" style="width: 100%;">
@@ -250,7 +250,7 @@
           </NFormItem>
         </NForm>
 
-        <NDivider style="margin: 12px 0 8px 0;" />
+        <NDivider style="margin: 8px 0 8px 0;" />
         <ModelAdvancedSection
           mode="text"
           :provider-type="currentProviderType"
@@ -659,7 +659,7 @@ const onProviderChange = (providerId: string) => {
 }
 
 .chrome-built-in-status {
-  margin: -4px 0 12px;
+  margin: -4px 0 8px;
 }
 
 .chrome-built-in-status__body {

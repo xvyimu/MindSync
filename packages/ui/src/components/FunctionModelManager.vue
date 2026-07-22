@@ -1,6 +1,6 @@
 <template>
   <div class="function-model-manager">
-    <NSpace vertical :size="12">
+    <NSpace vertical :size="8">
       <NCard embedded size="small" :bordered="false" class="function-config-card">
         <template #header>
           <NSpace justify="space-between" align="center" :size="8" class="section-header">
@@ -11,7 +11,7 @@
           </NSpace>
         </template>
 
-        <NSpace vertical :size="12" class="config-section">
+        <NSpace vertical :size="8" class="config-section">
           <NText depth="3" class="section-hint">
             {{ t('functionModel.evaluationModelHint') }}
           </NText>
@@ -55,7 +55,7 @@
           </NSpace>
         </template>
 
-        <NSpace vertical :size="12" class="config-section">
+        <NSpace vertical :size="8" class="config-section">
           <NText depth="3" class="section-hint">
             {{ t('functionModel.imageRecognitionModelHint') }}
           </NText>
@@ -251,7 +251,7 @@ defineExpose({ refresh })
 .config-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .section-header {

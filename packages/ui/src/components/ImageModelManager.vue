@@ -8,7 +8,7 @@
     </NEmpty>
 
     <!-- 模型列表 -->
-    <NSpace v-else vertical :size="12" class="image-model-stack">
+    <NSpace v-else vertical :size="8" class="image-model-stack">
       <NCard
         v-for="config in configs"
         :key="config.id"
@@ -411,7 +411,7 @@ defineExpose({
 }
 
 .image-model-card :deep(.n-card-header) {
-  padding-bottom: 10px;
+  padding-bottom: 8px;
 }
 
 .image-model-card :deep(.n-card__content) {

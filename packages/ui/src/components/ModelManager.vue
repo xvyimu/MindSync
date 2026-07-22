@@ -228,7 +228,7 @@ if (typeof window !== 'undefined') {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-height: 0;
   overflow: hidden;
 }

@@ -1,5 +1,5 @@
 <template>
-    <NFlex vertical :style="{ height: '100%', gap: '12px' }">
+    <NFlex vertical :style="{ height: '100%', gap: '8px' }">
         <!-- 测试输入区域 (仅在系统提示词优化模式下显示) -->
         <NCard v-if="showTestInput" :style="{ flexShrink: 0 }" size="small">
             <TestInputSection

@@ -1,5 +1,5 @@
 <template>
-  <NSpace vertical :size="12" class="model-list-stack">
+  <NSpace vertical :size="8" class="model-list-stack">
     <NCard
       v-for="model in models"
       :key="model.id"
@@ -238,7 +238,7 @@ const providerDisplayName = (model: TextModelConfig) => getProviderDisplayName(m
 }
 
 .model-config-card :deep(.n-card-header) {
-  padding-bottom: 10px;
+  padding-bottom: 8px;
 }
 
 .model-config-card :deep(.n-card__content) {

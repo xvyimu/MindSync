@@ -103,7 +103,7 @@
 
         <!-- 消息列表 -->
         <NScrollbar v-else :style="scrollbarStyle">
-            <NSpace vertical :size="12" style="padding-right: 12px;">
+            <NSpace vertical :size="8" style="padding-right: 8px;">
                 <NCard
                     v-for="(message, index) in localState.messages"
                     :key="`message-${index}`"

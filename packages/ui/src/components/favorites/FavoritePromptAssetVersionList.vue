@@ -131,13 +131,13 @@ const formatVersionDate = (timestamp: number) => {
 .favorite-prompt-asset-version-list__item {
   display: flex;
   min-width: 0;
-  gap: 12px;
+  gap: 8px;
   align-items: flex-start;
   justify-content: space-between;
   border: 1px solid color-mix(in srgb, var(--n-border-color) 72%, transparent);
   border-radius: 8px;
   background: var(--n-color);
-  padding: 10px 12px;
+  padding: 8px 8px;
 }
 
 .favorite-prompt-asset-version-list__item.is-current {

@@ -27,13 +27,33 @@ const EXCEPTIONS_PATH = path.join(__dirname, 'audit-design-tokens.exceptions.jso
 export const LEGAL_SPACING_PX = new Set([0, 4, 8, 16, 24, 32])
 export const LEGAL_FONT_PX = new Set([12, 14, 16, 18])
 
-/** Touch / chrome metrics that are not "layout spacing scale". */
-const SPACING_PROP =
-  /(?:padding(?:-(?:top|right|bottom|left))?|margin(?:-(?:top|right|bottom|left))?|gap|row-gap|column-gap|top|right|bottom|left|inset|scroll-margin(?:-(?:top|right|bottom|left))?)\s*[:=]\s*['"]?/i
+/**
+ * Layout spacing props only. Intentionally excludes bare top/right/bottom/left
+ * (they match border-left / inset-block-start noise) and border-width.
+ */
+const SPACING_DECL =
+  /(?:padding(?:-(?:top|right|bottom|left))?|margin(?:-(?:top|right|bottom|left))?|gap|row-gap|column-gap|inset|scroll-margin(?:-(?:top|right|bottom|left))?)\s*[:=]\s*(['"]?)([^;'"}\n]+)\1/gi
 
-const FONT_SIZE_PROP = /font-size\s*[:=]\s*['"]?/i
+const FONT_SIZE_DECL = /font-size\s*[:=]\s*(['"]?)([^;'"}\n]+)\1/gi
+const FONT_SIZE_CAMEL = /fontSize\s*[:=]\s*(['"]?)([^,'"}\n]+)\1/gi
 
 const PX_VALUE = /(\d+(?:\.\d+)?)px\b/gi
+
+/**
+ * @param {string} valueExpr
+ * @returns {number[]}
+ */
+function extractPx(valueExpr) {
+  /** @type {number[]} */
+  const out = []
+  let m
+  const re = new RegExp(PX_VALUE.source, 'gi')
+  while ((m = re.exec(valueExpr)) !== null) {
+    const n = Number(m[1])
+    if (Number.isFinite(n)) out.push(n)
+  }
+  return out
+}
 
 /**
  * @param {string} line
@@ -48,20 +68,14 @@ export function analyzeLine(line, lineNo, relFile) {
   if (!trimmed || trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
     return out
   }
-  // Skip pure comments in vue templates
   if (trimmed.startsWith('<!--')) return out
 
-  // Spacing: only when a spacing-ish property is present on the line
-  if (SPACING_PROP.test(line)) {
-    SPACING_PROP.lastIndex = 0
-    let m
-    const re = new RegExp(PX_VALUE.source, 'gi')
-    while ((m = re.exec(line)) !== null) {
-      const n = Number(m[1])
-      if (!Number.isFinite(n)) continue
-      // Ignore 1px hairlines and 2px focus rings
+  SPACING_DECL.lastIndex = 0
+  let sm
+  while ((sm = SPACING_DECL.exec(line)) !== null) {
+    const valueExpr = sm[2] ?? ''
+    for (const n of extractPx(valueExpr)) {
       if (n === 1 || n === 2) continue
-      // Ignore off-screen / absolute layout tricks (e.g. left: -9999px)
       if (n < 0 || n >= 100) continue
       if (!LEGAL_SPACING_PX.has(n)) {
         out.push({
@@ -75,31 +89,27 @@ export function analyzeLine(line, lineNo, relFile) {
     }
   }
 
-  // Font sizes
-  if (FONT_SIZE_PROP.test(line)) {
-    FONT_SIZE_PROP.lastIndex = 0
-    let m
-    const re = new RegExp(PX_VALUE.source, 'gi')
-    while ((m = re.exec(line)) !== null) {
-      const n = Number(m[1])
-      if (!Number.isFinite(n)) continue
-      if (!LEGAL_FONT_PX.has(n)) {
-        out.push({
-          file: relFile,
-          line: lineNo,
-          kind: 'illegal-font-size',
-          value: `${n}px`,
-          snippet: trimmed.slice(0, 160),
-        })
+  for (const re of [FONT_SIZE_DECL, FONT_SIZE_CAMEL]) {
+    re.lastIndex = 0
+    let fm
+    while ((fm = re.exec(line)) !== null) {
+      const valueExpr = fm[2] ?? ''
+      for (const n of extractPx(valueExpr)) {
+        // Ignore absurd values (likely false parse) and sub-pixel
+        if (n < 4 || n > 96) continue
+        if (!LEGAL_FONT_PX.has(n)) {
+          out.push({
+            file: relFile,
+            line: lineNo,
+            kind: 'illegal-font-size',
+            value: `${n}px`,
+            snippet: trimmed.slice(0, 160),
+          })
+        }
       }
     }
   }
 
-  // Inline style="...font-size: Npx" / margin: Npx without separate prop word sometimes
-  // (already covered when prop keyword is on same line)
-
-  // Shorthand margin/padding: "12px" in style="margin: 12px" — covered by SPACING_PROP
-  // margin: 0 0 12px 0 — SPACING_PROP matches margin
   return out
 }
 

@@ -17,7 +17,7 @@
           </NSpace>
         </template>
         
-        <NSpace vertical :size="12">
+        <NSpace vertical :size="8">
           <div 
             v-for="(toolCall, index) in toolCalls" 
             :key="`tool-call-${index}`"
@@ -175,7 +175,7 @@ const formatResult = (result: string | Record<string, unknown> | Array<unknown>)
 
 <style scoped>
 .tool-call-display {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .tool-call-item {
@@ -191,6 +191,6 @@ const formatResult = (result: string | Record<string, unknown> | Array<unknown>)
 .tool-result,
 .tool-error {
   border-left: 2px solid var(--n-border-color);
-  padding-left: 12px;
+  padding-left: 8px;
 }
 </style>

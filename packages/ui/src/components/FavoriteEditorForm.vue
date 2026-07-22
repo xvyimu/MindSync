@@ -145,7 +145,7 @@
                 {{ t('favorites.dialog.changed') }}
               </NTag>
             </template>
-            <NSpace vertical :size="12">
+            <NSpace vertical :size="8">
               <template v-if="mediaDraft.sources.length === 0">
                 <div class="favorite-editor-form__upload-compact">
                   <div class="favorite-editor-form__upload-copy">
@@ -1468,11 +1468,11 @@ onBeforeUnmount(() => {
 }
 
 .favorite-editor-form__content {
-  padding: 18px;
+  padding: 16px;
 }
 
 .favorite-editor-form--embedded .favorite-editor-form__content {
-  padding: 18px 18px 96px;
+  padding: 16px 16px 32px;
 }
 
 .favorite-editor-form :deep(.n-card) {
@@ -1484,11 +1484,11 @@ onBeforeUnmount(() => {
 
 .favorite-editor-form :deep(.n-card-header) {
   min-height: 44px;
-  padding: 12px 16px 8px;
+  padding: 8px 16px 8px;
 }
 
 .favorite-editor-form :deep(.n-card__content) {
-  padding: 14px 16px 16px;
+  padding: 16px 16px 16px;
 }
 
 .favorite-editor-form :deep(.n-form-item-label) {
@@ -1517,10 +1517,10 @@ onBeforeUnmount(() => {
   display: flex;
   min-width: 0;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: 8px 8px;
   border: 1px dashed var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color-embedded);
@@ -1543,7 +1543,7 @@ onBeforeUnmount(() => {
 .favorite-editor-form__media-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .favorite-editor-form__media-card {
@@ -1564,7 +1564,7 @@ onBeforeUnmount(() => {
   flex: 0 0 auto;
   border-top: 1px solid var(--n-divider-color);
   background: var(--n-card-color);
-  padding: 16px 20px;
+  padding: 16px 16px;
 }
 
 .favorite-editor-form__actions--embedded {
@@ -1579,7 +1579,7 @@ onBeforeUnmount(() => {
   }
 
   .favorite-editor-form--embedded .favorite-editor-form__content {
-    padding: 16px 16px 88px;
+    padding: 16px 16px 32px;
   }
 
   .favorite-editor-form__media-grid {
@@ -1591,7 +1591,7 @@ onBeforeUnmount(() => {
   }
 
   .favorite-editor-form__actions {
-    padding: 14px 16px;
+    padding: 16px 16px;
   }
 }
 </style>

@@ -78,7 +78,7 @@
               size="small"
               data-testid="evaluation-panel-compare-decision"
             >
-              <NSpace vertical :size="12">
+              <NSpace vertical :size="8">
                 <div class="compare-section-header">
                   <div class="compare-section-header__main">
                     <NText strong>{{ tOr('evaluation.compareSummary.decision.title', 'Iteration Advice') }}</NText>
@@ -201,7 +201,7 @@
               size="small"
               data-testid="evaluation-panel-compare-metadata"
             >
-              <NSpace vertical :size="12">
+              <NSpace vertical :size="8">
                 <div class="compare-context-strip" data-testid="evaluation-panel-compare-metadata-context">
                   <NTag
                     v-if="shouldShowCompareModeChip"
@@ -241,7 +241,7 @@
 
             <!-- 四维度分数 -->
             <NCard :title="t('evaluation.dimensions')" size="small">
-              <NSpace vertical :size="12">
+              <NSpace vertical :size="8">
                 <div v-for="dim in result.score.dimensions" :key="dim.key" class="dimension-item">
                   <div class="dimension-header">
                     <NText>{{ dim.label }}</NText>
@@ -327,7 +327,7 @@
 
       <!-- 空状态 -->
       <template v-else>
-        <NSpace vertical :size="12" style="width: 100%;">
+        <NSpace vertical :size="8" style="width: 100%;">
           <NAlert
             v-if="evaluationDisableMessage"
             type="warning"
@@ -1220,7 +1220,7 @@ watch(() => props.show, (visible) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 32px 16px;
   gap: 16px;
 }
 
@@ -1231,7 +1231,7 @@ watch(() => props.show, (visible) => {
 .stream-preview {
   width: 100%;
   margin-top: 16px;
-  padding: 12px;
+  padding: 8px;
   background: var(--n-color-embedded);
   border-radius: 8px;
 }
@@ -1266,7 +1266,7 @@ watch(() => props.show, (visible) => {
   height: 120px;
   border-radius: 50%;
   border: 4px solid currentColor;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .evaluation-panel-action-trigger {
@@ -1274,7 +1274,7 @@ watch(() => props.show, (visible) => {
 }
 
 .score-value {
-  font-size: 36px;
+  font-size: 18px;
   font-weight: bold;
 }
 
@@ -1321,8 +1321,8 @@ watch(() => props.show, (visible) => {
 .compare-judgement-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-bottom: 10px;
+  gap: 4px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--n-border-color);
 }
 
@@ -1335,7 +1335,7 @@ watch(() => props.show, (visible) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .compare-section-header__main {
@@ -1347,7 +1347,7 @@ watch(() => props.show, (visible) => {
 
 .compare-decision-subheadline {
   line-height: 1.5;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .compare-decision-signals {
@@ -1358,8 +1358,8 @@ watch(() => props.show, (visible) => {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 10px;
-  padding: 8px 10px;
+  gap: 8px 8px;
+  padding: 8px 8px;
   border-radius: 8px;
   background: var(--n-color-embedded);
   border: 1px solid var(--n-border-color);
@@ -1368,13 +1368,13 @@ watch(() => props.show, (visible) => {
 .compare-role-inline-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 8px;
+  gap: 4px 8px;
 }
 
 .compare-role-inline-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 4px 8px;
   border-radius: 999px;
   background: var(--n-hover-color);
@@ -1411,7 +1411,7 @@ watch(() => props.show, (visible) => {
 }
 
 .compare-focus-panel {
-  padding: 10px 12px;
+  padding: 8px 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color-embedded);
@@ -1458,7 +1458,7 @@ watch(() => props.show, (visible) => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -1484,13 +1484,13 @@ watch(() => props.show, (visible) => {
 .patch-instruction {
   flex: 1;
   word-break: break-word;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .patch-diff-inline {
   background: var(--n-color-embedded);
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 8px 8px;
   font-size: 12px;
 }
 
@@ -1503,11 +1503,11 @@ watch(() => props.show, (visible) => {
 }
 
 .feedback-section :deep(.n-card__header) {
-  padding: 10px 12px 6px;
+  padding: 8px 8px 4px;
 }
 
 .feedback-section :deep(.n-card__content) {
-  padding: 0 12px 12px;
+  padding: 0 8px 8px;
 }
 
 .feedback-card-title {

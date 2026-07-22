@@ -115,7 +115,7 @@ function handleClick() {
   border-radius: 999px;
   background: var(--n-warning-color-suppl);
   color: var(--n-warning-color);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
 }

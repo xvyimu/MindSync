@@ -453,7 +453,7 @@
 
             <!-- 右侧：图像生成测试区域（图像模型，多列 variants） -->
             <div ref="testPaneRef" class="split-pane" style="min-width: 0; height: 100%; overflow: hidden;">
-                <NFlex vertical :style="{ height: '100%', gap: '12px' }">
+                <NFlex vertical :style="{ height: '100%', gap: '8px' }">
                     <TemporaryVariablesPanel
                         :manager="temporaryVariablePanelManager"
                         :disabled="isOptimizing"
@@ -598,7 +598,7 @@
                                 <div class="result-container">
                                     <div class="result-body">
                                         <template v-if="hasVariantResult(id)">
-                                            <NSpace vertical :size="12" style="padding: 12px;">
+                                            <NSpace vertical :size="8" style="padding: 8px;">
                                                 <NFlex justify="end" align="center">
                                                     <SaveTestResultExampleButton
                                                         sub-mode-key="image-image2image"
@@ -689,7 +689,7 @@
                                         <template v-else>
                                             <NEmpty
                                                 :description="t('imageWorkspace.results.noGenerationResult')"
-                                                style="padding: 24px 12px;"
+                                                style="padding: 24px 8px;"
                                             />
                                         </template>
                                     </div>
@@ -766,7 +766,7 @@
                 >
                     <n-upload-dragger>
                         <div style="padding: 24px; text-align: center">
-                            <div style="font-size: 32px; margin-bottom: 12px">
+                            <div style="font-size: 18px; margin-bottom: 8px">
                                 📁
                             </div>
                             <n-text style="font-size: 14px">{{
@@ -2686,7 +2686,7 @@ onUnmounted(() => {
     cursor: col-resize;
     background: var(--n-divider-color, rgba(0, 0, 0, 0.08));
     border-radius: 999px;
-    margin: 6px 0;
+    margin: 4px 0;
     transition: background 120ms ease;
 }
 
@@ -2700,7 +2700,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -2710,7 +2710,7 @@ onUnmounted(() => {
 
 .variant-deck {
     display: grid;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -2740,7 +2740,7 @@ onUnmounted(() => {
 .variant-cell__meta {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     min-width: 0;
     flex-wrap: wrap;
 }
@@ -2774,7 +2774,7 @@ onUnmounted(() => {
 
 .variant-results {
     display: grid;
-    gap: 12px;
+    gap: 8px;
     height: 100%;
     min-height: 0;
 }

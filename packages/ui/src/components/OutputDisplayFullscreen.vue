@@ -20,7 +20,7 @@
         />
       </NFlex>
 
-      <NDivider v-if="$slots['extra-content']" style="margin: 12px 0 8px;" />
+      <NDivider v-if="$slots['extra-content']" style="margin: 8px 0 8px;" />
 
       <NScrollbar
         v-if="$slots['extra-content']"

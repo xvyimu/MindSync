@@ -21,8 +21,8 @@
           </NFormItem>
 
           <!-- 提供商配置区域 -->
-          <NDivider style="margin: 12px 0 8px 0;" />
-          <NH4 style="margin: 0 0 12px 0; font-size: 14px;">{{ t('image.provider.section') }}</NH4>
+          <NDivider style="margin: 8px 0 8px 0;" />
+          <NH4 style="margin: 0 0 8px 0; font-size: 14px;">{{ t('image.provider.section') }}</NH4>
 
           <NFormItem :label="t('image.provider.label')">
             <ProviderPillSelect
@@ -92,8 +92,8 @@
           <!-- 代理配置通过 connectionFields 动态渲染，并基于可用性过滤，不再单独渲染 -->
 
           <!-- 模型配置区域 -->
-          <NDivider style="margin: 12px 0 8px 0;" />
-          <NH4 style="margin: 0 0 12px 0; font-size: 14px;">{{ t('image.model.section') }}</NH4>
+          <NDivider style="margin: 8px 0 8px 0;" />
+          <NH4 style="margin: 0 0 8px 0; font-size: 14px;">{{ t('image.model.section') }}</NH4>
 
           <NFormItem :label="t('image.model.label')">
             <NSpace align="center" style="width: 100%;">
@@ -159,7 +159,7 @@
           </NFormItem>
 
           <!-- 高级参数配置区域 -->
-          <NDivider style="margin: 12px 0 8px 0;" />
+          <NDivider style="margin: 8px 0 8px 0;" />
           <ModelAdvancedSection
             mode="image"
             :provider-type="selectedProviderId"

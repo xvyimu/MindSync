@@ -96,7 +96,7 @@
                 variant="media"
                 class="favorite-detail-panel__media-card"
               >
-                <NSpace vertical :size="12">
+                <NSpace vertical :size="8">
                   <AppPreviewImageGroup v-if="activeImage">
                     <AppPreviewImage
                       data-testid="favorite-detail-media-hero"
@@ -136,7 +136,7 @@
                   variant="identity"
                   class="favorite-detail-panel__meta-card"
                 >
-                  <NSpace vertical :size="12">
+                  <NSpace vertical :size="8">
                     <div class="favorite-detail-panel__title-block">
                       <NText strong class="favorite-detail-panel__title">
                         {{ favorite.title }}
@@ -289,7 +289,7 @@
               variant="identity"
               class="favorite-detail-panel__meta-card"
             >
-              <NSpace vertical :size="12">
+              <NSpace vertical :size="8">
                 <div class="favorite-detail-panel__title-block">
                   <NText strong class="favorite-detail-panel__title">
                     {{ favorite.title }}
@@ -784,7 +784,7 @@ const handleApplyExample = (options: { exampleId?: string; exampleIndex: number 
   height: 100%;
   min-height: 0;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .favorite-detail-panel__empty {
@@ -800,7 +800,7 @@ const handleApplyExample = (options: { exampleId?: string; exampleIndex: number 
   margin: 0;
   border-bottom: 1px solid color-mix(in srgb, var(--n-border-color) 72%, transparent);
   background: color-mix(in srgb, var(--n-color) 92%, var(--n-primary-color) 8%);
-  padding: 10px 12px;
+  padding: 8px 8px;
   border-radius: 8px;
 }
 
@@ -864,11 +864,11 @@ const handleApplyExample = (options: { exampleId?: string; exampleIndex: number 
 }
 
 .favorite-detail-panel :deep(.n-card-header) {
-  padding: 14px 16px 10px;
+  padding: 16px 16px 8px;
 }
 
 .favorite-detail-panel :deep(.n-card__content) {
-  padding: 14px 16px;
+  padding: 16px 16px;
 }
 
 .favorite-detail-panel :deep(.n-collapse) {
@@ -908,7 +908,7 @@ const handleApplyExample = (options: { exampleId?: string; exampleIndex: number 
 .favorite-detail-panel__title-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-detail-panel__title {
@@ -942,7 +942,7 @@ const handleApplyExample = (options: { exampleId?: string; exampleIndex: number 
 .favorite-detail-panel__attachment-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .favorite-detail-panel__sections {
@@ -950,7 +950,7 @@ const handleApplyExample = (options: { exampleId?: string; exampleIndex: number 
   border: 1px solid color-mix(in srgb, var(--n-border-color) 76%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--n-color) 96%, var(--n-primary-color) 4%);
-  padding: 12px;
+  padding: 8px;
 }
 
 .favorite-detail-panel__sections :deep(.n-collapse-item:first-child) {

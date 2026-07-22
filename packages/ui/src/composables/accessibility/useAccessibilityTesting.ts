@@ -504,8 +504,8 @@ export function useAccessibilityTesting() {
             <meta charset="UTF-8">
             <title>Accessibility Test Report</title>
             <style>
-              body { font-family: sans-serif; margin: 20px; }
-              .score { font-size: 24px; font-weight: bold; margin: 20px 0; }
+              body { font-family: sans-serif; margin: 16px; }
+              .score { font-size: 18px; font-weight: bold; margin: 16px 0; }
               .score.passed { color: green; }
               .score.failed { color: red; }
               table { border-collapse: collapse; width: 100%; }

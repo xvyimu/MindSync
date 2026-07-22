@@ -17,7 +17,7 @@
         flex: 1,
         overflow: 'hidden',
         height: '100%',
-        gap: '12px'
+        gap: '8px'
       }"
     >
       <!-- 第一列结果 -->

@@ -112,7 +112,7 @@
       </NSpace>
       
       <NScrollbar style="max-height: 60vh;">
-        <NSpace vertical :size="12">
+        <NSpace vertical :size="8">
           <NCard
             v-for="template in filteredTemplates"
             :key="template.id"
@@ -360,7 +360,7 @@
         </NSpace>
 
         <!-- Advanced Template Editor -->
-        <NSpace v-else vertical :size="12">
+        <NSpace v-else vertical :size="8">
           <NSpace justify="space-between" align="center">
             <NText>
               {{ t('templateManager.messageTemplates') }}
@@ -385,7 +385,7 @@
 
           <!-- Message List -->
           <NScrollbar style="max-height: 500px;">
-            <NSpace vertical :size="12">
+            <NSpace vertical :size="8">
               <NCard
                 v-for="(message, index) in form.messages"
                 :key="index"

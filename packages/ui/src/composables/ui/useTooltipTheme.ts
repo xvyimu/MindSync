@@ -8,7 +8,7 @@ export type TooltipVariant = 'auto' | TooltipDensity;
 
 const COMPACT_LABEL_MAX_LENGTH = 18;
 const COMPACT_TOOLTIP_PADDING = '4px 8px';
-const RICH_TOOLTIP_PADDING = '10px 12px';
+const RICH_TOOLTIP_PADDING = '8px';
 
 interface UseTooltipThemeOptions {
   density?: MaybeRef<TooltipDensity>;

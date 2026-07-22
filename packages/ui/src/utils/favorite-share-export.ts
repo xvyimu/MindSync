@@ -734,7 +734,7 @@ export const createFavoriteShareHtml = async (
         linear-gradient(135deg, rgba(37, 99, 235, 0.12), transparent 34%),
         radial-gradient(circle at 86% 12%, rgba(217, 119, 6, 0.16), transparent 26%);
     }
-    main { position: relative; width: min(960px, 100%); margin: 0 auto; padding: 42px 20px 52px; }
+    main { position: relative; width: min(960px, 100%); margin: 0 auto; padding: 32px 16px 32px; }
     header {
       border: 1px solid var(--color-border);
       border-radius: 8px;
@@ -748,18 +748,18 @@ export const createFavoriteShareHtml = async (
       border: 1px solid rgba(37, 99, 235, 0.24);
       border-radius: 999px;
       background: var(--color-muted);
-      padding: 0 12px;
+      padding: 0 8px;
       color: var(--color-primary);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
     }
-    h1 { margin: 18px 0 0; max-width: 820px; font-size: clamp(32px, 7vw, 72px); line-height: 1.02; letter-spacing: 0; }
-    .meta { margin-top: 16px; color: #475569; font-size: 15px; line-height: 1.6; }
+    h1 { margin: 16px 0 0; max-width: 820px; font-size: clamp(32px, 7vw, 72px); line-height: 1.02; letter-spacing: 0; }
+    .meta { margin-top: 16px; color: #475569; font-size: 16px; line-height: 1.6; }
     .import-note {
-      margin-top: 18px;
+      margin-top: 16px;
       border-left: 4px solid var(--color-accent);
       background: #fff7ed;
-      padding: 12px 14px;
+      padding: 8px 16px;
       color: #7c2d12;
       font-size: 14px;
       line-height: 1.55;
@@ -767,8 +767,8 @@ export const createFavoriteShareHtml = async (
     .hero-media {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 14px;
-      margin-top: 18px;
+      gap: 16px;
+      margin-top: 16px;
     }
     .hero-media img {
       display: block;
@@ -780,15 +780,15 @@ export const createFavoriteShareHtml = async (
       object-fit: cover;
     }
     .section {
-      margin-top: 18px;
+      margin-top: 16px;
       border: 1px solid var(--color-border);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.94);
       padding: clamp(18px, 3vw, 28px);
     }
-    h2 { margin: 0 0 12px; color: var(--color-primary); font-size: 14px; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
+    h2 { margin: 0 0 8px; color: var(--color-primary); font-size: 14px; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
     h3 { margin: 16px 0 8px; font-size: 16px; }
-    h4 { margin: 14px 0 8px; font-size: 13px; color: #475569; text-transform: uppercase; letter-spacing: 0; }
+    h4 { margin: 16px 0 8px; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0; }
     p, li { line-height: 1.7; }
     .muted { color: #64748b; }
     .copyable-block { position: relative; }
@@ -801,9 +801,9 @@ export const createFavoriteShareHtml = async (
       border-radius: 6px;
       background: #eff6ff;
       color: #1d4ed8;
-      padding: 0 10px;
+      padding: 0 8px;
       font: inherit;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 750;
       cursor: pointer;
     }
@@ -819,18 +819,18 @@ export const createFavoriteShareHtml = async (
       color: #172033;
       line-height: 1.65;
     }
-    .copyable-block pre { padding-right: 78px; }
+    .copyable-block pre { padding-right: 32px; }
     .example {
-      margin-top: 12px;
+      margin-top: 8px;
       border-top: 1px solid #e2e8f0;
-      padding-top: 12px;
+      padding-top: 8px;
     }
     .example:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
     .example-images {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px;
-      margin: 10px 0;
+      gap: 8px;
+      margin: 8px 0;
     }
     .example-images img {
       display: block;
@@ -843,7 +843,7 @@ export const createFavoriteShareHtml = async (
     }
     .example-images--input img { aspect-ratio: 4 / 3; object-fit: contain; }
     .import-guide {
-      margin-top: 18px;
+      margin-top: 16px;
       border: 1px solid #fed7aa;
       border-radius: 8px;
       background: #fff7ed;
@@ -853,12 +853,12 @@ export const createFavoriteShareHtml = async (
     .import-guide h2 { color: #b45309; }
     .import-guide p { margin: 8px 0 0; }
     .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-    .tags span { border: 1px solid #bfdbfe; border-radius: 999px; padding: 6px 12px; background: #eff6ff; color: #1d4ed8; font-weight: 650; }
+    .tags span { border: 1px solid #bfdbfe; border-radius: 999px; padding: 4px 8px; background: #eff6ff; color: #1d4ed8; font-weight: 650; }
     .tags--mode span { border-color: #fed7aa; background: #fff7ed; color: #b45309; }
-    footer { margin-top: 22px; color: #475569; font-size: 13px; line-height: 1.6; }
+    footer { margin-top: 24px; color: #475569; font-size: 12px; line-height: 1.6; }
     @media (max-width: 520px) {
-      main { padding: 20px 12px 32px; }
-      header, .section { padding: 18px; }
+      main { padding: 16px 8px 32px; }
+      header, .section { padding: 16px; }
       .hero-media { grid-template-columns: 1fr; }
     }
   </style>

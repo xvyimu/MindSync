@@ -1,7 +1,7 @@
 <template>
   <div class="tcb-root">
     <!-- 左侧：标签 + 模型下拉 + 可选 tags（tags 断点隐藏，且不允许挤压右侧控件） -->
-    <NSpace class="tcb-left" align="center" :size="12" :wrap="false">
+    <NSpace class="tcb-left" align="center" :size="8" :wrap="false">
       <NText :depth="2" strong class="tcb-label">
         {{ modelLabel }}：
       </NText>
@@ -22,7 +22,7 @@
     </NSpace>
 
     <!-- 右侧：强约束控件（必须始终可用、不可被遮挡） -->
-    <NSpace class="tcb-right" align="center" justify="end" :size="12" :wrap="false">
+    <NSpace class="tcb-right" align="center" justify="end" :size="8" :wrap="false">
       <NSpace v-if="showCompareToggle" align="center" :size="8" :wrap="false">
         <NSwitch
           :value="isCompareMode"
@@ -111,7 +111,7 @@ const handlePrimaryAction = () => {
 .tcb-root {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 12px;
+  column-gap: 8px;
   align-items: center;
   width: 100%;
 }

@@ -111,7 +111,7 @@
                             v-else
                             :style="{
                                 fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-                                fontSize: '13px',
+                                fontSize: '12px',
                                 lineHeight: '20px',
                                 maxWidth: '100%',
                                 overflow: 'hidden',
@@ -206,7 +206,7 @@
         :on-positive-click="handleAddVariable"
         :mask-closable="false"
     >
-        <NSpace vertical :size="12" style="margin-top: 16px">
+        <NSpace vertical :size="8" style="margin-top: 16px">
             <NFormItem
                 :label="t('variableExtraction.variableName')"
                 :validation-status="newVariableNameError ? 'error' : undefined"
@@ -234,7 +234,7 @@
         v-model="showValueFullscreenEditor"
         :title="t('test.variables.fullscreenEdit')"
     >
-        <NFlex vertical :size="12" :style="{ height: '100%', minHeight: 0 }">
+        <NFlex vertical :size="8" :style="{ height: '100%', minHeight: 0 }">
             <NText v-if="fullscreenEditorVariableName" :depth="2">
                 {{ fullscreenEditorVariableName }}
             </NText>
@@ -352,7 +352,7 @@ const getVariableRowStyle = (index: number) => {
         display: 'flex',
         alignItems: 'flex-start',
         gap: '8px',
-        padding: '6px 0',
+        padding: '4px 0',
         borderBottom: hasDivider ? '1px solid rgba(128, 128, 128, 0.16)' : 'none',
     }
 }

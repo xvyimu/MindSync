@@ -1,23 +1,33 @@
 {
-  "$comment": "R5 residual allowlist. Prefer fixing source over adding entries. file-only matches all lines in that file for optional kind/value filters.",
+  "$comment": "R5 residual allowlist. Prefer fixing source over adding entries. Match is AND on present fields; omit line to allow whole file for kind/value.",
   "allow": [
+    {
+      "file": "src/composables/performance/useLazyLoad.ts",
+      "kind": "illegal-spacing",
+      "value": "50px",
+      "reason": "IntersectionObserver rootMargin API default, not layout token"
+    },
+    {
+      "file": "src/utils/favorite-share-export.ts",
+      "kind": "illegal-spacing",
+      "reason": "standalone share HTML export uses fluid clamp() layout outside app shell"
+    },
+    {
+      "file": "src/utils/favorite-share-export.ts",
+      "kind": "illegal-font-size",
+      "reason": "standalone share HTML export hero type scale uses clamp()"
+    },
     {
       "file": "src/components/DataManager.vue",
       "kind": "illegal-spacing",
       "value": "48px",
-      "reason": "touch min-height chrome, not layout spacing scale"
+      "reason": "touch min-height chrome"
     },
     {
       "file": "src/components/image-mode/ImageTokenUsage.vue",
       "kind": "illegal-spacing",
       "value": "48px",
       "reason": "touch min-width chrome"
-    },
-    {
-      "file": "src/styles/paper.css",
-      "kind": "illegal-spacing",
-      "value": "12px",
-      "reason": "skeleton line height metric; tracked as R5 residual or map to 8 in step 2"
     }
   ]
 }

@@ -2496,7 +2496,7 @@ onBeforeUnmount(async () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     height: 100vh;
     font-size: 1.2rem;
     color: var(--n-text-color);

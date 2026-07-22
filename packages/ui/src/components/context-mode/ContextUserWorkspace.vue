@@ -46,7 +46,7 @@
             <div class="split-pane" style="min-width: 0; height: 100%; overflow: hidden;">
                 <NFlex
                     vertical
-                    :size="12"
+                    :size="8"
                     :style="{ overflow: 'auto', height: '100%', minHeight: 0 }"
                 >
             <!-- 提示词输入面板 (可折叠) -->
@@ -255,7 +255,7 @@
 
             <!-- 右侧：测试区域（变量共享 + 多列 variants） -->
             <div ref="testPaneRef" class="split-pane" style="min-width: 0; height: 100%; overflow: hidden;">
-                <NFlex vertical :style="{ height: '100%', gap: '12px' }">
+                <NFlex vertical :style="{ height: '100%', gap: '8px' }">
                     <!-- 变量表单（共享所有列） -->
                     <ContextUserTestPanel
                         ref="testAreaPanelRef"
@@ -2577,7 +2577,7 @@ defineExpose({
     cursor: col-resize;
     background: var(--n-divider-color, rgba(0, 0, 0, 0.08));
     border-radius: 999px;
-    margin: 6px 0;
+    margin: 4px 0;
     transition: background 120ms ease;
 }
 
@@ -2591,7 +2591,7 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -2601,7 +2601,7 @@ defineExpose({
 
 .variant-deck {
     display: grid;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -2631,7 +2631,7 @@ defineExpose({
 .variant-cell__meta {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     min-width: 0;
     flex-wrap: wrap;
 }
@@ -2681,7 +2681,7 @@ defineExpose({
 
 .variant-results {
     display: grid;
-    gap: 12px;
+    gap: 8px;
     height: 100%;
     min-height: 0;
 }

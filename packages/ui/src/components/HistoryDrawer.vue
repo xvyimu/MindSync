@@ -10,7 +10,7 @@
     @update:show="(value: boolean) => !value && close()"
   >
     <template #header-extra>
-      <NSpace align="center" :size="12">
+      <NSpace align="center" :size="8">
         <NText depth="3" style="font-size: 12px;" data-testid="history-usage">
           {{ t('history.usage', { count: usage.count, max: usage.max }) }}
         </NText>
@@ -36,7 +36,7 @@
       </NSpace>
     </template>
 
-    <NSpace vertical :size="12">
+    <NSpace vertical :size="8">
       <NAlert
         v-if="usage.warningLevel === 'full'"
         type="warning"
@@ -173,7 +173,7 @@
           
           <!-- 版本列表 -->
           <NDivider style="margin: 16px 0;" />
-          <NSpace vertical :size="12">
+          <NSpace vertical :size="8">
             <NCollapse
               v-for="record in chain.versions.slice().reverse()"
               :key="record.id"
@@ -184,7 +184,7 @@
                 :name="record.id"
               >
                 <template #header>
-                  <NSpace align="center" :size="12" style="width: 100%;">
+                  <NSpace align="center" :size="8" style="width: 100%;">
                     <NText strong style="font-size: 14px;">
                       {{ t('common.version', { version: record.version }) }}
                     </NText>
@@ -223,7 +223,7 @@
                   </NSpace>
                 </template>
 
-                <NSpace vertical :size="12">
+                <NSpace vertical :size="8">
                   <div v-if="record.iterationNote">
                     <NText strong style="font-size: 12px;">{{ $t('history.iterationNote') }}:</NText>
                     <NText depth="3" style="font-size: 12px; margin-left: 8px;">{{ record.iterationNote }}</NText>
@@ -255,7 +255,7 @@
       
       <NEmpty v-else :description="$t('history.noHistory')">
         <template #icon>
-          <span style="font-size: 48px;">📜</span>
+          <span class="paper-glyph-empty" aria-hidden="true">📜</span>
         </template>
       </NEmpty>
     </NScrollbar>

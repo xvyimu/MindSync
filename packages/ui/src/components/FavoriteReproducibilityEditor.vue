@@ -5,7 +5,7 @@
     class="favorite-reproducibility-editor"
     :class="{ 'favorite-reproducibility-editor--embedded': embedded }"
   >
-    <NSpace vertical :size="12">
+    <NSpace vertical :size="8">
       <NText v-if="showHint" depth="3">
         {{ t('favorites.dialog.reproducibility.hint') }}
       </NText>
@@ -1156,17 +1156,17 @@ const handleBeforeExampleImageUpload = async (
 .favorite-reproducibility-editor__section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .favorite-reproducibility-editor__empty {
   display: flex;
   min-width: 0;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: 8px 8px;
   border: 1px dashed var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color-embedded);
@@ -1186,7 +1186,7 @@ const handleBeforeExampleImageUpload = async (
 
 .favorite-reproducibility-editor__item {
   min-width: 0;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color);
@@ -1195,7 +1195,7 @@ const handleBeforeExampleImageUpload = async (
 .favorite-reproducibility-editor__example {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .favorite-reproducibility-editor__example--added {
@@ -1220,7 +1220,7 @@ const handleBeforeExampleImageUpload = async (
   min-width: 0;
   flex-direction: column;
   gap: 8px;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 8px;
   background: var(--n-color-embedded);
@@ -1243,13 +1243,13 @@ const handleBeforeExampleImageUpload = async (
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-reproducibility-editor__summary-image-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(72px, 92px));
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-reproducibility-editor__summary-image {
@@ -1277,25 +1277,25 @@ const handleBeforeExampleImageUpload = async (
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-reproducibility-editor__message-row {
   display: grid;
   min-width: 0;
   grid-template-columns: 120px minmax(0, 1fr) auto;
-  gap: 6px;
+  gap: 4px;
   align-items: start;
 }
 
 .favorite-reproducibility-editor__example-media-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .favorite-reproducibility-editor__item-actions {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .favorite-reproducibility-editor__item-actions--end {
@@ -1307,20 +1307,20 @@ const handleBeforeExampleImageUpload = async (
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-reproducibility-editor__parameter-row {
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(92px, 0.8fr) minmax(0, 1.2fr) auto;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
 }
 
 .favorite-reproducibility-editor__parameter-key {
   min-width: 0;
-  padding: 5px 8px;
+  padding: 4px 8px;
   border: 1px solid var(--n-border-color);
   border-radius: 6px;
   background: var(--n-color-embedded);
@@ -1330,7 +1330,7 @@ const handleBeforeExampleImageUpload = async (
 .favorite-reproducibility-editor__image-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
-  gap: 6px;
+  gap: 4px;
 }
 
 .favorite-reproducibility-editor__image-toolbar :deep(.n-input) {

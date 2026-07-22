@@ -173,7 +173,7 @@
                         <NText
                             strong
                             depth="1"
-                            style="display: block; margin-bottom: 12px"
+                            style="display: block; margin-bottom: 8px"
                         >
                             {{ t("variables.addNew") }}
                         </NText>
@@ -278,7 +278,7 @@
             <NSpace vertical>
                 <!-- 导出格式选择 -->
                 <div>
-                    <NText strong style="display: block; margin-bottom: 12px">
+                    <NText strong style="display: block; margin-bottom: 8px">
                         {{ t("variables.management.exportFormat") }}
                     </NText>
                     <NRadioGroup v-model:value="exportFormat">
@@ -304,7 +304,7 @@
 
                 <!-- 预览区域 -->
                 <div>
-                    <NText strong style="display: block; margin-bottom: 12px">
+                    <NText strong style="display: block; margin-bottom: 8px">
                         {{ t("variables.management.exportPreview") }}
                     </NText>
                     <NInput

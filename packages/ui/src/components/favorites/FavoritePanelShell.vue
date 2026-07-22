@@ -60,13 +60,13 @@ withDefaults(defineProps<{
   flex: none;
   border-bottom: 1px solid color-mix(in srgb, var(--n-border-color) 78%, transparent);
   background: color-mix(in srgb, var(--n-color) 92%, var(--n-primary-color) 8%);
-  padding: 14px 18px;
+  padding: 16px 16px;
 }
 
 .favorite-panel-shell__body {
   min-height: 0;
   flex: 1;
-  padding: 18px;
+  padding: 16px;
 }
 
 .favorite-panel-shell--dialog.favorite-panel-shell--detail .favorite-panel-shell__body {
@@ -94,11 +94,11 @@ withDefaults(defineProps<{
   }
 
   .favorite-panel-shell__toolbar {
-    padding: 12px 14px;
+    padding: 8px 16px;
   }
 
   .favorite-panel-shell__body {
-    padding: 14px;
+    padding: 16px;
   }
 }
 </style>

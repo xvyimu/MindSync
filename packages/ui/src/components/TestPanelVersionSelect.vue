@@ -126,7 +126,7 @@ const handleUpdate = (nextValue: string | number | null) => {
 .test-panel-version-select__tooltip {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   max-width: 280px;
 }
 

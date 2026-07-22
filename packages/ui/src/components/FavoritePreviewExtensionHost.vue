@@ -49,6 +49,6 @@ onMounted(async () => {
 <style scoped>
 .favorite-preview-extension-host {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 </style>

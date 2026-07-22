@@ -10,7 +10,7 @@
       <CompareHelpButton />
     </template>
 
-    <NFlex vertical :size="12">
+    <NFlex vertical :size="8">
       <NAlert
         v-if="topStatusAlert"
         :type="topStatusAlert.type"
@@ -204,7 +204,7 @@
         embedded
         class="compare-role-config__advanced-card"
       >
-        <NFlex vertical :size="12">
+        <NFlex vertical :size="8">
           <div class="compare-role-config__section-copy">
             <NText strong>{{ t('evaluation.compareConfig.advancedSectionTitle') }}</NText>
             <NText depth="3">{{ t('evaluation.compareConfig.advancedSectionSummary') }}</NText>
@@ -697,7 +697,7 @@ function handleConfirm() {
 .compare-role-config__summary-card :deep(.n-card__content),
 .compare-role-config__advanced-card :deep(.n-card__content),
 .compare-role-config__slot-card :deep(.n-card__content) {
-  padding: 12px !important;
+  padding: 8px !important;
 }
 
 .compare-role-config__summary-card,
@@ -716,7 +716,7 @@ function handleConfirm() {
 .compare-role-config__pair-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
 .compare-role-config__summary-header {
@@ -734,20 +734,20 @@ function handleConfirm() {
 .compare-role-config__card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .compare-role-config__slot-header {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-start;
 }
 
 .compare-role-config__slot-title-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -768,8 +768,8 @@ function handleConfirm() {
 .compare-role-config__slot-summary {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 9px 11px;
+  gap: 4px;
+  padding: 8px 8px;
   border-radius: 10px;
   border: 1px solid var(--n-border-color);
   background: var(--n-color-embedded);
@@ -795,7 +795,7 @@ function handleConfirm() {
 .compare-role-config__slot-summary-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
 .compare-role-config__slot-role-pill {
@@ -816,14 +816,14 @@ function handleConfirm() {
 .compare-role-config__role-picker {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .compare-role-config__role-segment {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  padding: 3px;
+  gap: 4px;
+  padding: 4px;
   border: 1px solid var(--n-border-color);
   border-radius: 12px;
   background: var(--n-color-embedded);

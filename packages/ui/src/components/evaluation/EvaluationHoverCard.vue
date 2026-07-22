@@ -36,7 +36,7 @@
           data-testid="evaluation-hover-score-summary"
           @click="handleShowDetail"
         >
-          <NSpace align="center" :size="12" class="score-header">
+          <NSpace align="center" :size="8" class="score-header">
           <NProgress
             type="circle"
             :percentage="result.score.overall"
@@ -343,7 +343,7 @@ const handleApplyPatch = (operation: PatchOperation) => {
   /* 避免在视口底部被截断：高度随视口缩放，内容内部滚动 */
   max-height: min(480px, calc(100vh - 32px));
   box-sizing: border-box;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -378,7 +378,7 @@ const handleApplyPatch = (operation: PatchOperation) => {
 
 /* 分数头部 */
 .score-header {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .score-header-button {
@@ -402,7 +402,7 @@ const handleApplyPatch = (operation: PatchOperation) => {
 }
 
 .stale-alert {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .overall-progress {
@@ -416,7 +416,7 @@ const handleApplyPatch = (operation: PatchOperation) => {
 }
 
 .section-card {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .section-title {
@@ -429,18 +429,18 @@ const handleApplyPatch = (operation: PatchOperation) => {
 }
 
 .compact-list-item {
-  padding: 6px 0;
+  padding: 4px 0;
 }
 
 .dimension-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .dimension-label {
   min-width: 56px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .dimension-progress {
@@ -450,7 +450,7 @@ const handleApplyPatch = (operation: PatchOperation) => {
 .dimension-score {
   min-width: 24px;
   text-align: right;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .patch-instruction {
@@ -461,7 +461,7 @@ const handleApplyPatch = (operation: PatchOperation) => {
 }
 
 .patch-diff-inline {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .patch-apply-btn {
@@ -490,11 +490,11 @@ const handleApplyPatch = (operation: PatchOperation) => {
 }
 
 .feedback-editor-card :deep(.n-card__header) {
-  padding: 8px 10px 6px;
+  padding: 8px 8px 4px;
 }
 
 .feedback-editor-card :deep(.n-card__content) {
-  padding: 0 10px 10px;
+  padding: 0 8px 8px;
 }
 
 .optional-tag {

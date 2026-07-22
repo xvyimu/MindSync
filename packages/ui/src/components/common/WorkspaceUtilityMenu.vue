@@ -298,7 +298,7 @@ const handleConfirmPromptGardenImport = async (request: PromptGardenImportReques
   position: fixed;
   z-index: 20;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
 }
 

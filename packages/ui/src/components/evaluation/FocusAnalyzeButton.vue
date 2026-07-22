@@ -315,11 +315,11 @@ const handleStart = () => {
 }
 
 .focus-popover-card :deep(.n-card__header) {
-  padding: 10px 12px 6px;
+  padding: 8px 8px 4px;
 }
 
 .focus-popover-card :deep(.n-card__content) {
-  padding: 0 12px 12px;
+  padding: 0 8px 8px;
 }
 
 .focus-title {
