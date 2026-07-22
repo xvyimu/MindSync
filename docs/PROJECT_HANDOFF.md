@@ -22,6 +22,7 @@
 
 | 你想… | 去哪里 |
 |--------|--------|
+| **形态 / 唯一技术栈** | [`PROJECT.md`](./PROJECT.md) |
 | **现行版本/路径一页纸** | [`project/CURRENT.md`](./project/CURRENT.md) |
 | 改代码 | `D:\MindSync\src\mindsync`（本文后续章节） |
 | 打开软件 | `D:\MindSync\app\PromptOptimizer.exe` |
