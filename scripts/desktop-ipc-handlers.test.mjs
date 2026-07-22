@@ -475,3 +475,112 @@ test('desktop preference bridge exposes only registered preference handlers', ()
     assert.equal(preferenceHandlers.has(channel), true, `Missing handler for ${channel}`)
   }
 })
+
+/**
+ * Dual-B 败方（Codex）吸收：AI-Core IPC 默认关闭时 fail-closed，
+ * 坏 payload 在 validateArgs / handler 两层拒绝；status 永不带 bearer。
+ */
+test('desktop AI-Core IPC handlers fail closed when disabled and reject bad payloads', async () => {
+  const { registerAiCoreIpcHandlers } = require('../packages/desktop/config/ipc/ai-core-handlers.js')
+  const { resolveAiCoreConfig, toPublicAiCoreStatus } = require('../packages/desktop/config/ai-core-config.js')
+
+  const createIpcError = (code, message) => {
+    const err = new Error(message)
+    err.code = code
+    return err
+  }
+
+  const handlers = new Map()
+  const validators = new Map()
+  const registerSensitiveIpc = (channel, handler, validateArgs) => {
+    handlers.set(channel, handler)
+    if (typeof validateArgs === 'function') validators.set(channel, validateArgs)
+  }
+
+  const disabledConfig = resolveAiCoreConfig({})
+  assert.equal(disabledConfig.enabled, false)
+
+  registerAiCoreIpcHandlers({
+    registerSensitiveIpc,
+    getAiCoreConfig: () => disabledConfig,
+    getAiCoreClient: () => null,
+    createIpcError,
+  })
+
+  for (const channel of [
+    'ai-core-get-status',
+    'ai-core-probe-health',
+    'ai-core-run-evaluation',
+  ]) {
+    assert.equal(handlers.has(channel), true, `missing registration for ${channel}`)
+  }
+
+  const status = await handlers.get('ai-core-get-status')()
+  assert.deepEqual(status, toPublicAiCoreStatus(disabledConfig))
+  assert.equal(JSON.stringify(status).includes('bearer'), false)
+
+  await assert.rejects(
+    () => handlers.get('ai-core-probe-health')(),
+    (err) => err?.code === 'AI_CORE_DISABLED',
+  )
+  await assert.rejects(
+    () => handlers.get('ai-core-run-evaluation')({}, { prompt: 'x' }),
+    (err) => err?.code === 'AI_CORE_DISABLED',
+  )
+
+  // validateArgs 在启用前也会拦非法 body（register 时挂上）
+  const validateEval = validators.get('ai-core-run-evaluation')
+  assert.equal(typeof validateEval, 'function')
+  assert.throws(
+    () => validateEval(['not-an-object']),
+    (err) => err?.code === 'IPC_INVALID_ARGUMENT',
+  )
+  assert.throws(
+    () => validateEval([null]),
+    (err) => err?.code === 'IPC_INVALID_ARGUMENT',
+  )
+  // undefined body allowed through validator (handler still fail-closed when disabled)
+  assert.doesNotThrow(() => validateEval([undefined]))
+
+  // enabled path: invalid body still rejected inside handler even if client present
+  const enabledConfig = resolveAiCoreConfig({
+    AI_CORE_URL: 'http://127.0.0.1:8091',
+    AI_CORE_BEARER: 'secret-must-not-leak',
+  })
+  const clientCalls = []
+  const handlersEnabled = new Map()
+  registerAiCoreIpcHandlers({
+    registerSensitiveIpc: (channel, handler, validateArgs) => {
+      handlersEnabled.set(channel, handler)
+      if (typeof validateArgs === 'function') validators.set(channel, validateArgs)
+    },
+    getAiCoreConfig: () => enabledConfig,
+    getAiCoreClient: () => ({
+      health: async () => {
+        clientCalls.push('health')
+        return { ok: true }
+      },
+      runEvaluation: async (body) => {
+        clientCalls.push(['eval', body])
+        return { ok: true, body }
+      },
+    }),
+    createIpcError,
+  })
+
+  const publicStatus = await handlersEnabled.get('ai-core-get-status')()
+  assert.equal(publicStatus.enabled, true)
+  assert.equal(JSON.stringify(publicStatus).includes('secret-must-not-leak'), false)
+
+  await assert.rejects(
+    () => handlersEnabled.get('ai-core-run-evaluation')({}, null),
+    (err) => err?.code === 'IPC_INVALID_ARGUMENT',
+  )
+  await assert.rejects(
+    () => handlersEnabled.get('ai-core-run-evaluation')({}, ['array']),
+    (err) => err?.code === 'IPC_INVALID_ARGUMENT',
+  )
+  const evalOk = await handlersEnabled.get('ai-core-run-evaluation')({}, { task: 'ping' })
+  assert.equal(evalOk.ok, true)
+  assert.deepEqual(clientCalls.at(-1), ['eval', { task: 'ping' }])
+})
