@@ -1,6 +1,6 @@
 # 桌面软件重设计方案（评审稿 · 2026-07-21 · v2）
 
-> 状态：**R0 已合 develop**（flag 默认 OFF）。**R1 token 收敛**在分支 `feature/redesign-token-r1`（未 push / 未合 develop，除非维护者授权）。
+> 状态：**R0–R2 已合 develop**（flag 默认 OFF）。**R3 管理入口**在分支 `feature/redesign-manage-r3`。
 > 目标：重新设计一个"我想要的"桌面软件；**全局 UI 强制规范**（§4）吸收自用户提供的设计宪法，全站严格遵守。
 > 参照：**Naive UI Admin**（侧栏 + 顶栏后台骨架）。
 > 前置澄清：MindSync 已是 `app→ui→core` + Electron——本方案聚焦桌面 UI，不拆后端、不换栈。
@@ -16,8 +16,9 @@
 | D3 | 视觉方向 | **已定 · 现代极简 + Paper 收口** | 见 §4 |
 | 参照 | Naive UI Admin | **已定** | 用户确认 3 |
 | 起步 | R0 | **已完成（flag 默认关 · 已合 develop）** | 见 §10 |
-| token | R1 | **已完成（PR#9 · 默认 Paper + 结构 token）** | 见 §11 |
-| modes | R2 | **进行中 / 本工作树** | 见 §12 |
+| token | R1 | **已完成（PR#9）** | 见 §11 |
+| modes | R2 | **已完成（PR#10）** | 见 §12 |
+| manage | R3 | **本分支** | 见 §13 |
 
 ---
 
@@ -361,7 +362,40 @@
 | 未改 core / IPC | **pass** |
 
 ### 合并建议
-R1 合入后开 `feature/redesign-modes-r2` → PR → develop。
+R2 已合 develop（PR#10）。下一阶段 **R3**。
+
+---
+
+## 13. R3 阶段报告（2026-07-22）
+
+### 功能概述
+**管理入口迁侧栏 + 顶栏瘦身**：shell ON 时六类管理（收藏/模板/历史/模型/数据/变量）在 `AppManageNav`；父组件仍打开既有 modal/drawer（History 等已是 Drawer，modal 作 fallback）。顶栏 `AppHeaderActions` 用 `compact` 只留主题/GitHub/关于/语言/更新。
+
+### 改动文件清单
+| 文件 | 动作 |
+|------|------|
+| `packages/ui/src/components/app-layout/AppManageNav.vue` | **新增** 六入口 + emits |
+| `packages/ui/src/components/app-layout/AppSideNav.vue` | manage 槽 + `collapsed` slot prop |
+| `packages/ui/src/components/MainLayout.vue` | 透传 manage 槽 |
+| `packages/ui/src/components/app-layout/AppHeaderActions.vue` | `compact` 隐藏管理区 |
+| `packages/ui/src/components/app-layout/PromptOptimizerApp.vue` | 接线 manage + compact |
+| `packages/ui/src/components/app-layout/index.ts` | 导出 AppManageNav |
+| `packages/ui/tests/unit/components/AppManageNav.spec.ts` | 新增 |
+| `packages/ui/tests/unit/components/AppSideNav.spec.ts` | 扩展 manage 槽 |
+| `packages/ui/tests/unit/components/AppHeaderActions.spec.ts` | compact 用例 |
+| `docs/project/REDESIGN-PROPOSAL-2026-07-21.md` | 本报告 |
+
+### 验收
+| 项 | 结果 |
+|----|------|
+| shell ON：六管理在侧栏可达 | **pass**（结构 + 单测 emits） |
+| shell ON：顶栏无重复管理按钮 | **pass**（compact） |
+| shell OFF：legacy 顶栏全量入口 | **pass**（compact 默认 false） |
+| 既有 modal/drawer 打开路径不变 | **pass**（同 handlers） |
+| 未改 core / IPC | **pass** |
+
+### 合并建议
+`feature/redesign-manage-r3` → PR → develop。下一阶段 **R4** 工作区卡片式主次。
 
 ---
 

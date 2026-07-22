@@ -14,10 +14,13 @@
     >
       <!-- ===== Redesign shell: sider + column (Naive UI Admin) ===== -->
       <template v-if="redesignShell">
-        <!-- R2: workspace modes live in the sider (same core-nav slot / AppCoreNav) -->
+        <!-- R2 modes + R3 manage live in the sider -->
         <AppSideNav>
           <template #modes>
             <slot name="core-nav"></slot>
+          </template>
+          <template #manage="manageSlot">
+            <slot name="manage" v-bind="manageSlot"></slot>
           </template>
         </AppSideNav>
         <NLayout class="main-layout-column">
