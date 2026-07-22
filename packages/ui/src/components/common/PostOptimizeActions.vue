@@ -71,17 +71,17 @@ const { t } = useI18n()
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   margin-top: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 8px 16px;
+  border-radius: 8px;
   border: 1px solid var(--n-border-color);
   background: var(--n-color-modal);
 }
 .post-optimize-cta__text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 .post-optimize-cta__hint {

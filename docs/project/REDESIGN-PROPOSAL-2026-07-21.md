@@ -1,6 +1,6 @@
 # 桌面软件重设计方案（评审稿 · 2026-07-21 · v2）
 
-> 状态：**R0–R2 已合 develop**（flag 默认 OFF）。**R3 管理入口**在分支 `feature/redesign-manage-r3`。
+> 状态：**R0–R3 已合 develop**（flag 默认 OFF）。**R4 工作区卡片主次**在分支 `feature/redesign-workspace-r4`。
 > 目标：重新设计一个"我想要的"桌面软件；**全局 UI 强制规范**（§4）吸收自用户提供的设计宪法，全站严格遵守。
 > 参照：**Naive UI Admin**（侧栏 + 顶栏后台骨架）。
 > 前置澄清：MindSync 已是 `app→ui→core` + Electron——本方案聚焦桌面 UI，不拆后端、不换栈。
@@ -18,7 +18,8 @@
 | 起步 | R0 | **已完成（flag 默认关 · 已合 develop）** | 见 §10 |
 | token | R1 | **已完成（PR#9）** | 见 §11 |
 | modes | R2 | **已完成（PR#10）** | 见 §12 |
-| manage | R3 | **本分支** | 见 §13 |
+| manage | R3 | **已完成（PR#11）** | 见 §13 |
+| cards | R4 | **本分支** | 见 §14 |
 
 ---
 
@@ -395,7 +396,49 @@ R2 已合 develop（PR#10）。下一阶段 **R3**。
 | 未改 core / IPC | **pass** |
 
 ### 合并建议
-`feature/redesign-manage-r3` → PR → develop。下一阶段 **R4** 工作区卡片式主次。
+R3 已合 develop（PR#11）。下一阶段 **R4**。
+
+---
+
+## 14. R4 阶段报告（2026-07-22）
+
+### 功能概述
+**工作区卡片式主次布局**（Basic System/User）：
+- 模块角色：`secondary` 原始输入（可折叠）· `primary` 优化结果（主焦点）· `support` 测试模块
+- redesign shell ON：测试区默认折叠；PostOptimize「去测试」自动展开并滚动；默认左分栏 42%
+- 间距收敛 12→8；PostOptimize CTA 圆角/间距合法化
+- 共享 helper `useWorkspaceCardLayout` + paper.css 卡片类
+
+### 改动文件清单
+| 文件 | 动作 |
+|------|------|
+| `packages/ui/src/composables/ui/useWorkspaceCardLayout.ts` | **新增** |
+| `packages/ui/src/composables/ui/index.ts` | 导出 |
+| `packages/ui/src/styles/paper.css` | workspace-card / test-collapsed / skeleton tokens |
+| `packages/ui/src/components/basic-mode/BasicSystemWorkspace.vue` | 主次卡片 + 测试折叠 |
+| `packages/ui/src/components/basic-mode/BasicUserWorkspace.vue` | 同上 |
+| `packages/ui/src/components/common/PostOptimizeActions.vue` | token 间距/圆角 |
+| `packages/ui/src/i18n/locales/{zh-CN,en-US,zh-TW}/testing.ts` | expandHint / collapseTest |
+| `packages/ui/tests/unit/composables/useWorkspaceCardLayout.spec.ts` | 新增 |
+| `docs/project/REDESIGN-PROPOSAL-2026-07-21.md` | 本报告 |
+
+### 验收
+| 项 | 结果 |
+|----|------|
+| shell ON：优化结果 primary 卡片 | **pass**（class 结构） |
+| shell ON：测试区默认折叠可展开 | **pass**（默认 true + CTA 展开） |
+| shell OFF：测试区默认展开 | **pass**（resolveInitialTestCollapsed false） |
+| 原始输入仍可折叠 | **pass**（既有 isInputPanelCollapsed） |
+| typecheck / unit | **pass** |
+| 未改 core / IPC | **pass** |
+
+### 已知未做
+- Context / Image 工作区同构卡片（可 R4.1 或随触达）
+- 全量 NSkeleton 接入优化流（token 已备，组件级 skeleton 待接）
+- R5 全仓 12/48 gap 审计
+
+### 合并建议
+`feature/redesign-workspace-r4` → PR → develop。下一阶段 **R5** 全仓 token 审计。
 
 ---
 

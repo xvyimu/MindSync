@@ -30,6 +30,8 @@ const messages = {
   "test": {
     "title": "測試",
     "areaTitle": "測試區域",
+    "expandHint": "測試區預設收合；優化完成後可展開執行對照測試。",
+    "collapseTest": "收合測試區",
     "content": "測試內容",
     "placeholder": "請輸入要測試的內容...",
     "modes": {
