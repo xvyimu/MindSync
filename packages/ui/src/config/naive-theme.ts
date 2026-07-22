@@ -5,8 +5,8 @@ import { darkTheme, lightTheme, type GlobalThemeOverrides, type GlobalTheme } fr
 import { pinia } from '../plugins/pinia'
 import { useGlobalSettings } from '../stores/settings/useGlobalSettings'
 
-// 当前主题ID
-export const currentThemeId = ref<string>('light')
+// 当前主题ID — R1 product default is Paper (overridden by settings after init)
+export const currentThemeId = ref<string>('paper')
 
 // 主题类型定义
 export interface ThemeConfig {
@@ -16,6 +16,35 @@ export interface ThemeConfig {
   themeOverrides: GlobalThemeOverrides
 }
 
+/**
+ * Design constitution structural tokens (§4.3–4.4).
+ * Shared across every theme so switching themes never reintroduces ad-hoc radii/type.
+ * Spacing five-step (4/8/16/24/32) lives in paper.css; full component gap audit is R5.
+ */
+const CONSTITUTION_STRUCTURAL_COMMON = {
+  // Card / modal / drawer surface radius (buttons override separately → 4px)
+  borderRadius: '8px',
+  borderRadiusSmall: '4px',
+  fontSize: '14px',
+  fontSizeMini: '12px',
+  fontSizeTiny: '12px',
+  fontSizeSmall: '14px',
+  fontSizeMedium: '14px',
+  fontSizeLarge: '16px',
+  fontSizeHuge: '18px',
+} as const
+
+/** Naive Button self() copies common.borderRadius into all sizes — force 4px. */
+const CONSTITUTION_BUTTON_RADIUS = {
+  borderRadiusTiny: '4px',
+  borderRadiusSmall: '4px',
+  borderRadiusMedium: '4px',
+  borderRadiusLarge: '4px',
+} as const
+
+/** Optional single-layer elevation (constitution §4.3). Prefer hairline on Paper. */
+export const CONSTITUTION_ELEVATION_SHADOW = '0 1px 2px rgba(15, 23, 42, 0.06)'
+
 // 纯Naive UI主题配置 - 完全消除CSS依赖
 export const naiveThemeConfigs: Record<string, ThemeConfig> = {
   light: {
@@ -24,6 +53,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
     naiveTheme: lightTheme,
     themeOverrides: {
       common: {
+        ...CONSTITUTION_STRUCTURAL_COMMON,
         primaryColor: '#4b5563',
         primaryColorHover: '#3f4854',
         primaryColorPressed: '#374151',
@@ -59,6 +89,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         clearColorPressed: 'rgba(79, 89, 102, 0.36)'
       },
       Button: {
+        ...CONSTITUTION_BUTTON_RADIUS,
         textColorPrimary: '#f9fafb',
         textColorHoverPrimary: '#f9fafb',
         textColorPressedPrimary: '#f9fafb',
@@ -154,11 +185,12 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
   },
 
   dark: {
-    id: 'dark', 
+    id: 'dark',
     labelKey: 'theme.dark',
     naiveTheme: darkTheme,
     themeOverrides: {
       common: {
+        ...CONSTITUTION_STRUCTURAL_COMMON,
         primaryColor: '#64748b',
         primaryColorHover: '#475569',
         primaryColorPressed: '#334155',
@@ -171,7 +203,10 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         errorColorHover: '#dc2626',
         errorColorPressed: '#b91c1c',
         errorColorSuppl: '#7f1d1d',
-      }
+      },
+      Button: {
+        ...CONSTITUTION_BUTTON_RADIUS,
+      },
     }
   },
 
@@ -181,6 +216,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
     naiveTheme: lightTheme,
     themeOverrides: {
       common: {
+        ...CONSTITUTION_STRUCTURAL_COMMON,
         primaryColor: '#1f6bd1',
         primaryColorHover: '#185cb8',
         primaryColorPressed: '#134c98',
@@ -210,6 +246,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         clearColorPressed: 'rgba(31, 107, 209, 0.45)'
       },
       Button: {
+        ...CONSTITUTION_BUTTON_RADIUS,
         textColorPrimary: '#ffffff',
         textColorHoverPrimary: '#ffffff',
         textColorPressedPrimary: '#ffffff',
@@ -310,6 +347,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
     naiveTheme: lightTheme,
     themeOverrides: {
       common: {
+        ...CONSTITUTION_STRUCTURAL_COMMON,
         primaryColor: '#7b6a58',
         primaryColorHover: '#6a5a4a',
         primaryColorPressed: '#594a3d',
@@ -348,6 +386,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         boxShadow2: '0 12px 32px rgba(87, 69, 55, 0.12)'
       },
       Button: {
+        ...CONSTITUTION_BUTTON_RADIUS,
         textColorPrimary: '#3f382f',
         textColorHoverPrimary: '#3f382f',
         textColorPressedPrimary: '#3f382f',
@@ -448,6 +487,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
     naiveTheme: darkTheme,
     themeOverrides: {
       common: {
+        ...CONSTITUTION_STRUCTURAL_COMMON,
         primaryColor: '#1fb598',
         primaryColorHover: '#1aa184',
         primaryColorPressed: '#16846c',
@@ -493,6 +533,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         errorColorSuppl: '#4d2020'
       },
       Button: {
+        ...CONSTITUTION_BUTTON_RADIUS,
         textColorPrimary: '#0f342b',
         textColorHoverPrimary: '#0b271f',
         textColorPressedPrimary: '#092017',
@@ -593,6 +634,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
     naiveTheme: darkTheme,
     themeOverrides: {
       common: {
+        ...CONSTITUTION_STRUCTURAL_COMMON,
         primaryColor: '#b47bff',
         primaryColorHover: '#a060f7',
         primaryColorPressed: '#8c4edf',
@@ -638,6 +680,7 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         errorColorSuppl: '#4b1f32'
       },
       Button: {
+        ...CONSTITUTION_BUTTON_RADIUS,
         textColorPrimary: '#1f1633',
         textColorHoverPrimary: '#1a122c',
         textColorPressedPrimary: '#140d22',
@@ -732,14 +775,15 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
     }
   },
 
-  // Paper: developer-tool + E-Ink palette. Offline-first system font stacks.
-  // WCAG AAA body text; hairline borders; no elevation shadows.
+  // Paper: product default visual (R1). Constitution palette + offline font stacks.
+  // WCAG AA body text; hairline borders; single optional elevation token elsewhere.
   paper: {
     id: 'paper',
     labelKey: 'theme.paper',
     naiveTheme: lightTheme,
     themeOverrides: {
       common: {
+        ...CONSTITUTION_STRUCTURAL_COMMON,
         fontFamily:
           '"IBM Plex Sans", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif',
         fontFamilyMono:
@@ -777,8 +821,9 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         pressedColor: 'rgba(59, 130, 246, 0.12)',
         textColorBase: '#1E293B',
         textColor1: '#1E293B',
-        textColor2: '#475569',
-        textColor3: '#64748B',
+        // Constitution §4.2 / §4.8 secondary + tertiary text
+        textColor2: '#64748B',
+        textColor3: '#94A3B8',
         textColorDisabled: 'rgba(30, 41, 59, 0.38)',
         placeholderColor: '#94A3B8',
         placeholderColorDisabled: 'rgba(148, 163, 184, 0.5)',
@@ -796,10 +841,9 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         clearColor: 'rgba(30, 41, 59, 0.2)',
         clearColorHover: 'rgba(30, 41, 59, 0.3)',
         clearColorPressed: 'rgba(30, 41, 59, 0.4)',
-        borderRadius: '8px',
-        borderRadiusSmall: '6px'
       },
       Button: {
+        ...CONSTITUTION_BUTTON_RADIUS,
         textColorPrimary: '#FFFFFF',
         textColorHoverPrimary: '#FFFFFF',
         textColorPressedPrimary: '#FFFFFF',
@@ -872,7 +916,16 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
         closeIconColor: '#94A3B8',
         closeIconColorHover: '#64748B',
         closeIconColorPressed: '#475569',
+        // Hairline only (constitution: prefer no multi-layer elevation on paper surfaces)
+        // Hairline; borderRadius inherits common 8px via Card self()
         boxShadow: '0 0 0 1px rgba(226, 232, 240, 0.6)'
+      },
+      // Dialog/Drawer inherit common.borderRadius (8px)
+      Dialog: {
+        borderRadius: '8px'
+      },
+      Drawer: {
+        borderRadius: '8px'
       },
       Tabs: {
         tabColor: '#F1F5F9',
@@ -943,9 +996,9 @@ export const naiveThemeConfigs: Record<string, ThemeConfig> = {
 // 获取可用主题列表
 export const availableThemes = Object.values(naiveThemeConfigs)
 
-// 当前主题配置
-export const currentThemeConfig = computed(() => 
-  naiveThemeConfigs[currentThemeId.value] || naiveThemeConfigs.light
+// 当前主题配置 — fall back to product default Paper (R1)
+export const currentThemeConfig = computed(() =>
+  naiveThemeConfigs[currentThemeId.value] || naiveThemeConfigs.paper
 )
 
 // 当前 Naive UI 主题
@@ -958,13 +1011,18 @@ export const currentThemeOverrides = computed<GlobalThemeOverrides>(() =>
   currentThemeConfig.value.themeOverrides || {}
 )
 
+/**
+ * Resolve settings theme id → applied config id.
+ * R1: `auto` light path uses Paper (product default), not gray `light`.
+ * Explicit `light` / other themes remain available for power users.
+ */
 const resolveAppliedThemeId = (selectedThemeId: string): string => {
   if (selectedThemeId === 'auto') {
     try {
       const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
-      return prefersDark ? 'dark' : 'light'
+      return prefersDark ? 'dark' : 'paper'
     } catch {
-      return 'light'
+      return 'paper'
     }
   }
   return selectedThemeId

@@ -16,8 +16,9 @@
   --paper-rule: var(--n-border-color, #e2e8f0);
   --paper-rule-strong: #cbd5e1;
   --paper-ink: var(--n-text-color-1, #1e293b);
-  --paper-ink-2: var(--n-text-color-2, #475569);
-  --paper-ink-3: var(--n-text-color-3, #64748b);
+  /* Constitution §4.2 secondary / tertiary */
+  --paper-ink-2: var(--n-text-color-2, #64748b);
+  --paper-ink-3: var(--n-text-color-3, #94a3b8);
   --paper-primary: var(--n-primary-color, #3b82f6);
   --paper-primary-soft: color-mix(
     in srgb,
@@ -28,19 +29,35 @@
   --paper-focus-ring: 0 0 0 2px
     color-mix(in srgb, var(--n-primary-color, #3b82f6) 22%, transparent);
 
-  /* 8pt spacing scale */
+  /*
+   * Spacing: design constitution allows ONLY 4 / 8 / 16 / 24 / 32 (plus 0).
+   * Index map (R1): 1=4, 2=8, 3=16, 4=24, 5=32.
+   * Legacy aliases: --paper-space-6 → 32; --paper-space-7 → 32 (was 48, out of scale).
+   */
   --paper-space-0: 0;
   --paper-space-1: 4px;
   --paper-space-2: 8px;
-  --paper-space-3: 12px;
-  --paper-space-4: 16px;
-  --paper-space-5: 24px;
-  --paper-space-6: 32px;
-  --paper-space-7: 48px;
+  --paper-space-3: 16px;
+  --paper-space-4: 24px;
+  --paper-space-5: 32px;
+  --paper-space-6: 32px; /* legacy alias; prefer space-5 */
+  --paper-space-7: 32px; /* was 48px — clamped to max legal step */
 
-  --paper-radius-sm: 6px;
-  --paper-radius-md: 10px;
+  /* Radii: button 4 · card/modal 8 · pill only for true chips */
+  --paper-radius-sm: 4px;
+  --paper-radius-md: 8px;
   --paper-radius-pill: 999px;
+
+  /* Type scale (constitution §4.4) */
+  --paper-font-title: 18px;
+  --paper-font-subtitle: 16px;
+  --paper-font-body: 14px;
+  --paper-font-meta: 12px;
+  --paper-lh-title: 1.4;
+  --paper-lh-body: 1.6;
+
+  /* Single-layer elevation (optional; paper cards stay hairline) */
+  --paper-shadow-elev: 0 1px 2px rgba(15, 23, 42, 0.06);
 
   --paper-dur-fast: 150ms;
   --paper-dur-med: 220ms;
@@ -67,8 +84,8 @@ html[data-app-theme='paper'] {
   --paper-rule: #e2e8f0;
   --paper-rule-strong: #cbd5e1;
   --paper-ink: #1e293b;
-  --paper-ink-2: #475569;
-  --paper-ink-3: #64748b;
+  --paper-ink-2: #64748b;
+  --paper-ink-3: #94a3b8;
   --paper-primary: #3b82f6;
   --paper-primary-soft: rgba(59, 130, 246, 0.12);
   --paper-focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.22);
@@ -76,6 +93,8 @@ html[data-app-theme='paper'] {
   color: var(--paper-ink);
   background-color: var(--paper-bg);
   font-family: var(--paper-font-sans);
+  font-size: var(--paper-font-body);
+  line-height: var(--paper-lh-body);
   font-feature-settings: 'ss01', 'cv02', 'cv03', 'cv04';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -106,13 +125,23 @@ html[data-app-theme='paper'] ::-webkit-scrollbar-thumb:hover {
   background: rgba(71, 85, 105, 0.45);
 }
 
-/* Flat chrome: no elevation on paper surfaces. */
+/* Flat chrome: hairline only on paper surfaces (no multi-layer elevation). */
 html[data-app-theme='paper'] .n-card {
   box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.7) !important;
+  border-radius: var(--paper-radius-md) !important;
+}
+
+html[data-app-theme='paper'] .n-button {
+  border-radius: var(--paper-radius-sm);
 }
 
 html[data-app-theme='paper'] .n-layout-header {
   box-shadow: none !important;
+}
+
+/* Optional elevation helper — single layer only */
+.paper-elev {
+  box-shadow: var(--paper-shadow-elev);
 }
 
 /* Code / mono surfaces — developer-tool feel. */
@@ -129,8 +158,34 @@ html[data-app-theme='paper'] .version-tag-clickable {
 /* Reusable helpers */
 .paper-hairline {
   border: 1px solid var(--paper-rule);
-  border-radius: var(--paper-radius-md);
+  border-radius: var(--paper-radius-md); /* 8px card radius */
   background: var(--paper-surface);
+}
+
+.paper-type-title {
+  font-size: var(--paper-font-title);
+  line-height: var(--paper-lh-title);
+  font-weight: 600;
+  color: var(--paper-ink);
+}
+
+.paper-type-subtitle {
+  font-size: var(--paper-font-subtitle);
+  line-height: var(--paper-lh-title);
+  font-weight: 600;
+  color: var(--paper-ink);
+}
+
+.paper-type-body {
+  font-size: var(--paper-font-body);
+  line-height: var(--paper-lh-body);
+  color: var(--paper-ink);
+}
+
+.paper-type-meta {
+  font-size: var(--paper-font-meta);
+  line-height: var(--paper-lh-body);
+  color: var(--paper-ink-3);
 }
 
 .paper-rule {

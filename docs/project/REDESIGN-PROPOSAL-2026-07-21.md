@@ -1,6 +1,6 @@
 # 桌面软件重设计方案（评审稿 · 2026-07-21 · v2）
 
-> 状态：**R0 已落地于分支 `feature/redesign-shell` · 未 push · 未合 develop**。默认 flag OFF，旧布局零影响。
+> 状态：**R0 已合 develop**（flag 默认 OFF）。**R1 token 收敛**在分支 `feature/redesign-token-r1`（未 push / 未合 develop，除非维护者授权）。
 > 目标：重新设计一个"我想要的"桌面软件；**全局 UI 强制规范**（§4）吸收自用户提供的设计宪法，全站严格遵守。
 > 参照：**Naive UI Admin**（侧栏 + 顶栏后台骨架）。
 > 前置澄清：MindSync 已是 `app→ui→core` + Electron——本方案聚焦桌面 UI，不拆后端、不换栈。
@@ -15,7 +15,8 @@
 | D2 | 功能与交互 | **已定 · 保功能换壳** | 用户确认 1 |
 | D3 | 视觉方向 | **已定 · 现代极简 + Paper 收口** | 见 §4 |
 | 参照 | Naive UI Admin | **已定** | 用户确认 3 |
-| 起步 | R0 | **已完成（flag 默认关）** | 用户确认 2；见 §10 阶段报告 |
+| 起步 | R0 | **已完成（flag 默认关 · 已合 develop）** | 见 §10 |
+| token | R1 | **本分支完成（默认 Paper + 结构 token）** | 见 §11 |
 
 ---
 
@@ -243,10 +244,10 @@
 
 ## 9. 下一步
 
-- **R0 完成**（本分支）→ 待你验收 flag ON 预览后进 **R1（token 收敛）**。
-- 预览 shell：浏览器/桌面 dev 控制台执行 `localStorage.setItem('ui:redesign-shell','1')` 后刷新；或 URL `?redesignShell=1`。
+- **R0** 已合 develop；**R1** 在 `feature/redesign-token-r1`（见 §11）。
+- 预览 shell：`localStorage.setItem('ui:redesign-shell','1')` 或 `?redesignShell=1`。
 - 关回旧布局：`localStorage.removeItem('ui:redesign-shell')` 或 `?redesignShell=0`。
-- **不 push / 不合 develop**，除非你明确授权。
+- 下一阶段：**R2**（功能模式迁侧栏）。**不 push / 不合 develop**，除非你明确授权。
 
 ---
 
@@ -286,7 +287,52 @@
 - fetch origin 本环境 SSL 失败，分支仅本地。
 
 ### 合并建议
-**不合并**。等你本地 flag ON 预览 OK → 授权后进 R1；整包 redesign 完成前保持 feature 分支。
+**R0 已合 develop**（历史：当时建议不合并；后随 PR#8 落地）。
+
+---
+
+## 11. R1 阶段报告（2026-07-22）
+
+### 功能概述
+按 §4.8 **token 收敛**：产品默认视觉 = Paper；全主题共享结构 token（圆角 8/4、字号 12/14/16/18）；间距尺度仅 4/8/16/24/32；按钮强制 4px 圆角；文字次/辅色对齐宪法；单层 elevation token；不改 core / IPC / 业务语义。
+
+### 改动文件清单
+| 文件 | 动作 |
+|------|------|
+| `packages/ui/src/config/naive-theme.ts` | `CONSTITUTION_*`；全主题结构 token；Paper 文字色；Button 4px；Dialog/Drawer 8px；`auto`→light 走 Paper；fallback paper |
+| `packages/ui/src/stores/settings/useGlobalSettings.ts` | 默认 `selectedThemeId: 'paper'` |
+| `packages/ui/src/styles/paper.css` | 五档间距；radius 4/8；type token；ink-2/3；`.paper-elev` / type helpers |
+| `packages/ui/src/components/MainLayout.vue` | 顶栏/内容 padding 去 12/48/40/10；圆角对齐 |
+| `packages/ui/tests/unit/redesign-tokens-r1.test.ts` | 新增结构 token 守卫 |
+| `docs/project/REDESIGN-PROPOSAL-2026-07-21.md` | 本报告 |
+
+### 验收
+| 项 | 结果 |
+|----|------|
+| 间距 token 合法档 | **pass**（`paper.css` 仅 0/4/8/16/24/32；legacy 6/7 钳到 32） |
+| 按钮 4 / 卡片·弹窗 8 | **pass**（common 8 + Button override 4 + Dialog/Drawer 8） |
+| 字号四档 | **pass**（common fontSize* + CSS vars） |
+| 次要/辅助文字 | **pass**（Paper `#64748b` / `#94a3b8`） |
+| 默认 Paper | **pass**（settings 默认 + auto 浅色 → paper） |
+| 未改 core / IPC | **pass** |
+| 单测 redesign tokens | **pass**（4/4 · `redesign-tokens-r1.test.ts`） |
+| redesign-shell 回归 | **pass**（4/4） |
+| `pnpm -F @mindsync/ui typecheck` | **pass** |
+
+### 架构合规自检
+- 分层：仅 `packages/ui` → **合规**
+- C2：只扩展 `paper.css` token + Naive overrides，无新 ad-hoc CSS 文件 → **合规**
+- C5：MainLayout 触达路径去越界间距 → **改善**；全仓 12/48 组件 gap 仍属 **R5**
+- 多主题入口：仍可切换（源码保留）；新产品默认 Paper，结构 token 全主题统一 → **对齐 §4.2 收敛策略**
+
+### 已知风险 / 未做
+- 127 组件历史 `12px`/`48px`/`gap` **未**全仓审计（R5）。
+- 已有用户持久化主题 ≠ paper 时不会被强制改写。
+- `paper-space-3` 语义从 12→16、`space-4` 从 16→24（尺度重编号）；当前仓内几乎无 `var(--paper-space-*)` 消费方，风险低。
+- Naive Button 默认把 `common.borderRadius` 抄到按钮；已用 `CONSTITUTION_BUTTON_RADIUS` 全主题覆盖。
+
+### 合并建议
+**可合 develop**（视觉向、可回滚）。仍默认 **不 push / 不合**，除非你明确授权。授权后建议：`feature/redesign-token-r1` → PR → develop。下一阶段 **R2**。
 
 ---
 

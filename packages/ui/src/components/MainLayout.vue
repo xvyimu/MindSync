@@ -65,7 +65,7 @@
         class="main-layout-legacy"
       >
         <NLayoutHeader class="theme-header nav-header-enhanced">
-          <NFlex justify="space-between" align="center" class="w-full nav-content" :wrap="false" :size="[16, 12]">
+          <NFlex justify="space-between" align="center" class="w-full nav-content" :wrap="false" :size="[16, 8]">
             <NFlex align="center" :size="16" :wrap="false">
               <NButton text class="brand-link" @click="openBrandWebsite">
                 <NFlex align="center" :size="8" :wrap="false">
@@ -97,7 +97,7 @@
         <NLayoutContent
           has-sider
           class="main-layout-content"
-          content-style="height: 100%; max-height: 100%; min-height: 0; box-sizing: border-box; padding: 24px clamp(16px, 2vw, 48px) 40px; display: flex; flex-direction: column; align-items: stretch; overflow: hidden;"
+          content-style="height: 100%; max-height: 100%; min-height: 0; box-sizing: border-box; padding: 24px clamp(16px, 2vw, 32px) 32px; display: flex; flex-direction: column; align-items: stretch; overflow: hidden;"
         >
           <div class="main-content-wrapper">
             <slot name="main"></slot>
@@ -229,10 +229,10 @@ const openBrandWebsite = async () => {
   min-height: 0;
 }
 
-/* 增强导航栏样式 */
+/* 增强导航栏样式 — spacing only 4/8/16/24/32 (R1 constitution) */
 .nav-header-enhanced {
   min-height: 64px !important;
-  padding: 12px 16px !important;
+  padding: 8px 16px !important;
 }
 
 /* Shell header: slightly tighter vertical padding (token 8). */
@@ -241,10 +241,10 @@ const openBrandWebsite = async () => {
   padding: 8px 16px !important;
 }
 
-/* Paper theme: flat hairline header, slightly roomier horizontal padding. */
+/* Paper theme: flat hairline header, roomier horizontal padding (24). */
 html[data-app-theme='paper'] .nav-header-enhanced {
-  min-height: 60px !important;
-  padding: 10px 24px !important;
+  min-height: 56px !important;
+  padding: 8px 24px !important;
   background: var(--paper-surface, var(--n-card-color));
   border-bottom: 1px solid var(--paper-rule, var(--n-border-color));
   box-shadow: none !important;
@@ -260,13 +260,13 @@ html[data-app-theme='paper'] .nav-header-enhanced {
 
 .brand-link {
   align-items: center;
-  padding: 6px 10px 6px 6px;
-  border-radius: 12px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 8px;
   color: inherit;
   transition:
-    background-color 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out,
-    transform 0.2s ease-in-out;
+    background-color var(--paper-dur-med, 220ms) var(--paper-ease, ease-in-out),
+    box-shadow var(--paper-dur-med, 220ms) var(--paper-ease, ease-in-out),
+    transform var(--paper-dur-med, 220ms) var(--paper-ease, ease-in-out);
 }
 
 .brand-link:hover {
@@ -288,10 +288,10 @@ html[data-app-theme='paper'] .nav-header-enhanced {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--n-primary-color) 28%, transparent);
 }
 
-/* Logo样式优化 */
+/* Logo样式优化 — button radius 4px */
 .logo-image {
-  border-radius: 6px;
-  transition: transform 0.2s ease-in-out;
+  border-radius: 4px;
+  transition: transform var(--paper-dur-med, 220ms) var(--paper-ease, ease-in-out);
   flex-shrink: 0;
 }
 
