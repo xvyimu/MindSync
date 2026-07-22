@@ -18,6 +18,7 @@
 | **包 scope / Electron** | 根 `mindsync` · `@mindsync/*` · appId `com.xvyimu.mindsync` · productName `MindSync`（见 PR#7） |
 | **Redesign** | R0–R4 已合 develop（PR#8–#12）；shell flag 默认 OFF；下一刀 R5 |
 | **许可** | AGPL-3.0-only（`LICENSE` 正文保留；抬头含独立维护说明） |
+| **形态与栈 SSOT** | [`../PROJECT.md`](../PROJECT.md)（Desktop Electron + Vue monorepo；小修不重选型） |
 
 ---
 
