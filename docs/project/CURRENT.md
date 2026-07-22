@@ -15,7 +15,7 @@
 | **上游 remote** | **已移除**（2026-07-21）。安全补丁改为手工补丁，不恢复 `upstream` 除非维护者书面决定 |
 | **身份 SSOT** | [`GITHUB_IDENTITY.md`](../../GITHUB_IDENTITY.md) |
 | **包 scope / Electron** | 根 `mindsync` · `@mindsync/*` · appId `com.xvyimu.mindsync` · productName `MindSync`（见 PR#7） |
-| **Redesign** | R0–R4 已合 develop（PR#8–#12）；shell flag 默认 OFF；下一刀 R5 |
+| **Redesign** | R0–R4 已合 develop（PR#8–#12）；shell flag 默认 OFF；**R5 token 审计在 `feature/redesign-token-r5`** |
 | **许可** | AGPL-3.0-only（`LICENSE` 正文保留；抬头含独立维护说明） |
 
 ---

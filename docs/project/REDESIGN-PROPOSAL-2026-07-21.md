@@ -19,7 +19,8 @@
 | token | R1 | **已完成（PR#9）** | 见 §11 |
 | modes | R2 | **已完成（PR#10）** | 见 §12 |
 | manage | R3 | **已完成（PR#11）** | 见 §13 |
-| cards | R4 | **本分支** | 见 §14 |
+| cards | R4 | **已完成（PR#12）** | 见 §14 |
+| audit | R5 | **本分支** | 见 §15 |
 
 ---
 
@@ -439,6 +440,66 @@ R3 已合 develop（PR#11）。下一阶段 **R4**。
 
 ### 合并建议
 `feature/redesign-workspace-r4` → PR → develop。下一阶段 **R5** 全仓 token 审计。
+
+---
+
+## 15. R5 阶段报告（2026-07-22）
+
+### 功能概述
+**全仓设计 token 审计 + 归一化**（设计宪法 §4.3 / §4.4 / C1–C5）：
+- 静态扫描器：`packages/ui/scripts/audit-design-tokens.mjs`（间距仅 0/4/8/16/24/32；字号仅 12/14/16/18）
+- 一次性 codemod：`normalize-design-tokens.mjs`（多值 margin/padding 映射 + 非法字号收敛）
+- 残余 allowlist：`audit-design-tokens.exceptions.json`（IO rootMargin、分享 HTML clamp、触控 48px）
+- 单测零债门闩：`redesign-token-audit-r5.test.ts` + `node … --check` exit 0
+- `paper.css`：R5 spacing 工具类 + empty-state glyph helper
+
+### 改动文件清单（摘要）
+| 区域 | 动作 |
+|------|------|
+| `packages/ui/scripts/audit-design-tokens.mjs` | **新增** 扫描器 |
+| `packages/ui/scripts/audit-design-tokens.exceptions.json` | **新增** 残余 allowlist |
+| `packages/ui/scripts/normalize-design-tokens.mjs` | **新增** codemod（可重复 dry-run） |
+| `packages/ui/tests/unit/redesign-token-audit-r5.test.ts` | **新增** harness + zero-debt |
+| `packages/ui/src/styles/paper.css` | spacing 工具类 / glyph |
+| `packages/ui/src/**/*.{vue,css,ts}` | ~70 文件：12→8、6→4、10→8、14→16 等间距；10/11/13→12、17/22→16/18 字号 |
+| 本文 §0 / §15 | 状态与本报告 |
+
+### 验收
+| 项 | 结果 |
+|----|------|
+| `node packages/ui/scripts/audit-design-tokens.mjs --check` | **pass**（actionable=0） |
+| redesign unit（shell/r1/r5/workspace layout） | **pass**（18） |
+| 未改 `core` / IPC / 业务语义 | **pass**（仅 UI 样式与工具脚本） |
+| shell flag 默认 OFF | **pass**（未改 `redesign-shell.ts`） |
+
+### 映射表（行为不变 · 视觉收敛）
+| 现状 | 目标 |
+|------|------|
+| 间距 3/5/6 | 4 |
+| 间距 7/9/10/11/12 | 8 |
+| 间距 13/14/18/20 | 16 |
+| 间距 22 | 24 |
+| 间距 28/36/40 / 32–100 页脚垫 | 32 |
+| 字号 10/11/13 | 12 |
+| 字号 15/17 | 16 |
+| 字号 19/20/22 | 18 |
+| 装饰空状态 emoji | `paper-glyph-empty`（2rem） |
+
+### 已知残余（allowlist · 非布局债）
+| 项 | 原因 |
+|----|------|
+| `useLazyLoad` `rootMargin: 50px` | IntersectionObserver API 语义 |
+| `favorite-share-export` clamp 间距/字号 | 独立分享 HTML，非 app shell |
+| DataManager / ImageTokenUsage `48px` min-height/width | 触控目标，非间距档 |
+
+### 架构合规自检
+- 分层：仅 `packages/ui` → **合规**
+- 无新第三方依赖 → **合规**
+- C5 token 门闩可重复执行 → **合规**
+- 未清空全部内联 `style=` / `:style` 布局宽高（属后续触达债）→ **记录**
+
+### 合并建议
+`feature/redesign-token-r5` → PR → develop。R5 关门后 redesign 主线（R0–R5）完成；后续可开 R4.1（Context/Image 卡片同构）或 shell 默认策略（需单独规格）。
 
 ---
 
