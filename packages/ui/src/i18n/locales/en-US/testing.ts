@@ -30,6 +30,8 @@ const messages = {
   "test": {
     "title": "Test",
     "areaTitle": "Test Area",
+    "expandHint": "Test area starts collapsed; expand after optimize to run comparisons.",
+    "collapseTest": "Collapse test area",
     "content": "Test Content",
     "placeholder": "Enter content to test...",
     "modes": {

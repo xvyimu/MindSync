@@ -30,6 +30,8 @@ const messages = {
   "test": {
     "title": "测试",
     "areaTitle": "测试区域",
+    "expandHint": "测试区默认折叠；优化完成后可展开运行对照测试。",
+    "collapseTest": "折叠测试区",
     "content": "测试内容",
     "placeholder": "请输入要测试的内容...",
     "modes": {

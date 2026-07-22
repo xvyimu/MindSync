@@ -188,6 +188,94 @@ html[data-app-theme='paper'] .version-tag-clickable {
   color: var(--paper-ink-3);
 }
 
+/*
+ * R4 workspace card layout (design constitution §3 / §4.5).
+ * Applied under redesign shell; modules remain NCard-based.
+ */
+.workspace-card-layout {
+  /* hierarchy marker for shell workspaces */
+}
+
+.workspace-card {
+  border-radius: var(--paper-radius-md, 8px);
+}
+
+.workspace-card--primary {
+  /* optimize result: main focus */
+  flex: 1 1 auto;
+  min-height: 200px;
+}
+
+.workspace-card--secondary {
+  /* original input: collapsible, lower visual weight */
+  flex-shrink: 0;
+}
+
+.workspace-card--support {
+  /* test / aux modules */
+  flex-shrink: 0;
+}
+
+/* Shell: hairline focus ring on primary result card */
+html[data-app-theme='paper'] .workspace-card--primary.n-card,
+html[data-app-theme='paper'] .workspace-card--primary.test-source-linked-card {
+  box-shadow:
+    0 0 0 1px rgba(226, 232, 240, 0.85),
+    var(--paper-shadow-elev, 0 1px 2px rgba(15, 23, 42, 0.06)) !important;
+}
+
+.workspace-test-collapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.workspace-test-collapsed__title {
+  font-size: var(--paper-font-subtitle, 16px);
+  line-height: var(--paper-lh-title, 1.4);
+  font-weight: 600;
+  color: var(--paper-ink, #1e293b);
+}
+
+.workspace-test-collapsed__hint {
+  font-size: var(--paper-font-meta, 12px);
+  line-height: var(--paper-lh-body, 1.6);
+  color: var(--paper-ink-3, #94a3b8);
+}
+
+/* Async skeleton placeholders (R4 §4.6) — use with NSkeleton */
+.workspace-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.workspace-skeleton__line {
+  height: 12px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--paper-ink-3, #94a3b8) 18%, transparent);
+}
+
+.workspace-skeleton__line--title {
+  width: 40%;
+  height: 16px;
+}
+
+.workspace-skeleton__line--body {
+  width: 100%;
+}
+
+.workspace-skeleton__line--short {
+  width: 72%;
+}
+
 .paper-rule {
   border: 0;
   border-top: 1px solid var(--paper-rule);

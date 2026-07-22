@@ -1,6 +1,7 @@
 <template>
     <div
         class="basic-user-workspace"
+        :class="{ 'workspace-card-layout': redesignShell }"
         data-testid="workspace"
         data-mode="basic-user"
     >
@@ -39,10 +40,11 @@
                 <NFlex
                     vertical
                     :style="{ overflow: 'auto', height: '100%', minHeight: 0 }"
-                    size="medium"
+                    :size="8"
                 >
-                <!-- 输入控制区域（可折叠） -->
+                <!-- 输入控制区域（可折叠 · secondary card） -->
                 <TestSourceLinkedCard
+                    class="workspace-card workspace-card--secondary"
                     :style="{ flexShrink: 0 }"
                     :feedback-key="sourceAreaFeedback.original.key"
                     :feedback-tone="sourceAreaFeedback.original.tone"
@@ -163,8 +165,9 @@
                     </InputPanelUI>
                 </TestSourceLinkedCard>
 
-                <!-- 优化工作区 -->
+                <!-- 优化工作区（primary focus card · R4） -->
                 <TestSourceLinkedCard
+                    class="workspace-card workspace-card--primary"
                     :style="{ flex: 1, minHeight: '200px', overflow: 'hidden' }"
                     content-style="height: 100%; max-height: 100%; overflow: hidden;"
                     :feedback-key="sourceAreaFeedback.workspace.key"
@@ -219,11 +222,28 @@
                 @keydown="onSplitKeydown"
             />
 
-            <!-- 右侧：测试区域 -->
+            <!-- 右侧：测试区域（R4 shell 默认折叠 · support） -->
             <div ref="testPaneRef" class="split-pane" style="min-width: 0; height: 100%; overflow: hidden;">
-                <NFlex vertical :style="{ height: '100%', gap: '12px' }">
+                <div
+                    v-if="isTestPanelCollapsed"
+                    class="workspace-test-collapsed"
+                    data-testid="basic-user-test-collapsed"
+                >
+                    <div class="workspace-test-collapsed__title">{{ t('test.areaTitle') }}</div>
+                    <div class="workspace-test-collapsed__hint">{{ t('test.expandHint') }}</div>
+                    <NButton
+                        size="small"
+                        type="primary"
+                        secondary
+                        data-testid="basic-user-test-expand"
+                        @click="isTestPanelCollapsed = false"
+                    >
+                        {{ t('common.expand') }}
+                    </NButton>
+                </div>
+                <NFlex v-else vertical :style="{ height: '100%', gap: '8px' }">
                     <!-- 顶部：列数与全局操作 -->
-                    <NCard size="small" :style="{ flexShrink: 0 }">
+                    <NCard class="workspace-card workspace-card--support" size="small" :style="{ flexShrink: 0 }">
                         <div class="test-area-top">
                             <NFlex align="center" :size="8" :wrap="false" style="min-width: 0;">
                                 <NText :depth="2" class="test-area-label">
@@ -241,6 +261,16 @@
                             </NFlex>
 
                             <NFlex align="center" justify="end" :size="8" :wrap="false">
+                                <NButton
+                                    v-if="redesignShell"
+                                    size="small"
+                                    quaternary
+                                    data-testid="basic-user-test-collapse"
+                                    :title="t('test.collapseTest')"
+                                    @click="isTestPanelCollapsed = true"
+                                >
+                                    {{ t('common.collapse') }}
+                                </NButton>
                                 <ThemedTooltip :label="t('test.layout.dualModelHint')">
                                     <NButton
                                         size="small"
@@ -312,7 +342,7 @@
                     </NCard>
 
                     <!-- 配置区：与结果列对齐 -->
-                    <NCard size="small" :style="{ flexShrink: 0 }">
+                    <NCard class="workspace-card workspace-card--support" size="small" :style="{ flexShrink: 0 }">
                         <div class="variant-deck" :style="{ gridTemplateColumns: testGridTemplateColumns }">
                             <div
                                 v-for="id in activeVariantIds"
@@ -550,6 +580,11 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useToast } from '../../composables/ui/useToast'
 import {
+  redesignDefaultLeftSplitPct,
+  resolveInitialTestCollapsed,
+} from '../../composables/ui/useWorkspaceCardLayout'
+import { isRedesignShellEnabled } from '../../config/redesign-shell'
+import {
   useBasicUserSession,
   type TestPanelVersionValue,
   type TestVariantConfig,
@@ -625,13 +660,18 @@ const testPaneRef = ref<HTMLElement | null>(null)
 
 const clampLeftPct = (pct: number) => Math.min(50, Math.max(25, pct))
 
+/** R4: redesign shell hierarchy (read once at setup, same as MainLayout). */
+const redesignShell = isRedesignShellEnabled()
+
 // 使用本地 draft，避免拖拽过程频繁写入持久化存储
-const mainSplitLeftPct = ref<number>(50)
+const mainSplitLeftPct = ref<number>(redesignShell ? redesignDefaultLeftSplitPct() : 50)
 watch(
   () => session.layout.mainSplitLeftPct,
   (pct) => {
     if (typeof pct === 'number' && Number.isFinite(pct)) {
       mainSplitLeftPct.value = clampLeftPct(Math.round(pct))
+    } else if (redesignShell) {
+      mainSplitLeftPct.value = clampLeftPct(redesignDefaultLeftSplitPct())
     }
   },
   { immediate: true }
@@ -1233,6 +1273,9 @@ const promptPanelRef = ref<PromptPanelExpose>(null)
 // 输入区折叠状态（初始展开）
 const isInputPanelCollapsed = ref(false)
 
+// R4: test pane starts collapsed under redesign shell (expand on demand)
+const isTestPanelCollapsed = ref(resolveInitialTestCollapsed(redesignShell))
+
 // 提示词摘要（折叠态显示）
 const promptSummary = computed(() => {
   const prompt = logic.prompt.value
@@ -1424,6 +1467,7 @@ const { evaluation, handleEvaluate: handleEvaluateInternal } = evaluationHandler
 
 const handlePostOptimizeTest = () => {
   showPostOptimizeCta.value = false
+  isTestPanelCollapsed.value = false
   const el = testPaneRef.value
   if (el && typeof el.scrollIntoView === 'function') {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -1946,7 +1990,7 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -1956,7 +2000,7 @@ defineExpose({
 
 .variant-deck {
     display: grid;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
 }
 
