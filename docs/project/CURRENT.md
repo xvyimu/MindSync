@@ -9,7 +9,7 @@
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
 | **日期** | 2026-07-22 |
 | **分支** | `develop` |
-| **远端 tip** | **`ac6687c`**（Merge PR#12 R4；以 `git log -1 --oneline` 复核） |
+| **远端 tip** | **`700643a`**（Merge PR#13 docs closeout；含 PR#12 R4；以 `git log -1 --oneline` 复核） |
 | **本仓** | https://github.com/xvyimu/MindSync（独立仓；**仅 `origin`**） |
 | **策略** | **独立产品开发 / 不跟踪原上游 / 不默认开 PR 到 linshenkx** |
 | **上游 remote** | **已移除**（2026-07-21）。安全补丁改为手工补丁，不恢复 `upstream` 除非维护者书面决定 |

@@ -41,3 +41,17 @@ Test-Path 'D:\PromtOptimizer\nsis-2026-07-21-ipc'              # True
 Test-Path 'D:\PromtOptimizer\src\mindsync\docs\project\CURRENT.md' # True
 Test-Path 'D:\PromtOptimizer\src\mindsync\packages\desktop\dist'   # False
 ```
+
+---
+
+## Pass 2 · 2026-07-22（再扫）
+
+| 动作 | 结果 |
+|------|------|
+| tip 对齐 | CURRENT → **`700643a`**（PR#13） |
+| 本地分支 `feature/five-layer-internal-opt` | 已是 develop 祖先 → **本地删除**（origin 仍可保留直至维护者 prune） |
+| redesign / desktop dist / vite / TEMP e2e | 仍为已清理状态 |
+| `feat/paper-visual-c` | **保留**（非 develop 祖先；无 origin） |
+| `packages/{core,ui,web}/dist` | **保留**（~56MB，dev 常用；非测试垃圾） |
+| 打开 PR | 无 |
+| `D:\orca\.tmp-*` | 再扫 **0** |
