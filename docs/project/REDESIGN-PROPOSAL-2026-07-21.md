@@ -16,7 +16,8 @@
 | D3 | 视觉方向 | **已定 · 现代极简 + Paper 收口** | 见 §4 |
 | 参照 | Naive UI Admin | **已定** | 用户确认 3 |
 | 起步 | R0 | **已完成（flag 默认关 · 已合 develop）** | 见 §10 |
-| token | R1 | **本分支完成（默认 Paper + 结构 token）** | 见 §11 |
+| token | R1 | **已完成（PR#9 · 默认 Paper + 结构 token）** | 见 §11 |
+| modes | R2 | **进行中 / 本工作树** | 见 §12 |
 
 ---
 
@@ -247,7 +248,7 @@
 - **R0** 已合 develop；**R1** 在 `feature/redesign-token-r1`（见 §11）。
 - 预览 shell：`localStorage.setItem('ui:redesign-shell','1')` 或 `?redesignShell=1`。
 - 关回旧布局：`localStorage.removeItem('ui:redesign-shell')` 或 `?redesignShell=0`。
-- 下一阶段：**R2**（功能模式迁侧栏）。**不 push / 不合 develop**，除非你明确授权。
+- **R1** → PR#9；**R2** 在 R1 合入后的 feature 分支（功能模式迁侧栏）。合并仍需维护者授权流程。
 
 ---
 
@@ -332,7 +333,35 @@
 - Naive Button 默认把 `common.borderRadius` 抄到按钮；已用 `CONSTITUTION_BUTTON_RADIUS` 全主题覆盖。
 
 ### 合并建议
-**可合 develop**（视觉向、可回滚）。仍默认 **不 push / 不合**，除非你明确授权。授权后建议：`feature/redesign-token-r1` → PR → develop。下一阶段 **R2**。
+**已开 PR#9**（`feature/redesign-token-r1` → develop）。下一阶段 **R2**。
+
+---
+
+## 12. R2 阶段报告（2026-07-22）
+
+### 功能概述
+**功能模式迁侧栏**：shell ON 时 `core-nav`（`AppCoreNav`）渲染在 `AppSideNav` 的 modes 槽，顶栏不再重复模式选择；legacy 顶栏路径不变。管理入口仍占位（R3）。
+
+### 改动文件清单
+| 文件 | 动作 |
+|------|------|
+| `packages/ui/src/components/app-layout/AppSideNav.vue` | modes 槽 + 竖排 deep 样式 + i18n 标签 |
+| `packages/ui/src/components/MainLayout.vue` | shell 路径：侧栏传 `core-nav`；顶栏去掉重复导航 |
+| `packages/ui/src/components/app-layout/AppCoreNav.vue` | NSpace size 12→8（合法间距） |
+| `packages/ui/src/i18n/locales/{zh-CN,en-US,zh-TW}/core.ts` | `nav.workspace/manage/*Placeholder` |
+| `packages/ui/tests/unit/components/AppSideNav.spec.ts` | 新增 |
+| `docs/project/REDESIGN-PROPOSAL-2026-07-21.md` | 本报告 |
+
+### 验收
+| 项 | 结果 |
+|----|------|
+| shell ON：模式选择仅在侧栏 | **pass**（结构） |
+| shell OFF：legacy 顶栏 core-nav | **pass**（未改 legacy 路径） |
+| 三模式路由逻辑复用 AppCoreNav | **pass**（无复制导航状态机） |
+| 未改 core / IPC | **pass** |
+
+### 合并建议
+R1 合入后开 `feature/redesign-modes-r2` → PR → develop。
 
 ---
 

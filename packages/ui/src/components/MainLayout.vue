@@ -14,7 +14,12 @@
     >
       <!-- ===== Redesign shell: sider + column (Naive UI Admin) ===== -->
       <template v-if="redesignShell">
-        <AppSideNav />
+        <!-- R2: workspace modes live in the sider (same core-nav slot / AppCoreNav) -->
+        <AppSideNav>
+          <template #modes>
+            <slot name="core-nav"></slot>
+          </template>
+        </AppSideNav>
         <NLayout class="main-layout-column">
           <NLayoutHeader class="theme-header nav-header-enhanced nav-header-shell">
             <NFlex justify="space-between" align="center" class="w-full nav-content" :wrap="false" :size="[16, 8]">
@@ -37,10 +42,7 @@
                     </NText>
                   </NFlex>
                 </NButton>
-                <!-- R0: keep core-nav so app stays fully usable; R2 moves modes into sider -->
-                <div class="core-navigation">
-                  <slot name="core-nav"></slot>
-                </div>
+                <!-- R2: modes moved to sider — no duplicate core-nav in shell header -->
               </NFlex>
               <NFlex align="center" :size="8" :wrap="true" justify="end" class="nav-actions">
                 <slot name="actions"></slot>

@@ -151,7 +151,11 @@ const messages = {
     "about": "關於",
     "basicMode": "基礎",
     "contextMode": "情境",
-    "imageMode": "圖像"
+    "imageMode": "圖像",
+    "workspace": "工作區",
+    "manage": "管理",
+    "modesPlaceholder": "模式導航",
+    "managePlaceholder": "管理入口 · R3"
   },
   "about": {
     "title": "提示詞優化器",

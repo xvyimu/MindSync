@@ -151,7 +151,11 @@ const messages = {
     "about": "About",
     "basicMode": "Basic",
     "contextMode": "Context",
-    "imageMode": "Image"
+    "imageMode": "Image",
+    "workspace": "Workspace",
+    "manage": "Manage",
+    "modesPlaceholder": "Mode navigation",
+    "managePlaceholder": "Management · R3"
   },
   "about": {
     "title": "Prompt Optimizer",
