@@ -72,6 +72,8 @@ const {
   getPageZoomActionFromDirection,
 } = require('./config/page-zoom');
 const { getPublicRuntimeConfig } = require('./config/runtime-security');
+const { resolveAiCoreConfig } = require('./config/ai-core-config');
+const { createAiCoreClient } = require('./config/ai-core-client');
 const { installMainFrameNavigationGuard, isSafeExternalUrl } = require('./config/window-security');
 const {
   createIpcError,
@@ -110,6 +112,29 @@ const envPath = path.join(__dirname, '.env');
 // 加载环境变量
 require('dotenv').config({ path: envLocalPath });
 require('dotenv').config({ path: envPath });
+
+// Optional local AI-Core side-car (AI_CORE_URL empty = disabled; same as production).
+// Must resolve AFTER dotenv so .env.local is visible.
+let aiCoreConfig = resolveAiCoreConfig(process.env);
+let aiCoreClient = null;
+if (aiCoreConfig.enabled) {
+  try {
+    aiCoreClient = createAiCoreClient(aiCoreConfig);
+    console.log(
+      '[Main Process] AI-Core enabled at',
+      aiCoreConfig.baseUrl,
+      aiCoreConfig.bearer ? '(bearer set)' : '(no bearer)',
+    );
+  } catch (aiCoreInitError) {
+    console.warn(
+      '[Main Process] AI-Core client init failed (non-fatal):',
+      aiCoreInitError && aiCoreInitError.message,
+    );
+    aiCoreClient = null;
+  }
+} else if (aiCoreConfig.error) {
+  console.warn('[Main Process] AI_CORE_URL rejected:', aiCoreConfig.error);
+}
 
 // 业务服务工厂由 config/service-container.js 内聚 require('@mindsync/core')
 
@@ -777,6 +802,8 @@ function setupIPC() {
     },
     normalizeUiLocale,
     setupUpdateHandlers,
+    getAiCoreConfig: () => aiCoreConfig,
+    getAiCoreClient: () => aiCoreClient,
   });
 
   console.log('[Main Process] High-level service IPC handlers ready.');

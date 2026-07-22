@@ -15,6 +15,7 @@ const { registerContextIpcHandlers } = require('./context-handlers');
 const { registerDataIpcHandlers } = require('./data-handlers');
 const { registerPreferenceIpcHandlers } = require('./preference-handlers');
 const { registerSystemIpcHandlers } = require('./system-handlers');
+const { registerAiCoreIpcHandlers } = require('./ai-core-handlers');
 
 /**
  * @param {object} ctx
@@ -33,6 +34,8 @@ const { registerSystemIpcHandlers } = require('./system-handlers');
  * @param {(locale: string|null) => void} ctx.setUiLocale
  * @param {Function} ctx.normalizeUiLocale
  * @param {Function} [ctx.setupUpdateHandlers]
+ * @param {() => import('../ai-core-config').AiCoreConfig} [ctx.getAiCoreConfig]
+ * @param {() => object|null} [ctx.getAiCoreClient]
  */
 function registerDomainIpcHandlers(ctx) {
   const {
@@ -51,6 +54,8 @@ function registerDomainIpcHandlers(ctx) {
     setUiLocale,
     normalizeUiLocale,
     setupUpdateHandlers,
+    getAiCoreConfig,
+    getAiCoreClient,
   } = ctx;
 
   const {
@@ -152,6 +157,16 @@ function registerDomainIpcHandlers(ctx) {
     setUiLocale,
     normalizeUiLocale,
   });
+
+  if (typeof getAiCoreConfig === 'function' && typeof getAiCoreClient === 'function') {
+    registerAiCoreIpcHandlers({
+      registerSensitiveIpc,
+      getAiCoreConfig,
+      getAiCoreClient,
+      createIpcError,
+      safeSerialize,
+    });
+  }
 
   if (typeof setupUpdateHandlers === 'function') {
     setupUpdateHandlers();

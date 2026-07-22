@@ -1350,8 +1350,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
     }
   },
 
+  // Optional local AI-Core side-car probes (main process only; default OFF).
+  // Bearer never crosses into renderer. Evaluation UI still uses in-process TS.
+  aiCore: {
+    getStatus: async () => {
+      const result = await ipcRenderer.invoke('ai-core-get-status');
+      if (!result.success) {
+        throw createIpcError(result.error);
+      }
+      return result.data;
+    },
+    probeHealth: async () => {
+      const result = await ipcRenderer.invoke('ai-core-probe-health');
+      if (!result.success) {
+        throw createIpcError(result.error);
+      }
+      return result.data;
+    },
+    runEvaluation: async (body) => {
+      const result = await ipcRenderer.invoke('ai-core-run-evaluation', body);
+      if (!result.success) {
+        throw createIpcError(result.error);
+      }
+      return result.data;
+    },
+  },
 
-  
+
+
+
   // Data Manager interface
   data: {
     // Export all data (default redacts API keys; pass { includeSecrets: true } to keep them)

@@ -213,6 +213,13 @@ const SYSTEM_CHANNELS = Object.freeze([
   'logs-open-directory',
 ]);
 
+/** Optional local AI-Core side-car (default OFF when AI_CORE_URL empty). */
+const AI_CORE_CHANNELS = Object.freeze([
+  'ai-core-get-status',
+  'ai-core-probe-health',
+  'ai-core-run-evaluation',
+]);
+
 /** 自动更新 invoke channel（字符串值，非 IPC_EVENTS 键名）。 */
 const UPDATE_CHANNELS = Object.freeze([
   IPC_EVENTS.UPDATE_CHECK,
@@ -254,6 +261,7 @@ const ALL_DOMAIN_CHANNELS = Object.freeze([
   ...DATA_CHANNELS,
   ...PREFERENCE_CHANNELS,
   ...SYSTEM_CHANNELS,
+  ...AI_CORE_CHANNELS,
   ...UPDATE_CHANNELS,
   ...REMOTE_STORAGE_CHANNELS,
 ]);
@@ -279,6 +287,7 @@ const CHANNEL_META = Object.freeze(
       else if (channel.startsWith('data-')) domain = 'data';
       else if (channel.startsWith('preference-')) domain = 'preference';
       else if (channel.startsWith('updater-') || channel.startsWith('update-')) domain = 'update';
+      else if (channel.startsWith('ai-core-')) domain = 'ai-core';
       else if (
         channel.startsWith('config-')
         || channel.startsWith('shell-')
@@ -333,6 +342,7 @@ module.exports = {
   PROMPT_CHANNELS,
   LLM_CHANNELS,
   SYSTEM_CHANNELS,
+  AI_CORE_CHANNELS,
   UPDATE_CHANNELS,
   UPDATE_EVENT_CHANNELS,
   REMOTE_STORAGE_CHANNELS,

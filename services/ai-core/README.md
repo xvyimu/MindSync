@@ -89,9 +89,45 @@ uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
 
 1. [x] Freeze OpenAPI for EvaluationRequest/Response from TS types.
 2. [x] Stub route + bearer gate + tests.
-3. [ ] Port structured-compare prompts / real evaluator.
-4. [ ] Wire Electron main env `AI_CORE_URL` behind feature flag (default off).
+3. [x] Wire Electron main env `AI_CORE_URL` behind feature flag (default off) — see [Local Electron ↔ AI-Core](#local-electron--ai-core-5-steps).
+4. [ ] Port structured-compare prompts / real evaluator.
 5. [ ] Dual-run shadow: TS evaluation vs Python.
+
+## Local Electron ↔ AI-Core (5 steps)
+
+1. **Start stub** (loopback only):
+
+   ```bash
+   cd services/ai-core
+   python -m venv .venv
+   # Windows: .venv\Scripts\activate
+   pip install -e ".[dev]"
+   # Option A — local scaffold (no bearer):
+   set AI_CORE_LOCAL_DEV=1
+   uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+   # Option B — pin bearer (matches desktop):
+   # set AI_CORE_BEARER=dev-token
+   # uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
+   ```
+
+2. **Point desktop main at stub** (repo root `.env.local`, never commit secrets):
+
+   ```bash
+   AI_CORE_URL=http://127.0.0.1:8091
+   # If stub uses AI_CORE_BEARER:
+   # AI_CORE_BEARER=dev-token
+   ```
+
+3. **Verify health** without Electron:
+
+   ```bash
+   curl -s http://127.0.0.1:8091/health
+   # or: node packages/desktop/scripts/ai-core-smoke.cjs
+   ```
+
+4. **Start desktop** (`pnpm --filter @mindsync/desktop dev`). Main logs `AI-Core enabled at http://127.0.0.1:8091` when URL is set. IPC probes: `ai-core-get-status` / `ai-core-probe-health` / `ai-core-run-evaluation` (preload: `window.electronAPI.aiCore`).
+
+5. **Default off**: leave `AI_CORE_URL` empty — client disabled, evaluation remains in-process TS (unchanged production path). Non-loopback hosts are rejected.
 
 ## Out of scope
 
@@ -100,3 +136,4 @@ uvicorn ai_core.main:app --host 127.0.0.1 --port 8091
 - Dexie/storage
 - Replacing NaiveUI console
 - Production LLM spend from this process without BFF auth
+- Wiring Vue evaluation panel to AI-Core (later wave)
