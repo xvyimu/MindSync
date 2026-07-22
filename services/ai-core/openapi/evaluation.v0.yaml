@@ -1,0 +1,790 @@
+openapi: 3.0.3
+info:
+  title: MindSync AI-Core · Evaluation API
+  version: 0.1.0-draft
+  description: |
+    Draft HTTP contract for evaluation jobs in Python AI-Core (Phase2).
+
+    **SSOT**: TypeScript types in `packages/core/src/services/evaluation/types.ts`.
+    This document is a JSON-serializable **mirror**, not a second source of truth.
+
+    **Status**: draft / non-production. Not wired to Vue, Electron IPC, or production traffic.
+  contact:
+    name: MindSync
+  license:
+    name: AGPL-3.0-only
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+  x-status: draft
+  x-ssot: packages/core/src/services/evaluation/types.ts
+  x-task: T-MS-001
+
+# Localhost scaffold: no public auth scheme in v0 (desktop Main injects token later).
+security: []
+
+servers:
+  - url: http://127.0.0.1:8091
+    description: Local scaffold only (uvicorn ai_core.main:app)
+
+tags:
+  - name: health
+    description: Liveness probe
+  - name: evaluation
+    description: Evaluation run (sync JSON; streaming deferred)
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      operationId: getHealth
+      summary: Liveness
+      description: Aligns with `ai_core.health.health_payload` / existing FastAPI route.
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+                service: mindsync-ai-core
+                version: 0.1.0
+                ts: "2026-07-22T00:00:00+00:00"
+                phase: scaffold
+        "400":
+          description: Malformed request (unused for health; satisfies lint)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/evaluation/run:
+    post:
+      tags: [evaluation]
+      operationId: runEvaluation
+      summary: Run one evaluation job (non-streaming)
+      description: |
+        Mirrors `IEvaluationService.evaluate(EvaluationRequest) -> EvaluationResponse`.
+
+        Request body is a **discriminated union** on `type`:
+        `result` | `compare` | `prompt-only` | `prompt-iterate`.
+
+        **Not in v0**: streaming (`evaluateStream`), SSE, cancel, rewrite-brief,
+        structured-compare as a separate path (structured mode is `compareHints.mode`).
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluationRequest"
+            examples:
+              promptOnly:
+                summary: prompt-only
+                value:
+                  type: prompt-only
+                  evaluationModelKey: openai:gpt-4o-mini
+                  mode:
+                    functionMode: basic
+                    subMode: system
+                  target:
+                    workspacePrompt: "You are a helpful assistant."
+                  focus:
+                    content: "Clarity of role and constraints"
+                    source: user
+                    priority: highest
+              result:
+                summary: result
+                value:
+                  type: result
+                  evaluationModelKey: openai:gpt-4o-mini
+                  mode:
+                    functionMode: basic
+                    subMode: system
+                  target:
+                    workspacePrompt: "You are a helpful assistant."
+                  testCase:
+                    id: tc-1
+                    label: "greeting"
+                    input:
+                      kind: text
+                      label: "user input"
+                      content: "Hello"
+                  snapshot:
+                    id: snap-a
+                    label: A
+                    testCaseId: tc-1
+                    promptRef:
+                      kind: workspace
+                    promptText: "You are a helpful assistant."
+                    output: "Hello! How can I help?"
+              compare:
+                summary: compare (structured hints)
+                value:
+                  type: compare
+                  evaluationModelKey: openai:gpt-4o-mini
+                  mode:
+                    functionMode: basic
+                    subMode: system
+                  target:
+                    workspacePrompt: "You are a helpful assistant. Be concise."
+                    referencePrompt: "You are a helpful assistant."
+                  testCases:
+                    - id: tc-1
+                      input:
+                        kind: text
+                        label: "input"
+                        content: "Say hi"
+                  snapshots:
+                    - id: snap-a
+                      label: A
+                      testCaseId: tc-1
+                      promptRef: { kind: original }
+                      promptText: "You are a helpful assistant."
+                      output: "Hello there, how may I assist you today?"
+                    - id: snap-b
+                      label: B
+                      testCaseId: tc-1
+                      promptRef: { kind: workspace }
+                      promptText: "You are a helpful assistant. Be concise."
+                      output: "Hi."
+                  compareHints:
+                    mode: structured
+                    snapshotRoles:
+                      snap-a: baseline
+                      snap-b: target
+              promptIterate:
+                summary: prompt-iterate
+                value:
+                  type: prompt-iterate
+                  evaluationModelKey: openai:gpt-4o-mini
+                  mode:
+                    functionMode: basic
+                    subMode: user
+                  target:
+                    workspacePrompt: "Write a short product blurb for {{product}}."
+                  iterateRequirement: "Keep under 40 words; no hype adjectives."
+      responses:
+        "200":
+          description: Evaluation completed (scaffold may return stub until logic lands)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationResponse"
+        "400":
+          description: Invalid request body / unsupported combination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "501":
+          description: Endpoint registered but evaluation logic not implemented
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service not ready / dependency missing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, service, version, ts, phase]
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: mindsync-ai-core
+        version:
+          type: string
+          example: 0.1.0
+        ts:
+          type: string
+          format: date-time
+          description: ISO-8601 UTC timestamp
+        phase:
+          type: string
+          example: scaffold
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          description: Machine-readable code (e.g. not_implemented, validation_error)
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    EvaluationType:
+      type: string
+      enum: [result, compare, prompt-only, prompt-iterate]
+      description: Discriminator for EvaluationRequest / echo on EvaluationResponse
+
+    FunctionMode:
+      type: string
+      enum: [basic, pro, image]
+
+    EvaluationSubMode:
+      type: string
+      description: |
+        Union of BasicSubMode | ProSubMode | ImageSubMode from prompt/types.ts.
+        OpenAPI flattens the union; valid pairs with functionMode are enforced by
+        the implementation (see README TS vs OpenAPI diff table).
+      enum:
+        - system
+        - user
+        - multi
+        - variable
+        - text2image
+        - image2image
+        - multiimage
+
+    EvaluationModeConfig:
+      type: object
+      required: [functionMode, subMode]
+      additionalProperties: false
+      properties:
+        functionMode:
+          $ref: "#/components/schemas/FunctionMode"
+        subMode:
+          $ref: "#/components/schemas/EvaluationSubMode"
+
+    FocusBrief:
+      type: object
+      required: [content]
+      additionalProperties: false
+      properties:
+        content:
+          type: string
+        source:
+          type: string
+          enum: [user, system]
+        priority:
+          type: string
+          enum: [highest]
+
+    EvaluationMediaItem:
+      type: object
+      required: [label]
+      additionalProperties: false
+      description: |
+        Media evidence. Prefer `assetId` over inline `b64` on the wire when possible.
+        Large b64 payloads are allowed for parity with TS but may be truncated/rejected
+        by future size limits (not specified in v0).
+      properties:
+        label:
+          type: string
+        assetId:
+          type: string
+        b64:
+          type: string
+          description: Base64 image data without data-URL prefix
+        mimeType:
+          type: string
+
+    EvaluationContentBlock:
+      type: object
+      required: [kind, label, content]
+      additionalProperties: false
+      properties:
+        kind:
+          type: string
+          enum: [text, variables, conversation, image, json, custom]
+        label:
+          type: string
+        content:
+          type: string
+        summary:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationMediaItem"
+
+    EvaluationTarget:
+      type: object
+      required: [workspacePrompt]
+      additionalProperties: false
+      properties:
+        workspacePrompt:
+          type: string
+          description: Current workspace prompt (unique patch target)
+        referencePrompt:
+          type: string
+        designContext:
+          $ref: "#/components/schemas/EvaluationContentBlock"
+
+    EvaluationTestCase:
+      type: object
+      required: [id, input]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        input:
+          $ref: "#/components/schemas/EvaluationContentBlock"
+        settingsSummary:
+          type: string
+
+    EvaluationPromptRef:
+      type: object
+      required: [kind]
+      additionalProperties: false
+      properties:
+        kind:
+          type: string
+          enum: [workspace, original, version, custom]
+        version:
+          type: integer
+        label:
+          type: string
+        dynamicAlias:
+          type: string
+          enum: [previous]
+
+    EvaluationSnapshot:
+      type: object
+      required: [id, label, testCaseId, promptRef, promptText, output]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        testCaseId:
+          type: string
+        promptRef:
+          $ref: "#/components/schemas/EvaluationPromptRef"
+        promptText:
+          type: string
+        output:
+          type: string
+        outputBlock:
+          $ref: "#/components/schemas/EvaluationContentBlock"
+        reasoning:
+          type: string
+        modelKey:
+          type: string
+        versionLabel:
+          type: string
+        executionInput:
+          $ref: "#/components/schemas/EvaluationContentBlock"
+
+    StructuredCompareRole:
+      type: string
+      enum:
+        - target
+        - baseline
+        - reference
+        - referenceBaseline
+        - replica
+        - auxiliary
+
+    CompareAnalysisHints:
+      type: object
+      additionalProperties: false
+      properties:
+        mode:
+          type: string
+          enum: [generic, structured]
+        snapshotRoles:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/StructuredCompareRole"
+        hasSharedTestCases:
+          type: boolean
+        hasSamePromptSnapshots:
+          type: boolean
+        hasCrossModelComparison:
+          type: boolean
+
+    EvaluationRequestBase:
+      type: object
+      required: [evaluationModelKey, mode]
+      properties:
+        evaluationModelKey:
+          type: string
+          description: Model key resolved by caller/Main; never include API keys
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+        mode:
+          $ref: "#/components/schemas/EvaluationModeConfig"
+        focus:
+          $ref: "#/components/schemas/FocusBrief"
+
+    ResultEvaluationRequest:
+      allOf:
+        - $ref: "#/components/schemas/EvaluationRequestBase"
+        - type: object
+          required: [type, target, testCase, snapshot]
+          properties:
+            type:
+              type: string
+              enum: [result]
+            target:
+              $ref: "#/components/schemas/EvaluationTarget"
+            testCase:
+              $ref: "#/components/schemas/EvaluationTestCase"
+            snapshot:
+              $ref: "#/components/schemas/EvaluationSnapshot"
+
+    CompareEvaluationRequest:
+      allOf:
+        - $ref: "#/components/schemas/EvaluationRequestBase"
+        - type: object
+          required: [type, target, testCases, snapshots]
+          properties:
+            type:
+              type: string
+              enum: [compare]
+            target:
+              $ref: "#/components/schemas/EvaluationTarget"
+            testCases:
+              type: array
+              minItems: 1
+              items:
+                $ref: "#/components/schemas/EvaluationTestCase"
+            snapshots:
+              type: array
+              minItems: 2
+              items:
+                $ref: "#/components/schemas/EvaluationSnapshot"
+            compareHints:
+              $ref: "#/components/schemas/CompareAnalysisHints"
+
+    PromptOnlyEvaluationRequest:
+      allOf:
+        - $ref: "#/components/schemas/EvaluationRequestBase"
+        - type: object
+          required: [type, target]
+          properties:
+            type:
+              type: string
+              enum: [prompt-only]
+            target:
+              $ref: "#/components/schemas/EvaluationTarget"
+
+    PromptIterateEvaluationRequest:
+      allOf:
+        - $ref: "#/components/schemas/EvaluationRequestBase"
+        - type: object
+          required: [type, target, iterateRequirement]
+          properties:
+            type:
+              type: string
+              enum: [prompt-iterate]
+            target:
+              $ref: "#/components/schemas/EvaluationTarget"
+            iterateRequirement:
+              type: string
+
+    EvaluationRequest:
+      description: |
+        Discriminated union on `type` (oneOf).
+        Pro-only contexts (ProSystemEvaluationContext / ProUserEvaluationContext) from TS
+        are **not** separate request roots in the current TS API surface either;
+        they are omitted from v0 HTTP body. Callers should encode needed context inside
+        `target` / content blocks if required later.
+      oneOf:
+        - $ref: "#/components/schemas/ResultEvaluationRequest"
+        - $ref: "#/components/schemas/CompareEvaluationRequest"
+        - $ref: "#/components/schemas/PromptOnlyEvaluationRequest"
+        - $ref: "#/components/schemas/PromptIterateEvaluationRequest"
+      discriminator:
+        propertyName: type
+        mapping:
+          result: "#/components/schemas/ResultEvaluationRequest"
+          compare: "#/components/schemas/CompareEvaluationRequest"
+          prompt-only: "#/components/schemas/PromptOnlyEvaluationRequest"
+          prompt-iterate: "#/components/schemas/PromptIterateEvaluationRequest"
+
+    EvaluationDimension:
+      type: object
+      required: [key, label, score]
+      additionalProperties: false
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        score:
+          type: number
+          minimum: 0
+          maximum: 100
+
+    EvaluationScore:
+      type: object
+      required: [overall, dimensions]
+      additionalProperties: false
+      properties:
+        overall:
+          type: number
+          minimum: 0
+          maximum: 100
+        dimensions:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationDimension"
+
+    PatchOperationType:
+      type: string
+      enum: [insert, replace, delete]
+
+    PatchOperation:
+      type: object
+      required: [op, oldText, newText, instruction]
+      additionalProperties: false
+      properties:
+        op:
+          $ref: "#/components/schemas/PatchOperationType"
+        oldText:
+          type: string
+        newText:
+          type: string
+        instruction:
+          type: string
+        occurrence:
+          type: integer
+          minimum: 1
+          default: 1
+
+    CompareStopSignals:
+      type: object
+      additionalProperties: false
+      properties:
+        targetVsBaseline:
+          type: string
+          enum: [improved, flat, regressed]
+        targetVsReferenceGap:
+          type: string
+          enum: [none, minor, major]
+        improvementHeadroom:
+          type: string
+          enum: [none, low, medium, high]
+        overfitRisk:
+          type: string
+          enum: [low, medium, high]
+        stopRecommendation:
+          type: string
+          enum: [continue, stop, review]
+        stopReasons:
+          type: array
+          items:
+            type: string
+
+    CompareJudgementPairType:
+      type: string
+      enum:
+        - targetBaseline
+        - targetReference
+        - referenceBaseline
+        - targetReplica
+
+    CompareConflictSignal:
+      type: string
+      enum:
+        - improvementNotSupportedOnReference
+        - improvementUnstableAcrossReplicas
+        - regressionOutweighsCosmeticGains
+        - sampleOverfitRiskVisible
+
+    CompareJudgement:
+      type: object
+      required:
+        - pairKey
+        - pairType
+        - pairLabel
+        - leftSnapshotId
+        - leftSnapshotLabel
+        - rightSnapshotId
+        - rightSnapshotLabel
+        - verdict
+        - winner
+        - confidence
+        - pairSignal
+        - analysis
+        - evidence
+        - learnableSignals
+        - overfitWarnings
+      additionalProperties: false
+      properties:
+        pairKey:
+          type: string
+        pairType:
+          $ref: "#/components/schemas/CompareJudgementPairType"
+        pairLabel:
+          type: string
+        leftSnapshotId:
+          type: string
+        leftSnapshotLabel:
+          type: string
+        leftRole:
+          $ref: "#/components/schemas/StructuredCompareRole"
+        rightSnapshotId:
+          type: string
+        rightSnapshotLabel:
+          type: string
+        rightRole:
+          $ref: "#/components/schemas/StructuredCompareRole"
+        verdict:
+          type: string
+          enum: [left-better, right-better, mixed, similar]
+        winner:
+          type: string
+          enum: [left, right, none]
+        confidence:
+          type: string
+          enum: [low, medium, high]
+        pairSignal:
+          type: string
+        analysis:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        learnableSignals:
+          type: array
+          items:
+            type: string
+        overfitWarnings:
+          type: array
+          items:
+            type: string
+
+    CompareInsightHighlight:
+      type: object
+      required:
+        - pairKey
+        - pairType
+        - pairLabel
+        - pairSignal
+        - verdict
+        - confidence
+        - analysis
+      additionalProperties: false
+      properties:
+        pairKey:
+          type: string
+        pairType:
+          $ref: "#/components/schemas/CompareJudgementPairType"
+        pairLabel:
+          type: string
+        pairSignal:
+          type: string
+        verdict:
+          type: string
+          enum: [left-better, right-better, mixed, similar]
+        confidence:
+          type: string
+          enum: [low, medium, high]
+        analysis:
+          type: string
+
+    CompareInsights:
+      type: object
+      required: [pairHighlights]
+      additionalProperties: false
+      properties:
+        pairHighlights:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompareInsightHighlight"
+        progressSummary:
+          $ref: "#/components/schemas/CompareInsightHighlight"
+        referenceGapSummary:
+          $ref: "#/components/schemas/CompareInsightHighlight"
+        promptChangeSummary:
+          $ref: "#/components/schemas/CompareInsightHighlight"
+        stabilitySummary:
+          $ref: "#/components/schemas/CompareInsightHighlight"
+        evidenceHighlights:
+          type: array
+          items:
+            type: string
+        learnableSignals:
+          type: array
+          items:
+            type: string
+        overfitWarnings:
+          type: array
+          items:
+            type: string
+        conflictSignals:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompareConflictSignal"
+
+    EvaluationResponseMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          type: string
+        timestamp:
+          type: number
+          description: Epoch ms (matches TS number), not ISO string
+        duration:
+          type: number
+          description: Duration in ms
+        compareMode:
+          type: string
+          enum: [generic, structured]
+        snapshotRoles:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/StructuredCompareRole"
+        compareStopSignals:
+          $ref: "#/components/schemas/CompareStopSignals"
+        compareJudgements:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompareJudgement"
+        compareInsights:
+          $ref: "#/components/schemas/CompareInsights"
+
+    EvaluationResponse:
+      type: object
+      required: [type, score, improvements, summary, patchPlan]
+      additionalProperties: false
+      properties:
+        type:
+          $ref: "#/components/schemas/EvaluationType"
+        score:
+          $ref: "#/components/schemas/EvaluationScore"
+        improvements:
+          type: array
+          maxItems: 3
+          items:
+            type: string
+        summary:
+          type: string
+        patchPlan:
+          type: array
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/PatchOperation"
+        metadata:
+          $ref: "#/components/schemas/EvaluationResponseMetadata"
