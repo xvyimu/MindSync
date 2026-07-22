@@ -208,3 +208,7 @@ __pycache__/
 *.py[cod]
 .venv/
 services/ai-core/.venv/
+
+# Python packaging (local editable installs)
+*.egg-info/
+services/ai-core/.venv/
