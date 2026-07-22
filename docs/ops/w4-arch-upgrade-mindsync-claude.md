@@ -9,7 +9,7 @@
 | **Worktree** | `C:\Users\yuanjia\orca\workspaces\mindsync\w4-ms-claude` |
 | **Branch** | `xvyimu/w4-ms-claude` |
 | **Tip（开工）** | `f1ff0c2` · W3 Mode A healthState + local-model flag + CURRENT tip gate |
-| **Tip（本波结束）** | **`11e4dba`** 起（CURRENT tip 门闩对齐后以 `git rev-parse --short HEAD` 为准） |
+| **Tip（本波结束）** | 以最终 `git rev-parse --short HEAD` 为准（CURRENT tip 与 HEAD 同前缀时 `check:docs-tip` 为 0） |
 | **主线** | `develop`（合入 / push 由总控） |
 | **题单** | `portfolio-arch-upgrade-2026h2/prompts/w4-ms.md` + `w4-shared.md` |
 | **进度 tip 基线** | `docs/orca-closed-loop/state/progress.json` · MindSync `f1ff0c2` |
