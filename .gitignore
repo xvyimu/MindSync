@@ -202,3 +202,9 @@ AGENTS.md
 .codex-run/
 .codex-tmp/
 .trellis/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+services/ai-core/.venv/
