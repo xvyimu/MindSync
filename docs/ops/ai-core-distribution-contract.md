@@ -2,12 +2,13 @@
 
 | 项 | 值 |
 |----|-----|
-| **状态** | 契约冻结（文档）· 实现仍为 scaffold/stub |
-| **日期** | 2026-07-22 |
+| **状态** | 契约冻结（文档）· 实现仍为 scaffold/stub · **W2 ADR Accepted Mode A** |
+| **日期** | 2026-07-23 |
 | **服务路径** | `services/ai-core/` |
 | **桌面旁路** | `AI_CORE_URL` 默认空（OFF） |
 | **OpenAPI** | `services/ai-core/openapi/*.v0.yaml`（`x-status: draft`） |
 | **目标架构** | [`../ARCHITECTURE_TARGET.md`](../ARCHITECTURE_TARGET.md) |
+| **W2 ADR** | [`adr-ai-core-distribution-w2.md`](./adr-ai-core-distribution-w2.md)（Mode A/B/C 拍板） |
 
 ---
 
@@ -15,9 +16,11 @@
 
 | 选项 | 含义 | 本仓决策 |
 |------|------|----------|
-| **A. 开发者自启 sidecar** | 源码/venv 本地启动；桌面经 main 网关探测 | **当前正式模式** |
-| B. Versioned sidecar bundle | 安装包附带解释器/二进制 | **未采纳**（本波不做） |
-| C. 容器内 AI-Core | Docker 镜像含 Python 服务 | **未采纳**；Web 镜像仍只含 nginx+MCP |
+| **A. 开发者自启 sidecar** | 源码/venv 本地启动；桌面经 main 网关探测 | **当前正式模式（W2 ADR Accepted）** |
+| B. Versioned sidecar bundle | 安装包附带解释器/二进制 | **Deferred**（W3+ 人 gate；禁止默认 ON） |
+| C. 容器内 / 远程 AI-Core | Docker 或非 loopback | **Rejected as default**；Web 镜像仍只含 nginx+MCP；桌面拒非 loopback |
+
+**理由与 UX 全文：** [`adr-ai-core-distribution-w2.md`](./adr-ai-core-distribution-w2.md)
 
 **理由（证据）：**
 
@@ -25,6 +28,7 @@
 - 根 `Dockerfile` **不** `COPY` `services/ai-core`。
 - `pnpm-workspace.yaml` 仅 `packages/*`；CI `test.yml` 以 Node/pnpm 为主（Python 测试为本地/后续 CI 扩展）。
 - 旁路已具备：loopback-only + bearer fail-closed + 默认 OFF → 不污染生产路径。
+- 组合角色：MindSync = 提示/工作台，**非**公有多租户网关。
 
 ---
 
@@ -49,6 +53,7 @@
 | Desktop env | `AI_CORE_URL` 非空才启用 client；非 loopback host **拒绝** |
 | Renderer | **不得**持有 bearer；preload 只暴露 status/health/evaluation 探测 API |
 | IPC 通道 | `ai-core-get-status` · `ai-core-probe-health` · `ai-core-run-evaluation`（manifest + Gate 扫描） |
+| Status 字段 | `enabled` · `baseUrl` · `error` · `distributionMode: 'A'` · `lastHealth`（probe 缓存；无 bearer） |
 | 未接线 | `/v1/prompt/optimize` 有 stub **无**桌面 client/IPC（后波） |
 
 ---

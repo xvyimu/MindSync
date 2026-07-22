@@ -98,14 +98,30 @@ function resolveAiCoreConfig(env = process.env) {
 }
 
 /**
- * Public status for logs / IPC (never includes bearer).
- * @param {AiCoreConfig} config
+ * Distribution mode letter (ADR W2): A = developer sidecar (current).
+ * B/C reserved — never silently switch without ADR change.
  */
-function toPublicAiCoreStatus(config) {
+const DISTRIBUTION_MODE = 'A';
+
+/**
+ * Public status for logs / IPC (never includes bearer).
+ * Optional lastHealth is a non-secret probe snapshot for desktop status panels.
+ *
+ * @param {AiCoreConfig} config
+ * @param {{ lastHealth?: object|null }} [extras]
+ */
+function toPublicAiCoreStatus(config, extras = {}) {
+  const lastHealth = extras && Object.prototype.hasOwnProperty.call(extras, 'lastHealth')
+    ? extras.lastHealth
+    : null;
   return {
     enabled: Boolean(config && config.enabled),
     baseUrl: config && config.enabled ? config.baseUrl : null,
     error: config && config.error ? config.error : null,
+    /** @type {'A'} Mode A · developer sidecar (see docs/ops/adr-ai-core-distribution-w2.md) */
+    distributionMode: DISTRIBUTION_MODE,
+    /** Last successful/failed probeHealth result without secrets; null until probed. */
+    lastHealth,
   };
 }
 
@@ -114,4 +130,5 @@ module.exports = {
   toPublicAiCoreStatus,
   isTruthyEnv,
   LOOPBACK_HOSTS,
+  DISTRIBUTION_MODE,
 };

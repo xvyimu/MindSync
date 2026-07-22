@@ -441,10 +441,17 @@ test('desktop remote storage rejects Google Drive provider', async () => {
 test('desktop remote storage implementation avoids renderer fetch/WebDAV XML paths', () => {
   const remoteStorage = readText('packages/desktop/remote-storage.js')
 
+  // W2: AWS SDK is lazy-loaded inside createDefaultDependencies (still literal require for Gate).
   assert.match(remoteStorage, /require\('@aws-sdk\/client-s3'\)/)
+  assert.match(remoteStorage, /loadS3Sdk|createDefaultDependencies/)
   assert.match(remoteStorage, /require\('webdav'\)/)
   assert.doesNotMatch(remoteStorage, /\bfetch\s*\(/)
   assert.doesNotMatch(remoteStorage, /\bPROPFIND\b|\bMKCOL\b/)
+  // Top-level must not destructure the SDK at module load (no install → MODULE_NOT_FOUND).
+  assert.doesNotMatch(
+    remoteStorage.split('const loadS3Sdk')[0],
+    /require\('@aws-sdk\/client-s3'\)/,
+  )
 })
 
 test('desktop preference bridge exposes only registered preference handlers', () => {
@@ -516,7 +523,9 @@ test('desktop AI-Core IPC handlers fail closed when disabled and reject bad payl
   }
 
   const status = await handlers.get('ai-core-get-status')()
-  assert.deepEqual(status, toPublicAiCoreStatus(disabledConfig))
+  assert.deepEqual(status, toPublicAiCoreStatus(disabledConfig, { lastHealth: null }))
+  assert.equal(status.distributionMode, 'A')
+  assert.equal(status.lastHealth, null)
   assert.equal(JSON.stringify(status).includes('bearer'), false)
 
   await assert.rejects(
@@ -558,7 +567,7 @@ test('desktop AI-Core IPC handlers fail closed when disabled and reject bad payl
     getAiCoreClient: () => ({
       health: async () => {
         clientCalls.push('health')
-        return { ok: true }
+        return { status: 200, body: { status: 'ok', service: 'ai-core' } }
       },
       runEvaluation: async (body) => {
         clientCalls.push(['eval', body])
@@ -570,7 +579,20 @@ test('desktop AI-Core IPC handlers fail closed when disabled and reject bad payl
 
   const publicStatus = await handlersEnabled.get('ai-core-get-status')()
   assert.equal(publicStatus.enabled, true)
+  assert.equal(publicStatus.distributionMode, 'A')
+  assert.equal(publicStatus.lastHealth, null)
   assert.equal(JSON.stringify(publicStatus).includes('secret-must-not-leak'), false)
+
+  // probeHealth records lastHealth for subsequent get-status (status panel)
+  const healthOk = await handlersEnabled.get('ai-core-probe-health')()
+  assert.equal(healthOk.status, 200)
+  assert.equal(clientCalls.includes('health'), true)
+  const statusAfterProbe = await handlersEnabled.get('ai-core-get-status')()
+  assert.equal(statusAfterProbe.lastHealth.ok, true)
+  assert.equal(statusAfterProbe.lastHealth.httpStatus, 200)
+  assert.equal(statusAfterProbe.lastHealth.body?.status, 'ok')
+  assert.equal(typeof statusAfterProbe.lastHealth.probedAt, 'string')
+  assert.equal(JSON.stringify(statusAfterProbe).includes('secret-must-not-leak'), false)
 
   await assert.rejects(
     () => handlersEnabled.get('ai-core-run-evaluation')({}, null),

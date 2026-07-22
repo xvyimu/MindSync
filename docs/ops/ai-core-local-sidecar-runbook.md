@@ -2,10 +2,11 @@
 
 | 项 | 值 |
 |----|-----|
-| **模式** | A · 开发者自启 sidecar（发行契约正式模式） |
+| **模式** | A · 开发者自启 sidecar（发行契约正式模式 · **W2 ADR Accepted**） |
 | **契约** | [`ai-core-distribution-contract.md`](./ai-core-distribution-contract.md) |
+| **ADR** | [`adr-ai-core-distribution-w2.md`](./adr-ai-core-distribution-w2.md) |
 | **默认** | `AI_CORE_URL` 空 = OFF；**不进** asar / Docker Web / 生产评测路径 |
-| **日期** | 2026-07-22 |
+| **日期** | 2026-07-23 |
 
 > 目标：全新开发机 **5 分钟内** 起 loopback stub + 验 `/health`。不做真打包、不默认打开生产路径。
 
@@ -94,7 +95,13 @@ AI_CORE_URL=http://127.0.0.1:8091 node packages/desktop/scripts/ai-core-smoke.cj
    主进程日志应出现 `AI-Core enabled at http://127.0.0.1:8091`。
 
 3. Preload 探测（Bearer **不进** renderer）：  
-   `window.electronAPI.aiCore.getStatus()` / `.probeHealth()` / `.runEvaluation(body)`
+   `window.electronAPI.aiCore.getStatus()` / `.probeHealth()` / `.runEvaluation(body)`  
+
+   | API | 用途 |
+   |-----|------|
+   | `getStatus()` | 配置态：`enabled` · `baseUrl` · `error` · `distributionMode: 'A'` · `lastHealth`（上次 probe 缓存；未 probe 为 `null`） |
+   | `probeHealth()` | 主动 `GET /health`；成功后 `getStatus().lastHealth` 带 `ok` / `httpStatus` / `body` / `probedAt` |
+   | `runEvaluation(body)` | stub 评测；需 enabled + 合法 object body |
 
 4. 关掉旁路：清空 `AI_CORE_URL` → 评测仍走进程内 TS。
 
@@ -107,14 +114,15 @@ AI_CORE_URL=http://127.0.0.1:8091 node packages/desktop/scripts/ai-core-smoke.cj
 ```powershell
 python -m pytest services/ai-core/tests -q
 node --test packages/desktop/config/ai-core-config.test.js packages/desktop/config/ai-core-client.test.js
-node --test --test-name-pattern "preload IPC|streaming contract|composition root|channel manifest|preference bridge|avoids renderer" scripts/desktop-ipc-handlers.test.mjs
+# 全量 IPC（含 S3/WebDAV/AI-Core fail-closed + lastHealth）；W2 S3 懒加载后装载模块不再依赖 top-level SDK
+node --test scripts/desktop-ipc-handlers.test.mjs
 ```
 
 | 检查 | 通过标准 |
 |------|----------|
 | pytest | exit **0**，evaluation + prompt stubs 绿 |
-| desktop config/client | exit **0**，默认 OFF + loopback only |
-| IPC Gate 子集 | exit **0**，含 `ai-core-*` 三条通道 |
+| desktop config/client | exit **0**，默认 OFF + loopback only + `distributionMode: 'A'` |
+| IPC 全量 | exit **0**，11/11（含 `ai-core-*` 与 remote-storage） |
 
 ---
 

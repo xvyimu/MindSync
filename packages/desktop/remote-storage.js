@@ -1,16 +1,17 @@
-const {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  HeadObjectCommand,
-  ListObjectsV2Command,
-  PutObjectCommand,
-  S3Client,
-} = require('@aws-sdk/client-s3');
-
 const REMOTE_STORAGE_CHANNEL = 'remote-storage:invoke';
 const JSON_MIME_TYPE = 'application/json';
 const CLOUDFLARE_R2_DEFAULT_BACKUP_PREFIX = 'prompt-optimizer-backups/';
 let webDavModulePromise = null;
+/** Lazy-load AWS SDK so static IPC gate tests do not fail when node_modules is incomplete. */
+let s3SdkModule = null;
+
+const loadS3Sdk = () => {
+  if (!s3SdkModule) {
+    // Keep require('@aws-sdk/client-s3') literal for contract tests / grep.
+    s3SdkModule = require('@aws-sdk/client-s3');
+  }
+  return s3SdkModule;
+};
 
 const decodeRemotePathSegment = (segment) => {
   let decoded = segment;
@@ -149,25 +150,35 @@ const toCloudflareR2S3Config = (config) => ({
   forcePathStyle: true,
 });
 
-const createDefaultDependencies = () => ({
-  S3Client,
-  DeleteObjectCommand,
-  GetObjectCommand,
-  HeadObjectCommand,
-  ListObjectsV2Command,
-  PutObjectCommand,
-  openExternal: async (url) => {
-    const { shell } = require('electron');
-    await shell.openExternal(url);
-  },
-  createWebDavClient: async (endpoint, options) => {
-    if (!webDavModulePromise) {
-      webDavModulePromise = Promise.resolve().then(() => require('webdav'));
-    }
-    const webdav = await webDavModulePromise;
-    return webdav.createClient(endpoint, options);
-  },
-});
+const createDefaultDependencies = () => {
+  const {
+    S3Client,
+    DeleteObjectCommand,
+    GetObjectCommand,
+    HeadObjectCommand,
+    ListObjectsV2Command,
+    PutObjectCommand,
+  } = loadS3Sdk();
+  return {
+    S3Client,
+    DeleteObjectCommand,
+    GetObjectCommand,
+    HeadObjectCommand,
+    ListObjectsV2Command,
+    PutObjectCommand,
+    openExternal: async (url) => {
+      const { shell } = require('electron');
+      await shell.openExternal(url);
+    },
+    createWebDavClient: async (endpoint, options) => {
+      if (!webDavModulePromise) {
+        webDavModulePromise = Promise.resolve().then(() => require('webdav'));
+      }
+      const webdav = await webDavModulePromise;
+      return webdav.createClient(endpoint, options);
+    },
+  };
+};
 
 class S3RemoteObjectStore {
   constructor(config, dependencies) {

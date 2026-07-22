@@ -54,7 +54,7 @@ test('non-loopback and invalid URLs stay disabled', () => {
   );
 });
 
-test('public status never includes bearer', () => {
+test('public status never includes bearer and exposes Mode A + lastHealth slot', () => {
   const config = resolveAiCoreConfig({
     AI_CORE_URL: 'http://127.0.0.1:8091',
     AI_CORE_BEARER: 'secret-token-must-not-leak',
@@ -64,6 +64,21 @@ test('public status never includes bearer', () => {
     enabled: true,
     baseUrl: 'http://127.0.0.1:8091',
     error: null,
+    distributionMode: 'A',
+    lastHealth: null,
   });
   assert.equal(JSON.stringify(publicStatus).includes('secret-token'), false);
+
+  const withHealth = toPublicAiCoreStatus(config, {
+    lastHealth: {
+      ok: true,
+      httpStatus: 200,
+      body: { status: 'ok' },
+      error: null,
+      probedAt: '2026-07-23T00:00:00.000Z',
+    },
+  });
+  assert.equal(withHealth.distributionMode, 'A');
+  assert.equal(withHealth.lastHealth.ok, true);
+  assert.equal(withHealth.lastHealth.httpStatus, 200);
 });
