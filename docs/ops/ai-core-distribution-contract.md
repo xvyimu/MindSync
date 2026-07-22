@@ -55,6 +55,8 @@
 
 ## 4. 支持的健康检查（模式 A）
 
+**最短步骤（推荐入口）：** [`ai-core-local-sidecar-runbook.md`](./ai-core-local-sidecar-runbook.md)
+
 ```bash
 # 1) 安装与启动（仓库根或 services/ai-core）
 cd services/ai-core
