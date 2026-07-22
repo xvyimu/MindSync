@@ -2,7 +2,7 @@
 
 > **仓库：** [xvyimu/MindSync](https://github.com/xvyimu/MindSync) — 独立产品仓。  
 > **产品 UI 名：** Prompt Optimizer（提示词优化器）。  
-> **许可：** AGPL-3.0-only（见 [LICENSE](LICENSE)）。  
+> **许可：** AGPL-3.0-only（见 [LICENSE](LICENSE) · [NOTICE](NOTICE)）。  
 > **归属：** 衍生自 [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer)；原版权保留于 `LICENSE`。本仓**不再**配置 `upstream` remote。
 
 <div align="center">
@@ -93,7 +93,7 @@
 
 #### Vercel部署
 方式1：一键部署到自己的Vercel(方便，但后续无法自动更新)：
-   [![部署到 Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flinshenkx%2Fprompt-optimizer)
+   [![部署到 Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fxvyimu%2FMindSync)
 
 方式2: Fork项目后在Vercel中导入（推荐，但需参考部署文档进行手动设置）：
    - 先Fork项目到自己的GitHub
@@ -109,14 +109,14 @@
 
 #### Cloudflare 部署
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/linshenkx/prompt-optimizer)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/xvyimu/MindSync)
 
 公开仓库用户优先使用 Deploy to Cloudflare 按钮，它会在你的 GitHub/GitLab 账号下创建仓库并用 Workers Builds 部署。需要私有仓库或更严格的仓库权限控制时，再手动导入自己的仓库；保持默认部署命令，如果 Cloudflare 自动填入 `pnpm run build`，请清空构建命令，因为 `wrangler.jsonc` 会构建 Web 前端并把 `packages/web/dist` 发布为静态资源。
 
 Cloudflare 上的访问控制和访问分析建议分别使用 Cloudflare Access 和 Cloudflare Web Analytics，在 Cloudflare 控制台配置即可，不需要安装前端依赖或修改应用代码。
 
 ### 3. 下载桌面应用
-从 [GitHub Releases](https://github.com/linshenkx/prompt-optimizer/releases) 下载最新版本。我们为各平台提供**安装程序**和**压缩包**两种格式。
+从 [GitHub Releases](https://github.com/xvyimu/MindSync/releases) 下载最新版本。我们为各平台提供**安装程序**和**压缩包**两种格式。
 
 - **安装程序 (推荐)**: 如 `*.exe`, `*.dmg`, `*.AppImage` 等。**强烈推荐使用此方式，因为它支持自动更新**。
 - **压缩包**: 如 `*.zip`。解压即用，但无法自动更新。
@@ -157,7 +157,7 @@ docker run -d -p 8081:80 \
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/linshenkx/prompt-optimizer.git
+git clone https://github.com/xvyimu/MindSync.git
 cd prompt-optimizer
 
 # 2. 创建 .env 文件配置 API 密钥和访问认证
@@ -328,7 +328,7 @@ git clone https://github.com/xvyimu/MindSync.git
 cd MindSync
 
 # 可选：仅拉取上游（默认不向上游开 PR）
-# git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
+# git remote add upstream https://github.com/linshenkx/prompt-optimizer.git  # DO NOT re-add; attribution only
 
 # 2. 安装依赖（Node ^24、pnpm）
 pnpm install
@@ -369,11 +369,11 @@ pnpm dev:fresh        # 完整重置并重新启动开发环境
 
 ## Star History
 
-<a href="https://star-history.com/#linshenkx/prompt-optimizer&Date">
+<a href="https://star-history.com/#xvyimu/MindSync&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=linshenkx/prompt-optimizer&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=linshenkx/prompt-optimizer&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=linshenkx/prompt-optimizer&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=xvyimu/MindSync&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=xvyimu/MindSync&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=xvyimu/MindSync&type=Date" />
  </picture>
 </a>
 
@@ -399,7 +399,7 @@ pnpm dev:fresh        # 完整重置并重新启动开发环境
    - 桌面应用作为原生应用，完全没有跨域限制
    - 可以直接连接任何API服务，包括本地部署的模型
    - 提供最完整、最稳定的功能体验
-   - 从 [GitHub Releases](https://github.com/linshenkx/prompt-optimizer/releases) 下载
+   - 从 [GitHub Releases](https://github.com/xvyimu/MindSync/releases) 下载
 
 2. **使用自部署的API中转服务**（专业方案）
    - 部署如OneAPI、NewAPI等开源API聚合/代理工具
@@ -465,8 +465,8 @@ xattr -rd com.apple.quarantine ~/Downloads/PromptOptimizer-*.dmg
 
 感谢所有为项目做出贡献的开发者！
 
-<a href="https://github.com/linshenkx/prompt-optimizer/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=linshenkx/prompt-optimizer" alt="贡献者" />
+<a href="https://github.com/xvyimu/MindSync/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=xvyimu/MindSync" alt="贡献者" />
 </a>
 
 ## 🙏 鸣谢

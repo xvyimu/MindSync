@@ -2,7 +2,7 @@
 
 > **Repository:** [xvyimu/MindSync](https://github.com/xvyimu/MindSync) — independent product distribution.  
 > **Product UI name:** Prompt Optimizer（提示词优化器）.  
-> **License:** AGPL-3.0-only (see [LICENSE](LICENSE)).  
+> **License:** AGPL-3.0-only (see [LICENSE](LICENSE) · [NOTICE](NOTICE)).  
 > **Attribution:** Derived from [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer); original copyright retained in `LICENSE`. This repo does **not** track an `upstream` remote.
 
 <div align="center">
@@ -109,14 +109,14 @@ For more detailed deployment steps and important notes, please check:
 
 #### Cloudflare Deployment
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/linshenkx/prompt-optimizer)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/xvyimu/MindSync)
 
 Use the Deploy to Cloudflare button for the quickest public-repository setup. It creates a repository under your GitHub/GitLab account and deploys with Workers Builds. For private repositories or stricter repository-access control, import your own repository manually; keep the default deploy commands and clear the build command if Cloudflare auto-fills `pnpm run build`, because `wrangler.jsonc` builds the Web frontend and publishes `packages/web/dist` as static assets.
 
 For access control and analytics on Cloudflare, configure Cloudflare Access and Cloudflare Web Analytics in the Cloudflare dashboard. No frontend dependency or application-code change is required.
 
 ### 3. Download Desktop Application
-Download the latest version from [GitHub Releases](https://github.com/linshenkx/prompt-optimizer/releases). We provide both **installer** and **archive** formats for each platform.
+Download the latest version from [GitHub Releases](https://github.com/xvyimu/MindSync/releases). We provide both **installer** and **archive** formats for each platform.
 
 - **Installer (Recommended)**: Such as `*.exe`, `*.dmg`, `*.AppImage`, etc. **Strongly recommended as it supports automatic updates**.
 - **Archive**: Such as `*.zip`. Extract and use, but cannot auto-update.
@@ -153,7 +153,7 @@ docker run -d -p 8081:80 \
 <summary>Click to view Docker Compose deployment steps</summary>
 ```bash
 # 1. Clone the repository
-git clone https://github.com/linshenkx/prompt-optimizer.git
+git clone https://github.com/xvyimu/MindSync.git
 cd prompt-optimizer
 
 # 2. Create .env file for API keys and authentication
@@ -333,7 +333,7 @@ git clone https://github.com/xvyimu/MindSync.git
 cd MindSync
 
 # Optional: track upstream for pulls only (do not assume PRs to upstream)
-# git remote add upstream https://github.com/linshenkx/prompt-optimizer.git
+# git remote add upstream https://github.com/linshenkx/prompt-optimizer.git  # DO NOT re-add; attribution only
 
 # 2. Install dependencies (Node ^24, pnpm)
 pnpm install
@@ -374,11 +374,11 @@ For detailed project status, see [Project Status Document](docs/project/project-
 
 ## Star History
 
-<a href="https://star-history.com/#linshenkx/prompt-optimizer&Date">
+<a href="https://star-history.com/#xvyimu/MindSync&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=linshenkx/prompt-optimizer&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=linshenkx/prompt-optimizer&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=linshenkx/prompt-optimizer&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=xvyimu/MindSync&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=xvyimu/MindSync&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=xvyimu/MindSync&type=Date" />
  </picture>
 </a>
 
@@ -404,7 +404,7 @@ For detailed project status, see [Project Status Document](docs/project/project-
    - Desktop app has no CORS restrictions as a native application
    - Can directly connect to any API service, including locally deployed models
    - Provides the most complete and stable feature experience
-   - Download from [GitHub Releases](https://github.com/linshenkx/prompt-optimizer/releases)
+   - Download from [GitHub Releases](https://github.com/xvyimu/MindSync/releases)
 
 2. **Use Self-deployed API Proxy Service** (Professional solution)
    - Deploy open-source API aggregation/proxy tools like OneAPI, NewAPI
@@ -470,8 +470,8 @@ Tip: When developing with Cursor tool, it is recommended to do the following bef
 
 Thanks to all the developers who have contributed to this project!
 
-<a href="https://github.com/linshenkx/prompt-optimizer/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=linshenkx/prompt-optimizer" alt="Contributors" />
+<a href="https://github.com/xvyimu/MindSync/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=xvyimu/MindSync" alt="Contributors" />
 </a>
 
 ## 🙏 Acknowledgements
