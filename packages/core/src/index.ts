@@ -65,6 +65,13 @@ export {
   markChromeBuiltInUserConfigured,
   prepareChromeBuiltInModel
 } from './services/llm/chrome-built-in'
+export {
+  isLocalModelAdapterEnabled,
+  isTruthyEnvValue,
+  LOCAL_MODEL_PROVIDER_ID,
+  LOCAL_MODEL_STUB_ID,
+} from './services/llm/local-model-flag'
+export { LocalModelAdapter } from './services/llm/adapters/local-model-adapter'
 export type {
   ChromeBuiltInAvailability,
   ChromeBuiltInDownloadProgress,

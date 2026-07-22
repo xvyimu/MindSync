@@ -99,9 +99,19 @@ AI_CORE_URL=http://127.0.0.1:8091 node packages/desktop/scripts/ai-core-smoke.cj
 
    | API | 用途 |
    |-----|------|
-   | `getStatus()` | 配置态：`enabled` · `baseUrl` · `error` · `distributionMode: 'A'` · `lastHealth`（上次 probe 缓存；未 probe 为 `null`） |
-   | `probeHealth()` | 主动 `GET /health`；成功后 `getStatus().lastHealth` 带 `ok` / `httpStatus` / `body` / `probedAt` |
+   | `getStatus()` | 配置态：`enabled` · `baseUrl` · `error` · `distributionMode: 'A'` · `lastHealth`（上次 probe 缓存；未 probe 为 `null`） · **`healthState`**（见下表） |
+   | `probeHealth()` | 主动 `GET /health`；成功后 `getStatus().lastHealth` 带 `ok` / `httpStatus` / `body` / `probedAt`；`healthState` 同步为 `ok`/`error` |
    | `runEvaluation(body)` | stub 评测；需 enabled + 合法 object body |
+
+   **`healthState`（W3 Mode A · 与 IPC 一致 · 无 bearer）**
+
+   | 值 | 含义 |
+   |----|------|
+   | `disabled` | `AI_CORE_URL` 空 / 默认 OFF |
+   | `config_error` | URL 被拒（非 loopback / 非法） |
+   | `not_probed` | enabled 但尚未 `probeHealth`（`lastHealth === null`） |
+   | `ok` | 最近一次 probe `ok: true` |
+   | `error` | 最近一次 probe 失败或 HTTP≠200 |
 
 4. 关掉旁路：清空 `AI_CORE_URL` → 评测仍走进程内 TS。
 
@@ -121,8 +131,9 @@ node --test scripts/desktop-ipc-handlers.test.mjs
 | 检查 | 通过标准 |
 |------|----------|
 | pytest | exit **0**，evaluation + prompt stubs 绿 |
-| desktop config/client | exit **0**，默认 OFF + loopback only + `distributionMode: 'A'` |
+| desktop config/client | exit **0**，默认 OFF + loopback only + `distributionMode: 'A'` + `healthState` |
 | IPC 全量 | exit **0**，11/11（含 `ai-core-*` 与 remote-storage） |
+| CURRENT tip 门闩 | `pnpm check:docs-tip` / `pnpm check:docs` exit **0**（`本仓 tip（SSOT）` = `git rev-parse HEAD` 前缀） |
 
 ---
 

@@ -477,29 +477,32 @@ class WebDavRemoteObjectStore {
   }
 }
 
-const createRemoteObjectStore = (provider, dependencies = createDefaultDependencies()) => {
+const createRemoteObjectStore = (provider, dependencies) => {
   if (!provider || typeof provider !== 'object') {
     throw new Error('Remote storage provider config is required');
   }
+  // Reject before loading AWS SDK / WebDAV (no install → MODULE_NOT_FOUND otherwise).
   if (provider.kind === 'google-drive') {
     throw new Error('Google Drive remote backup is only supported in the Web version');
   }
+  const deps = dependencies ?? createDefaultDependencies();
   if (provider.kind === 'cloudflare-r2') {
-    return new S3RemoteObjectStore(toCloudflareR2S3Config(provider), dependencies);
+    return new S3RemoteObjectStore(toCloudflareR2S3Config(provider), deps);
   }
   if (provider.kind === 's3-compatible') {
-    return new S3RemoteObjectStore(provider, dependencies);
+    return new S3RemoteObjectStore(provider, deps);
   }
   if (provider.kind === 'webdav') {
-    return new WebDavRemoteObjectStore(provider, dependencies);
+    return new WebDavRemoteObjectStore(provider, deps);
   }
   throw new Error(`Remote storage provider is not supported by Desktop IPC: ${provider.kind}`);
 };
 
-const handleRemoteStorageOperation = async (request, dependencies = createDefaultDependencies()) => {
+const handleRemoteStorageOperation = async (request, dependencies) => {
   if (!request || typeof request !== 'object') {
     throw new Error('Remote storage request is required');
   }
+  // createRemoteObjectStore resolves default deps only after google-drive reject.
   const store = createRemoteObjectStore(request.provider, dependencies);
   const operation = request.operation;
   const path = normalizeObjectPath(request.path || '');

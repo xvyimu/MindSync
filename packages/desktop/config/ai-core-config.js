@@ -104,8 +104,33 @@ function resolveAiCoreConfig(env = process.env) {
 const DISTRIBUTION_MODE = 'A';
 
 /**
+ * Derive a coarse healthState for Mode A status panels / runbooks (W3).
+ * Never depends on bearer. Prefer explicit lastHealth when present.
+ *
+ * @param {AiCoreConfig} config
+ * @param {object|null|undefined} lastHealth
+ * @returns {'disabled'|'not_probed'|'ok'|'error'|'config_error'}
+ */
+function deriveAiCoreHealthState(config, lastHealth) {
+  if (config && config.error) {
+    return 'config_error';
+  }
+  if (!config || !config.enabled) {
+    return 'disabled';
+  }
+  if (lastHealth == null) {
+    return 'not_probed';
+  }
+  if (lastHealth && lastHealth.ok === true) {
+    return 'ok';
+  }
+  return 'error';
+}
+
+/**
  * Public status for logs / IPC (never includes bearer).
  * Optional lastHealth is a non-secret probe snapshot for desktop status panels.
+ * healthState (W3) mirrors Mode A visibility without re-probing.
  *
  * @param {AiCoreConfig} config
  * @param {{ lastHealth?: object|null }} [extras]
@@ -122,12 +147,15 @@ function toPublicAiCoreStatus(config, extras = {}) {
     distributionMode: DISTRIBUTION_MODE,
     /** Last successful/failed probeHealth result without secrets; null until probed. */
     lastHealth,
+    /** Coarse state for status panels / runbook table (W3 Mode A harden). */
+    healthState: deriveAiCoreHealthState(config, lastHealth),
   };
 }
 
 module.exports = {
   resolveAiCoreConfig,
   toPublicAiCoreStatus,
+  deriveAiCoreHealthState,
   isTruthyEnv,
   LOOPBACK_HOSTS,
   DISTRIBUTION_MODE,

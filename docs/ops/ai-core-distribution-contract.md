@@ -53,7 +53,7 @@
 | Desktop env | `AI_CORE_URL` 非空才启用 client；非 loopback host **拒绝** |
 | Renderer | **不得**持有 bearer；preload 只暴露 status/health/evaluation 探测 API |
 | IPC 通道 | `ai-core-get-status` · `ai-core-probe-health` · `ai-core-run-evaluation`（manifest + Gate 扫描） |
-| Status 字段 | `enabled` · `baseUrl` · `error` · `distributionMode: 'A'` · `lastHealth`（probe 缓存；无 bearer） |
+| Status 字段 | `enabled` · `baseUrl` · `error` · `distributionMode: 'A'` · `lastHealth`（probe 缓存；无 bearer） · **`healthState`**（W3：`disabled` / `not_probed` / `ok` / `error` / `config_error`） |
 | 未接线 | `/v1/prompt/optimize` 有 stub **无**桌面 client/IPC（后波） |
 
 ---

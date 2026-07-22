@@ -526,6 +526,7 @@ test('desktop AI-Core IPC handlers fail closed when disabled and reject bad payl
   assert.deepEqual(status, toPublicAiCoreStatus(disabledConfig, { lastHealth: null }))
   assert.equal(status.distributionMode, 'A')
   assert.equal(status.lastHealth, null)
+  assert.equal(status.healthState, 'disabled')
   assert.equal(JSON.stringify(status).includes('bearer'), false)
 
   await assert.rejects(
@@ -581,6 +582,7 @@ test('desktop AI-Core IPC handlers fail closed when disabled and reject bad payl
   assert.equal(publicStatus.enabled, true)
   assert.equal(publicStatus.distributionMode, 'A')
   assert.equal(publicStatus.lastHealth, null)
+  assert.equal(publicStatus.healthState, 'not_probed')
   assert.equal(JSON.stringify(publicStatus).includes('secret-must-not-leak'), false)
 
   // probeHealth records lastHealth for subsequent get-status (status panel)
@@ -592,6 +594,7 @@ test('desktop AI-Core IPC handlers fail closed when disabled and reject bad payl
   assert.equal(statusAfterProbe.lastHealth.httpStatus, 200)
   assert.equal(statusAfterProbe.lastHealth.body?.status, 'ok')
   assert.equal(typeof statusAfterProbe.lastHealth.probedAt, 'string')
+  assert.equal(statusAfterProbe.healthState, 'ok')
   assert.equal(JSON.stringify(statusAfterProbe).includes('secret-must-not-leak'), false)
 
   await assert.rejects(

@@ -85,9 +85,9 @@ W1 已固定 pnpm 11.5、IPC 契约与装通后全绿。W2 需**书面拍板**�
 
 | 波 | 允许 |
 |----|------|
-| **W2（本波）** | ADR 冻结 A；runbook + status `lastHealth`；IPC 全绿 harden（S3 懒加载） |
-| **W3** | 可选本地模型适配器（feature flag）；Mode B **仅设计/spike**；asar **人 gate** |
-| **W4** | 文档收口；若 Mode B 证据充分再开独立 ADR |
+| **W2** | ADR 冻结 A；runbook + status `lastHealth`；IPC 全绿 harden（S3 懒加载） |
+| **W3（已做）** | Mode A `healthState`；可选本地模型 flag/stub（默认 OFF）；CURRENT tip 门闩；GDrive 拒路径不拉 S3；asar **仍人 gate / NOT EXECUTED** |
+| **W4** | 文档收口；Python 锁文件；若 Mode B 证据充分再开独立 ADR |
 
 **升级流程：** 改 OpenAPI → Pydantic + pytest →（若有）desktop client → 新 IPC 同步 manifest + Gate 测试。模式升级 **先文档后打包**。
 

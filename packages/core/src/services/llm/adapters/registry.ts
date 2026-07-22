@@ -22,6 +22,8 @@ import { CloudflareAdapter } from './cloudflare-adapter';
 import { GrokAdapter } from './grok-adapter';
 import { ChromeBuiltInAdapter } from './chrome-built-in-adapter';
 import { XiaomiMimoTokenPlanAdapter } from './xiaomi-mimo-token-plan-adapter';
+import { LocalModelAdapter } from './local-model-adapter';
+import { isLocalModelAdapterEnabled, LOCAL_MODEL_PROVIDER_ID } from '../local-model-flag';
 import { RequestConfigError } from '../errors';
 
 /**
@@ -70,6 +72,11 @@ export class TextAdapterRegistry
     const grokAdapter = new GrokAdapter();
     const chromeBuiltInAdapter = new ChromeBuiltInAdapter();
     const xiaomiMimoTokenPlanAdapter = new XiaomiMimoTokenPlanAdapter();
+
+    // Optional local-model stub (W3): feature flag default OFF — never production default.
+    if (isLocalModelAdapterEnabled()) {
+      this.adapters.set(LOCAL_MODEL_PROVIDER_ID, new LocalModelAdapter());
+    }
 
     this.adapters.set('openai', openaiAdapter);
     this.adapters.set('openai-compatible', openaiCompatibleAdapter);

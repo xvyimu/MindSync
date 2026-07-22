@@ -54,7 +54,7 @@ test('non-loopback and invalid URLs stay disabled', () => {
   );
 });
 
-test('public status never includes bearer and exposes Mode A + lastHealth slot', () => {
+test('public status never includes bearer and exposes Mode A + lastHealth + healthState', () => {
   const config = resolveAiCoreConfig({
     AI_CORE_URL: 'http://127.0.0.1:8091',
     AI_CORE_BEARER: 'secret-token-must-not-leak',
@@ -66,6 +66,7 @@ test('public status never includes bearer and exposes Mode A + lastHealth slot',
     error: null,
     distributionMode: 'A',
     lastHealth: null,
+    healthState: 'not_probed',
   });
   assert.equal(JSON.stringify(publicStatus).includes('secret-token'), false);
 
@@ -81,4 +82,21 @@ test('public status never includes bearer and exposes Mode A + lastHealth slot',
   assert.equal(withHealth.distributionMode, 'A');
   assert.equal(withHealth.lastHealth.ok, true);
   assert.equal(withHealth.lastHealth.httpStatus, 200);
+  assert.equal(withHealth.healthState, 'ok');
+});
+
+test('healthState covers disabled / config_error / error (Mode A W3)', () => {
+  const { deriveAiCoreHealthState } = require('./ai-core-config');
+  assert.equal(deriveAiCoreHealthState({ enabled: false }, null), 'disabled');
+  assert.equal(
+    deriveAiCoreHealthState({ enabled: false, error: 'non_loopback_host' }, null),
+    'config_error',
+  );
+  assert.equal(
+    deriveAiCoreHealthState(
+      { enabled: true, baseUrl: 'http://127.0.0.1:8091' },
+      { ok: false, httpStatus: 500, error: 'boom', probedAt: 't' },
+    ),
+    'error',
+  );
 });
