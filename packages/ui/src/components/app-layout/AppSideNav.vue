@@ -1,20 +1,19 @@
 <template>
   <!--
-    AppSideNav — redesign shell left rail (R0 skeleton).
+    AppSideNav — redesign shell left rail.
 
     Naive UI Admin pattern:
     - Fixed sider, collapsible to icon rail
-    - Upper: workspace modes (placeholder in R0)
-    - Lower: management entries (placeholder in R0)
+    - Upper: workspace modes (R2 — reuses core-nav slot / AppCoreNav)
+    - Lower: management entries (placeholder until R3)
 
-    R0: structure + chrome only. No navigation wiring (R2/R3).
     Flag-gated by parent MainLayout via isRedesignShellEnabled().
   -->
   <NLayoutSider
     bordered
     collapse-mode="width"
     :collapsed-width="64"
-    :width="200"
+    :width="220"
     :collapsed="collapsed"
     show-trigger
     :native-scrollbar="false"
@@ -24,19 +23,26 @@
     @expand="collapsed = false"
   >
     <div class="app-side-nav__body">
-      <div class="app-side-nav__section" data-testid="app-side-nav-modes">
-        <span v-if="!collapsed" class="app-side-nav__label">工作区</span>
-        <span class="app-side-nav__placeholder">
-          {{ collapsed ? '···' : '模式导航 · R2' }}
-        </span>
+      <div
+        class="app-side-nav__section app-side-nav__section--modes"
+        data-testid="app-side-nav-modes"
+      >
+        <span v-if="!collapsed" class="app-side-nav__label">{{ t('nav.workspace') }}</span>
+        <div class="app-side-nav__modes" :class="{ 'app-side-nav__modes--collapsed': collapsed }">
+          <slot name="modes">
+            <span class="app-side-nav__placeholder">
+              {{ collapsed ? '···' : t('nav.modesPlaceholder') }}
+            </span>
+          </slot>
+        </div>
       </div>
 
       <NDivider class="app-side-nav__divider" />
 
       <div class="app-side-nav__section" data-testid="app-side-nav-manage">
-        <span v-if="!collapsed" class="app-side-nav__label">管理</span>
+        <span v-if="!collapsed" class="app-side-nav__label">{{ t('nav.manage') }}</span>
         <span class="app-side-nav__placeholder">
-          {{ collapsed ? '···' : '管理入口 · R3' }}
+          {{ collapsed ? '···' : t('nav.managePlaceholder') }}
         </span>
       </div>
     </div>
@@ -45,13 +51,15 @@
 
 <script setup lang="ts">
 /**
- * Side navigation skeleton for redesign shell (R0).
- * Navigation behavior lands in R2 (modes) and R3 (management).
- * Placeholder copy is temporary Chinese; i18n lands with real nav items.
+ * Side navigation for redesign shell.
+ * R2: modes slot hosts AppCoreNav (same router logic as legacy header).
+ * R3: management entries + drawer wiring.
  */
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { NDivider, NLayoutSider } from 'naive-ui'
 
+const { t } = useI18n()
 const collapsed = ref(false)
 </script>
 
@@ -83,6 +91,46 @@ const collapsed = ref(false)
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--n-text-color-3, #94a3b8);
+}
+
+.app-side-nav__modes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.app-side-nav__modes--collapsed {
+  align-items: center;
+}
+
+/* Stack AppCoreNav (NSpace + mode selectors) vertically in the rail */
+.app-side-nav__modes :deep([data-testid='core-nav']) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.app-side-nav__modes :deep(.n-space) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.app-side-nav__modes :deep(.function-mode-selector),
+.app-side-nav__modes :deep(.n-radio-group) {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.app-side-nav__modes :deep(.n-radio-button) {
+  flex: 1 1 auto;
+  justify-content: center;
 }
 
 .app-side-nav__placeholder {
