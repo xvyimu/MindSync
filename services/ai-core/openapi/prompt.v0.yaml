@@ -1,0 +1,256 @@
+openapi: 3.0.3
+info:
+  title: MindSync AI-Core · Prompt Jobs API
+  version: 0.1.0-draft
+  description: |
+    Draft HTTP contract for prompt jobs in Python AI-Core (Phase2).
+
+    **SSOT**: TypeScript types in `packages/core/src/services/prompt/types.ts`
+    (`OptimizationRequest` and related). This document is a JSON-serializable
+    **mirror**, not a second source of truth.
+
+    **Status**: draft / non-production. Not wired to Vue, Electron IPC, or production traffic.
+
+    **Implementation requirements (v0)**:
+    - Bind **loopback only** (`127.0.0.1`), never `0.0.0.0` / public interfaces.
+    - `POST /v1/prompt/optimize` **must** enforce `desktopBearer` (or equivalent)
+      before any model call when leaving pure-local scaffold.
+    - No API keys in request bodies; desktop Main / BFF holds secrets.
+  contact:
+    name: MindSync
+  license:
+    name: AGPL-3.0-only
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+  x-status: draft
+  x-ssot: packages/core/src/services/prompt/types.ts
+  x-task: T-MS-004
+  x-implementation-requirements:
+    - loopback-only-bind
+    - bearer-before-model-calls
+    - no-api-keys-in-body
+
+# Local scaffold may omit Authorization; production-shaped runs use desktopBearer.
+security:
+  - {}
+  - desktopBearer: []
+
+servers:
+  - url: http://127.0.0.1:8091
+    description: Local scaffold only (uvicorn ai_core.main:app) — loopback
+
+tags:
+  - name: health
+    description: Liveness probe
+  - name: prompt
+    description: Prompt optimize / iterate / test jobs (sync JSON; streaming deferred)
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      operationId: getHealth
+      summary: Liveness
+      description: Aligns with `ai_core.health.health_payload` / existing FastAPI route.
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+                service: mindsync-ai-core
+                version: 0.1.0
+                ts: "2026-07-22T00:00:00+00:00"
+                phase: scaffold
+        "400":
+          description: Malformed request (unused for health; satisfies lint)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/prompt/optimize:
+    post:
+      tags: [prompt]
+      operationId: optimizePrompt
+      summary: Optimize one prompt (non-streaming stub)
+      description: |
+        Mirrors `IPromptService.optimizePrompt(OptimizationRequest) -> string`.
+
+        HTTP wraps the string result as `PromptOptimizeResponse.optimizedPrompt`
+        so clients receive stable JSON (same pattern as evaluation stub).
+
+        **Not in v0**: streaming (`optimizePromptStream`), iterate, test,
+        message-optimize, template library bulk move.
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PromptOptimizeRequest"
+            examples:
+              systemBasic:
+                summary: system-mode optimize
+                value:
+                  optimizationMode: system
+                  targetPrompt: "You are a helpful assistant."
+                  modelKey: openai:gpt-4o-mini
+              userWithTemplate:
+                summary: user-mode with template id
+                value:
+                  optimizationMode: user
+                  targetPrompt: "Write a short product blurb for {{product}}."
+                  modelKey: openai:gpt-4o-mini
+                  templateId: user-prompt-basic
+      responses:
+        "200":
+          description: Optimization completed (scaffold returns stub until logic lands)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptOptimizeResponse"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Missing or invalid desktopBearer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "501":
+          description: Endpoint registered but optimize logic not implemented
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Service not ready / dependency missing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    desktopBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: |
+        Desktop Main or same-host BFF injects an opaque bearer.
+        **Required** before any model-backed prompt job outside pure local scaffold.
+        Local `uvicorn` health checks may omit Authorization (`security: [{}]`).
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, service, version, ts, phase]
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: mindsync-ai-core
+        version:
+          type: string
+          example: 0.1.0
+        ts:
+          type: string
+          format: date-time
+          description: ISO-8601 UTC timestamp
+        phase:
+          type: string
+          example: scaffold
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          description: Machine-readable code (e.g. not_implemented, validation_error)
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    OptimizationMode:
+      type: string
+      enum: [system, user]
+      description: Mirrors TS `OptimizationMode`
+
+    PromptOptimizeRequest:
+      type: object
+      required: [optimizationMode, targetPrompt, modelKey]
+      additionalProperties: false
+      description: |
+        Minimal HTTP mirror of TS `OptimizationRequest`.
+        Optional advancedContext / inputImages / contextMode deferred until
+        non-stub implementation needs them.
+      properties:
+        optimizationMode:
+          $ref: "#/components/schemas/OptimizationMode"
+        targetPrompt:
+          type: string
+          description: Prompt text to optimize
+          minLength: 1
+        modelKey:
+          type: string
+          description: Model key resolved by caller/Main; never include API keys
+          minLength: 1
+        templateId:
+          type: string
+          description: Optional optimization template id
+
+    PromptOptimizeResponseMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          type: string
+        timestamp:
+          type: number
+          description: Epoch ms (matches evaluation metadata)
+        duration:
+          type: number
+          description: Duration in ms
+        stub:
+          type: boolean
+          description: True when response is a non-model scaffold placeholder
+
+    PromptOptimizeResponse:
+      type: object
+      required: [optimizedPrompt]
+      additionalProperties: false
+      properties:
+        optimizedPrompt:
+          type: string
+          description: |
+            Optimized prompt text. TS `optimizePrompt` returns a bare string;
+            HTTP wraps it for stable JSON.
+        summary:
+          type: string
+          description: Optional human-readable note (stub may set this)
+        metadata:
+          $ref: "#/components/schemas/PromptOptimizeResponseMetadata"

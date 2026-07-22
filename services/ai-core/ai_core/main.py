@@ -130,3 +130,59 @@ def run_evaluation(body: dict[str, Any]) -> dict[str, Any]:
         "evaluationModelKey", "unknown"
     )
     return _stub_response(str(req_type), str(model_key))
+
+
+def _prompt_optimize_stub(
+    optimization_mode: str, target_prompt: str, model_key: str
+) -> dict[str, Any]:
+    """Deterministic non-model prompt-optimize placeholder (no LLM calls)."""
+    now_ms = time.time() * 1000.0
+    # Echo target with a clear stub prefix so callers can detect scaffold output.
+    optimized = (
+        f"[AI-Core prompt stub · mode={optimization_mode} · model={model_key}]\n"
+        f"{target_prompt}"
+    )
+    return {
+        "optimizedPrompt": optimized,
+        "summary": (
+            f"Stub prompt optimize for mode={optimization_mode} model={model_key}. "
+            "Phase2 scaffold; not production-wired. No model call was made."
+        ),
+        "metadata": {
+            "model": model_key,
+            "timestamp": now_ms,
+            "duration": 0.0,
+            "stub": True,
+        },
+    }
+
+
+@app.post("/v1/prompt/optimize", dependencies=[Depends(require_desktop_bearer)])
+def optimize_prompt(body: dict[str, Any]) -> dict[str, Any]:
+    """
+    Draft OpenAPI path: validate request shape, return stub PromptOptimizeResponse.
+
+    Does **not** call LLM providers. Refuses to run without bearer unless
+    AI_CORE_LOCAL_DEV=1.
+    """
+    try:
+        from ai_core.schemas.prompt import PromptOptimizeRequest  # lazy: needs pydantic
+    except ImportError as exc:  # pragma: no cover
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="pydantic schemas not installed; pip install 'mindsync-ai-core[dev]' or pydantic",
+        ) from exc
+
+    try:
+        req = PromptOptimizeRequest.model_validate(body)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=exc.errors(),
+        ) from exc
+
+    return _prompt_optimize_stub(
+        str(req.optimizationMode),
+        str(req.targetPrompt),
+        str(req.modelKey),
+    )
