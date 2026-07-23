@@ -159,6 +159,48 @@ manifest 分布：`pnpm-lock.yaml` · `site/pnpm-lock.yaml` · `packages/core/pa
 
 ---
 
+## 推前复跑 · 2026-07-24 00:59 +08:00
+
+> Worktree: `C:\Users\yuanjia\orca\workspaces\mindsync\ms-deps-sec`  
+> 基线 HEAD 进跑：`5be8f4f`（`xvyimu/ms-deps-sec` · clean）  
+> 对照 develop：`fabe6c5` · `git log fabe6c5..HEAD` = 仅 `5be8f4f`  
+> **未 push · 未 asar · 未改 glass 默认**
+
+### lock 抽检（critical）
+
+| 包 | lock 版本 | 期望 patched |
+|----|-----------|--------------|
+| `tar` | **7.5.21**（`pnpm-lock.yaml`） | ≥7.5.19 |
+| `protobufjs` | **7.6.5**（`pnpm-lock.yaml`） | ≥7.6.5 |
+| site `vite` | **7.3.6**（`site/pnpm-lock.yaml`） | ≥7.3.5 |
+
+无 critical 旧版残留；本轮**无需**额外 pin。
+
+### exit 表
+
+| # | 命令 | Exit | 备注 |
+|---|------|-----:|------|
+| 1 | `pnpm install`（root） | **0** | Already up to date · pnpm 11.5.3 |
+| 2 | `pnpm install --force`（`site/` · `CI=true`） | **0** | pnpm 10.6.1 · vite 7.3.6 |
+| 3 | `pnpm -F @mindsync/core test:gate` | **0** | 21 passed |
+| 4 | `pnpm -F @mindsync/core exec vitest run tests/unit/llm/anthropic-adapter.test.ts` | **0** | 8 passed |
+| 5 | `pnpm -F @mindsync/core build` | **0** | tsup cjs/esm+dts |
+| 6 | `pnpm -F @mindsync/core typecheck` | **0** | |
+| 7 | `node --test scripts/desktop-ipc-handlers.test.mjs` | **0** | 11/11 |
+| 8 | `pnpm -F @mindsync/desktop test` | **0** | 89/89 |
+| 9 | `pytest -q`（`services/ai-core`） | **0** | 9 passed · 3 deprecation warnings（既有） |
+| 10 | `pnpm -F @mindsync/mcp-server test` | **0** | 39 passed（core build 后） |
+| 11 | `pnpm -F @mindsync/ui test` | **0** | 953 passed · 4 skipped · 1 todo |
+| 12 | `pnpm typecheck:ui` | **—** | **未强修** · 既有 CodeMirror 双版本（见残留 #3） |
+
+### 结论
+
+- 必测清单 **全绿**；无本支引入失败。  
+- 可推：**是**（本地 tip 含本 docs 复跑 commit；**本会话仍未 push**）。  
+- 未修：`typecheck:ui` CodeMirror 双实例 · `esbuild` 工具链债 · Dependabot 需 push 后再扫。
+
+---
+
 ## 残留 / 后续
 
 1. **Dependabot 关闭：** 需 push 后 GH 再扫；本轮禁 push，alert 状态以远端为准。  
