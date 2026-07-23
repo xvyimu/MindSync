@@ -10,6 +10,26 @@ interface Window {
     CUSTOM_API_MODEL?: string;
     [key: string]: string | undefined;
   };
+  /**
+   * Canonical desktop facade (Electron alias + Tauri install target).
+   * P0 fields mirror electronAPI subset; see `@mindsync/core` desktop module.
+   */
+  desktopAPI?: {
+    isDesktop?: true;
+    isElectron?: boolean;
+    shellKind?: 'electron' | 'tauri' | 'mock' | 'unknown';
+    app: {
+      getVersion: () => Promise<string>;
+    };
+    preference: {
+      get: <T>(key: string, defaultValue: T) => Promise<T>;
+      set: <T>(key: string, value: T) => Promise<void>;
+    };
+    shell: {
+      openExternal: (url: string) => Promise<unknown>;
+    };
+    ping?: () => Promise<{ ok: true; shell: string; ts: number }>;
+  };
   electronAPI?: {
     llm: {
       // Define the methods for the LLM API proxy

@@ -216,7 +216,11 @@ export { PreferenceService, createPreferenceService } from './services/preferenc
 // 导出环境检测工具
 export {
   isRunningInElectron,
+  isRunningInDesktop,
   isElectronApiReady,
+  isDesktopApiReady,
+  waitForElectronApi,
+  waitForDesktopApi,
   isBrowser,
   isDevelopment,
   getEnvVar,
@@ -229,6 +233,31 @@ export {
   MAX_SUFFIX_LENGTH
 } from './utils/environment'
 export type { CustomModelEnvConfig, ValidatedCustomModelEnvConfig, ValidationResult } from './utils/environment'
+
+// Desktop facade (P0): command map + mock backend + install helpers
+export {
+  DESKTOP_P0_COMMANDS,
+  DESKTOP_P0_COMMAND_LIST,
+  createDesktopApiFromBackend,
+  createMockDesktopBackend,
+  installDesktopApi,
+  resolveDesktopApi,
+  uninstallDesktopApi,
+} from './desktop'
+export type {
+  DesktopP0CommandName,
+  DesktopAppAPI,
+  DesktopCommandBackend,
+  DesktopP0API,
+  DesktopPingResult,
+  DesktopPreferenceP0API,
+  DesktopShellAPI,
+  DesktopShellKind,
+  CreateDesktopApiOptions,
+  CreateMockDesktopBackendOptions,
+  InstallDesktopApiOptions,
+  MockDesktopBackendState,
+} from './desktop'
 export {
   normalizeCustomRequestHeaders,
   validateCustomRequestHeaders
