@@ -8,7 +8,7 @@
  * `{ success, data, error }` envelope produced by the Rust commands.
  */
 
-import { DESKTOP_P0_COMMANDS } from './commands'
+import { DESKTOP_P0_COMMANDS, DESKTOP_STREAM_COMMANDS } from './commands'
 import type { DesktopCommandBackend, DesktopShellKind } from './types'
 
 type TauriInvoke = (cmd: string, args?: Record<string, unknown>) => Promise<unknown>
@@ -69,6 +69,14 @@ function toTauriPayload(
       return { key: args[0], value: args[1] }
     case DESKTOP_P0_COMMANDS.SHELL_OPEN_EXTERNAL:
       return { url: args[0] }
+    case DESKTOP_STREAM_COMMANDS.DESKTOP_STREAM_DEMO:
+      return {
+        streamId: args[0],
+        chunkCount: args[1],
+        intervalMs: args[2],
+      }
+    case DESKTOP_STREAM_COMMANDS.STREAM_CANCEL:
+      return { streamId: args[0] }
     default:
       // Forward as `{ args }` for future commands; P0 never hits this.
       return args.length > 0 ? { args } : undefined

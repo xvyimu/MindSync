@@ -9,7 +9,11 @@
 export {
   DESKTOP_P0_COMMANDS,
   DESKTOP_P0_COMMAND_LIST,
+  DESKTOP_STREAM_COMMANDS,
+  DESKTOP_STREAM_COMMAND_LIST,
+  DESKTOP_STREAM_EVENT_PREFIXES,
   type DesktopP0CommandName,
+  type DesktopStreamCommandName,
 } from './commands'
 
 export type {
@@ -44,3 +48,24 @@ export {
   tryInstallTauriDesktopApi,
   type InstallTauriDesktopApiOptions,
 } from './bootstrap'
+export {
+  createDesktopStreamClient,
+  createTauriDesktopStreamClient,
+  generateDesktopStreamId,
+  isValidDesktopStreamId,
+  streamEventName,
+  type CreateDesktopStreamClientOptions,
+  type CreateTauriDesktopStreamClientOptions,
+  type DesktopStreamClient,
+  type DesktopStreamDemoCallbacks,
+  type DesktopStreamInvokeBridge,
+  type DesktopStreamListenBridge,
+  type DesktopStreamUnlisten,
+  type RunDesktopStreamDemoOptions,
+} from './stream'
+export {
+  createMockStreamTransport,
+  type CreateMockStreamTransportOptions,
+  type MockStreamTransport,
+  type MockStreamTransportState,
+} from './mock-stream'

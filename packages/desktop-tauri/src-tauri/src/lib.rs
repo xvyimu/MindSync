@@ -1,12 +1,13 @@
-//! MindSync Tauri 2 shell — M2 P0 commands.
+//! MindSync Tauri 2 shell — M2 P0 commands + M4 mock stream/Abort.
 //!
-//! Opens a window that loads `@mindsync/web` and exposes the P0 invoke surface
-//! required by `@mindsync/core` desktop facade:
-//! `app-get-version`, `preference-get` / `preference-set`, `desktop-ping`,
-//! `shell-openExternal`.
+//! Opens a window that loads `@mindsync/web` and exposes:
+//! - P0: `app-get-version`, `preference-get` / `preference-set`, `desktop-ping`, `shell-openExternal`
+//! - M4: `desktop-stream-demo`, `stream-cancel` (mock model; no real API keys)
 //!
 //! Response shape mirrors Electron IPC envelope: `{ success, data }` / `{ success: false, error }`.
 //! Electron remains the production shell until G3 cutover.
+
+mod stream;
 
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -15,6 +16,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::Serialize;
 use serde_json::Value;
 use tauri::{AppHandle, State};
+
+use stream::{desktop_stream_demo, stream_cancel, StreamRegistry};
 
 /// In-memory non-secret preference store (M2). File-backed storage can replace this later.
 pub struct PreferenceStore {
@@ -38,16 +41,16 @@ struct IpcErrorBody {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct IpcEnvelope {
-    success: bool,
+pub(crate) struct IpcEnvelope {
+    pub success: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    data: Option<Value>,
+    pub data: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     error: Option<IpcErrorBody>,
 }
 
 impl IpcEnvelope {
-    fn ok(data: impl Serialize) -> Self {
+    pub(crate) fn ok(data: impl Serialize) -> Self {
         Self {
             success: true,
             data: Some(serde_json::to_value(data).unwrap_or(Value::Null)),
@@ -55,7 +58,7 @@ impl IpcEnvelope {
         }
     }
 
-    fn ok_null() -> Self {
+    pub(crate) fn ok_null() -> Self {
         Self {
             success: true,
             data: Some(Value::Null),
@@ -63,7 +66,7 @@ impl IpcEnvelope {
         }
     }
 
-    fn err(code: &str, message: impl Into<String>) -> Self {
+    pub(crate) fn err(code: &str, message: impl Into<String>) -> Self {
         Self {
             success: false,
             data: None,
@@ -73,6 +76,15 @@ impl IpcEnvelope {
             }),
         }
     }
+}
+
+/// Electron `STREAM_ID_PATTERN` parity: `^[A-Za-z0-9_-]{1,96}$`.
+pub(crate) fn is_valid_stream_id(stream_id: &str) -> bool {
+    let len = stream_id.len();
+    (1..=96).contains(&len)
+        && stream_id
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
 }
 
 #[derive(Debug, Serialize)]
@@ -167,13 +179,30 @@ fn shell_open_external(url: String) -> IpcEnvelope {
 pub fn run() {
     tauri::Builder::default()
         .manage(PreferenceStore::default())
+        .manage(StreamRegistry::default())
         .invoke_handler(tauri::generate_handler![
             app_get_version,
             preference_get,
             preference_set,
             desktop_ping,
             shell_open_external,
+            desktop_stream_demo,
+            stream_cancel,
         ])
         .run(tauri::generate_context!())
         .expect("error while running MindSync Tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_valid_stream_id;
+
+    #[test]
+    fn stream_id_pattern_matches_electron() {
+        assert!(is_valid_stream_id("stream_1"));
+        assert!(is_valid_stream_id("stream_1710000000_abc12def"));
+        assert!(!is_valid_stream_id(""));
+        assert!(!is_valid_stream_id("bad id"));
+        assert!(!is_valid_stream_id(&"x".repeat(97)));
+    }
 }

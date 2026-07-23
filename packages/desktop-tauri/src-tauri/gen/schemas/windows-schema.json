@@ -177,10 +177,10 @@
       "description": "Permission identifier",
       "oneOf": [
         {
-          "description": "P0 facade commands: version, preference non-secret, ping, openExternal",
+          "description": "P0 facade + M4 mock stream/cancel commands",
           "type": "string",
           "const": "allow-mindsync-p0",
-          "markdownDescription": "P0 facade commands: version, preference non-secret, ping, openExternal"
+          "markdownDescription": "P0 facade + M4 mock stream/cancel commands"
         },
         {
           "description": "Default core plugins set.\n#### This default permission set includes:\n\n- `core:path:default`\n- `core:event:default`\n- `core:window:default`\n- `core:webview:default`\n- `core:app:default`\n- `core:image:default`\n- `core:resources:default`\n- `core:menu:default`\n- `core:tray:default`",

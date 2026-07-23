@@ -234,13 +234,22 @@ export {
 } from './utils/environment'
 export type { CustomModelEnvConfig, ValidatedCustomModelEnvConfig, ValidationResult } from './utils/environment'
 
-// Desktop facade (P0): command map + mock/Tauri backends + install helpers
+// Desktop facade (P0 + M4 stream): command map + mock/Tauri backends + stream client
 export {
   DESKTOP_P0_COMMANDS,
   DESKTOP_P0_COMMAND_LIST,
+  DESKTOP_STREAM_COMMANDS,
+  DESKTOP_STREAM_COMMAND_LIST,
+  DESKTOP_STREAM_EVENT_PREFIXES,
   createDesktopApiFromBackend,
   createMockDesktopBackend,
+  createMockStreamTransport,
+  createDesktopStreamClient,
   createTauriDesktopBackend,
+  createTauriDesktopStreamClient,
+  generateDesktopStreamId,
+  isValidDesktopStreamId,
+  streamEventName,
   isTauriRuntime,
   tryInstallTauriDesktopApi,
   installDesktopApi,
@@ -249,6 +258,7 @@ export {
 } from './desktop'
 export type {
   DesktopP0CommandName,
+  DesktopStreamCommandName,
   DesktopAppAPI,
   DesktopCommandBackend,
   DesktopP0API,
@@ -256,12 +266,19 @@ export type {
   DesktopPreferenceP0API,
   DesktopShellAPI,
   DesktopShellKind,
+  DesktopStreamClient,
   CreateDesktopApiOptions,
   CreateMockDesktopBackendOptions,
+  CreateMockStreamTransportOptions,
+  CreateDesktopStreamClientOptions,
   CreateTauriDesktopBackendOptions,
+  CreateTauriDesktopStreamClientOptions,
   InstallDesktopApiOptions,
   InstallTauriDesktopApiOptions,
   MockDesktopBackendState,
+  MockStreamTransport,
+  MockStreamTransportState,
+  RunDesktopStreamDemoOptions,
 } from './desktop'
 export {
   normalizeCustomRequestHeaders,
