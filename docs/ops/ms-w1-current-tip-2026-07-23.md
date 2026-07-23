@@ -7,10 +7,12 @@
 
 | 项 | 值 |
 |----|-----|
-| 分支 | `xvyimu/ms-w1-current-tip` → 本地合入 `develop` |
+| 分支 | `xvyimu/ms-w1-current-tip` → 本地 `develop`（**ahead 3 · 未 push**） |
 | 内容 tip | `82043f3` · `docs(project): MS-W1 align CURRENT tip/branch to develop live` |
 | re-pin tip | `80eafcf` · `docs(project): re-pin CURRENT tip to MS-W1 content commit` |
-| 父 tip | `d760c2d`（D1 README hub） |
+| 证据 tip | `1826519` · `docs(ops): MS-W1 evidence + re-pin CURRENT tip to 80eafcf`（**local HEAD**） |
+| 文档 tip 行 | **`80eafcf`**（相对 HEAD 滞后 1 · W4 自指惯例） |
+| 父 tip | `d760c2d`（D1 README hub · origin/develop） |
 | 前态漂移 | CURRENT 钉 `xvyimu/w4-ms-claude` @ `1009439`（约 19 commit 后） |
 
 ## 改动
