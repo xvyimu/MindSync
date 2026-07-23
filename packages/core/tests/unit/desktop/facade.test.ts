@@ -6,6 +6,8 @@ import {
   createTauriDesktopBackend,
   DESKTOP_P0_COMMANDS,
   DESKTOP_P0_COMMAND_LIST,
+  DESKTOP_SYSTEM_COMMANDS,
+  DESKTOP_SYSTEM_COMMAND_LIST,
   installDesktopApi,
   isTauriRuntime,
   resolveDesktopApi,
@@ -172,10 +174,23 @@ describe('desktop mock facade (P0)', () => {
     expect(DESKTOP_P0_COMMANDS.DESKTOP_PING).toBe('desktop-ping')
   })
 
-  it('mock backend round-trips version, preference, ping, openExternal', async () => {
+  it('exposes the B1 system command name table', () => {
+    expect(DESKTOP_SYSTEM_COMMAND_LIST).toEqual([
+      'config-getEnvironmentVariables',
+      'app-set-locale',
+      'logs-get-paths',
+      'logs-open-directory',
+    ])
+    expect(DESKTOP_SYSTEM_COMMANDS.CONFIG_GET_ENVIRONMENT_VARIABLES).toBe(
+      'config-getEnvironmentVariables',
+    )
+  })
+
+  it('mock backend round-trips version, preference, ping, openExternal, B1 system', async () => {
     const backend = createMockDesktopBackend({
       version: '2.11.7-mock',
       preferences: { theme: 'dark' },
+      publicEnv: { VITE_APP_TITLE: 'MindSync', APP_TITLE: 'MindSync' },
     })
     const api = createDesktopApiFromBackend(backend, { shellKind: 'mock' })
     installDesktopApi(api)
@@ -198,6 +213,20 @@ describe('desktop mock facade (P0)', () => {
 
     await resolved!.shell.openExternal('https://example.com/docs')
     expect(backend.state.openedExternalUrls).toEqual(['https://example.com/docs'])
+
+    await resolved!.app.setLocale!('zh-CN')
+    expect(backend.state.locale).toBe('zh-CN')
+
+    expect(await resolved!.config!.getEnvironmentVariables()).toEqual({
+      VITE_APP_TITLE: 'MindSync',
+      APP_TITLE: 'MindSync',
+    })
+
+    const paths = await resolved!.logs!.getPaths()
+    expect(paths.logDir).toContain('logs')
+    expect(paths.main).toContain('main.log')
+    expect(await resolved!.logs!.openDirectory()).toBe(true)
+    expect(backend.state.openedLogDirectory).toBe(true)
 
     // electronAPI alias installed for legacy proxies
     expect((window as any).electronAPI.app.getVersion).toBeTypeOf('function')
@@ -225,7 +254,7 @@ describe('tauri desktop backend adapter (P0)', () => {
     vi.unstubAllGlobals()
   })
 
-  it('maps P0 commands to named payloads and unwraps success envelope', async () => {
+  it('maps P0 + B1 commands to named payloads and unwraps success envelope', async () => {
     const invoke = vi.fn(async (command: string, args?: Record<string, unknown>) => {
       switch (command) {
         case 'app-get-version':
@@ -241,6 +270,25 @@ describe('tauri desktop backend adapter (P0)', () => {
         case 'shell-openExternal':
           expect(args).toEqual({ url: 'https://example.com' })
           return { success: true, data: true }
+        case 'config-getEnvironmentVariables':
+          return { success: true, data: { VITE_APP_TITLE: 'MS' } }
+        case 'app-set-locale':
+          expect(args).toEqual({ locale: 'zh-CN' })
+          return { success: true, data: null }
+        case 'logs-get-paths':
+          return {
+            success: true,
+            data: {
+              logDir: 'C:\\logs',
+              main: 'C:\\logs\\main.log',
+              desktop: 'C:\\logs\\desktop.log',
+              updater: 'C:\\logs\\updater.log',
+              ipc: 'C:\\logs\\ipc.log',
+              error: 'C:\\logs\\error.log',
+            },
+          }
+        case 'logs-open-directory':
+          return { success: true, data: true }
         default:
           return { success: false, error: { code: 'IPC_UNKNOWN', message: command } }
       }
@@ -255,9 +303,17 @@ describe('tauri desktop backend adapter (P0)', () => {
     await api.preference.set('locale', 'zh-CN')
     await expect(api.ping!()).resolves.toEqual({ ok: true, shell: 'tauri', ts: 123 })
     await expect(api.shell.openExternal('https://example.com')).resolves.toBe(true)
+    await api.app.setLocale!('zh-CN')
+    expect(await api.config!.getEnvironmentVariables()).toEqual({ VITE_APP_TITLE: 'MS' })
+    expect(await api.logs!.getPaths()).toMatchObject({ logDir: 'C:\\logs' })
+    expect(await api.logs!.openDirectory()).toBe(true)
 
     expect(invoke).toHaveBeenCalledWith('app-get-version', undefined)
     expect(invoke).toHaveBeenCalledWith('desktop-ping', undefined)
+    expect(invoke).toHaveBeenCalledWith('config-getEnvironmentVariables', undefined)
+    expect(invoke).toHaveBeenCalledWith('logs-get-paths', undefined)
+    expect(invoke).toHaveBeenCalledWith('logs-open-directory', undefined)
+    expect(invoke).toHaveBeenCalledWith('app-set-locale', { locale: 'zh-CN' })
   })
 
   it('throws with IPC code when envelope success is false', async () => {

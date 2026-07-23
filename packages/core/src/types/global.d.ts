@@ -20,6 +20,7 @@ interface Window {
     shellKind?: 'electron' | 'tauri' | 'mock' | 'unknown';
     app: {
       getVersion: () => Promise<string>;
+      setLocale?: (locale: string) => Promise<void>;
     };
     preference: {
       get: <T>(key: string, defaultValue: T) => Promise<T>;
@@ -27,6 +28,20 @@ interface Window {
     };
     shell: {
       openExternal: (url: string) => Promise<unknown>;
+    };
+    config?: {
+      getEnvironmentVariables: () => Promise<Record<string, string>>;
+    };
+    logs?: {
+      getPaths: () => Promise<{
+        logDir: string;
+        main: string;
+        desktop: string;
+        updater: string;
+        ipc: string;
+        error: string;
+      }>;
+      openDirectory: () => Promise<boolean>;
     };
     ping?: () => Promise<{ ok: true; shell: string; ts: number }>;
   };

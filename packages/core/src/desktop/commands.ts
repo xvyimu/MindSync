@@ -33,6 +33,31 @@ export const DESKTOP_P0_COMMAND_LIST: readonly DesktopP0CommandName[] = [
 ]
 
 /**
+ * B1 system + app channels (Electron `SYSTEM_CHANNELS` parity subset).
+ * P0 already covers version / openExternal / desktop-ping.
+ */
+export const DESKTOP_SYSTEM_COMMANDS = {
+  /** Public VITE_* whitelist: () → Record<string, string> */
+  CONFIG_GET_ENVIRONMENT_VARIABLES: 'config-getEnvironmentVariables',
+  /** Sync UI locale to shell chrome: (locale) → null */
+  APP_SET_LOCALE: 'app-set-locale',
+  /** Log path map under userData/logs */
+  LOGS_GET_PATHS: 'logs-get-paths',
+  /** Open log directory in OS file manager */
+  LOGS_OPEN_DIRECTORY: 'logs-open-directory',
+} as const
+
+export type DesktopSystemCommandName =
+  (typeof DESKTOP_SYSTEM_COMMANDS)[keyof typeof DESKTOP_SYSTEM_COMMANDS]
+
+export const DESKTOP_SYSTEM_COMMAND_LIST: readonly DesktopSystemCommandName[] = [
+  DESKTOP_SYSTEM_COMMANDS.CONFIG_GET_ENVIRONMENT_VARIABLES,
+  DESKTOP_SYSTEM_COMMANDS.APP_SET_LOCALE,
+  DESKTOP_SYSTEM_COMMANDS.LOGS_GET_PATHS,
+  DESKTOP_SYSTEM_COMMANDS.LOGS_OPEN_DIRECTORY,
+]
+
+/**
  * M4 stream + Abort command names (Electron parity + Tauri mock demo).
  *
  * Electron uses `llm-sendMessageStream` + `stream-cancel` with the same

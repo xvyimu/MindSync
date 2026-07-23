@@ -18,9 +18,11 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-# open external URLs (shell-openExternal); keep out of UI — only Rust command uses this
+# open external URLs / log dirs (shell-openExternal, logs-open-directory)
 open = "5"
 url = "2"
+# public env whitelist (config-getEnvironmentVariables) — Electron runtime-security parity
+regex = "1"
 
 [profile.release]
 panic = "abort"

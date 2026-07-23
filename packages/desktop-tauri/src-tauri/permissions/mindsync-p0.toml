@@ -1,6 +1,6 @@
 [[permission]]
 identifier = "allow-mindsync-p0"
-description = "P0 facade + M4 mock stream/cancel commands"
+description = "P0 facade + M4 mock stream/cancel + B1 system/app commands"
 commands.allow = [
   "app-get-version",
   "preference-get",
@@ -9,4 +9,8 @@ commands.allow = [
   "shell-openExternal",
   "desktop-stream-demo",
   "stream-cancel",
+  "config-getEnvironmentVariables",
+  "app-set-locale",
+  "logs-get-paths",
+  "logs-open-directory",
 ]

@@ -1724,6 +1724,7 @@ name = "mindsync-desktop-tauri"
 version = "2.11.7"
 dependencies = [
  "open",
+ "regex",
  "serde",
  "serde_json",
  "tauri",

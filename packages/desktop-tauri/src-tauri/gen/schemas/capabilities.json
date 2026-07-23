@@ -1,1 +1,1 @@
-{"default":{"identifier":"default","description":"Default capabilities for the MindSync Tauri shell (M2 P0 + M4 stream demo)","local":true,"windows":["main"],"permissions":["core:default","core:event:default","allow-mindsync-p0"]}}
+{"default":{"identifier":"default","description":"Default capabilities for the MindSync Tauri shell (P0 + M4 stream + B1 system)","local":true,"windows":["main"],"permissions":["core:default","core:event:default","allow-mindsync-p0"]}}

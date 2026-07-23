@@ -9,10 +9,13 @@
 export {
   DESKTOP_P0_COMMANDS,
   DESKTOP_P0_COMMAND_LIST,
+  DESKTOP_SYSTEM_COMMANDS,
+  DESKTOP_SYSTEM_COMMAND_LIST,
   DESKTOP_STREAM_COMMANDS,
   DESKTOP_STREAM_COMMAND_LIST,
   DESKTOP_STREAM_EVENT_PREFIXES,
   type DesktopP0CommandName,
+  type DesktopSystemCommandName,
   type DesktopStreamCommandName,
 } from './commands'
 
@@ -20,6 +23,9 @@ export type {
   CreateDesktopApiOptions,
   DesktopAppAPI,
   DesktopCommandBackend,
+  DesktopConfigAPI,
+  DesktopLogPaths,
+  DesktopLogsAPI,
   DesktopP0API,
   DesktopPingResult,
   DesktopPreferenceP0API,

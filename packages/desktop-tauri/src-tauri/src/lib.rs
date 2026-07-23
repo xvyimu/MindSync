@@ -1,13 +1,15 @@
-//! MindSync Tauri 2 shell — M2 P0 commands + M4 mock stream/Abort.
+//! MindSync Tauri 2 shell — P0 + M4 stream + B1 system channels.
 //!
 //! Opens a window that loads `@mindsync/web` and exposes:
 //! - P0: `app-get-version`, `preference-get` / `preference-set`, `desktop-ping`, `shell-openExternal`
 //! - M4: `desktop-stream-demo`, `stream-cancel` (mock model; no real API keys)
+//! - B1: `config-getEnvironmentVariables`, `app-set-locale`, `logs-get-paths`, `logs-open-directory`
 //!
 //! Response shape mirrors Electron IPC envelope: `{ success, data }` / `{ success: false, error }`.
 //! Electron remains the production shell until G3 cutover.
 
 mod stream;
+mod system;
 
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -18,6 +20,10 @@ use serde_json::Value;
 use tauri::{AppHandle, State};
 
 use stream::{desktop_stream_demo, stream_cancel, StreamRegistry};
+use system::{
+    app_set_locale, config_get_environment_variables, logs_get_paths, logs_open_directory,
+    UiLocaleState,
+};
 
 /// In-memory non-secret preference store (M2). File-backed storage can replace this later.
 pub struct PreferenceStore {
@@ -180,6 +186,7 @@ pub fn run() {
     tauri::Builder::default()
         .manage(PreferenceStore::default())
         .manage(StreamRegistry::default())
+        .manage(UiLocaleState::default())
         .invoke_handler(tauri::generate_handler![
             app_get_version,
             preference_get,
@@ -188,6 +195,10 @@ pub fn run() {
             shell_open_external,
             desktop_stream_demo,
             stream_cancel,
+            config_get_environment_variables,
+            app_set_locale,
+            logs_get_paths,
+            logs_open_directory,
         ])
         .run(tauri::generate_context!())
         .expect("error while running MindSync Tauri application");

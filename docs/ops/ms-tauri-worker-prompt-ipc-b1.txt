@@ -1,0 +1,17 @@
+产品 MindSync。先读 docs/PROJECT.md、docs/adr/0001-tauri-desktop-mainline.md、docs/ops/ms-tauri-cutover-plan.md §M5、docs/ops/ms-tauri-migration-scout-2026-07-24.md、docs/ops/ms-tauri-stream-progress.md、docs/ops/ms-tauri-commands-progress.md、packages/desktop/config/ipc/system-handlers.js、packages/desktop/config/ipc/channel-manifest.js SYSTEM_CHANNELS、packages/desktop/main.js（menu/zoom 相关）。
+
+栈：Vue3/Naive/core 不变。禁：push、删 packages/desktop、换 UI、实现 B2+ 域、空口完成。验证写 docs/ops/ms-tauri-ipc-b1-progress.md（命令+exit code）。
+
+任务 Phase3 B1 · ms-tauri-ipc-b1（system + app 窗体）：
+基线已含 Tauri shell + P0 + stream。本批只补 system 域与窗体横切。
+
+必做：
+1) 对齐 SYSTEM_CHANNELS（manifest）：config-getEnvironmentVariables（公共白名单）、shell-openExternal（已有则复核）、app-get-version（已有）、app-set-locale、logs-get-paths、logs-open-directory。
+2) 窗体必要项：至少保证 main 窗标题/最小尺寸与 Electron 不冲突；menu/zoom 能做多少做多少，做不到写 DEFER 与理由。
+3) 经 desktop facade / tauri-backend 暴露；UI 不散落 @tauri-apps/api。
+4) 权限 toml + capability 更新（学 commands：用 permissions/*.toml）。
+5) 测：core 相关 + cargo check（vcvars）+ 尽量 cargo test；Electron IPC 契约仍绿。
+6) 禁止 push。
+
+验收：progress 含 channel 表、exit code、与 Electron 差异；未完成项列 DEFER 供 B2。
+做完 worker_done。

@@ -1,5 +1,5 @@
 /**
- * Desktop facade types (P0 surface).
+ * Desktop facade types (P0 + B1 system surface).
  *
  * Goal: UI / core proxies talk to a stable desktop API shape. Electron keeps
  * exposing `window.electronAPI`; Tauri (and tests) may expose `window.desktopAPI`
@@ -11,11 +11,12 @@
 export type DesktopShellKind = 'electron' | 'tauri' | 'mock' | 'unknown'
 
 /**
- * P0 app info. Mirrors preload `electronAPI.app` subset.
- * Full Electron surface may add setLocale etc. later without breaking this.
+ * App info. Mirrors preload `electronAPI.app` subset used by UI (version + locale).
  */
 export interface DesktopAppAPI {
   getVersion(): Promise<string>
+  /** Sync UI locale to shell chrome (native menus when available). */
+  setLocale?(locale: string): Promise<void>
 }
 
 /**
@@ -33,6 +34,29 @@ export interface DesktopShellAPI {
   openExternal(url: string): Promise<unknown>
 }
 
+/**
+ * Public runtime config (Electron `config.getEnvironmentVariables` parity).
+ * Values are already filtered by the shell (VITE_APP_/VITE_PUBLIC_ whitelist).
+ */
+export interface DesktopConfigAPI {
+  getEnvironmentVariables(): Promise<Record<string, string>>
+}
+
+/** Log path map under userData/logs (Electron console-logger parity). */
+export interface DesktopLogPaths {
+  logDir: string
+  main: string
+  desktop: string
+  updater: string
+  ipc: string
+  error: string
+}
+
+export interface DesktopLogsAPI {
+  getPaths(): Promise<DesktopLogPaths>
+  openDirectory(): Promise<boolean>
+}
+
 /** Result of `desktop-ping`. */
 export interface DesktopPingResult {
   ok: true
@@ -41,7 +65,7 @@ export interface DesktopPingResult {
 }
 
 /**
- * Minimal desktop bridge that both Electron and Tauri must satisfy for M2.
+ * Minimal desktop bridge that both Electron and Tauri must satisfy for M2/B1.
  * Extra namespaces (llm, model, …) may exist on the same object at runtime;
  * they are intentionally not required here.
  */
@@ -55,6 +79,10 @@ export interface DesktopP0API {
   app: DesktopAppAPI
   preference: DesktopPreferenceP0API
   shell: DesktopShellAPI
+  /** B1: public env whitelist from shell. */
+  config?: DesktopConfigAPI
+  /** B1: log paths + open directory. */
+  logs?: DesktopLogsAPI
   /** Health check; may be absent on older Electron preload until aliased. */
   ping?: () => Promise<DesktopPingResult>
 }
