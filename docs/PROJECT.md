@@ -9,6 +9,18 @@
 
 ---
 
+## 产品方案指针与验收摘要
+
+| 项 | 链接 |
+|----|------|
+| **产品分层（L0–L6）** | [`PRODUCT-LAYERS.md`](./PRODUCT-LAYERS.md) |
+| **形态与栈 SSOT** | 本文其余章节 |
+| **组合总纲** | 本机 `D:\orca\.planning\portfolio-product-docs-program-2026-07-23\PORTFOLIO-PRODUCT-PROGRAM.md` |
+
+**五问快答：** 身份/用户/边界见 PRODUCT-LAYERS **L0**；栈见本文；验收见 **L4**；许可与协作见 **L5** 与根 `LICENSE` / `CONTRIBUTING.md` / `SECURITY.md`。
+
+---
+
 ## 1. 产品形态（唯一）
 
 | 项 | 结论 |
