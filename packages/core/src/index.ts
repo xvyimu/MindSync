@@ -147,6 +147,21 @@ export {
   SECRET_AWARE_STORAGE_KEYS,
 } from './services/storage/secret-field'
 export type { ISecretCodec } from './services/storage/secret-field'
+/** Alias: SecretCodec == ISecretCodec (encrypt/decrypt/isAvailable). */
+export type { ISecretCodec as SecretCodec } from './services/storage/secret-field'
+export {
+  createSecretCodecFromBackend,
+  createUnavailableSecretCodec,
+  createCompositeSecretCodec,
+  createPlatformSecretCodec,
+  createDesktopShellSecretCodec,
+  tryCreateNodeDpapiBackend,
+} from './services/storage/secret-codec-platform'
+export type {
+  SecretCodecBackend,
+  SecretCodecWarn,
+  CreatePlatformSecretCodecOptions,
+} from './services/storage/secret-codec-platform'
 export {
   SecretAwareStorageProvider,
   createSecretAwareStorageProvider,
