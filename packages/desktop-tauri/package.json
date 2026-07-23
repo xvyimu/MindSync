@@ -1,0 +1,22 @@
+{
+  "name": "@mindsync/desktop-tauri",
+  "version": "2.11.7",
+  "private": true,
+  "description": "Tauri 2 desktop shell for MindSync (parallel to Electron packages/desktop)",
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "pnpm run build:web-dist && tauri build",
+    "build:web-dist": "pnpm -F @mindsync/web build && node ./scripts/copy-web-dist.mjs",
+    "tauri": "tauri",
+    "check:rust": "cargo check --manifest-path src-tauri/Cargo.toml"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xvyimu/MindSync.git"
+  },
+  "license": "AGPL-3.0-only"
+}

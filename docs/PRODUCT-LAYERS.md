@@ -20,7 +20,7 @@
 
 ## L1 · 形态与栈
 
-见 PROJECT：pnpm · Node 24 · Vue3 · Naive · Electron · Vitest/Playwright · **AGPL-3.0-only**。
+见 PROJECT：pnpm · Node 24 · Vue3 · Naive · **Desktop 目标 Tauri2 / 过渡 Electron**（[ADR-0001](./adr/0001-tauri-desktop-mainline.md)）· Vitest/Playwright · **AGPL-3.0-only**。
 
 ---
 
@@ -43,7 +43,8 @@
 | `@mindsync/core` | 领域与模型适配 SSOT |
 | `@mindsync/ui` | Vue 工作台 UI · Paper/Atelier |
 | `@mindsync/web` | Web 构建 / Desktop 加载 |
-| `@mindsync/desktop` | Electron · IPC manifest |
+| `@mindsync/desktop` | Electron（过渡默认）· IPC manifest |
+| desktop-tauri（规划） | Tauri2 壳 · 见 ADR-0001 / cutover-plan · G3 前非默认交付 |
 | extension / mcp-server | 并列入口 |
 | ai-core | Python scaffold · **默认 OFF** |
 | 扩展点 | 模型 provider · 模板 · MCP 工具 |
@@ -75,7 +76,7 @@
 
 | 周期 | 内容 |
 |------|------|
-| 近 | Desktop 硬化与依赖健康 · 文档 CURRENT tip |
+| 近 | Desktop 换壳 A1（Tauri2 目标）按 cutover 阶段 · Electron 回滚面 · 文档 CURRENT tip |
 | 中 | AI-Core 发行模型清晰化（仍默认 OFF） |
 | 远 | 多入口体验一致 · 性能（大文档/编辑器） |
 | 节奏 | Issue/PR 欢迎 · 发版走 CURRENT 双层 SSOT |

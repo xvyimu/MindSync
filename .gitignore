@@ -10,6 +10,8 @@ dist-ssr
 packages/extension/*.zip
 packages/desktop/web-dist
 packages/desktop/dist
+packages/desktop-tauri/web-dist
+packages/desktop-tauri/src-tauri/target
 packages/desktop-standalone/dist
 packages/desktop-standalone/prompt-optimizer-*
 *.tar.gz
