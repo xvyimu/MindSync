@@ -1,11 +1,39 @@
 packages:
   - packages/*
-# pnpm 11: lifecycle allowlist lives here (package.json "pnpm" key ignored).
+# pnpm 11: lifecycle allowlist + overrides live here (package.json "pnpm" key ignored).
 # W1 (2026-07): allow electron/esbuild/msw/protobufjs so desktop + vite postinstall work under 11.5.
 # Removed ignoredBuiltDependencies (conflicted with allowBuilds; CI can still use cache).
+# MS-deps-sec (2026-07-24): security-now transitive pins only (no majors).
 allowBuilds:
   electron: true
   electron-winstaller: true
   esbuild: true
   msw: true
   protobufjs: true
+overrides:
+  tar: '>=7.5.19 <8'
+  protobufjs: '>=7.6.5 <8'
+  hono: '>=4.12.27 <5'
+  '@hono/node-server': '>=1.19.13 <2'
+  fast-uri: '>=3.1.4 <4'
+  linkify-it: '>=5.0.2 <6'
+  js-yaml: '>=4.3.0 <5'
+  form-data: '>=4.0.6 <5'
+  ws: '>=8.21.0 <9'
+  tmp: '>=0.2.6 <0.3'
+  qs: '>=6.15.2 <7'
+  js-cookie: '>=3.0.7 <4'
+  '@xmldom/xmldom': '>=0.8.13 <0.9'
+  lodash: '>=4.18.0 <5'
+  lodash-es: '>=4.18.0 <5'
+  'brace-expansion@1': 1.1.16
+  'brace-expansion@2': 2.1.2
+  'brace-expansion@5': 5.0.7
+  'body-parser@2': '>=2.3.0 <3'
+  ip-address: '>=10.1.1 <11'
+  undici: '>=7.28.0 <8'
+  vite: '>=8.0.16 <9'
+  postcss: '>=8.5.10 <9'
+  dompurify: '>=3.4.12 <4'
+  markdown-it: '>=14.2.0 <15'
+  '@anthropic-ai/sdk': '>=0.91.1 <1'
