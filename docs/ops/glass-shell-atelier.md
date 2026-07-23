@@ -1,7 +1,9 @@
 # 工坊 · Atelier（frontend-ui-engineering）
 
-> Flag: `?glassShell=1` · 与 `?redesignShell=1` 同开  
-> **反 AI 脸**：无紫渐变、无满屏毛玻璃、无 oversized 圆角卡片堆叠
+> Flag: `?glassShell=1` · 与 `?redesignShell=1` 同开 · **默认 OFF** · **不重打 asar**  
+> **反 AI 脸**：无紫渐变、无满屏毛玻璃、无 oversized 圆角卡片堆叠  
+> **组合 Token SSOT（分仓用）：** `D:\orca\.planning\portfolio-visual-fluent-glass-2026-07-23\atelier-token-ssot.md`  
+> **分仓波次：** 同包 `visual-adoption-waves.md`（V0=本仓已实现）
 
 ## 原则（skill）
 
