@@ -55,6 +55,24 @@ export default defineConfig(({ mode, command }) => {
   return {
     envDir: monorepoRoot,
     plugins: [vue()],
+    optimizeDeps: {
+      // pnpm may hoist naive-ui under ui; declare peers on web + include for prebundle
+      include: [
+        'naive-ui',
+        'date-fns',
+        'date-fns/locale',
+        'css-render',
+        '@css-render/plugin-bem',
+        '@css-render/vue3-ssr',
+        '@emotion/hash',
+        'seemly',
+        'vueuc',
+        'vooks',
+        'evtd',
+        'vdirs',
+        'date-fns-tz',
+      ],
+    },
     server: {
       port: 18181,
       host: true,
@@ -85,7 +103,12 @@ export default defineConfig(({ mode, command }) => {
         '@codemirror/language',
         '@codemirror/state',
         '@codemirror/view',
-        'codemirror'
+        'codemirror',
+        'css-render',
+        '@css-render/plugin-bem',
+        '@emotion/hash',
+        'naive-ui',
+        'vue',
       ],
       alias: packageAliases,
     },

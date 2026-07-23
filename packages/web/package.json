@@ -14,9 +14,21 @@
     "test:unit": "vitest run tests/unit"
   },
   "dependencies": {
+    "@css-render/plugin-bem": "^0.15.14",
+    "@css-render/vue3-ssr": "^0.15.14",
+    "@emotion/hash": "^0.9.2",
     "@mindsync/core": "workspace:*",
     "@mindsync/ui": "workspace:*",
-    "vue": "^3.5.31"
+    "css-render": "^0.15.14",
+    "date-fns": "^4.4.0",
+    "date-fns-tz": "^3.2.0",
+    "evtd": "^0.2.4",
+    "naive-ui": "^2.44.1",
+    "seemly": "^0.3.10",
+    "vdirs": "^0.1.8",
+    "vooks": "^0.2.12",
+    "vue": "^3.5.31",
+    "vueuc": "^0.4.65"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.5",
