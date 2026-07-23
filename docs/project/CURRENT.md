@@ -8,9 +8,9 @@
 |----|-----|
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
 | **日期** | 2026-07-23 |
-| **分支** | `xvyimu/w4-ms-claude`（W4 收口 feature；主线仍 `develop`） |
-| **本仓 tip（SSOT）** | **`1009439`**（W4 收口；以 `git rev-parse --short HEAD` + `pnpm check:docs-tip` 复核） |
-| **远端 develop tip（参考）** | 以 `git log -1 --oneline origin/develop` 复核（W4 未 push） |
+| **分支** | `develop`（主线；MS-W1 tip 对齐） |
+| **本仓 tip（SSOT）** | **`d760c2d`**（MS-W1 对齐 develop；以 `git rev-parse --short HEAD` + `pnpm check:docs-tip` 复核） |
+| **远端 develop tip（参考）** | 与本仓 tip 同前缀时即已跟 `origin/develop` 同步；否则以 `git log -1 --oneline origin/develop` 复核 |
 | **本仓** | https://github.com/xvyimu/MindSync（独立仓；**仅 `origin`**） |
 | **策略** | **独立产品开发 / 不跟踪原上游 / 不默认开 PR 到 linshenkx** |
 | **上游 remote** | **已移除**（2026-07-21）。安全补丁改为手工补丁，不恢复 `upstream` 除非维护者书面决定 |
@@ -101,6 +101,8 @@
 - **E1 入口铺全（R3）**：PostOptimize CTA + EvalCase 面板 + 双模型一键覆盖 **Basic System/User + Context System/User**（同一 `useEvalCaseSet` / `seedDualModelKeys`）  
 - **工具链**：Node **^24**（系统 Node 即可，无需 portable 22）· pnpm **11.5.3**  
 - **架构收口（W1–W4）**：AI-Core **Mode A** sidecar（`AI_CORE_URL` 默认 OFF · `uv.lock` 可复现）· IPC `healthState` · **本地模型 flag 默认 OFF**（`MINDSYNC_LOCAL_MODEL_ADAPTER` / `VITE_LOCAL_MODEL_ADAPTER`；见 [`../ops/local-model-adapter-flag-w3.md`](../ops/local-model-adapter-flag-w3.md)）· CURRENT tip 门闩 `pnpm check:docs-tip` · **ASAR 未执行**  
+- **文档枢纽（D1）**：README → [`PRODUCT-LAYERS`](../PRODUCT-LAYERS.md) L0/L4 → [`PROJECT`](../PROJECT.md) → CONTRIBUTING / SECURITY；glassShell **默认 OFF**（Atelier 预览可开）  
+- **MS-W1**：CURRENT 分支/tip SSOT 回到 `develop` live（不再钉 W4 feature 支）  
 - **战略文档**：竞品/架构调研见 `docs/project/archives/install-side-2026-07/COMPETITIVE-ARCHITECTURE-RESEARCH-2026-07-21.md`；**R3 决策**见 `INTEGRATED-WORKBENCH-DECISION-RESEARCH-2026-07-21-R3.md` · 栈矩阵 [`../ops/stack-matrix-2026-07.md`](../ops/stack-matrix-2026-07.md)  
 
 ---
