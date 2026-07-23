@@ -1,7 +1,20 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
+const { isDarkThemeRef } = vi.hoisted(() => {
+  // plain ref-like; glass-shell only reads .value in getter / sync
+  return {
+    isDarkThemeRef: { value: true as boolean },
+  }
+})
+
+vi.mock('../../src/config/naive-theme', () => ({
+  isDarkTheme: isDarkThemeRef,
+}))
+
 import {
   isGlassShellEnabled,
   applyGlassShellDocumentClass,
+  syncGlassShellScheme,
   GLASS_SHELL_STORAGE_KEY,
 } from '../../src/config/glass-shell'
 
@@ -11,6 +24,8 @@ describe('isGlassShellEnabled (Fluent glass flag)', () => {
   beforeEach(() => {
     window.localStorage.removeItem(GLASS_SHELL_STORAGE_KEY)
     document.documentElement.classList.remove('glass-shell-on')
+    document.documentElement.removeAttribute('data-glass-scheme')
+    isDarkThemeRef.value = true
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: { ...originalLocation, search: '' },
@@ -18,8 +33,10 @@ describe('isGlassShellEnabled (Fluent glass flag)', () => {
   })
 
   afterEach(() => {
+    applyGlassShellDocumentClass(false)
     window.localStorage.removeItem(GLASS_SHELL_STORAGE_KEY)
     document.documentElement.classList.remove('glass-shell-on')
+    document.documentElement.removeAttribute('data-glass-scheme')
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: originalLocation,
@@ -54,10 +71,16 @@ describe('isGlassShellEnabled (Fluent glass flag)', () => {
     expect(window.localStorage.getItem(GLASS_SHELL_STORAGE_KEY)).toBeNull()
   })
 
-  it('toggles documentElement class glass-shell-on', () => {
+  it('toggles documentElement class and scheme from product theme', () => {
+    isDarkThemeRef.value = true
     applyGlassShellDocumentClass(true)
     expect(document.documentElement.classList.contains('glass-shell-on')).toBe(true)
-    expect(document.documentElement.dataset.glassScheme === 'dark' || document.documentElement.dataset.glassScheme === 'light').toBe(true)
+    expect(document.documentElement.dataset.glassScheme).toBe('dark')
+
+    isDarkThemeRef.value = false
+    syncGlassShellScheme()
+    expect(document.documentElement.dataset.glassScheme).toBe('light')
+
     applyGlassShellDocumentClass(false)
     expect(document.documentElement.classList.contains('glass-shell-on')).toBe(false)
     expect(document.documentElement.dataset.glassScheme).toBeUndefined()

@@ -11,7 +11,13 @@
  *   - or ?glassShell=0
  *
  * Independent from redesign-shell (R0). Can combine: ?redesignShell=1&glassShell=1
+ *
+ * HTML sandbox parity: white-based L3/L2 fills, blur ≤20, solid main content.
+ * See: D:\orca\.planning\portfolio-visual-fluent-glass-2026-07-23\
  */
+
+import { watch, type WatchStopHandle } from 'vue'
+import { isDarkTheme } from './naive-theme'
 
 const STORAGE_KEY = 'ui:glass-shell'
 
@@ -62,23 +68,56 @@ export const isGlassShellEnabled = (): boolean => {
   return readStorageFlag()
 }
 
+const resolveGlassScheme = (): 'dark' | 'light' => {
+  try {
+    // Prefer product theme (Paper/dark/light/…) once Naive theme is live.
+    if (isDarkTheme.value) return 'dark'
+    return 'light'
+  } catch {
+    try {
+      if (
+        typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-color-scheme: dark)').matches
+      ) {
+        return 'dark'
+      }
+    } catch {
+      /* ignore */
+    }
+    return 'light'
+  }
+}
+
+/** Sync data-glass-scheme from product theme (or system fallback). */
+export const syncGlassShellScheme = (): void => {
+  if (typeof document === 'undefined') return
+  if (!document.documentElement.classList.contains('glass-shell-on')) return
+  document.documentElement.dataset.glassScheme = resolveGlassScheme()
+}
+
+let schemeWatchStop: WatchStopHandle | null = null
+
 /** Apply or remove documentElement marker for global Naive modal/drawer CSS. */
 export const applyGlassShellDocumentClass = (enabled: boolean): void => {
   if (typeof document === 'undefined') return
   document.documentElement.classList.toggle('glass-shell-on', enabled)
   if (!enabled) {
     document.documentElement.removeAttribute('data-glass-scheme')
+    if (schemeWatchStop) {
+      schemeWatchStop()
+      schemeWatchStop = null
+    }
     return
   }
-  // Prefer system scheme for L3 fill strength; product theme can refine later.
-  try {
-    const dark =
-      typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    document.documentElement.dataset.glassScheme = dark ? 'dark' : 'light'
-  } catch {
-    document.documentElement.dataset.glassScheme = 'dark'
+  syncGlassShellScheme()
+  if (!schemeWatchStop) {
+    schemeWatchStop = watch(
+      () => isDarkTheme.value,
+      () => {
+        syncGlassShellScheme()
+      },
+      { flush: 'post' },
+    )
   }
 }
 

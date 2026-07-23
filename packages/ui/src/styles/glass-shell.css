@@ -2,10 +2,10 @@
  * Fluent glass atmosphere — MindSync opt-in (flag ui:glass-shell / ?glassShell=1).
  * Default OFF: selectors under html.glass-shell-on only.
  *
- * Rules (pack modern-minimal):
+ * Parity with pack glass-theme.css + HTML sandbox (user-confirmed):
  * - White-based glass fill (never black alpha as glass)
- * - Shell only: modal / drawer / redesign sider; main content stays solid
- * - blur ≤ 20; respect reduced-transparency
+ * - Shell only: modal / drawer / redesign sider (+ thin shell header)
+ * - Main content solid; blur ≤ 20; reduced-transparency / @supports fallback
  */
 
 html.glass-shell-on {
@@ -20,9 +20,11 @@ html.glass-shell-on {
   --ms-glass-l2-blur: 14px;
   --ms-glass-l2-border: 1px solid rgba(255, 255, 255, 0.11);
   --ms-glass-l2-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --ms-glass-radius-l3: 16px;
+  --ms-glass-radius-l2: 12px;
 }
 
-/* Light product themes: stronger white fill + dark hairline */
+/* Light product themes / data-glass-scheme=light */
 html.glass-shell-on[data-glass-scheme='light'] {
   --ms-glass-saturate: 130%;
   --ms-glass-l3-bg: rgba(255, 255, 255, 0.78);
@@ -35,11 +37,6 @@ html.glass-shell-on[data-glass-scheme='light'] {
   --ms-glass-l2-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-/* Naive dark provider */
-html.glass-shell-on .n-config-provider {
-  /* marker only — tokens already dark-default */
-}
-
 /* L3: modals & drawers (teleported) */
 html.glass-shell-on .n-modal .n-card,
 html.glass-shell-on .n-dialog,
@@ -49,9 +46,10 @@ html.glass-shell-on .n-drawer .n-drawer-content-wrapper {
   -webkit-backdrop-filter: blur(var(--ms-glass-l3-blur)) saturate(var(--ms-glass-saturate));
   border: var(--ms-glass-l3-border) !important;
   box-shadow: var(--ms-glass-l3-shadow) !important;
+  border-radius: var(--ms-glass-radius-l3) !important;
 }
 
-/* L2: redesign sider only */
+/* L2: redesign sider */
 html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider,
 html.glass-shell-on .main-layout-root .app-side-nav {
   background: var(--ms-glass-l2-bg) !important;
@@ -61,14 +59,23 @@ html.glass-shell-on .main-layout-root .app-side-nav {
   box-shadow: var(--ms-glass-l2-shadow);
 }
 
-/* Main workspace stays opaque (modern minimal) */
-html.glass-shell-on .main-layout-content,
-html.glass-shell-on .main-content-wrapper {
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+/* L2: thin shell header (redesign path only) — counts toward ≤3 blur layers with sider+modal */
+html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header {
+  background: var(--ms-glass-l2-bg) !important;
+  backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate));
+  border-bottom: var(--ms-glass-l2-border) !important;
+  box-shadow: none;
 }
 
-/* Optional soft ambient on shell path only — very subtle */
+/* Main workspace stays opaque (modern minimal · HTML surface-solid) */
+html.glass-shell-on .main-layout-content,
+html.glass-shell-on .main-content-wrapper {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Optional soft ambient — enable html.glass-shell-on.glass-shell-ambient */
 html.glass-shell-on.glass-shell-ambient .main-layout-root {
   background:
     radial-gradient(900px 480px at 12% 0%, rgba(232, 164, 92, 0.08), transparent 55%),
@@ -80,7 +87,8 @@ html.glass-shell-on.glass-shell-ambient .main-layout-root {
   html.glass-shell-on .n-dialog,
   html.glass-shell-on .n-drawer .n-drawer-content-wrapper,
   html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider,
-  html.glass-shell-on .main-layout-root .app-side-nav {
+  html.glass-shell-on .main-layout-root .app-side-nav,
+  html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -92,7 +100,17 @@ html.glass-shell-on.glass-shell-ambient .main-layout-root {
   html.glass-shell-on .n-drawer .n-drawer-content-wrapper {
     background: var(--n-modal-color, #1e1e28) !important;
   }
-  html.glass-shell-on .main-layout-root .app-side-nav {
+  html.glass-shell-on[data-glass-scheme='light'] .n-modal .n-card,
+  html.glass-shell-on[data-glass-scheme='light'] .n-dialog,
+  html.glass-shell-on[data-glass-scheme='light'] .n-drawer .n-drawer-content-wrapper {
+    background: var(--n-modal-color, #ffffff) !important;
+  }
+  html.glass-shell-on .main-layout-root .app-side-nav,
+  html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header {
     background: var(--n-color, #181820) !important;
+  }
+  html.glass-shell-on[data-glass-scheme='light'] .main-layout-root .app-side-nav,
+  html.glass-shell-on[data-glass-scheme='light'] .main-layout-root .nav-header-shell.n-layout-header {
+    background: var(--n-color, #ffffff) !important;
   }
 }
