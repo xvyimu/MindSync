@@ -1,0 +1,98 @@
+/*
+ * Fluent glass atmosphere — MindSync opt-in (flag ui:glass-shell / ?glassShell=1).
+ * Default OFF: selectors under html.glass-shell-on only.
+ *
+ * Rules (pack modern-minimal):
+ * - White-based glass fill (never black alpha as glass)
+ * - Shell only: modal / drawer / redesign sider; main content stays solid
+ * - blur ≤ 20; respect reduced-transparency
+ */
+
+html.glass-shell-on {
+  --ms-glass-saturate: 160%;
+  --ms-glass-l3-bg: rgba(255, 255, 255, 0.1);
+  --ms-glass-l3-blur: 20px;
+  --ms-glass-l3-border: 1px solid rgba(255, 255, 255, 0.14);
+  --ms-glass-l3-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+  --ms-glass-l2-bg: rgba(255, 255, 255, 0.07);
+  --ms-glass-l2-blur: 14px;
+  --ms-glass-l2-border: 1px solid rgba(255, 255, 255, 0.11);
+  --ms-glass-l2-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Light product themes: stronger white fill + dark hairline */
+html.glass-shell-on[data-glass-scheme='light'] {
+  --ms-glass-saturate: 130%;
+  --ms-glass-l3-bg: rgba(255, 255, 255, 0.78);
+  --ms-glass-l3-border: 1px solid rgba(0, 0, 0, 0.1);
+  --ms-glass-l3-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 8px 32px rgba(0, 0, 0, 0.08);
+  --ms-glass-l2-bg: rgba(255, 255, 255, 0.72);
+  --ms-glass-l2-border: 1px solid rgba(0, 0, 0, 0.08);
+  --ms-glass-l2-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Naive dark provider */
+html.glass-shell-on .n-config-provider {
+  /* marker only — tokens already dark-default */
+}
+
+/* L3: modals & drawers (teleported) */
+html.glass-shell-on .n-modal .n-card,
+html.glass-shell-on .n-dialog,
+html.glass-shell-on .n-drawer .n-drawer-content-wrapper {
+  background: var(--ms-glass-l3-bg) !important;
+  backdrop-filter: blur(var(--ms-glass-l3-blur)) saturate(var(--ms-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ms-glass-l3-blur)) saturate(var(--ms-glass-saturate));
+  border: var(--ms-glass-l3-border) !important;
+  box-shadow: var(--ms-glass-l3-shadow) !important;
+}
+
+/* L2: redesign sider only */
+html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider,
+html.glass-shell-on .main-layout-root .app-side-nav {
+  background: var(--ms-glass-l2-bg) !important;
+  backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate));
+  border-right: var(--ms-glass-l2-border) !important;
+  box-shadow: var(--ms-glass-l2-shadow);
+}
+
+/* Main workspace stays opaque (modern minimal) */
+html.glass-shell-on .main-layout-content,
+html.glass-shell-on .main-content-wrapper {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Optional soft ambient on shell path only — very subtle */
+html.glass-shell-on.glass-shell-ambient .main-layout-root {
+  background:
+    radial-gradient(900px 480px at 12% 0%, rgba(232, 164, 92, 0.08), transparent 55%),
+    radial-gradient(800px 420px at 90% 100%, rgba(126, 200, 227, 0.07), transparent 50%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html.glass-shell-on .n-modal .n-card,
+  html.glass-shell-on .n-dialog,
+  html.glass-shell-on .n-drawer .n-drawer-content-wrapper,
+  html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider,
+  html.glass-shell-on .main-layout-root .app-side-nav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+@supports not ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) {
+  html.glass-shell-on .n-modal .n-card,
+  html.glass-shell-on .n-dialog,
+  html.glass-shell-on .n-drawer .n-drawer-content-wrapper {
+    background: var(--n-modal-color, #1e1e28) !important;
+  }
+  html.glass-shell-on .main-layout-root .app-side-nav {
+    background: var(--n-color, #181820) !important;
+  }
+}

@@ -22,6 +22,7 @@ import "./styles/common.css";
 // Paper tokens + paper-only chrome. Loaded as a JS import (not CSS @import)
 // so it does not fight Tailwind's @import/@config ordering in index.css.
 import "./styles/paper.css";
+import "./styles/glass-shell.css";
 // 已移除: import './styles/theme.css' - 完全使用Naive UI主题系统
 
 // 导出插件

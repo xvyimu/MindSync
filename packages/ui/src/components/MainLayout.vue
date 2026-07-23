@@ -126,12 +126,19 @@ import logoImage from '../assets/logo.png'
 import AppPreviewImage from './media/AppPreviewImage.vue'
 import AppSideNav from './app-layout/AppSideNav.vue'
 import { isRedesignShellEnabled } from '../config/redesign-shell'
+import {
+  applyGlassShellDocumentClass,
+  isGlassShellEnabled,
+} from '../config/glass-shell'
 import { openExternalUrl } from '../utils/open-external-url'
 
 const { t } = useI18n()
 
 /** R0: Naive UI Admin shell behind flag (default false). */
 const redesignShell = isRedesignShellEnabled()
+
+/** Fluent glass atmosphere (default false) — modals/sider only. */
+const glassShell = isGlassShellEnabled()
 
 // Logo图片配置
 const logoSrc = logoImage
@@ -157,6 +164,7 @@ const updateWindowWidth = () => {
 }
 
 onMounted(() => {
+  applyGlassShellDocumentClass(glassShell)
   if (typeof window !== 'undefined') {
     windowWidth.value = window.innerWidth
     window.addEventListener('resize', updateWindowWidth)
@@ -164,6 +172,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  applyGlassShellDocumentClass(false)
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateWindowWidth)
   }
