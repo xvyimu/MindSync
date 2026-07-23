@@ -214,3 +214,6 @@ services/ai-core/.venv/
 # Python packaging (local editable installs)
 *.egg-info/
 services/ai-core/.venv/
+
+# local tool (codebase-memory) - do not commit
+.cbmignore
