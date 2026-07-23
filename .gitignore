@@ -71,6 +71,8 @@ junit.xml
 test-results
 playwright-report
 test-results/
+**/TestResults/
+artifacts/
 
 # ==========================================
 # 环境变量和配置
