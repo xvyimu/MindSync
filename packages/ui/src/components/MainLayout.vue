@@ -54,9 +54,9 @@
           </NLayoutHeader>
           <NLayoutContent
             class="main-layout-content main-layout-content--shell"
-            content-style="height: 100%; max-height: 100%; min-height: 0; box-sizing: border-box; padding: 24px 16px 32px; display: flex; flex-direction: column; align-items: stretch; overflow: hidden;"
+            content-style="height: 100%; max-height: 100%; min-height: 0; box-sizing: border-box; padding: 16px 16px 24px; display: flex; flex-direction: column; align-items: stretch; overflow: hidden;"
           >
-            <div class="main-content-wrapper">
+            <div class="main-content-wrapper main-content-wrapper--atelier">
               <slot name="main"></slot>
             </div>
           </NLayoutContent>
@@ -244,6 +244,11 @@ const openBrandWebsite = async () => {
   overflow: auto;
 }
 
+/* Atelier shell: denser canvas, allow workspace to own scroll */
+.main-content-wrapper--atelier {
+  gap: var(--paper-space-3, 16px);
+}
+
 .main-content-wrapper > * {
   flex: 1;
   min-height: 0;
@@ -255,9 +260,9 @@ const openBrandWebsite = async () => {
   padding: 8px 16px !important;
 }
 
-/* Shell header: slightly tighter vertical padding (token 8). */
+/* Shell header: tighter tool bar (52) */
 .nav-header-shell {
-  min-height: 56px !important;
+  min-height: 52px !important;
   padding: 8px 16px !important;
 }
 
@@ -268,6 +273,11 @@ html[data-app-theme='paper'] .nav-header-enhanced {
   background: var(--paper-surface, var(--n-card-color));
   border-bottom: 1px solid var(--paper-rule, var(--n-border-color));
   box-shadow: none !important;
+}
+
+html[data-app-theme='paper'] .nav-header-shell {
+  min-height: 52px !important;
+  padding: 8px 16px !important;
 }
 
 .nav-content {

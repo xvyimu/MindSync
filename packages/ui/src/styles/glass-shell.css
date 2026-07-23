@@ -1,119 +1,74 @@
 /*
- * MindSync 「墨焰 · Ink & Ember」shell identity
- * Flag only: html.glass-shell-on (?glassShell=1 / ui:glass-shell)
+ * MindSync 「工坊 · Atelier」shell
+ * Flag: html.glass-shell-on (?glassShell=1 / ui:glass-shell) — default OFF
  *
- * Unique vs generic Fluent/iOS glass:
- * - Ink navy depth field + ember (#f97316) brand spark (Paper CTA)
- * - Vertical ink-rail on sider, ember hairline under header
- * - Paper-fiber noise, squircle cards, selected = ember glow chip
- * - Not rainbow liquid glass; editorial workstation for prompts
+ * frontend-ui-engineering:
+ * - No purple-gradient / rainbow glass / max-rounded AI look
+ * - Paper design system tokens (4/8/16/24/32 · radius 4/8 · CTA #f97316)
+ * - Content-first: readable editors, clear hierarchy, WCAG-minded contrast
+ * - Unique: editorial workstation for prompts (not generic Fluent frost)
  */
 
 html.glass-shell-on {
-  /* Brand */
-  --ms-ink: #0c1222;
-  --ms-ink-soft: #141c2f;
-  --ms-ember: #f97316;
-  --ms-ember-soft: rgba(249, 115, 22, 0.45);
-  --ms-azure: #3b82f6;
-  --ms-azure-soft: rgba(59, 130, 246, 0.35);
-  --ms-mist: rgba(226, 232, 240, 0.12);
+  /* Paper-aligned tokens (override only under flag) */
+  --atelier-ink: #0f172a;
+  --atelier-ink-2: #334155;
+  --atelier-ink-3: #64748b;
+  --atelier-rule: #e2e8f0;
+  --atelier-rule-strong: #cbd5e1;
+  --atelier-surface: #ffffff;
+  --atelier-surface-2: #f8fafc;
+  --atelier-bg: #f1f5f9;
+  --atelier-cta: var(--paper-cta, #f97316);
+  --atelier-cta-ink: #9a3412;
+  --atelier-primary: var(--paper-primary, #3b82f6);
+  --atelier-focus: var(--paper-focus-ring, 0 0 0 2px rgba(59, 130, 246, 0.22));
+  --atelier-radius: var(--paper-radius-md, 8px);
+  --atelier-radius-sm: var(--paper-radius-sm, 4px);
+  --atelier-space-2: var(--paper-space-2, 8px);
+  --atelier-space-3: var(--paper-space-3, 16px);
+  --atelier-space-4: var(--paper-space-4, 24px);
+  --atelier-space-5: var(--paper-space-5, 32px);
+  --atelier-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --atelier-shadow-panel: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --atelier-font: var(--paper-font-sans, system-ui, sans-serif);
+  --atelier-mono: var(--paper-font-mono, ui-monospace, monospace);
 
-  --ms-glass-saturate: 170%;
-  --ms-glass-l3-bg: rgba(20, 28, 47, 0.72);
-  --ms-glass-l3-blur: 26px;
-  --ms-glass-l3-border: 1px solid rgba(148, 163, 184, 0.22);
-  --ms-glass-l3-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 0 1px rgba(249, 115, 22, 0.12),
-    0 20px 56px rgba(0, 0, 0, 0.5);
-  --ms-glass-l2-bg: rgba(16, 24, 40, 0.58);
-  --ms-glass-l2-blur: 22px;
-  --ms-glass-l2-border: 1px solid rgba(148, 163, 184, 0.16);
-  --ms-glass-l2-shadow: 8px 0 32px rgba(0, 0, 0, 0.28);
-  --ms-glass-l1-bg: rgba(22, 32, 52, 0.55);
-  --ms-glass-l1-blur: 16px;
-  --ms-glass-l1-border: 1px solid rgba(148, 163, 184, 0.14);
-  --ms-glass-radius-l3: 16px;
-  --ms-glass-radius-l2: 14px;
-  --ms-glass-radius-l1: 12px;
-  --ms-glass-body: var(--ms-ink);
-  --ms-glass-ambient-a: rgba(249, 115, 22, 0.2);
-  --ms-glass-ambient-b: rgba(59, 130, 246, 0.18);
-  --ms-glass-ambient-c: rgba(15, 23, 42, 0.9);
-  --ms-glass-sheen: linear-gradient(
-    155deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.03) 40%,
-    transparent 65%
-  );
-  --ms-glass-fiber: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+  /* Panel frost — restrained, never black-alpha fake glass */
+  --atelier-panel: rgba(255, 255, 255, 0.82);
+  --atelier-panel-edge: 1px solid rgba(15, 23, 42, 0.08);
+  --atelier-panel-blur: 12px;
+  --atelier-rail: 3px;
 }
 
-/* Light / Paper day — “warm vellum” ink wash, still unique */
-html.glass-shell-on[data-glass-scheme='light'] {
-  --ms-ink: #eef2f9;
-  --ms-ink-soft: #e4eaf5;
-  --ms-mist: rgba(15, 23, 42, 0.06);
-
-  --ms-glass-saturate: 150%;
-  --ms-glass-l3-bg: rgba(255, 252, 248, 0.62);
-  --ms-glass-l3-blur: 26px;
-  --ms-glass-l3-border: 1px solid rgba(15, 23, 42, 0.1);
-  --ms-glass-l3-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 0 0 1px rgba(249, 115, 22, 0.1),
-    0 18px 48px rgba(15, 23, 42, 0.12);
-  --ms-glass-l2-bg: rgba(255, 250, 245, 0.52);
-  --ms-glass-l2-blur: 24px;
-  --ms-glass-l2-border: 1px solid rgba(15, 23, 42, 0.09);
-  --ms-glass-l2-shadow: 6px 0 28px rgba(15, 23, 42, 0.08);
-  --ms-glass-l1-bg: rgba(255, 255, 255, 0.48);
-  --ms-glass-l1-blur: 14px;
-  --ms-glass-l1-border: 1px solid rgba(15, 23, 42, 0.08);
-  --ms-glass-body: #e8edf6;
-  --ms-glass-ambient-a: rgba(249, 115, 22, 0.16);
-  --ms-glass-ambient-b: rgba(59, 130, 246, 0.14);
-  --ms-glass-ambient-c: rgba(148, 163, 184, 0.2);
-  --ms-glass-sheen: linear-gradient(
-    155deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.25) 38%,
-    transparent 70%
-  );
+/* Dark product theme under same flag */
+html.glass-shell-on[data-glass-scheme='dark'] {
+  --atelier-ink: #e2e8f0;
+  --atelier-ink-2: #94a3b8;
+  --atelier-ink-3: #64748b;
+  --atelier-rule: #1e293b;
+  --atelier-rule-strong: #334155;
+  --atelier-surface: #0f172a;
+  --atelier-surface-2: #111827;
+  --atelier-bg: #020617;
+  --atelier-cta-ink: #ffedd5;
+  --atelier-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --atelier-shadow-panel: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --atelier-panel: rgba(15, 23, 42, 0.78);
+  --atelier-panel-edge: 1px solid rgba(148, 163, 184, 0.14);
 }
 
-/* ========== Stage: ink field ========== */
+/* ========== Canvas ========== */
 html.glass-shell-on .main-layout-root {
-  background-color: var(--ms-glass-body) !important;
+  background-color: var(--atelier-bg) !important;
+  /* Quiet depth: single wash + soft CTA corner — not multi-hue party gradients */
   background-image:
-    radial-gradient(1100px 600px at -5% -15%, var(--ms-glass-ambient-a), transparent 55%),
-    radial-gradient(900px 520px at 105% 105%, var(--ms-glass-ambient-b), transparent 52%),
-    radial-gradient(700px 400px at 70% 20%, var(--ms-glass-ambient-c), transparent 48%),
-    linear-gradient(165deg, var(--ms-ink-soft) 0%, var(--ms-glass-body) 45%, var(--ms-ink) 100%);
+    radial-gradient(900px 480px at 100% 0%, color-mix(in srgb, var(--atelier-cta) 9%, transparent), transparent 55%),
+    radial-gradient(700px 400px at 0% 100%, color-mix(in srgb, var(--atelier-primary) 7%, transparent), transparent 50%),
+    linear-gradient(180deg, var(--atelier-surface-2) 0%, var(--atelier-bg) 100%);
   background-attachment: fixed;
-}
-
-/* paper fiber overlay (unique texture) */
-html.glass-shell-on .main-layout-root::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.07;
-  background-image: var(--ms-glass-fiber);
-  mix-blend-mode: overlay;
-}
-
-html.glass-shell-on[data-glass-scheme='light'] .main-layout-root::before {
-  opacity: 0.05;
-  mix-blend-mode: multiply;
-}
-
-html.glass-shell-on .main-layout-root > * {
-  position: relative;
-  z-index: 1;
+  font-family: var(--atelier-font);
+  color: var(--atelier-ink);
 }
 
 html.glass-shell-on body,
@@ -121,276 +76,281 @@ html.glass-shell-on .n-config-provider {
   background: transparent !important;
 }
 
-/* ========== L3: dialogs — ink frame + ember ring ========== */
-html.glass-shell-on .n-modal .n-card,
-html.glass-shell-on .n-dialog,
-html.glass-shell-on .n-drawer .n-drawer-content-wrapper {
-  background:
-    var(--ms-glass-sheen),
-    var(--ms-glass-l3-bg) !important;
-  backdrop-filter: blur(var(--ms-glass-l3-blur)) saturate(var(--ms-glass-saturate)) !important;
-  -webkit-backdrop-filter: blur(var(--ms-glass-l3-blur)) saturate(var(--ms-glass-saturate)) !important;
-  border: var(--ms-glass-l3-border) !important;
-  box-shadow: var(--ms-glass-l3-shadow) !important;
-  border-radius: var(--ms-glass-radius-l3) !important;
+/* ========== Sider: solid editorial rail ========== */
+html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider,
+html.glass-shell-on .main-layout-root .app-side-nav,
+html.glass-shell-on .main-layout-root .n-layout-sider {
+  background: var(--atelier-panel) !important;
+  backdrop-filter: blur(var(--atelier-panel-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--atelier-panel-blur)) !important;
+  border-right: var(--atelier-panel-edge) !important;
+  box-shadow: var(--atelier-shadow) !important;
+  position: relative;
 }
 
-/* ember top edge on modals */
-html.glass-shell-on .n-modal .n-card::before,
-html.glass-shell-on .n-dialog::before {
+/* Signature: left ink spine (not rainbow) */
+html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider::before,
+html.glass-shell-on .main-layout-root .app-side-nav::before {
   content: '';
   position: absolute;
-  left: 12%;
-  right: 12%;
+  left: 0;
   top: 0;
-  height: 2px;
-  border-radius: 2px;
+  bottom: 0;
+  width: var(--atelier-rail);
   background: linear-gradient(
-    90deg,
-    transparent,
-    var(--ms-ember) 20%,
-    var(--ms-azure) 55%,
-    var(--ms-ember) 85%,
-    transparent
+    180deg,
+    var(--atelier-cta) 0%,
+    var(--atelier-primary) 55%,
+    var(--atelier-rule-strong) 100%
   );
-  opacity: 0.85;
   pointer-events: none;
   z-index: 2;
 }
 
-html.glass-shell-on .n-modal .n-card,
-html.glass-shell-on .n-dialog {
-  position: relative;
-  overflow: hidden;
-}
-
-html.glass-shell-on .n-modal-mask,
-html.glass-shell-on .n-drawer-mask {
-  background: rgba(8, 12, 24, 0.48) !important;
-  backdrop-filter: blur(8px) saturate(130%);
-  -webkit-backdrop-filter: blur(8px) saturate(130%);
-}
-
-html.glass-shell-on[data-glass-scheme='light'] .n-modal-mask,
-html.glass-shell-on[data-glass-scheme='light'] .n-drawer-mask {
-  background: rgba(15, 23, 42, 0.28) !important;
-}
-
-/* ========== L2: sider — ink rail ========== */
-html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider,
-html.glass-shell-on .main-layout-root .app-side-nav,
-html.glass-shell-on .main-layout-root .n-layout-sider {
-  background:
-    var(--ms-glass-sheen),
-    var(--ms-glass-l2-bg) !important;
-  backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate)) !important;
-  -webkit-backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate)) !important;
-  border-right: none !important;
-  box-shadow: var(--ms-glass-l2-shadow) !important;
-  position: relative;
-}
-
-/* signature vertical ink→ember rail */
-html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider::after,
-html.glass-shell-on .main-layout-root .app-side-nav::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 3px;
-  height: 100%;
-  background: linear-gradient(
-    180deg,
-    var(--ms-ember) 0%,
-    var(--ms-azure) 42%,
-    rgba(148, 163, 184, 0.35) 100%
-  );
-  opacity: 0.9;
-  pointer-events: none;
-  z-index: 3;
+html.glass-shell-on .app-side-nav__body {
+  padding: var(--atelier-space-3) var(--atelier-space-2) !important;
+  gap: var(--atelier-space-3) !important;
 }
 
 html.glass-shell-on .app-side-nav__label {
-  letter-spacing: 0.12em !important;
+  font-size: var(--paper-font-meta, 12px) !important;
   font-weight: 600 !important;
-  color: color-mix(in srgb, var(--n-text-color-3, #94a3b8) 80%, var(--ms-ember)) !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--atelier-ink-3) !important;
+  padding-left: var(--atelier-space-2) !important;
 }
 
-html.glass-shell-on .app-side-nav .n-divider {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--ms-ember) 50%, #94a3b8),
-    transparent
-  ) !important;
-  height: 1px !important;
-  opacity: 0.7;
+html.glass-shell-on .app-side-nav .n-divider,
+html.glass-shell-on .app-side-nav__divider {
+  margin: var(--atelier-space-2) !important;
+  background: var(--atelier-rule) !important;
+  opacity: 1 !important;
 }
 
-/* selected nav — ember glow chip (not flat blue block) */
+/* Selected nav: CTA-tinted chip, radius 8, clear focus */
 html.glass-shell-on .app-side-nav .n-button--primary-type,
 html.glass-shell-on .app-side-nav .n-button.n-button--primary-type {
-  background: color-mix(in srgb, var(--ms-ember) 18%, rgba(255, 255, 255, 0.12)) !important;
-  color: var(--n-text-color-1, #fff) !important;
-  border: 1px solid color-mix(in srgb, var(--ms-ember) 55%, transparent) !important;
-  border-radius: 10px !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
-    0 0 20px color-mix(in srgb, var(--ms-ember) 35%, transparent),
-    0 4px 14px rgba(0, 0, 0, 0.15) !important;
-  position: relative;
+  background: color-mix(in srgb, var(--atelier-cta) 14%, var(--atelier-surface)) !important;
+  color: var(--atelier-cta-ink) !important;
+  border: 1px solid color-mix(in srgb, var(--atelier-cta) 45%, transparent) !important;
+  border-radius: var(--atelier-radius) !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
 }
 
-html.glass-shell-on[data-glass-scheme='light'] .app-side-nav .n-button--primary-type {
-  background: color-mix(in srgb, var(--ms-ember) 16%, #fff) !important;
-  color: #9a3412 !important;
+html.glass-shell-on[data-glass-scheme='dark'] .app-side-nav .n-button--primary-type {
+  background: color-mix(in srgb, var(--atelier-cta) 22%, var(--atelier-surface)) !important;
+  color: var(--atelier-cta-ink) !important;
 }
 
-/* ========== Header: brand underline ========== */
+html.glass-shell-on .app-side-nav .n-button:focus-visible {
+  outline: none !important;
+  box-shadow: var(--atelier-focus) !important;
+}
+
+/* ========== Header: thin tool bar ========== */
 html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header,
 html.glass-shell-on .main-layout-root .theme-header.n-layout-header {
-  background:
-    var(--ms-glass-sheen),
-    var(--ms-glass-l2-bg) !important;
-  backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate)) !important;
-  -webkit-backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate)) !important;
-  border-bottom: 1px solid transparent !important;
+  background: var(--atelier-panel) !important;
+  backdrop-filter: blur(var(--atelier-panel-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--atelier-panel-blur)) !important;
+  border-bottom: var(--atelier-panel-edge) !important;
   box-shadow: none !important;
-  position: relative;
-}
-
-html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header::after,
-html.glass-shell-on .main-layout-root .theme-header.n-layout-header::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    var(--ms-ember) 0%,
-    var(--ms-azure) 35%,
-    transparent 70%
-  );
-  opacity: 0.85;
-  pointer-events: none;
+  min-height: 52px;
 }
 
 html.glass-shell-on .theme-title,
 html.glass-shell-on .brand-link .n-text {
-  background: linear-gradient(105deg, var(--n-text-color-1, #e2e8f0) 20%, var(--ms-ember) 95%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.01em;
+  color: var(--atelier-ink) !important;
+  background: none !important;
+  -webkit-text-fill-color: var(--atelier-ink) !important;
+  font-size: var(--paper-font-title, 18px) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em;
 }
 
-html.glass-shell-on[data-glass-scheme='light'] .theme-title,
-html.glass-shell-on[data-glass-scheme='light'] .brand-link .n-text {
-  background: linear-gradient(105deg, #0f172a 30%, #c2410c 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-/* ========== L1: workspace cards — ink panels ========== */
-html.glass-shell-on .main-layout-content .n-card,
-html.glass-shell-on .main-content-wrapper .n-card {
-  background:
-    var(--ms-glass-sheen),
-    var(--ms-glass-l1-bg) !important;
-  backdrop-filter: blur(var(--ms-glass-l1-blur)) saturate(var(--ms-glass-saturate)) !important;
-  -webkit-backdrop-filter: blur(var(--ms-glass-l1-blur)) saturate(var(--ms-glass-saturate)) !important;
-  border: var(--ms-glass-l1-border) !important;
-  border-radius: var(--ms-glass-radius-l1) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.08) inset,
-    0 10px 32px rgba(0, 0, 0, 0.12) !important;
-  position: relative;
-  overflow: hidden;
-}
-
-/* left ember tick on first column cards */
-html.glass-shell-on .main-content-wrapper .n-card::before {
+/* Small CTA mark after title for brand without rainbow */
+html.glass-shell-on .brand-link .theme-title::after {
   content: '';
-  position: absolute;
-  left: 0;
-  top: 16px;
-  bottom: 16px;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: linear-gradient(180deg, var(--ms-ember), var(--ms-azure));
-  opacity: 0.75;
-  pointer-events: none;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 8px;
+  margin-bottom: 2px;
+  border-radius: 1px;
+  background: var(--atelier-cta);
+  vertical-align: middle;
 }
 
-/* solid editors */
-html.glass-shell-on .main-layout-content .n-input,
-html.glass-shell-on .main-layout-content .n-input-wrapper,
-html.glass-shell-on .main-layout-content .n-base-selection,
-html.glass-shell-on .main-layout-content .cm-editor,
-html.glass-shell-on .main-content-wrapper .n-input,
-html.glass-shell-on .main-content-wrapper .n-input-wrapper {
-  background: color-mix(in srgb, var(--n-input-color, #fff) 92%, transparent) !important;
-  backdrop-filter: none !important;
-  border-radius: 10px !important;
+/* ========== Content column ========== */
+html.glass-shell-on .main-layout-content.main-layout-content--shell,
+html.glass-shell-on .main-layout-content {
+  /* denser, purposeful padding on scale */
+  /* content-style inline wins some paths — reinforce here */
 }
 
 html.glass-shell-on .main-layout-content,
 html.glass-shell-on .main-layout-content .n-layout-scroll-container,
 html.glass-shell-on .main-content-wrapper {
   background: transparent !important;
+}
+
+/* Workspace cards: paper surfaces + CTA accent bar (not frosted everything) */
+html.glass-shell-on .main-layout-content .n-card,
+html.glass-shell-on .main-content-wrapper .n-card,
+html.glass-shell-on .workspace-card {
+  background: var(--atelier-surface) !important;
+  border: 1px solid var(--atelier-rule) !important;
+  border-radius: var(--atelier-radius) !important;
+  box-shadow: var(--atelier-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Primary card emphasis: left CTA bar */
+html.glass-shell-on .workspace-card--primary,
+html.glass-shell-on .main-content-wrapper .n-card:first-of-type {
+  box-shadow: var(--atelier-shadow-panel) !important;
+}
+
+html.glass-shell-on .workspace-card--primary::before,
+html.glass-shell-on .main-content-wrapper .split-pane:first-child .n-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--atelier-rail);
+  background: var(--atelier-cta);
+  pointer-events: none;
+}
+
+/* Secondary cards: hairline only */
+html.glass-shell-on .workspace-card--secondary {
+  background: var(--atelier-surface-2) !important;
+  box-shadow: none !important;
+}
+
+/* Inputs / editors: solid, high contrast */
+html.glass-shell-on .main-layout-content .n-input,
+html.glass-shell-on .main-layout-content .n-input-wrapper,
+html.glass-shell-on .main-layout-content .n-base-selection,
+html.glass-shell-on .main-layout-content .cm-editor,
+html.glass-shell-on .main-content-wrapper .n-input,
+html.glass-shell-on .main-content-wrapper .n-input-wrapper,
+html.glass-shell-on .main-content-wrapper .cm-editor {
+  background: var(--atelier-surface) !important;
+  border-radius: var(--atelier-radius-sm) !important;
   backdrop-filter: none !important;
 }
 
-/* primary CTA — ember */
-html.glass-shell-on .main-layout-content .n-button--primary-type {
-  background: linear-gradient(135deg, #fb923c 0%, var(--ms-ember) 45%, #ea580c 100%) !important;
-  border: none !important;
-  box-shadow: 0 4px 16px var(--ms-ember-soft) !important;
-  color: #fff !important;
+html.glass-shell-on .main-layout-content .n-input:focus-within,
+html.glass-shell-on .main-content-wrapper .n-input:focus-within {
+  box-shadow: var(--atelier-focus) !important;
 }
 
+/* Section titles in workspace */
+html.glass-shell-on .main-layout-content .n-text[style*='font-size: 18px'],
+html.glass-shell-on .main-content-wrapper .n-card .n-text {
+  letter-spacing: -0.01em;
+}
+
+/* Primary buttons → CTA */
+html.glass-shell-on .main-layout-content .n-button--primary-type,
+html.glass-shell-on .main-content-wrapper .n-button--primary-type {
+  background: var(--atelier-cta) !important;
+  border: 1px solid color-mix(in srgb, var(--atelier-cta) 80%, #000) !important;
+  color: #fff !important;
+  border-radius: var(--atelier-radius-sm) !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+}
+
+html.glass-shell-on .main-layout-content .n-button--primary-type:hover,
+html.glass-shell-on .main-content-wrapper .n-button--primary-type:hover {
+  filter: brightness(1.05);
+}
+
+html.glass-shell-on .main-layout-content .n-button--primary-type:focus-visible {
+  box-shadow: var(--atelier-focus) !important;
+}
+
+/* Modals: elevated paper panels, not liquid glass */
+html.glass-shell-on .n-modal .n-card,
+html.glass-shell-on .n-dialog,
+html.glass-shell-on .n-drawer .n-drawer-content-wrapper {
+  background: var(--atelier-surface) !important;
+  border: 1px solid var(--atelier-rule) !important;
+  border-radius: var(--atelier-radius) !important;
+  box-shadow: var(--atelier-shadow-panel) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+html.glass-shell-on .n-modal .n-card::before,
+html.glass-shell-on .n-dialog::before {
+  content: '';
+  display: block;
+  height: 3px;
+  margin: -1px -1px 0;
+  border-radius: var(--atelier-radius) var(--atelier-radius) 0 0;
+  background: linear-gradient(90deg, var(--atelier-cta), var(--atelier-primary));
+}
+
+html.glass-shell-on .n-modal-mask,
+html.glass-shell-on .n-drawer-mask {
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+html.glass-shell-on[data-glass-scheme='dark'] .n-modal-mask {
+  background: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Utility / mono hints */
+html.glass-shell-on .paper-mono,
+html.glass-shell-on .cm-editor {
+  font-family: var(--atelier-mono);
+}
+
+/* Float button — restrained */
 html.glass-shell-on .n-float-button {
-  background:
-    var(--ms-glass-sheen),
-    var(--ms-glass-l2-bg) !important;
-  backdrop-filter: blur(14px) !important;
-  border: 1px solid color-mix(in srgb, var(--ms-ember) 40%, transparent) !important;
-  box-shadow: 0 0 24px var(--ms-ember-soft) !important;
+  background: var(--atelier-surface) !important;
+  border: 1px solid var(--atelier-rule) !important;
+  box-shadow: var(--atelier-shadow-panel) !important;
+  color: var(--atelier-ink) !important;
+}
+
+/* Density: shell content padding on scale */
+html.glass-shell-on .main-layout-content--shell {
+  /* override common content-style padding via nested wrapper */
+}
+
+html.glass-shell-on .main-layout-content--shell .main-content-wrapper {
+  gap: var(--atelier-space-3);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  html.glass-shell-on * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  html.glass-shell-on .n-modal .n-card,
-  html.glass-shell-on .n-dialog,
-  html.glass-shell-on .n-drawer .n-drawer-content-wrapper,
-  html.glass-shell-on .main-layout-root .n-layout-sider,
   html.glass-shell-on .main-layout-root .app-side-nav,
   html.glass-shell-on .main-layout-root .theme-header,
-  html.glass-shell-on .main-layout-content .n-card {
+  html.glass-shell-on .n-modal .n-card {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    background: var(--atelier-surface) !important;
   }
   html.glass-shell-on .main-layout-root {
-    background-image: none;
-  }
-  html.glass-shell-on .main-layout-root::before {
-    display: none;
-  }
-}
-
-@supports not ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) {
-  html.glass-shell-on .n-modal .n-card,
-  html.glass-shell-on .n-dialog {
-    background: var(--n-modal-color, #141c2f) !important;
-  }
-  html.glass-shell-on[data-glass-scheme='light'] .n-modal .n-card,
-  html.glass-shell-on[data-glass-scheme='light'] .n-dialog {
-    background: #fffaf5 !important;
-  }
-  html.glass-shell-on .main-layout-root .app-side-nav,
-  html.glass-shell-on .main-layout-root .theme-header {
-    background: var(--n-color, #141c2f) !important;
+    background-image: none !important;
   }
 }
