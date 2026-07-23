@@ -165,6 +165,12 @@ const updateWindowWidth = () => {
 
 onMounted(() => {
   applyGlassShellDocumentClass(glassShell)
+  // Theme store may hydrate after first paint — re-sync light/dark glass tokens.
+  if (glassShell && typeof window !== 'undefined') {
+    window.setTimeout(() => {
+      applyGlassShellDocumentClass(true)
+    }, 0)
+  }
   if (typeof window !== 'undefined') {
     windowWidth.value = window.innerWidth
     window.addEventListener('resize', updateWindowWidth)

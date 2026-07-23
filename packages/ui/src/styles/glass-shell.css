@@ -2,39 +2,56 @@
  * Fluent glass atmosphere — MindSync opt-in (flag ui:glass-shell / ?glassShell=1).
  * Default OFF: selectors under html.glass-shell-on only.
  *
- * Parity with pack glass-theme.css + HTML sandbox (user-confirmed):
- * - White-based glass fill (never black alpha as glass)
- * - Shell only: modal / drawer / redesign sider (+ thin shell header)
- * - Main content solid; blur ≤ 20; reduced-transparency / @supports fallback
+ * Light/Paper: frost must stay readable on pale body — stronger border/shadow + tinted fill.
+ * Dark: white low-alpha fill (never black-alpha "fake glass").
+ * Shell only: modal / drawer / redesign sider + shell header; main content solid.
  */
 
 html.glass-shell-on {
+  /* Dark defaults (overridden by data-glass-scheme=light) */
   --ms-glass-saturate: 160%;
   --ms-glass-l3-bg: rgba(255, 255, 255, 0.1);
   --ms-glass-l3-blur: 20px;
-  --ms-glass-l3-border: 1px solid rgba(255, 255, 255, 0.14);
+  --ms-glass-l3-border: 1px solid rgba(255, 255, 255, 0.16);
   --ms-glass-l3-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 8px 32px rgba(0, 0, 0, 0.3);
-  --ms-glass-l2-bg: rgba(255, 255, 255, 0.07);
-  --ms-glass-l2-blur: 14px;
-  --ms-glass-l2-border: 1px solid rgba(255, 255, 255, 0.11);
-  --ms-glass-l2-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 12px 40px rgba(0, 0, 0, 0.35);
+  --ms-glass-l2-bg: rgba(255, 255, 255, 0.08);
+  --ms-glass-l2-blur: 16px;
+  --ms-glass-l2-border: 1px solid rgba(255, 255, 255, 0.12);
+  --ms-glass-l2-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
   --ms-glass-radius-l3: 16px;
   --ms-glass-radius-l2: 12px;
+  /* ambient behind shell so blur has structure on flat themes */
+  --ms-glass-ambient-a: rgba(232, 164, 92, 0.14);
+  --ms-glass-ambient-b: rgba(126, 200, 227, 0.12);
 }
 
-/* Light product themes / data-glass-scheme=light */
+/* Light / Paper product themes — visible frost on pale UI */
 html.glass-shell-on[data-glass-scheme='light'] {
-  --ms-glass-saturate: 130%;
-  --ms-glass-l3-bg: rgba(255, 255, 255, 0.78);
-  --ms-glass-l3-border: 1px solid rgba(0, 0, 0, 0.1);
+  --ms-glass-saturate: 140%;
+  --ms-glass-l3-bg: rgba(255, 255, 255, 0.72);
+  --ms-glass-l3-blur: 20px;
+  --ms-glass-l3-border: 1px solid rgba(15, 23, 42, 0.12);
   --ms-glass-l3-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    0 8px 32px rgba(0, 0, 0, 0.08);
-  --ms-glass-l2-bg: rgba(255, 255, 255, 0.72);
-  --ms-glass-l2-border: 1px solid rgba(0, 0, 0, 0.08);
-  --ms-glass-l2-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 12px 40px rgba(15, 23, 42, 0.12);
+  /* slightly cool frosted panel so it separates from Paper body #f5f6f8 */
+  --ms-glass-l2-bg: rgba(248, 250, 252, 0.62);
+  --ms-glass-l2-blur: 18px;
+  --ms-glass-l2-border: 1px solid rgba(15, 23, 42, 0.1);
+  --ms-glass-l2-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+  --ms-glass-ambient-a: rgba(59, 130, 246, 0.1);
+  --ms-glass-ambient-b: rgba(249, 115, 22, 0.08);
+}
+
+/* Soft dual-glow on layout root whenever glass is on (preview-friendly) */
+html.glass-shell-on .main-layout-root {
+  background-color: var(--n-body-color, #f5f6f8);
+  background-image:
+    radial-gradient(1000px 520px at 8% 0%, var(--ms-glass-ambient-a), transparent 55%),
+    radial-gradient(900px 480px at 92% 100%, var(--ms-glass-ambient-b), transparent 52%);
+  background-attachment: fixed;
 }
 
 /* L3: modals & drawers (teleported) */
@@ -49,6 +66,13 @@ html.glass-shell-on .n-drawer .n-drawer-content-wrapper {
   border-radius: var(--ms-glass-radius-l3) !important;
 }
 
+/* Dim scrim slightly so L3 glass reads clearer on light themes */
+html.glass-shell-on .n-modal-mask,
+html.glass-shell-on .n-drawer-mask {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
 /* L2: redesign sider */
 html.glass-shell-on .main-layout-root .app-side-nav.n-layout-sider,
 html.glass-shell-on .main-layout-root .app-side-nav {
@@ -59,7 +83,7 @@ html.glass-shell-on .main-layout-root .app-side-nav {
   box-shadow: var(--ms-glass-l2-shadow);
 }
 
-/* L2: thin shell header (redesign path only) — counts toward ≤3 blur layers with sider+modal */
+/* L2: thin shell header */
 html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header {
   background: var(--ms-glass-l2-bg) !important;
   backdrop-filter: blur(var(--ms-glass-l2-blur)) saturate(var(--ms-glass-saturate));
@@ -68,18 +92,11 @@ html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header {
   box-shadow: none;
 }
 
-/* Main workspace stays opaque (modern minimal · HTML surface-solid) */
+/* Main workspace stays opaque */
 html.glass-shell-on .main-layout-content,
 html.glass-shell-on .main-content-wrapper {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-}
-
-/* Optional soft ambient — enable html.glass-shell-on.glass-shell-ambient */
-html.glass-shell-on.glass-shell-ambient .main-layout-root {
-  background:
-    radial-gradient(900px 480px at 12% 0%, rgba(232, 164, 92, 0.08), transparent 55%),
-    radial-gradient(800px 420px at 90% 100%, rgba(126, 200, 227, 0.07), transparent 50%);
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -91,6 +108,9 @@ html.glass-shell-on.glass-shell-ambient .main-layout-root {
   html.glass-shell-on .main-layout-root .nav-header-shell.n-layout-header {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+  html.glass-shell-on .main-layout-root {
+    background-image: none;
   }
 }
 
