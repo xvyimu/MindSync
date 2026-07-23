@@ -17,7 +17,7 @@ import {
   ElectronImageUnderstandingServiceProxy,
   createVariableExtractionService,
   createVariableValueGenerationService,
-  isRunningInElectron,
+  isRunningInDesktop,
   createPreferenceService,
   FavoriteManager,
   createImageModelManager,
@@ -120,8 +120,10 @@ export function useAppInitializer(): {
       let favoriteImageStorageService: IImageStorageService | undefined;
       let textAdapterRegistryInstance: ITextAdapterRegistry | undefined;
 
-      if (isRunningInElectron()) {
-        console.log('[AppInitializer] Electron environment detected; waiting for API readiness...');
+      // Desktop shell (Electron today; Tauri via desktopAPI/electronAPI facade).
+      // Detection uses isRunningInDesktop so Web never takes the proxy path.
+      if (isRunningInDesktop()) {
+        console.log('[AppInitializer] Desktop environment detected; waiting for API readiness...');
 
         const {
           ElectronContextRepoProxy,
@@ -138,14 +140,14 @@ export function useAppInitializer(): {
           FavoriteManagerElectronProxy,
           waitForElectronApi,
         } = await import('@mindsync/core/electron')
-        
-        // 等待 Electron API 完全就绪
+
+        // waitForElectronApi delegates to waitForDesktopApi (electronAPI | desktopAPI)
         const apiReady = await waitForElectronApi();
         if (!apiReady) {
-          throw new Error('Electron API initialization timed out. Please verify that the preload script loaded correctly.')
+          throw new Error('Desktop API initialization timed out. Please verify that the preload/facade script loaded correctly.')
         }
-        
-        console.log('[AppInitializer] Electron API is ready; initializing proxy services...');
+
+        console.log('[AppInitializer] Desktop API is ready; initializing proxy services...');
 
         // 在Electron环境中，不需要storageProvider
         // 所有存储操作都通过各个manager的代理完成

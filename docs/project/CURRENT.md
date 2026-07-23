@@ -18,7 +18,8 @@
 | **包 scope / Electron** | 根 `mindsync` · `@mindsync/*` · appId `com.xvyimu.mindsync` · productName `MindSync`（见 PR#7） |
 | **Redesign** | R0–R4 已合 develop（PR#8–#12）；shell flag 默认 OFF；下一刀 R5 |
 | **许可** | AGPL-3.0-only（`LICENSE` 正文保留；抬头含独立维护说明） |
-| **形态与栈 SSOT** | [`../PROJECT.md`](../PROJECT.md)（Desktop Electron + Vue monorepo；小修不重选型） |
+| **形态与栈 SSOT** | [`../PROJECT.md`](../PROJECT.md)（Vue monorepo；**Desktop 目标 Tauri2 / 现行默认 Electron** · [ADR-0001](../adr/0001-tauri-desktop-mainline.md) · [cutover](../ops/ms-tauri-cutover-plan.md) · [scout](../ops/ms-tauri-migration-scout-2026-07-24.md)） |
+| **换壳状态** | G0=A1 ✅ · Phase1 文档 ✅ · **G1 人批后**方可 Phase2 代码；G3 前默认安装仍 Electron |
 
 ---
 

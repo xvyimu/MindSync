@@ -199,8 +199,90 @@ export function isDevelopment(): boolean {
 
 
 /**
+ * Desktop shell platform values accepted by VITE_APP_PLATFORM.
+ * - electron: classic Electron main/preload
+ * - tauri / desktop: Tauri (or generic desktop) shell using the same facade
+ */
+const DESKTOP_PLATFORM_ENV_VALUES = new Set(['electron', 'tauri', 'desktop']);
+
+function hasDesktopP0Surface(api: unknown): boolean {
+  if (!api || typeof api !== 'object') return false;
+  const bridge = api as {
+    app?: { getVersion?: unknown };
+    preference?: { get?: unknown; set?: unknown };
+    shell?: { openExternal?: unknown };
+  };
+  return (
+    typeof bridge.app?.getVersion === 'function' &&
+    typeof bridge.preference?.get === 'function' &&
+    typeof bridge.preference?.set === 'function' &&
+    typeof bridge.shell?.openExternal === 'function'
+  );
+}
+
+/**
+ * True when a desktop bridge is present (electronAPI and/or desktopAPI)
+ * with at least the P0 surface required by the facade.
+ * Does NOT treat bare `window` as desktop — Web must stay false.
+ */
+function hasDesktopBridge(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  const w = window as any;
+  if (hasDesktopP0Surface(w.desktopAPI) || hasDesktopP0Surface(w.electronAPI)) {
+    return true;
+  }
+  // Partial bridge (Electron preload still loading preference): presence of either API object
+  if (typeof w.desktopAPI !== 'undefined' || typeof w.electronAPI !== 'undefined') {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * 检测是否在桌面壳中运行（Electron 或 Tauri facade）。
+ * 优先 VITE_APP_PLATFORM，再自动探测 bridge；Web 无 bridge 时必须为 false。
+ */
+export function isRunningInDesktop(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const platformEnv = getEnvVar('VITE_APP_PLATFORM');
+  if (platformEnv) {
+    const isDesktop = DESKTOP_PLATFORM_ENV_VALUES.has(platformEnv);
+    console.log('[isRunningInDesktop] Using platform from env:', platformEnv, '→', isDesktop);
+    return isDesktop;
+  }
+
+  if (hasDesktopBridge()) {
+    console.log('[isRunningInDesktop] Verdict: true (via desktop bridge)');
+    return true;
+  }
+
+  // Electron-only process fingerprint (legacy preload before electronAPI attach)
+  const hasValidElectronProcess =
+    typeof (window as any).process !== 'undefined' &&
+    (window as any).process?.type === 'renderer' &&
+    (window as any).process?.versions?.electron;
+
+  if (hasValidElectronProcess) {
+    console.log('[isRunningInDesktop] Verdict: true (via process.versions.electron)');
+    return true;
+  }
+
+  console.log('[isRunningInDesktop] Verdict: false (no desktop features)');
+  return false;
+}
+
+/**
  * 检测是否在Electron环境中运行
- * 优先使用环境变量VITE_APP_PLATFORM，然后使用自动检测机制
+ * 优先使用环境变量VITE_APP_PLATFORM，然后使用自动检测机制。
+ *
+ * 兼容：若仅有 desktopAPI（Tauri facade 别名策略），在未设置 platform env
+ * 时仍返回 true，以便现有 `isRunningInElectron()` 调用方走代理初始化路径。
+ * 新代码请优先使用 {@link isRunningInDesktop}。
  */
 export function isRunningInElectron(): boolean {
   if (typeof window === 'undefined') {
@@ -211,13 +293,13 @@ export function isRunningInElectron(): boolean {
   const platformEnv = getEnvVar('VITE_APP_PLATFORM');
   if (platformEnv) {
     console.log('[isRunningInElectron] Using platform from env:', platformEnv);
+    // Strict for env: only literal "electron" is Electron; tauri/desktop are desktop-only.
     return platformEnv === 'electron';
   }
 
-  // 自动检测：优先检查electronAPI
-  const hasElectronAPI = typeof (window as any).electronAPI !== 'undefined';
-  if (hasElectronAPI) {
-    console.log('[isRunningInElectron] Verdict: true (via electronAPI)');
+  // 自动检测：desktop facade 或 legacy electronAPI
+  if (hasDesktopBridge()) {
+    console.log('[isRunningInElectron] Verdict: true (via desktop bridge; prefer isRunningInDesktop for new code)');
     return true;
   }
 
@@ -236,10 +318,37 @@ export function isRunningInElectron(): boolean {
 }
 
 /**
+ * Desktop API readiness: P0 surface on desktopAPI or electronAPI.
+ */
+export function isDesktopApiReady(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const w = window as any;
+  if (hasDesktopP0Surface(w.desktopAPI) || hasDesktopP0Surface(w.electronAPI)) {
+    return true;
+  }
+
+  // Backward-compatible Electron readiness (preference only) while P0 shell may lag
+  const hasElectronAPI = typeof w.electronAPI !== 'undefined';
+  const hasPreferenceApi =
+    hasElectronAPI &&
+    typeof w.electronAPI.preference !== 'undefined' &&
+    typeof w.electronAPI.preference.get === 'function';
+
+  return hasPreferenceApi;
+}
+
+/**
  * 检测Electron API是否完全就绪
  * 不仅检测环境，还检测关键API的可用性
  */
 export function isElectronApiReady(): boolean {
+  // Prefer shared desktop readiness so Tauri/mock facade satisfies callers.
+  if (isDesktopApiReady()) {
+    return true;
+  }
   if (!isRunningInElectron()) {
     return false;
   }
@@ -247,7 +356,7 @@ export function isElectronApiReady(): boolean {
   const window_any = window as any;
   const hasElectronAPI = typeof window_any.electronAPI !== 'undefined';
   const hasPreferenceApi = hasElectronAPI && typeof window_any.electronAPI.preference !== 'undefined';
-  
+
   console.log('[isElectronApiReady] API readiness check:', {
     hasElectronAPI,
     hasPreferenceApi,
@@ -258,33 +367,41 @@ export function isElectronApiReady(): boolean {
 }
 
 /**
+ * 等待桌面 API（desktopAPI 或 electronAPI）就绪。
+ * @param timeout 超时时间（毫秒），默认5000ms
+ */
+export function waitForDesktopApi(timeout: number = 5000): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (isDesktopApiReady()) {
+      console.log('[waitForDesktopApi] API already ready');
+      resolve(true);
+      return;
+    }
+
+    console.log('[waitForDesktopApi] Waiting for desktop API...');
+    const startTime = Date.now();
+    const checkInterval = setInterval(() => {
+      if (isDesktopApiReady()) {
+        clearInterval(checkInterval);
+        console.log('[waitForDesktopApi] API ready after', Date.now() - startTime, 'ms');
+        resolve(true);
+      } else if (Date.now() - startTime > timeout) {
+        clearInterval(checkInterval);
+        console.warn('[waitForDesktopApi] Timeout waiting for desktop API after', timeout, 'ms');
+        resolve(false);
+      }
+    }, 50);
+  });
+}
+
+/**
  * 等待Electron API完全就绪
  * @param timeout 超时时间（毫秒），默认5000ms
  * @returns Promise<boolean> 是否在超时前API就绪
  */
 export function waitForElectronApi(timeout: number = 5000): Promise<boolean> {
-  return new Promise((resolve) => {
-    // 如果已经就绪，立即返回
-    if (isElectronApiReady()) {
-      console.log('[waitForElectronApi] API already ready');
-      resolve(true);
-      return;
-    }
-
-    console.log('[waitForElectronApi] Waiting for Electron API...');
-    const startTime = Date.now();
-    const checkInterval = setInterval(() => {
-      if (isElectronApiReady()) {
-        clearInterval(checkInterval);
-        console.log('[waitForElectronApi] API ready after', Date.now() - startTime, 'ms');
-        resolve(true);
-      } else if (Date.now() - startTime > timeout) {
-        clearInterval(checkInterval);
-        console.warn('[waitForElectronApi] Timeout waiting for Electron API after', timeout, 'ms');
-        resolve(false);
-      }
-    }, 50); // 每50ms检查一次
-  });
+  // Delegate to desktop wait so mock/Tauri facade works without dual loops.
+  return waitForDesktopApi(timeout);
 }
 
 /**
