@@ -2,12 +2,24 @@
 
 > 与 HTML sandbox（用户已确认）参数对齐 · **默认 OFF**
 
+## 政策
+
+- **默认 OFF**（不加参数 = Paper 原样）  
+- **不**因本功能重打 asar / 安装包；预览用 dev 即可  
+- 长相 SSOT：用户已确认的 HTML 包 `portfolio-visual-fluent-glass-2026-07-23`
+
 ## 启用
 
 开发 Web / Desktop web-dist 任一入口：
 
 ```text
 ?glassShell=1
+```
+
+本机 dev 示例（端口以终端为准）：
+
+```text
+http://localhost:18181/?glassShell=1&redesignShell=1
 ```
 
 或控制台：
