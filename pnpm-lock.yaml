@@ -228,6 +228,9 @@ importers:
       '@emotion/hash':
         specifier: ^0.9.2
         version: 0.9.2
+      '@juggle/resize-observer':
+        specifier: ^3.4.0
+        version: 3.4.0
       '@mindsync/core':
         specifier: workspace:*
         version: link:../core
@@ -237,6 +240,9 @@ importers:
       '@vueuse/core':
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.31(typescript@5.9.3))
+      async-validator:
+        specifier: ^4.2.5
+        version: 4.2.5
       codemirror:
         specifier: ^6.0.2
         version: 6.0.2
@@ -255,6 +261,9 @@ importers:
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.23
       markdown-it:
         specifier: ^14.1.1
         version: 14.1.1
@@ -267,6 +276,9 @@ importers:
       seemly:
         specifier: ^0.3.10
         version: 0.3.10
+      treemate:
+        specifier: ^0.3.11
+        version: 0.3.11
       uuid:
         specifier: ^13.0.0
         version: 13.0.2
@@ -364,12 +376,21 @@ importers:
       '@emotion/hash':
         specifier: ^0.9.2
         version: 0.9.2
+      '@juggle/resize-observer':
+        specifier: ^3.4.0
+        version: 3.4.0
       '@mindsync/core':
         specifier: workspace:*
         version: link:../core
       '@mindsync/ui':
         specifier: workspace:*
         version: link:../ui
+      '@vue/runtime-dom':
+        specifier: ^3.5.31
+        version: 3.5.31
+      async-validator:
+        specifier: ^4.2.5
+        version: 4.2.5
       css-render:
         specifier: ^0.15.14
         version: 0.15.14
@@ -382,12 +403,21 @@ importers:
       evtd:
         specifier: ^0.2.4
         version: 0.2.4
+      highlight.js:
+        specifier: ^11.11.1
+        version: 11.11.1
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.23
       naive-ui:
         specifier: ^2.44.1
         version: 2.44.1(vue@3.5.31(typescript@6.0.2))
       seemly:
         specifier: ^0.3.10
         version: 0.3.10
+      treemate:
+        specifier: ^0.3.11
+        version: 0.3.11
       vdirs:
         specifier: ^0.1.8
         version: 0.1.8(vue@3.5.31(typescript@6.0.2))

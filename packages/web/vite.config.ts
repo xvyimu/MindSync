@@ -56,21 +56,28 @@ export default defineConfig(({ mode, command }) => {
     envDir: monorepoRoot,
     plugins: [vue()],
     optimizeDeps: {
-      // pnpm may hoist naive-ui under ui; declare peers on web + include for prebundle
+      // pnpm isolates nested deps; pin them on web and force prebundle so
+      // preserveSymlinks + monorepo aliasing can still resolve bare imports.
       include: [
         'naive-ui',
         'date-fns',
         'date-fns/locale',
+        'date-fns-tz',
         'css-render',
         '@css-render/plugin-bem',
         '@css-render/vue3-ssr',
         '@emotion/hash',
+        '@juggle/resize-observer',
+        '@vue/runtime-dom',
+        'async-validator',
         'seemly',
         'vueuc',
         'vooks',
         'evtd',
         'vdirs',
-        'date-fns-tz',
+        'treemate',
+        'lodash-es',
+        'highlight.js',
       ],
     },
     server: {
@@ -95,7 +102,9 @@ export default defineConfig(({ mode, command }) => {
     },
     publicDir: 'public',
     resolve: {
-      preserveSymlinks: true,
+      // false (default): pnpm nested deps resolve correctly for Vite prebundle.
+      // CodeMirror singleton identity is handled via dedupe below, not preserveSymlinks.
+      preserveSymlinks: false,
       // CodeMirror relies on instanceof checks between its packages. pnpm
       // symlinks can otherwise make Vite bundle more than one state runtime.
       dedupe: [
