@@ -234,12 +234,15 @@ export {
 } from './utils/environment'
 export type { CustomModelEnvConfig, ValidatedCustomModelEnvConfig, ValidationResult } from './utils/environment'
 
-// Desktop facade (P0): command map + mock backend + install helpers
+// Desktop facade (P0): command map + mock/Tauri backends + install helpers
 export {
   DESKTOP_P0_COMMANDS,
   DESKTOP_P0_COMMAND_LIST,
   createDesktopApiFromBackend,
   createMockDesktopBackend,
+  createTauriDesktopBackend,
+  isTauriRuntime,
+  tryInstallTauriDesktopApi,
   installDesktopApi,
   resolveDesktopApi,
   uninstallDesktopApi,
@@ -255,7 +258,9 @@ export type {
   DesktopShellKind,
   CreateDesktopApiOptions,
   CreateMockDesktopBackendOptions,
+  CreateTauriDesktopBackendOptions,
   InstallDesktopApiOptions,
+  InstallTauriDesktopApiOptions,
   MockDesktopBackendState,
 } from './desktop'
 export {

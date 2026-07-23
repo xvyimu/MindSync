@@ -1,9 +1,10 @@
 {
   "$schema": "https://schema.tauri.app/config/2/capability",
   "identifier": "default",
-  "description": "Default capabilities for the MindSync Tauri shell (M1: window only)",
+  "description": "Default capabilities for the MindSync Tauri shell (M2: window + P0 commands)",
   "windows": ["main"],
   "permissions": [
-    "core:default"
+    "core:default",
+    "allow-mindsync-p0"
   ]
 }

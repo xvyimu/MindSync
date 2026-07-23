@@ -1,0 +1,10 @@
+[[permission]]
+identifier = "allow-mindsync-p0"
+description = "P0 facade commands: version, preference non-secret, ping, openExternal"
+commands.allow = [
+  "app-get-version",
+  "preference-get",
+  "preference-set",
+  "desktop-ping",
+  "shell-openExternal",
+]

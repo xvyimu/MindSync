@@ -37,6 +37,13 @@ function registerSystemIpcHandlers({
     return packageJson.version;
   });
 
+  // M2 P0: health probe aligned with Tauri `desktop-ping` / facade DesktopPingResult
+  registerSensitiveIpc('desktop-ping', async () => ({
+    ok: true,
+    shell: 'electron',
+    ts: Date.now(),
+  }));
+
   registerSensitiveIpc('app-set-locale', async (_event, locale) => {
     setUiLocale(normalizeUiLocale(locale) || 'en-US');
     return null;

@@ -35,3 +35,12 @@ export {
   resolveDesktopApi,
   uninstallDesktopApi,
 } from './install'
+export {
+  createTauriDesktopBackend,
+  isTauriRuntime,
+  type CreateTauriDesktopBackendOptions,
+} from './tauri-backend'
+export {
+  tryInstallTauriDesktopApi,
+  type InstallTauriDesktopApiOptions,
+} from './bootstrap'

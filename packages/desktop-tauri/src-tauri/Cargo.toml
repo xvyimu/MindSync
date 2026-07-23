@@ -18,6 +18,9 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+# open external URLs (shell-openExternal); keep out of UI — only Rust command uses this
+open = "5"
+url = "2"
 
 [profile.release]
 panic = "abort"

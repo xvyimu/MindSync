@@ -1,1 +1,1 @@
-{"default":{"identifier":"default","description":"Default capabilities for the MindSync Tauri shell (M1: window only)","local":true,"windows":["main"],"permissions":["core:default"]}}
+{"default":{"identifier":"default","description":"Default capabilities for the MindSync Tauri shell (M2: window + P0 commands)","local":true,"windows":["main"],"permissions":["core:default","allow-mindsync-p0"]}}

@@ -1671,6 +1671,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
   },
 
+  // M2 P0: facade health probe (parity with Tauri desktop-ping)
+  ping: async () => {
+    const result = await withTimeout(
+      ipcRenderer.invoke('desktop-ping'),
+      5000,
+    );
+    if (!result.success) {
+      throw createIpcError(result.error);
+    }
+    return result.data;
+  },
+
   // Auto-updater interface with timeout protection
   updater: {
     checkUpdate: async () => {

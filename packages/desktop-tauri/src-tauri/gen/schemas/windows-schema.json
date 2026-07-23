@@ -177,6 +177,12 @@
       "description": "Permission identifier",
       "oneOf": [
         {
+          "description": "P0 facade commands: version, preference non-secret, ping, openExternal",
+          "type": "string",
+          "const": "allow-mindsync-p0",
+          "markdownDescription": "P0 facade commands: version, preference non-secret, ping, openExternal"
+        },
+        {
           "description": "Default core plugins set.\n#### This default permission set includes:\n\n- `core:path:default`\n- `core:event:default`\n- `core:window:default`\n- `core:webview:default`\n- `core:app:default`\n- `core:image:default`\n- `core:resources:default`\n- `core:menu:default`\n- `core:tray:default`",
           "type": "string",
           "const": "core:default",

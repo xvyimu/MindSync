@@ -211,6 +211,8 @@ const SYSTEM_CHANNELS = Object.freeze([
   'app-set-locale',
   'logs-get-paths',
   'logs-open-directory',
+  // M2 P0 health probe (facade parity with Tauri desktop-ping)
+  'desktop-ping',
 ]);
 
 /** Optional local AI-Core side-car (default OFF when AI_CORE_URL empty). */
@@ -293,6 +295,7 @@ const CHANNEL_META = Object.freeze(
         || channel.startsWith('shell-')
         || channel.startsWith('app-')
         || channel.startsWith('logs-')
+        || channel.startsWith('desktop-')
       ) domain = 'system';
 
       return [channel, Object.freeze({

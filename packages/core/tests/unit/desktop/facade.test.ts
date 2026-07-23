@@ -3,10 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createDesktopApiFromBackend,
   createMockDesktopBackend,
+  createTauriDesktopBackend,
   DESKTOP_P0_COMMANDS,
   DESKTOP_P0_COMMAND_LIST,
   installDesktopApi,
+  isTauriRuntime,
   resolveDesktopApi,
+  tryInstallTauriDesktopApi,
   uninstallDesktopApi,
 } from '../../../src/desktop'
 import {
@@ -204,5 +207,97 @@ describe('desktop mock facade (P0)', () => {
   it('rejects unknown commands on the mock backend', async () => {
     const backend = createMockDesktopBackend()
     await expect(backend.invoke('not-a-real-command')).rejects.toThrow(/unknown command/)
+  })
+})
+
+describe('tauri desktop backend adapter (P0)', () => {
+  beforeEach(() => {
+    delete process.env.VITE_APP_PLATFORM
+    vi.unstubAllGlobals()
+    vi.stubGlobal('window', {})
+    uninstallDesktopApi()
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    uninstallDesktopApi()
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+  })
+
+  it('maps P0 commands to named payloads and unwraps success envelope', async () => {
+    const invoke = vi.fn(async (command: string, args?: Record<string, unknown>) => {
+      switch (command) {
+        case 'app-get-version':
+          return { success: true, data: '2.11.7-tauri' }
+        case 'preference-get':
+          expect(args).toEqual({ key: 'theme', defaultValue: 'light' })
+          return { success: true, data: 'dark' }
+        case 'preference-set':
+          expect(args).toEqual({ key: 'locale', value: 'zh-CN' })
+          return { success: true, data: null }
+        case 'desktop-ping':
+          return { success: true, data: { ok: true, shell: 'tauri', ts: 123 } }
+        case 'shell-openExternal':
+          expect(args).toEqual({ url: 'https://example.com' })
+          return { success: true, data: true }
+        default:
+          return { success: false, error: { code: 'IPC_UNKNOWN', message: command } }
+      }
+    })
+
+    const backend = createTauriDesktopBackend({ invoke, shellKind: 'tauri' })
+    const api = createDesktopApiFromBackend(backend, { shellKind: 'tauri' })
+    installDesktopApi(api)
+
+    expect(await api.app.getVersion()).toBe('2.11.7-tauri')
+    expect(await api.preference.get('theme', 'light')).toBe('dark')
+    await api.preference.set('locale', 'zh-CN')
+    await expect(api.ping!()).resolves.toEqual({ ok: true, shell: 'tauri', ts: 123 })
+    await expect(api.shell.openExternal('https://example.com')).resolves.toBe(true)
+
+    expect(invoke).toHaveBeenCalledWith('app-get-version', undefined)
+    expect(invoke).toHaveBeenCalledWith('desktop-ping', undefined)
+  })
+
+  it('throws with IPC code when envelope success is false', async () => {
+    const backend = createTauriDesktopBackend({
+      invoke: async () => ({
+        success: false,
+        error: { code: 'IPC_INVALID_ARGUMENT', message: 'bad url' },
+      }),
+    })
+
+    await expect(
+      backend.invoke(DESKTOP_P0_COMMANDS.SHELL_OPEN_EXTERNAL, 'javascript:alert(1)'),
+    ).rejects.toMatchObject({
+      message: 'bad url',
+      code: 'IPC_INVALID_ARGUMENT',
+    })
+  })
+
+  it('tryInstallTauriDesktopApi is no-op without Tauri bridge', () => {
+    vi.stubGlobal('window', {})
+    expect(isTauriRuntime()).toBe(false)
+    expect(tryInstallTauriDesktopApi()).toBeNull()
+    expect(resolveDesktopApi()).toBeNull()
+  })
+
+  it('tryInstallTauriDesktopApi installs facade when bridge present', async () => {
+    const invoke = vi.fn(async (command: string) => {
+      if (command === 'app-get-version') {
+        return { success: true, data: 'from-bridge' }
+      }
+      return { success: true, data: null }
+    })
+    vi.stubGlobal('window', {
+      __TAURI__: { core: { invoke } },
+    })
+
+    expect(isTauriRuntime()).toBe(true)
+    const api = tryInstallTauriDesktopApi()
+    expect(api).not.toBeNull()
+    expect(isDesktopApiReady()).toBe(true)
+    expect(await resolveDesktopApi()!.app.getVersion()).toBe('from-bridge')
   })
 })

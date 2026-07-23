@@ -16,9 +16,19 @@
  */
 
 import { createApp, watch } from 'vue'
+import { tryInstallTauriDesktopApi } from '@mindsync/core'
 import { installI18nOnly, installPinia, i18n, router } from '@mindsync/ui'
 import '@mindsync/ui/dist/style.css'
 import App from './App.vue'
+
+// Tauri shell: install desktop facade before UI mounts so AppInitializer sees
+// desktopAPI/electronAPI. No-op on Web / Electron (preload already provides API).
+// UI must not import @tauri-apps/api — bridge lives in core tauri-backend.
+try {
+  tryInstallTauriDesktopApi()
+} catch (error) {
+  console.warn('[web] tryInstallTauriDesktopApi failed:', error)
+}
 
 const app = createApp(App)
 // 只安装i18n插件，语言初始化将在App.vue中服务准备好后进行
