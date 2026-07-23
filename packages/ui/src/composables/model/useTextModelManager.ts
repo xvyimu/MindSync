@@ -337,6 +337,18 @@ export function useTextModelManager() {
     }
   }
 
+  /** Keep the currently saved model id in options so users can continue when /v1/models is blocked. */
+  const ensureCurrentModelOption = () => {
+    const currentId = form.value.modelId?.trim()
+    if (!currentId) return
+    if (!modelOptions.value.some(option => option.value === currentId)) {
+      modelOptions.value = [
+        { value: currentId, label: currentId },
+        ...modelOptions.value,
+      ]
+    }
+  }
+
   const isUnknownIdentity = (value: unknown) => {
     return typeof value !== 'string' || value.trim().length === 0 || value === 'unknown'
   }
@@ -769,7 +781,7 @@ export function useTextModelManager() {
         form.value.defaultModel = fetchedModels[0].value
       }
     } catch (error: unknown) {
-      console.error('Failed to fetch model list:', error)
+      console.warn('Failed to fetch model list:', error)
 
       // 使用统一的传输层错误分类，避免直接把 provider raw message 抛给用户。
       const classified = classifyLlmTransportError(error, { origin: providerTemplateId })
@@ -779,31 +791,39 @@ export function useTextModelManager() {
         (key) => te(key)
       )
       const fallbackDetail = humanMessage || getErrorDetail(error, t('modelManager.loadFailed'))
-
-      let staticCount: number
-      try {
-        const staticModels = textAdapterRegistry.getStaticModels(providerTemplateId)
-        staticCount = staticModels.length
-      } catch {
-        staticCount = 0
-      }
+      // 403 / 401 / permission 类：列表被拦仍可手填模型 ID 继续对话。
+      const isSoftDegradation =
+        classified.kind === 'permission' || classified.kind === 'auth' || classified.kind === 'not_found'
+      const blocked = classified.kind === 'permission'
 
       loadStaticModelsForProvider(providerTemplateId)
+      ensureCurrentModelOption()
 
-      if (staticCount > 0) {
-        // 403 / 401 / permission 类错误不需要 error 级 toast，用 info/warning 降噪即可。
-        const isSoftDegradation = classified.kind === 'permission' || classified.kind === 'auth' || classified.kind === 'not_found'
-        const message = t('modelManager.fetchModelsFallback', {
-          error: fallbackDetail,
-          count: staticCount,
-        })
+      const optionCount = modelOptions.value.length
+      if (optionCount > 0) {
+        const message = blocked
+          ? t('modelManager.fetchModelsBlockedFallback', {
+              error: fallbackDetail,
+              count: optionCount,
+            })
+          : t('modelManager.fetchModelsFallback', {
+              error: fallbackDetail,
+              count: optionCount,
+            })
         if (isSoftDegradation) {
           toast.info(message)
         } else {
           toast.warning(message)
         }
+      } else if (blocked) {
+        toast.error(t('modelManager.fetchModelsBlockedFailed', { error: fallbackDetail }))
       } else {
         toast.error(t('modelManager.fetchModelsFailed', { error: fallbackDetail }))
+      }
+
+      // Keep the currently saved model id so users can continue without remote list.
+      if (form.value.modelId?.trim()) {
+        form.value.defaultModel = form.value.modelId
       }
     } finally {
       isLoadingModelOptions.value = false
