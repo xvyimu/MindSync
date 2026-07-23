@@ -18,6 +18,15 @@
 
 </div>
 
+## 📚 Product plan & docs map
+
+| Doc | What |
+|-----|------|
+| [Product layers (PRODUCT-LAYERS)](docs/PRODUCT-LAYERS.md) | **L0** identity · **L4** acceptance / quality gates |
+| [Form & stack (PROJECT)](docs/PROJECT.md) | Desktop-primary monorepo stack SSOT |
+| [Contributing](CONTRIBUTING.md) | Read before code · public issues/PRs |
+| [Security](SECURITY.md) | Vulnerability reporting · **no** secrets in issues |
+
 ## 📖 Project Introduction
 
 **MindSync** is an independent AGPL distribution of an AI prompt optimization workbench (UI product name: **Prompt Optimizer**). It helps you write better AI prompts and improve the quality of AI outputs. It supports four usage methods: web application, desktop application, Chrome extension, and Docker deployment.

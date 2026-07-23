@@ -18,6 +18,15 @@
 
 </div>
 
+## 📚 产品方案与文档地图
+
+| 文档 | 说明 |
+|------|------|
+| [产品分层 PRODUCT-LAYERS](docs/PRODUCT-LAYERS.md) | **L0** 产品身份 · **L4** 验收与质量门闩 |
+| [形态与栈 PROJECT](docs/PROJECT.md) | 主交付 Desktop + monorepo 唯一技术栈 SSOT |
+| [贡献指南 CONTRIBUTING](CONTRIBUTING.md) | 改代码前必读 · 公开 Issues/PRs |
+| [安全策略 SECURITY](SECURITY.md) | 漏洞报告渠道 · **勿**在 Issue 贴密钥 |
+
 ## 📖 项目简介
 
 **MindSync** 是 AI 提示词优化工作台的独立 AGPL 发行版（UI 产品名仍为 **Prompt Optimizer / 提示词优化器**）。帮助编写更好的 AI 提示词、提升输出质量。支持 Web、桌面、Chrome 插件与 Docker 四种使用方式。
