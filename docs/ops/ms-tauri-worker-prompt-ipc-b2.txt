@@ -1,0 +1,14 @@
+产品 MindSync。先读 docs/PROJECT.md、docs/adr/0001-tauri-desktop-mainline.md、docs/ops/ms-tauri-cutover-plan.md §M5、docs/ops/ms-tauri-ipc-b1-progress.md、docs/ops/ms-tauri-phase3-ipc-batches-2026-07-24.md、packages/desktop/config/ipc/preference-handlers.js、template-handlers.js、history-handlers.js、context-handlers.js、channel-manifest 对应通道。
+
+栈：Vue3/Naive/core 不变。禁：push 除非总控另令、删 Electron、换 UI、做 B3 密钥域、空口完成。验证写 docs/ops/ms-tauri-ipc-b2-progress.md。
+
+任务 Phase3 B2 · ms-tauri-ipc-b2（preference + template + history + context）：
+基线：xvyimu/ms-tauri-ipc-b1 @ 3112096（已含 system B1）。
+必做：
+1) 将 PREFERENCE/TEMPLATE/HISTORY/CONTEXT 域 IPC 迁到 Tauri commands（可先文件/JSON 持久化在 app_data_dir；形状对齐 Electron 信封）。
+2) facade/tauri-backend 覆盖；既有 Electron*Proxy 尽量经同名 channel 工作。
+3) 单测/脚本 + cargo check（vcvars）+ Electron IPC 契约仍绿。
+4) progress 写 channel 完成表与 DEFER。
+5) 本批默认不 push（总控统一推）；本地 commit 可做。
+
+验收：DoD 见 phase3 批次卡；worker_done。

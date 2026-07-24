@@ -44,6 +44,11 @@ B8 update = DEFER（ADR D9）
 
 | 批 | wt | task id | status |
 |----|-----|---------|--------|
-| B1 | ms-tauri-ipc-b1 | （create 后填） | starting |
-| B2–B7 | — | pending deps | not started |
-| B8 | — | DEFER | — |
+| B1 | ms-tauri-ipc-b1 @ `83eedc9` | `task_fb1ae6b1b9aa` · handle `term_418ad335-…` | **dispatched** |
+| B2 | — | `task_b5cd4b993374` | pending ← B1 |
+| B3 | — | `task_e72616272681` | pending ← B2 |
+| B4 | — | `task_c5953d1d1ebb` | pending ← B3 |
+| B5 | — | `task_83f4e4ea5b2e` | pending ← B4 |
+| B6 | — | `task_f48f3ec5a1ef` | pending ← B5 |
+| B7 | — | `task_1ae7959d8660` | pending ← B6 |
+| B8 | — | DEFER update | — |
