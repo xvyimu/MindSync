@@ -2,50 +2,56 @@
 
 | 项 | 值 |
 |----|-----|
-| **总控 wt** | `ms-coord` · **保持在线** |
-| **基线 tip** | **`221b767`** develop（feature 未合） |
-| **G0** | **B · Electron 硬化 · 7m 巡检续航** |
-| **feature push** | tip OK · **禁** develop · **禁** asar/Tauri/D7·生产CSP大改 |
-| **findings** | 本波无新 code-review findings 路径 · 无 fix wt |
+| **总控 wt** | `ms-coord` · **在线** |
+| **基线 tip** | **`221b767`** develop |
+| **G0** | **B · Electron 硬化** |
+| **findings** | `…/code-review/mindsync-findings.md` · 消化 `FINDINGS-DIGEST.md` |
+| **红线** | 禁 develop push · asar · Tauri 实现 · D7/生产CSP大改 |
 
 ---
 
 ## 阶段
 
 ```
-W1–W9 ✅ origin tips 审过 · wt rm
-W10 electron-harden-verify LIVE
-W11 DEBT+INTEGRATE 收口 queued（总控可写）
+W1–W9 ✅
+W10 electron-harden-verify LIVE（综合 gate + findings 交叉）
+findings fix:
+  ms-fix-safestorage-warn LIVE · MS-CR-001
+  ms-fix-openexternal-allowlist LIVE · MS-CR-003
+W11 DEBT/INTEGRATE 收口 queued
 ```
 
 ---
 
-## Worktree
+## Worktree · live **3/3**
 
-| name | 状态 |
-|------|------|
-| ms-coord | KEEP · 在线 |
-| **ms-electron-harden-verify** | **live** · agent `term_dec15296…`（create 曾报 fc07a103） |
+| name | 模块 | 状态 |
+|------|------|------|
+| **ms-electron-harden-verify** | W10 | live · `term_dec15296…` |
+| **ms-fix-safestorage-warn** | MS-CR-001 | live · agent `term_02715c90…` |
+| **ms-fix-openexternal-allowlist** | MS-CR-003 | live · agent `term_46f0a20a…` |
 
-live：**1/3** · 非 agent 壳已 close
+live：**3/3** · MINGW 壳已 close
 
 ---
 
-## 已审 tips（合 develop 等人 · INTEGRATE 维持）
+## Findings 摘要
 
-| 支 | tip | gate 摘要 |
-|----|-----|-----------|
-| ms-harden-ipc | 881cca9 | 21+13+89 |
-| ms-harden-secrets | fcb35a0 | 12+99 |
-| ms-harden-abort | bf8e419 | 93 + cancel 5/5 |
-| ms-harden-preload-csp | 5132986 | 9+92 |
-| ms-harden-updater-surface | 2582c4a | 19+89+11 |
-| ms-core-api-boundary | 6638045 / f375cee | gate 21 |
-| ms-test-gate-stabilize | 6257056 | gate 21 + 27 |
-| ms-ext-mcp-smoke-docs | **131260b** | mcp 39 · exit 0 · docs-only |
-| ms-deps-audit | **d871aee** | docs-only residual 分类 |
+| 级 | 动作 |
+|----|------|
+| P0 | **无** |
+| MS-CR-001 | **fix wt** safestorage-warn |
+| MS-CR-002 | 并入已审 W1 ipc · verify 交叉 |
+| MS-CR-003 | **fix wt** openexternal-allowlist |
+| MS-CR-004 | G0=B · **不实现** Tauri |
+| MS-CR-005 | AI-Core OFF · verify 可断言 |
+| MS-CR-006 | 并入已审 W5 updater |
 
-**人闸：** 合 develop / push develop **未授** · 总控只维持 INTEGRATE，不擅自 merge。
+---
+
+## 已审 tips（合 develop 等人）
+
+见 INTEGRATE · 9+ harden tips · **未合 develop**
 
 ---
 
@@ -53,4 +59,4 @@ live：**1/3** · 非 agent 壳已 close
 
 | 时点 | 事件 |
 |------|------|
-| 7m 巡检 | W8/W9 审过 push/rm · 开 W10 · live 1/3 |
+| 审查驱动 | 读 findings · DIGEST · 派 CR-001/003 fix · live 3/3 |

@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-fix-safestorage-warn
+边界内：packages/desktop/config/service-container.js · safe-storage-secrets.js · main 启动路径可见警告 · 相关 test · docs/ops/ms-fix-safestorage-warn-*
+先读：docs/PROJECT.md · service-container safeStorage 降级 · safe-storage-secrets · findings MS-CR-001
+栈锁：Electron 默认 · pnpm
+禁：git push develop · asar · Tauri · 假绿 · 把 Web 透传改成强制加密（产品兼容另议）
+做完：safeStorage 不可用时**不可静默当安全** — 启动/日志/可选 UI 可感知警告 + docs + 测 + evidence + progress
+验证：node --test packages/desktop/config/safe-storage*.test.js packages/desktop/config/service-container.test.js packages/desktop/config/*.test.js 触及面；exit 写 evidence
+结束：DONE + in-review；feature tip 可 push · 不 push develop
+
+任务（findings MS-CR-001 · P1）：
+1) Scout：不可用时明文落盘路径与现有日志句。
+2) 加固：明确 warn 门闩（主进程日志固定文案 + 可选 preference/IPC 暴露 securityState 给 UI 若已有通道最小改）；文档 ops。
+3) evidence + commit；可 push xvyimu/ms-fix-safestorage-warn。
+基线 develop@221b767。可只读对照 origin/xvyimu/ms-harden-secrets 不强制 cherry。
