@@ -278,7 +278,6 @@ test('Model backend module registers the stable model IPC interface', async () =
     'model-getAllModels',
     'model-getDataType',
     'model-getEnabledModels',
-    'model-getModels',
     'model-importData',
     'model-isInitialized',
     'model-updateModel',
@@ -395,7 +394,8 @@ test('Template backend module registers the stable template IPC interface', asyn
 
   assert.equal(registrar.handlers.has('template-getTemplates'), true);
   assert.equal(registrar.handlers.has('template-updateTemplate'), true);
-  assert.equal(registrar.handlers.has('template-getSupportedLanguages'), true);
+  assert.equal(registrar.handlers.has('template-getSupportedBuiltinTemplateLanguages'), true);
+  assert.equal(registrar.handlers.has('template-getSupportedLanguages'), false);
 
   assert.deepEqual(
     await registrar.handlers.get('template-getTemplates')({}),
@@ -624,18 +624,14 @@ test('Preference backend module registers the stable preference IPC interface', 
   );
 });
 
-test('System backend module registers config/app/log channels', async () => {
+test('System backend module registers config/app channels without orphan log surface', async () => {
   const registrar = createRegistrar();
-  const opened = [];
   let locale = null;
 
   registerSystemIpcHandlers({
     shell: {
       openExternal: async () => {},
-      openPath: async (target) => {
-        opened.push(target);
-        return '';
-      },
+      openPath: async () => '',
     },
     consoleLogger: {
       getLogPaths: () => ({ logDir: 'C:\\logs', mainLog: 'C:\\logs\\main.log' }),
@@ -657,11 +653,8 @@ test('System backend module registers config/app/log channels', async () => {
 
   assert.equal(registrar.handlers.has('config-getEnvironmentVariables'), true);
   assert.equal(registrar.handlers.has('app-get-version'), true);
-  assert.equal(
-    await registrar.handlers.get('logs-open-directory')({}),
-    true,
-  );
-  assert.deepEqual(opened, ['C:\\logs']);
+  assert.equal(registrar.handlers.has('logs-get-paths'), false);
+  assert.equal(registrar.handlers.has('logs-open-directory'), false);
 
   await registrar.handlers.get('app-set-locale')({}, 'zh-CN');
   assert.equal(locale, 'zh-CN');

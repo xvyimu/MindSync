@@ -170,6 +170,7 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
     SYSTEM_CHANNELS,
     AI_CORE_CHANNELS,
     UPDATE_CHANNELS,
+    REMOTE_STORAGE_CHANNELS,
     IPC_PROTOCOL_VERSION,
     isKnownInvokeChannel,
     assertKnownInvokeChannel,
@@ -178,8 +179,10 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
 
   assert.equal(new Set(ALL_DOMAIN_CHANNELS).size, ALL_DOMAIN_CHANNELS.length)
   assert.ok(MODEL_CHANNELS.includes('model-getAllModels'))
+  assert.equal(MODEL_CHANNELS.includes('model-getModels'), false)
   assert.ok(IMAGE_CHANNELS.includes('image-generate'))
   assert.ok(TEMPLATE_CHANNELS.includes('template-getTemplates'))
+  assert.equal(TEMPLATE_CHANNELS.includes('template-getSupportedLanguages'), false)
   assert.ok(HISTORY_CHANNELS.includes('history-getHistory'))
   assert.ok(CONTEXT_CHANNELS.includes('context-list'))
   assert.ok(FAVORITE_CHANNELS.includes('favorite-addFavorite'))
@@ -188,13 +191,22 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
   assert.ok(PROMPT_CHANNELS.includes('prompt-optimizePromptStream'))
   assert.ok(LLM_CHANNELS.includes('stream-cancel'))
   assert.ok(SYSTEM_CHANNELS.includes('shell-openExternal'))
+  assert.equal(SYSTEM_CHANNELS.includes('logs-get-paths'), false)
+  assert.equal(SYSTEM_CHANNELS.includes('logs-open-directory'), false)
   assert.ok(AI_CORE_CHANNELS.includes('ai-core-get-status'))
   assert.ok(AI_CORE_CHANNELS.includes('ai-core-probe-health'))
   assert.ok(AI_CORE_CHANNELS.includes('ai-core-run-evaluation'))
   assert.ok(UPDATE_CHANNELS.includes('updater-check-update'))
+  assert.ok(UPDATE_CHANNELS.includes('updater-open-release-page'))
+  assert.ok(REMOTE_STORAGE_CHANNELS.includes('remote-storage:invoke'))
   assert.match(String(IPC_PROTOCOL_VERSION), /^\d+\.\d+\.\d+$/)
+  // 1.1.0: 本轮仅收敛幽灵 channel + 补 preload 暴露，无破坏性信封/名变更
+  assert.equal(IPC_PROTOCOL_VERSION, '1.1.0')
   assert.equal(isKnownInvokeChannel('llm-sendMessage'), true)
   assert.equal(isKnownInvokeChannel('ai-core-get-status'), true)
+  assert.equal(isKnownInvokeChannel('model-getModels'), false)
+  assert.equal(isKnownInvokeChannel('template-getSupportedLanguages'), false)
+  assert.equal(isKnownInvokeChannel('logs-open-directory'), false)
   assert.equal(getChannelMeta('llm-sendMessageStream')?.kind, 'stream')
   assert.equal(getChannelMeta('ai-core-run-evaluation')?.domain, 'ai-core')
   assert.throws(() => assertKnownInvokeChannel('definitely-not-a-channel'), /Unknown IPC invoke channel/)
@@ -234,6 +246,91 @@ test('desktop channel manifest covers registered domain invoke channels', () => 
 
   const missingInHandlers = ALL_DOMAIN_CHANNELS.filter((channel) => !registered.has(channel)).sort()
   assert.deepEqual(missingInHandlers, [])
+
+  // 装配完整性：注册到 main 的 invoke channel 不得超出 manifest（禁止幽灵 handle）
+  const extraInHandlers = [...registered]
+    .filter((channel) => {
+      // 注释示例 registerSensitiveIpc('...') 会被源码扫描误抓，忽略非真实 channel
+      if (!channel || channel === '...' || !/^[A-Za-z0-9_:-]+$/.test(channel)) return false
+      // 扫描可能把 IPC_EVENTS 键名当成 channel；仅校验字符串字面量级结果
+      if (/^[A-Z0-9_]+$/.test(channel) && IPC_EVENTS[channel]) return false
+      return !ALL_DOMAIN_CHANNELS.includes(channel)
+    })
+    .sort()
+  assert.deepEqual(extraInHandlers, [])
+})
+
+test('desktop preload invoke surface aligns with channel manifest (no preload-only / no orphan main-only)', () => {
+  const {
+    ALL_DOMAIN_CHANNELS,
+  } = require('../packages/desktop/config/ipc/channel-manifest.js')
+  const { IPC_EVENTS } = require('../packages/desktop/config/constants.js')
+  const preload = readText('packages/desktop/preload.js')
+
+  const preloadChannels = collectMatches(preload, [
+    /ipcRenderer\.invoke\(\s*['"]([^'"]+)['"]/g,
+    /invokeFavorite\(\s*['"]([^'"]+)['"]/g,
+  ])
+  for (const eventName of collectMatches(preload, [
+    /ipcRenderer\.invoke\(\s*IPC_EVENTS\.([A-Z0-9_]+)/g,
+  ])) {
+    if (IPC_EVENTS[eventName]) preloadChannels.add(IPC_EVENTS[eventName])
+  }
+
+  // preload 通过常量 REMOTE_STORAGE_CHANNEL 调用；补齐解析
+  if (/ipcRenderer\.invoke\(\s*REMOTE_STORAGE_CHANNEL\b/.test(preload)) {
+    preloadChannels.add('remote-storage:invoke')
+  }
+
+  const manifestSet = new Set(ALL_DOMAIN_CHANNELS)
+  const preloadOnly = [...preloadChannels].filter((c) => !manifestSet.has(c)).sort()
+  const manifestOnly = ALL_DOMAIN_CHANNELS.filter((c) => !preloadChannels.has(c)).sort()
+
+  assert.deepEqual(preloadOnly, [], `preload-only channels: ${preloadOnly.join(', ')}`)
+  // 主进程可登记但暂未在 preload 暴露的 channel 必须为空（本轮收敛后）
+  assert.deepEqual(manifestOnly, [], `manifest-only channels: ${manifestOnly.join(', ')}`)
+
+  // manual-release 关键路径：openReleasePage 必须在 preload 暴露
+  assert.match(preload, /openReleasePage:\s*async/)
+  assert.match(preload, /IPC_EVENTS\.UPDATE_OPEN_RELEASE_PAGE|updater-open-release-page/)
+})
+
+test('desktop sensitive domain handlers register via secure path only (no bare ipcMain.handle literals)', () => {
+  const domainModules = [
+    'packages/desktop/config/ipc/llm-handlers.js',
+    'packages/desktop/config/ipc/prompt-stream-handlers.js',
+    'packages/desktop/config/ipc/prompt-sync-handlers.js',
+    'packages/desktop/config/ipc/model-handlers.js',
+    'packages/desktop/config/ipc/image-handlers.js',
+    'packages/desktop/config/ipc/template-handlers.js',
+    'packages/desktop/config/ipc/history-handlers.js',
+    'packages/desktop/config/ipc/favorite-handlers.js',
+    'packages/desktop/config/ipc/context-handlers.js',
+    'packages/desktop/config/ipc/data-handlers.js',
+    'packages/desktop/config/ipc/preference-handlers.js',
+    'packages/desktop/config/ipc/system-handlers.js',
+    'packages/desktop/config/ipc/ai-core-handlers.js',
+  ]
+
+  for (const rel of domainModules) {
+    const text = readText(rel)
+    assert.doesNotMatch(
+      text,
+      /ipcMain\.handle\(\s*['"]/,
+      `${rel} must not bare-register string channels (use registerSensitiveIpc)`,
+    )
+    assert.match(text, /registerSensitiveIpc\(/, `${rel} must use registerSensitiveIpc`)
+  }
+
+  // update 域：secureHandle + sender 校验；禁止裸字面量 handle
+  const updateModule = readText('packages/desktop/config/ipc/update-handlers.js')
+  assert.match(updateModule, /secureHandle\s*\(/)
+  assert.match(updateModule, /assertTrustedRendererSender/)
+  assert.doesNotMatch(updateModule, /ipcMain\.handle\(\s*['"]/)
+
+  // remote-storage 主路径经 registerSensitiveIpc；legacy bare handle 仅 fallback
+  const remote = readText('packages/desktop/remote-storage.js')
+  assert.match(remote, /registerSensitiveIpc\(\s*['"]remote-storage:invoke['"]/)
 })
 
 test('desktop remote storage handler routes S3-compatible operations through AWS SDK commands', async () => {

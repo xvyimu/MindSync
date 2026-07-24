@@ -17,8 +17,6 @@ function registerModelIpcHandlers({
     }
   };
 
-  registerSensitiveIpc('model-getModels', async () => modelManager.getAllModels());
-
   registerSensitiveIpc('model-addModel', async (_event, model) => {
     const safeModel = safeSerialize(model);
     const { key, ...config } = safeModel || {};

@@ -67,10 +67,6 @@ function registerTemplateIpcHandlers({
   registerSensitiveIpc('template-getSupportedBuiltinTemplateLanguages', async () => {
     return templateManager.getSupportedBuiltinTemplateLanguages();
   });
-
-  registerSensitiveIpc('template-getSupportedLanguages', async (_event, template) => {
-    return templateManager.getSupportedLanguages(template);
-  });
 }
 
 module.exports = {
