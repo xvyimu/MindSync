@@ -1,0 +1,10 @@
+$ vitest run tests/unit/utils/vcr.spec.ts tests/unit/utils/llm-mock-service.spec.ts
+
+ RUN  v4.1.2 C:/Users/yuanjia/orca/workspaces/mindsync/ms-electron-harden-verify/packages/core
+
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  15:11:38
+   Duration  718ms (transform 149ms, setup 748ms, import 32ms, tests 140ms, environment 0ms)
+

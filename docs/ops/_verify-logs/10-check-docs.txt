@@ -1,0 +1,4 @@
+$ node scripts/check-docs-current-version.mjs && node scripts/check-docs-current-tip.mjs && node scripts/check-docs-freeze-banners.mjs && node scripts/check-docs-handoff-paths.mjs && node scripts/check-docs-pnpm-script-refs.mjs && node scripts/check-docs-version-sync-list.mjs && node scripts/check-docs-version-consistency.mjs && node scripts/check-docs-archive-index.mjs && node scripts/check-docs-source-readme-fork.mjs
+[check-docs-current-version] OK package 2.11.7 ↔ CURRENT.md
+[check-docs-current-tip] FAIL: CURRENT tip `201056d` ≠ git HEAD short `221b767` (full 221b767f3e25…). Update docs/project/CURRENT.md 本仓 tip（SSOT）.
+[ELIFECYCLE] Command failed with exit code 1.

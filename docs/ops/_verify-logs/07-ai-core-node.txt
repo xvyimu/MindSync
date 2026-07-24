@@ -1,0 +1,18 @@
+✔ disabled client rejects health/run without network (1.2641ms)
+✔ health GET hits AI_CORE_URL/health (0.3744ms)
+✔ runEvaluation sends bearer when AI_CORE_BEARER set (0.3054ms)
+✔ runEvaluation omits Authorization when bearer unset (0.2507ms)
+✔ AI_CORE_URL empty keeps remote AI-Core disabled (default / production-safe) (1.0367ms)
+✔ AI_CORE_URL loopback enables client baseUrl and optional bearer (0.205ms)
+✔ localhost is accepted as loopback (0.148ms)
+✔ non-loopback and invalid URLs stay disabled (0.2081ms)
+✔ public status never includes bearer and exposes Mode A + lastHealth + healthState (0.8337ms)
+✔ healthState covers disabled / config_error / error (Mode A W3) (0.9304ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 90.0097

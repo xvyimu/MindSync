@@ -1,0 +1,71 @@
+(node:42528) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/yuanjia/orca/workspaces/mindsync/ms-electron-harden-verify/api/access-session.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\yuanjia\orca\workspaces\mindsync\ms-electron-harden-verify\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ mints a session that verifies and never equals the password (12.9943ms)
+✔ rejects wrong password, raw password cookie, and tampered token (1.3357ms)
+✔ rejects expired sessions (0.8785ms)
+✔ cookie builders use HttpOnly session name and clear legacy cookie (0.323ms)
+✔ readCookie extracts named values (0.155ms)
+node:internal/modules/package_json_reader:301
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'typescript' imported from C:\Users\yuanjia\orca\workspaces\mindsync\ms-electron-harden-verify\scripts\check-locale-parity.mjs
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
+    at packageResolve (node:internal/modules/esm/resolve:768:81)
+    at moduleResolve (node:internal/modules/esm/resolve:859:18)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:691:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:708:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:740:52)
+    at #resolve (node:internal/modules/esm/loader:673:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:593:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v24.16.0
+✖ scripts\check-locale-parity.test.mjs (74.5835ms)
+✔ containsChinese detects Han characters (0.9901ms)
+✔ shouldIgnoreLine skips comments but not runtime strings (0.1409ms)
+✔ isAllowedPath respects allowlisted content assets (0.1545ms)
+✔ findChineseViolations reports runtime Chinese string literals in core files (0.4673ms)
+✔ findChineseViolations reports Chinese template literals but ignores comments (0.1766ms)
+✔ findChineseViolations ignores multi-line HTML comments in Vue files (0.1544ms)
+✔ findChineseViolations allows localized language display names in template language services (0.1833ms)
+✔ isDirectExecution works with Windows-style script paths (0.1494ms)
+✔ toComparableFileUrl normalizes Windows absolute paths for direct-execution checks (0.1884ms)
+✔ shouldScanPath includes third-batch runtime guardrail targets (0.646ms)
+✔ generate-config injects only public VITE keys and never API secrets (880.1648ms)
+✔ root lint includes isolated UI consumer checks plus existing package lint/typechecks (2.0478ms)
+✔ repo checks execute package script coverage tests (0.3164ms)
+✔ web build script targets the web package build (0.2779ms)
+✔ core package exposes a dedicated typecheck script (0.6749ms)
+✔ electron adapters use a dedicated core subpath and build entry (1.5225ms)
+✔ provider SDKs load through the retryable adapter loader (2.1185ms)
+✔ web and extension package typecheck scripts use isolated tsconfig files (0.8582ms)
+✔ web and extension declare direct core dependency for package boundary (0.3757ms)
+✔ ui package index does not re-export core factories or electron proxies (0.774ms)
+✔ web/extension production builds resolve packages via exports not source aliases (0.6007ms)
+✔ web dev loads root env while extension build stays isolated from root env (0.4211ms)
+✔ mcp-server bin points to a file that exists before build output is generated (0.3481ms)
+✔ parseArgs supports sequential mode by default (1.2625ms)
+✔ parseArgs supports parallel aliases (0.3866ms)
+✔ getRunnerSpec uses shell mode for Windows pnpm invocation (1.3543ms)
+✔ runSequential executes scripts in order and stops on failure (0.7379ms)
+✔ runParallel waits for all scripts to finish when all succeed (13.6101ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 33
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 998.0189
+
+✖ failing tests:
+
+test at scripts\check-locale-parity.test.mjs:1:1
+✖ scripts\check-locale-parity.test.mjs (74.5835ms)
+  'test failed'

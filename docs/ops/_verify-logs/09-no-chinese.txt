@@ -1,0 +1,2 @@
+$ node scripts/check-no-chinese-runtime.mjs
+[no-chinese-runtime] No disallowed Chinese runtime strings found

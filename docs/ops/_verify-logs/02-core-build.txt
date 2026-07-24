@@ -1,0 +1,25 @@
+$ tsup src/index.ts src/electron.ts --format cjs,esm --dts
+CLI Building entry: src/electron.ts, src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Target: es2020
+CJS Build start
+ESM Build start
+CJS dist\electron.cjs 45.92 KB
+CJS dist\index.cjs    1.52 MB
+CJS ⚡️ Build success in 231ms
+ESM dist\registry-3P6WT73T.js 183.00 B
+ESM dist\chunk-BKG32FUF.js    26.22 KB
+ESM dist\electron.js          24.73 KB
+ESM dist\chunk-Q2N4QXXH.js    12.33 KB
+ESM dist\chunk-LQPY7XSB.js    149.76 KB
+ESM dist\index.js             1.30 MB
+ESM ⚡️ Build success in 232ms
+DTS Build start
+DTS ⚡️ Build success in 5081ms
+DTS dist\electron.d.cts             14.45 KB
+DTS dist\index.d.cts                155.83 KB
+DTS dist\environment-DVSd5IMO.d.cts 69.19 KB
+DTS dist\electron.d.ts              14.45 KB
+DTS dist\index.d.ts                 155.83 KB
+DTS dist\environment-DVSd5IMO.d.ts  69.19 KB

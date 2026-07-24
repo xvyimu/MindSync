@@ -1,0 +1,19 @@
+✔ desktop preload IPC channels have main-process handlers (7.25ms)
+✔ desktop streaming contract exposes an owner-bound cancellation channel (0.8244ms)
+✔ desktop composition root delegates domain handlers to backend modules (3.3548ms)
+✔ desktop channel manifest covers registered domain invoke channels (5.9477ms)
+✔ desktop remote storage handler routes S3-compatible operations through AWS SDK commands (4.8631ms)
+✔ desktop remote storage S3 list operation follows continuation tokens (9.624ms)
+✔ desktop remote storage handler routes WebDAV operations through the WebDAV client library adapter (1.4318ms)
+✔ desktop remote storage rejects Google Drive provider (0.3763ms)
+✔ desktop remote storage implementation avoids renderer fetch/WebDAV XML paths (0.6021ms)
+✔ desktop preference bridge exposes only registered preference handlers (2.753ms)
+✔ desktop AI-Core IPC handlers fail closed when disabled and reject bad payloads (6.5917ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 165.8101

@@ -1,0 +1,10 @@
+$ vitest run
+
+ RUN  v4.1.2 C:/Users/yuanjia/orca/workspaces/mindsync/ms-electron-harden-verify/packages/mcp-server
+
+
+ Test Files  6 passed (6)
+      Tests  39 passed (39)
+   Start at  15:13:00
+   Duration  2.36s (transform 3.74s, setup 0ms, import 5.61s, tests 353ms, environment 1ms)
+
