@@ -22,9 +22,9 @@
 | M-MS-test-gate-stabilize | wt **rm** | `xvyimu/ms-test-gate-stabilize` | **`6257056`** · origin | `ms-test-gate-stabilize-evidence-2026-07-24.md` | gate 21 + 27 · exit 0 | **PASS** | feature tip | pending 人授 |
 | M-MS-ext-mcp-smoke-docs | wt **rm** | `xvyimu/ms-ext-mcp-smoke-docs` | **`131260b`** · origin | `ms-ext-mcp-smoke-2026-07-24.md` | mcp 39 · exit 0 | **PASS** · docs | feature tip | pending 人授 |
 | M-MS-deps-audit | wt **rm** | `xvyimu/ms-deps-audit` | **`d871aee`** · origin | `ms-deps-audit-2026-07-24.md` | docs-only residual | **PASS** · docs | feature tip | pending 人授 |
-| M-MS-electron-harden-verify | `ms-electron-harden-verify` | `xvyimu/ms-electron-harden-verify` | `221b767` base | pending | pending | **live** | n/a | pending |
-| M-MS-fix-safestorage-warn | `ms-fix-safestorage-warn` | `xvyimu/ms-fix-safestorage-warn` | `221b767` base | pending | pending | **live** · MS-CR-001 | n/a | pending |
-| M-MS-fix-openexternal-allowlist | `ms-fix-openexternal-allowlist` | `xvyimu/ms-fix-openexternal-allowlist` | `221b767` base | pending | pending | **live** · MS-CR-003 | n/a | pending |
+| M-MS-electron-harden-verify | wt **rm** | `xvyimu/ms-electron-harden-verify` | **`d066a12`** 矩阵（origin 另有 WIP `bec04e8` 未 force） | `ms-electron-harden-verify-2026-07-24.md` | 必测 exit0 | **PASS** docs | feature | pending 人授 |
+| M-MS-fix-safestorage-warn | wt **rm** | `xvyimu/ms-fix-safestorage-warn` | **`d9b6219`** · origin | `ms-fix-safestorage-warn-evidence-2026-07-24.md` | 6+9 · exit0 | **PASS** · MS-CR-001 | feature tip | pending 人授 |
+| M-MS-fix-openexternal-allowlist | wt **rm** | `xvyimu/ms-fix-openexternal-allowlist` | **`4bb542b`** · origin | `ms-fix-openexternal-allowlist-evidence-2026-07-24.md` | 5+91 · exit0 | **PASS** · MS-CR-003 | feature tip | pending 人授 |
 
 ---
 

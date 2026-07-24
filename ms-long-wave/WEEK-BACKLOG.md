@@ -26,10 +26,10 @@
 | **W7** | `ms-test-gate-stabilize` | pnpm gate 红/慢修 | core 6 fail 等 · 触及面 | **DONE** · `6257056` · origin · 审过 · wt rm |
 | **W8** | `ms-ext-mcp-smoke-docs` | 扩展/MCP 入口冒烟说明 | docs + 既有 smoke · **不换栈** | **DONE** · `131260b` · origin · 审过 · wt rm |
 | **W9** | `ms-deps-audit` | 依赖审计 · 无用可选依赖说明 | residual 卡对照 · **禁大爆炸升级** | **DONE** · `d871aee` · origin · 审过 · wt rm |
-| **W10** | `ms-electron-harden-verify` | 综合 gate | 全波触及面回归 | **live** |
-| **F1** | `ms-fix-safestorage-warn` | MS-CR-001 明文落盘可见警告 | service-container / safeStorage | **live** |
-| **F2** | `ms-fix-openexternal-allowlist` | MS-CR-003 外链 allowlist | window-security / openExternal | **live** |
-| **W11** | 文档收口 | 刷新 DEBT + INTEGRATE 终态 | `ms-long-wave/*` | queued |
+| **W10** | `ms-electron-harden-verify` | 综合 gate | 全波触及面回归 | **DONE** · `d066a12` 矩阵 · wt rm |
+| **F1** | `ms-fix-safestorage-warn` | MS-CR-001 明文落盘可见警告 | service-container / safeStorage | **DONE** · `d9b6219` · origin · wt rm |
+| **F2** | `ms-fix-openexternal-allowlist` | MS-CR-003 外链 allowlist | window-security / openExternal | **DONE** · `4bb542b` · origin · wt rm |
+| **W11** | 文档收口 | 刷新 DEBT + INTEGRATE 终态 | `ms-long-wave/*` | **partial** · 本巡已更 progress/INTEGRATE/DIGEST |
 
 ---
 

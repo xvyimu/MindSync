@@ -25,9 +25,9 @@
 | 7 | **M-MS-test-gate-stabilize** | `ms-test-gate-stabilize` | core 既有红测 | gate 红修 | **DONE** · `6257056` · origin |
 | 8 | **M-MS-ext-mcp-smoke-docs** | `ms-ext-mcp-smoke-docs` | extension / mcp-server | 冒烟说明 | **DONE** · `131260b` · origin |
 | 9 | **M-MS-deps-audit** | `ms-deps-audit` | residual deps 文档 | 审计不升 major | **DONE** · `d871aee` · origin |
-| 10 | **M-MS-electron-harden-verify** | `ms-electron-harden-verify` | 综合 gate 矩阵 | 回归 evidence | **live** |
-| F1 | **M-MS-fix-safestorage-warn** | `ms-fix-safestorage-warn` | safeStorage 降级警告 | MS-CR-001 | **live** |
-| F2 | **M-MS-fix-openexternal-allowlist** | `ms-fix-openexternal-allowlist` | openExternal allowlist | MS-CR-003 | **live** |
+| 10 | **M-MS-electron-harden-verify** | `ms-electron-harden-verify` | 综合 gate 矩阵 | 回归 evidence | **DONE** · `d066a12` |
+| F1 | **M-MS-fix-safestorage-warn** | `ms-fix-safestorage-warn` | safeStorage 降级警告 | MS-CR-001 | **DONE** · `d9b6219` |
+| F2 | **M-MS-fix-openexternal-allowlist** | `ms-fix-openexternal-allowlist` | openExternal allowlist | MS-CR-003 | **DONE** · `4bb542b` |
 | 4–11 | 见 `WEEK-BACKLOG.md` W4–W11 | — | preload-csp / updater / core API / test gate / ext-mcp / deps / verify / 文档收口 | 一周续航 | **queued** |
 
 触及面：`pnpm -F @mindsync/desktop` 既有 node test / `pnpm -F @mindsync/core test:gate` 等 · evidence 落 `docs/ops/ms-harden-*-evidence-YYYY-MM-DD.md` · commit · **不** asar · **不** push develop 除非另授。
