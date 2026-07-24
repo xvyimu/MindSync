@@ -55,6 +55,7 @@ test('core package exposes a dedicated typecheck script', () => {
 
 test('electron adapters use a dedicated core subpath and build entry', () => {
   const corePackage = readJson(path.join('packages', 'core', 'package.json'))
+  const exportKeys = Object.keys(corePackage.exports || {})
   const electronExport = corePackage.exports?.['./electron']
   const coreIndex = fs.readFileSync(
     path.join(process.cwd(), 'packages', 'core', 'src', 'index.ts'),
@@ -69,15 +70,31 @@ test('electron adapters use a dedicated core subpath and build entry', () => {
     'utf8',
   )
 
+  // 公开导出面仅主入口 + electron 子路径（禁 deep export）
+  assert.deepEqual(exportKeys.sort(), ['.', './electron'].sort())
   assert.equal(electronExport?.types, './dist/electron.d.ts')
   assert.equal(electronExport?.import, './dist/electron.js')
   assert.equal(electronExport?.require, './dist/electron.cjs')
   assert.match(corePackage.scripts.build, /src\/electron\.ts/)
   assert.doesNotMatch(coreIndex, /export\s+\{\s*ElectronModelManagerProxy/)
+  assert.doesNotMatch(
+    coreIndex,
+    /export\s*\{[^}]*\bElectronImageUnderstandingServiceProxy\b/,
+  )
+  assert.doesNotMatch(
+    coreIndex,
+    /from\s*['"]\.\/services\/image-understanding\/electron-proxy['"]/,
+  )
   assert.match(electronEntry, /ElectronModelManagerProxy/)
   assert.match(electronEntry, /FavoriteManagerElectronProxy/)
+  assert.match(electronEntry, /ElectronImageUnderstandingServiceProxy/)
   assert.match(electronEntry, /waitForElectronApi/)
   assert.match(appInitializer, /import\('@mindsync\/core\/electron'\)/)
+  assert.match(appInitializer, /ElectronImageUnderstandingServiceProxy/)
+  assert.doesNotMatch(
+    appInitializer,
+    /import\s*\{[^}]*\bElectronImageUnderstandingServiceProxy\b[^}]*\}\s*from\s*['"]@mindsync\/core['"]/,
+  )
 })
 
 test('provider SDKs load through the retryable adapter loader', () => {

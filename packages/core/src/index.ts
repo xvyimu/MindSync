@@ -346,10 +346,9 @@ export type {
   PromptfooExportResult,
 } from './services/evaluation/promptfoo-export'
 
-// 导出图像理解服务相关
+// 导出图像理解服务相关（Electron proxy 仅见 @mindsync/core/electron）
 export * from './services/image-understanding/types'
 export { ImageUnderstandingService, createImageUnderstandingService } from './services/image-understanding/service'
-export { ElectronImageUnderstandingServiceProxy } from './services/image-understanding/electron-proxy'
 
 // 🆕 导出变量提取服务相关
 export * from './services/variable-extraction/types'
