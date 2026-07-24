@@ -123,3 +123,20 @@ test('preload on/off and disposer remove the exact wrapped listener', () => {
   disposeAgain();
   assert.equal(ipcRenderer.listenerCount('update-error'), 0);
 });
+
+test('preload on rejects event channels outside the allowlist', () => {
+  const ipcRenderer = new EventEmitter();
+  ipcRenderer.invoke = async () => ({ success: true, data: null });
+  const api = loadPreloadWithElectronMock(ipcRenderer);
+
+  assert.throws(
+    () => api.on('preference-service-warning', () => {}),
+    (error) => error instanceof TypeError && /not allowed/.test(error.message),
+  );
+  assert.throws(
+    () => api.on('stream-token-stream_1', () => {}),
+    (error) => error instanceof TypeError && /not allowed/.test(error.message),
+  );
+  assert.equal(ipcRenderer.listenerCount('preference-service-warning'), 0);
+  assert.equal(ipcRenderer.listenerCount('stream-token-stream_1'), 0);
+});
