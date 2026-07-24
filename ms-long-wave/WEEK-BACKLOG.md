@@ -19,9 +19,9 @@
 |---|-----------|------|----------|------|
 | **W1** | `ms-harden-ipc` · M-MS-harden-ipc | manifest / 通道清单 / 未授权面 | desktop IPC + preload 暴露 + 契约测 | **DONE · 总控审通过** · `881cca9` · 待合入 |
 | **W2** | `ms-harden-secrets` · M-MS-harden-secrets | safeStorage / keytar 边界 · 密钥不进日志 | `safe-storage-secrets.js` · model/image-model 密钥路径 · 日志扫 | **DONE** · `6da7ecd`+`fcb35a0` · origin tip · 审过 |
-| **W3** | `ms-harden-abort` | 流式 Abort 可测 | stream-cancel · owned-stream-runner · core cancellation | **live** · term_d1332e27… · base `221b767` |
-| **W4** | `ms-harden-preload-csp` | preload 面与上下文隔离 | preload · webPreferences · CSP 相关 | queued |
-| **W5** | `ms-harden-updater-surface` | 更新路径审计 | update-handlers · 只文档+安全小修 | queued |
+| **W3** | `ms-harden-abort` | 流式 Abort 可测 | stream-cancel · owned-stream-runner · core cancellation | **DONE** · `bf8e419` · origin · 审过 · wt rm |
+| **W4** | `ms-harden-preload-csp` | preload 面与上下文隔离 | preload · webPreferences · CSP 相关 | **live** · term_8775d811… · base `221b767` |
+| **W5** | `ms-harden-updater-surface` | 更新路径审计 | update-handlers · 只文档+安全小修 | **live** · parallel with W4 |
 | **W6** | `ms-core-api-boundary` | `@mindsync/core` 边界与泄漏面 | core 公开 API / electron 子路径 | queued |
 | **W7** | `ms-test-gate-stabilize` | pnpm gate 红/慢修 | core 6 fail 等 · 触及面 | queued |
 | **W8** | `ms-ext-mcp-smoke-docs` | 扩展/MCP 入口冒烟说明 | docs + 既有 smoke · **不换栈** | queued |
@@ -73,3 +73,4 @@
 | 2026-07-24 | 建 WEEK-BACKLOG · W1 DONE 审过 · 派 W2 secrets |
 | 2026-07-24 | W1 wt stop/rm · branch 保留 `881cca9` · secrets create ok |
 | 2026-07-24 催办 | W2 DONE 审过 · push feature tips · 开 W3 abort |
+| 2026-07-24 强制续航 | W3 DONE 审过 · rm abort · 开 W4 preload-csp |

@@ -15,7 +15,9 @@
 |------|-----|--------|------|----------|------|--------|------|------|
 | M-MS-harden-ipc | wt rm | `xvyimu/ms-harden-ipc` | **`881cca9`** · origin | `ms-harden-ipc-evidence-2026-07-24.md` | 21+13+89 | **PASS** | feature tip pushed · develop 未合 | pending 人授 |
 | M-MS-harden-secrets | stop/rm | `xvyimu/ms-harden-secrets` | **`fcb35a0`** · origin（fix `6da7ecd`） | `ms-harden-secrets-evidence-2026-07-24.md` | 12 + 99 | **PASS** | feature tip pushed | pending 人授 |
-| M-MS-harden-abort | `ms-harden-abort` | `xvyimu/ms-harden-abort` | `221b767` base | pending | pending | **live** · term_8dc68db9… | n/a | pending |
+| M-MS-harden-abort | wt **rm** | `xvyimu/ms-harden-abort` | **`bf8e419`** · origin | `ms-harden-abort-evidence-2026-07-24.md` | 93 + cancel 5/5 | **PASS** | feature tip · develop 未合 | pending 人授 |
+| M-MS-harden-preload-csp | `ms-harden-preload-csp` | `xvyimu/ms-harden-preload-csp` | `221b767` base | pending | pending | **live** · term_ac1946fb… | n/a | pending |
+| M-MS-harden-updater-surface | `ms-harden-updater-surface` | `xvyimu/ms-harden-updater-surface` | `221b767` base | pending | pending | **live** · term_47334830… | n/a | pending |
 
 ---
 

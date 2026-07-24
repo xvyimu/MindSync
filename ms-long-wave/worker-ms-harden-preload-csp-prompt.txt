@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-harden-preload-csp
+边界内：packages/desktop/preload.js · main.js webPreferences · packages/desktop/config/window-security.js · runtime-security.js · 相关 test · docs/ops/ms-harden-preload-csp-*
+先读：docs/PROJECT.md · preload.js · main 窗口创建 · window-security · navigation guard
+栈锁：Electron + Vue3 + Naive + @mindsync/core；pnpm；默认交付仍 Electron
+禁：git push develop · asar · Tauri · 生产 CSP 大改当默认（本刀只审计+安全小修）· React · 假绿 · 拆 desktop 主路径
+做完：最小 diff + docs/ops/ms-harden-preload-csp-evidence-YYYY-MM-DD.md + progress.md + 风险一句
+验证：node --test packages/desktop/config/*.test.js 触及 window-security/preload 相关；exit code 写入 evidence
+结束：DONE + in-review；feature tip 可 push origin 本支 · 不 push develop
+
+任务（G0=B Electron 硬化 · W4）：
+1) Scout：contextIsolation / nodeIntegration / sandbox / webSecurity / preload 暴露面清单；CSP 或等价导航/外链门闩现状。
+2) 加固：缺隔离则补；preload 过宽 API 标风险+必要收口；文档矩阵；小修可测。
+3) evidence + conventional commit；可 push feature 支。
+基线 develop@221b767。独立刀不强制 cherry W1–W3。

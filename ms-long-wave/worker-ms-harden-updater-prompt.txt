@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-harden-updater-surface
+边界内：packages/desktop/config/ipc/update-handlers.js · update-config.js · 相关 test · docs/ops/ms-harden-updater-*
+先读：docs/PROJECT.md · update-handlers · update-config · CURRENT 更新叙述
+栈锁：Electron 默认交付；pnpm
+禁：git push develop · asar · Tauri · 生产默认 CSP 大改 · 假绿 · 拆 desktop 主路径 · 改更新源到不可信 host
+做完：审计文档 + 必要安全小修 + docs/ops/ms-harden-updater-surface-evidence-YYYY-MM-DD.md + progress.md + 风险一句
+验证：node --test 触及 update 相关 config tests；exit code 写 evidence
+结束：DONE + in-review；feature tip 可 push · 不 push develop
+
+任务（G0=B · W5 · 只文档+安全小修）：
+1) Scout：更新检查/下载/安装/忽略版本/openReleasePage 路径；sender 校验；publish 源解析与 fail-closed；manual macOS 策略。
+2) 缺口：未授权 sender、错误信息泄密、错误 host 接受 → 最小修；否则仅 evidence 矩阵。
+3) conventional commit；可 push feature 支 xvyimu/ms-harden-updater-surface。
+基线 develop@221b767。独立刀。
