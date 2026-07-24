@@ -7,8 +7,8 @@
 | 边界测试硬化 | **done** | package-scripts 断言 exports 键 + proxy |
 | 矩阵 + evidence | **done** | `docs/ops/ms-core-api-boundary-*` |
 | 验证 gate/typecheck/build | **done** | 全 exit 0 |
-| commit | **pending→** 本提交 | |
-| push feature tip | **optional** | 可 push `xvyimu/ms-core-api-boundary`；**不** push develop |
+| commit | **done** | `f375cee` |
+| push feature tip | **done** | `origin/xvyimu/ms-core-api-boundary`；**未** push develop |
 
-**HEAD 基线：** `221b767`  
+**HEAD 基线：** `221b767` → tip **`f375cee`**  
 **状态：** DONE · in-review
