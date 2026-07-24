@@ -18,8 +18,10 @@
 | M-MS-harden-abort | wt **rm** | `xvyimu/ms-harden-abort` | **`bf8e419`** · origin | `ms-harden-abort-evidence-2026-07-24.md` | 93 + cancel 5/5 | **PASS** | feature tip · develop 未合 | pending 人授 |
 | M-MS-harden-preload-csp | wt **rm** | `xvyimu/ms-harden-preload-csp` | **`5132986`** · origin | `ms-harden-preload-csp-evidence-2026-07-24.md` | 9 + **92** | **PASS** | feature tip | pending 人授 |
 | M-MS-harden-updater-surface | wt **rm** | `xvyimu/ms-harden-updater-surface` | **`2582c4a`** · origin | `ms-harden-updater-surface-evidence-2026-07-24.md` | 19+89+11 | **PASS** | feature tip | pending 人授 |
-| M-MS-core-api-boundary | `ms-core-api-boundary` | `xvyimu/ms-core-api-boundary` | `221b767` base | pending | pending | **live** | n/a | pending |
-| M-MS-test-gate-stabilize | `ms-test-gate-stabilize` | `xvyimu/ms-test-gate-stabilize` | `221b767` base | pending | pending | **live** · term_4d3177d0… | n/a | pending |
+| M-MS-core-api-boundary | wt **rm** | `xvyimu/ms-core-api-boundary` | **`6638045`** · origin | `ms-core-api-boundary-evidence-2026-07-24.md` | gate 21 · exit 0 | **PASS** | feature tip | pending 人授 |
+| M-MS-test-gate-stabilize | wt **rm** | `xvyimu/ms-test-gate-stabilize` | **`6257056`** · origin | `ms-test-gate-stabilize-evidence-2026-07-24.md` | gate 21 + 27 · exit 0 | **PASS** | feature tip | pending 人授 |
+| M-MS-ext-mcp-smoke-docs | `ms-ext-mcp-smoke-docs` | `xvyimu/ms-ext-mcp-smoke-docs` | `221b767` base | pending | pending | **live** | n/a | pending |
+| M-MS-deps-audit | `ms-deps-audit` | `xvyimu/ms-deps-audit` | `221b767` base | pending | pending | **live** | n/a | pending |
 
 ---
 

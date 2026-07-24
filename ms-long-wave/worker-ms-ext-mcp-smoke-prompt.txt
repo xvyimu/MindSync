@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-ext-mcp-smoke-docs
+边界内：packages/extension · packages/mcp-server · docs/ops/ms-ext-mcp-smoke-* · 既有 smoke/test 脚本说明（不换栈）
+先读：docs/PROJECT.md · packages/extension/package.json · packages/mcp-server/package.json · HANDOFF 扩展/MCP 节
+栈锁：Vue monorepo · @mindsync/core · pnpm · Electron 默认交付
+禁：git push develop · asar · Tauri · React 平行 UI · 假绿 · 大爆炸换栈
+做完：扩展/MCP 入口冒烟说明文档 + 能跑的既有 test 实跑 exit 写入 evidence + progress.md + 风险一句
+验证：pnpm -F @mindsync/mcp-server test（及 package 既有 gate）；extension 若无可测文件则文档说明 + 可选 typecheck 现状；exit code
+结束：DONE + in-review；feature tip 可 push · 不 push develop
+
+任务（G0=B · W8 · 文档为主）：
+1) Scout：extension 入口/构建/加载路径；mcp-server 工具面与测试；与 core 依赖边界。
+2) 产出 docs/ops/ms-ext-mcp-smoke-2026-07-24.md（怎么冒烟、命令、已知缺口）。
+3) 实跑既有测 + evidence；conventional commit；可 push xvyimu/ms-ext-mcp-smoke-docs。
+基线 develop@221b767。独立刀。

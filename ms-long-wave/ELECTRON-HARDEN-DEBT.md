@@ -21,7 +21,10 @@
 | 3 | **M-MS-harden-abort** | `ms-harden-abort` | stream-cancel · owned-stream-runner · core Abort | 流式 Abort **可测**路径绿 | **DONE** · `bf8e419` · origin · 合入待人 |
 | 4 | **M-MS-harden-preload-csp** | `ms-harden-preload-csp` | preload · webPreferences · window-security | 隔离/CSP 审计+小修 | **DONE** · `5132986` · origin |
 | 5 | **M-MS-harden-updater-surface** | `ms-harden-updater-surface` | update-handlers · update-config | 更新路径审计+小修 | **live** |
-| 6 | **M-MS-core-api-boundary** | `ms-core-api-boundary` | core exports / electron 子路径 | 边界与泄漏面 | **live** |
+| 6 | **M-MS-core-api-boundary** | `ms-core-api-boundary` | core exports / electron 子路径 | 边界与泄漏面 | **DONE** · `f375cee`/`6638045` · origin |
+| 7 | **M-MS-test-gate-stabilize** | `ms-test-gate-stabilize` | core 既有红测 | gate 红修 | **DONE** · `6257056` · origin |
+| 8 | **M-MS-ext-mcp-smoke-docs** | `ms-ext-mcp-smoke-docs` | extension / mcp-server | 冒烟说明 | **live** |
+| 9 | **M-MS-deps-audit** | `ms-deps-audit` | residual deps 文档 | 审计不升 major | **live** |
 | 4–11 | 见 `WEEK-BACKLOG.md` W4–W11 | — | preload-csp / updater / core API / test gate / ext-mcp / deps / verify / 文档收口 | 一周续航 | **queued** |
 
 触及面：`pnpm -F @mindsync/desktop` 既有 node test / `pnpm -F @mindsync/core test:gate` 等 · evidence 落 `docs/ops/ms-harden-*-evidence-YYYY-MM-DD.md` · commit · **不** asar · **不** push develop 除非另授。

@@ -22,10 +22,10 @@
 | **W3** | `ms-harden-abort` | 流式 Abort 可测 | stream-cancel · owned-stream-runner · core cancellation | **DONE** · `bf8e419` · origin · 审过 · wt rm |
 | **W4** | `ms-harden-preload-csp` | preload 面与上下文隔离 | preload · webPreferences · CSP 相关 | **DONE** · `5132986` · origin · 审过 · wt rm |
 | **W5** | `ms-harden-updater-surface` | 更新路径审计 | update-handlers · 只文档+安全小修 | **DONE** · `2582c4a` · origin · 审过 · wt rm |
-| **W6** | `ms-core-api-boundary` | `@mindsync/core` 边界与泄漏面 | core 公开 API / electron 子路径 | **live** |
-| **W7** | `ms-test-gate-stabilize` | pnpm gate 红/慢修 | core 6 fail 等 · 触及面 | **live** · term_4d3177d0… |
-| **W8** | `ms-ext-mcp-smoke-docs` | 扩展/MCP 入口冒烟说明 | docs + 既有 smoke · **不换栈** | queued |
-| **W9** | `ms-deps-audit` | 依赖审计 · 无用可选依赖说明 | residual 卡对照 · **禁大爆炸升级** | queued |
+| **W6** | `ms-core-api-boundary` | `@mindsync/core` 边界与泄漏面 | core 公开 API / electron 子路径 | **DONE** · `f375cee`/`6638045` · origin · 审过 · wt rm |
+| **W7** | `ms-test-gate-stabilize` | pnpm gate 红/慢修 | core 6 fail 等 · 触及面 | **DONE** · `6257056` · origin · 审过 · wt rm |
+| **W8** | `ms-ext-mcp-smoke-docs` | 扩展/MCP 入口冒烟说明 | docs + 既有 smoke · **不换栈** | **live** |
+| **W9** | `ms-deps-audit` | 依赖审计 · 无用可选依赖说明 | residual 卡对照 · **禁大爆炸升级** | **live** |
 | **W10** | `ms-electron-harden-verify` | 综合 gate | 全波触及面回归 | queued |
 | **W11** | 文档收口 | 刷新 DEBT + INTEGRATE 终态 | `ms-long-wave/*` · ops evidence 索引 | queued |
 
@@ -75,3 +75,4 @@
 | 2026-07-24 催办 | W2 DONE 审过 · push feature tips · 开 W3 abort |
 | 2026-07-24 强制续航 | W3 DONE 审过 · rm abort · 开 W4 preload-csp |
 | 2026-07-24 强制续航+ | W4 DONE 5132986 · 并行 W5 · 派 W6 · live≤3 |
+| 2026-07-24 7m 巡检 | W6/W7 DONE 审过 rm · 开 W8+W9 |

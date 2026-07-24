@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-deps-audit
+边界内：根 package.json / pnpm-lock · site lock 若触及 · docs/ops residual/deps 卡对照 · docs/ops/ms-deps-audit-*
+先读：docs/PROJECT.md · docs/ops/ms-residual-deps-card-2026-07-25.md · docs/ops/ms-deps-sec-2026-07-24.md
+栈锁：pnpm · 禁 npm/yarn 主路径
+禁：git push develop · asar · Tauri · 大爆炸升级 major · 假绿
+做完：依赖审计说明 + residual 状态刷新 + 无用可选依赖说明（只文档为主；无 CVE 急修则不改 lock）+ evidence + progress
+验证：可跑 pnpm why / gh dependabot 摘要；若改 lock 则装通 + 相关 gate；exit 写 evidence
+结束：DONE + in-review；feature tip 可 push · 不 push develop
+
+任务（G0=B · W9）：
+1) 对照 residual 卡：esbuild low×2 · @hono/node-server medium major。
+2) 分类：security-now / major-later / accept；禁大爆炸升级。
+3) docs/ops/ms-deps-audit-2026-07-24.md + evidence；conventional commit；可 push xvyimu/ms-deps-audit。
+基线 develop@221b767。
