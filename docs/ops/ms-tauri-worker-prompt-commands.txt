@@ -1,0 +1,19 @@
+产品 MindSync。先读 docs/PROJECT.md、docs/adr/0001-tauri-desktop-mainline.md、docs/ops/ms-tauri-cutover-plan.md、docs/ops/ms-tauri-facade-progress.md、docs/ops/ms-tauri-shell-progress.md、packages/core/src/desktop/*。
+
+栈：Vue3/Naive/core 不变。禁：push、删 packages/desktop、换 UI、实现完整 160 IPC。验证写 docs/ops/ms-tauri-commands-progress.md（命令+exit code）。
+
+任务 M2-impl ms-tauri-commands（orch task_29f8c53fecea）：
+本 wt 应含 packages/desktop-tauri（shell）与 packages/core/src/desktop facade。若缺 facade，先 git merge xvyimu/ms-tauri-facade 或从 sibling 路径复制 core/desktop（只合相关，解冲突保两边 DoD）。
+
+必做 P0 Tauri commands + 接线 installDesktopApi：
+1) app-get-version
+2) preference-get / preference-set（非密，内存或文件均可，形状对齐 Electron 信封 success/data/error）
+3) desktop-ping → {ok:true, shell:'tauri', ts}
+4) shell-openExternal
+用 createDesktopApiFromBackend + installDesktopApi；UI 不散落 @tauri-apps/api。
+Rust 侧 tauri::command 或等价；capabilities 放行。
+Windows 编译注意 Git link.exe 遮罩 MSVC：用 vcvars64 再 cargo check。
+Electron packages/desktop 不删；可补 desktop-ping polyfill 可选。
+禁止 push。
+
+验收：cargo check（vcvars）exit 0 或记缺口；core facade 测仍绿；progress 写 invoke 表与后续 stream wt 接口。
