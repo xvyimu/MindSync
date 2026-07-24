@@ -1,0 +1,12 @@
+产品 MindSync。先读 docs/PROJECT.md、docs/adr/0001-tauri-desktop-mainline.md、docs/ops/ms-tauri-cutover-plan.md、docs/ops/ms-tauri-migration-scout-2026-07-24.md、docs/ops/ms-tauri-orca-fleet-2026-07-24.md。
+
+栈：Vue3/Naive/Vite/pnpm/@mindsync/core 不变；只加 Tauri 壳。禁：git push、删 packages/desktop、换 UI 框架、AI-Core 默认进包、改 Web/扩展业务。验证写 docs/ops/ms-tauri-shell-progress.md（命令+exit code）。做完按 preamble worker_done。
+
+任务 M1 ms-tauri-shell：Tauri2 骨架，开窗加载现有 Vue/Vite UI（对齐 @mindsync/web 与 desktop web-dist）。
+1) 目录优先 packages/desktop-tauri（冲突则 apps/desktop-tauri 并记 progress）。
+2) 初始化 Tauri2 + 对接前端；脚本 dev:desktop-tauri 或等价，pnpm only。
+3) appId/productName 对齐 com.xvyimu.mindsync / MindSync。
+4) progress 写启动法；缺 Rust 记缺口仍交骨架。
+5) 不破坏 packages/desktop。
+6) 可本地 commit 本分支，禁止 push。
+验收：启动说明；有 rustc 尽量开窗；node --test scripts/desktop-ipc-handlers.test.mjs 或 desktop test 仍绿并记 exit code。

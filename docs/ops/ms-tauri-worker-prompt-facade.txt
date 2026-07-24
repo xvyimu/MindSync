@@ -1,0 +1,12 @@
+产品 MindSync。先读 docs/PROJECT.md、docs/adr/0001-tauri-desktop-mainline.md、docs/ops/ms-tauri-cutover-plan.md、docs/ops/ms-tauri-migration-scout-2026-07-24.md、packages/desktop/preload.js、packages/core/src/electron.ts、packages/ui/src/composables/system/useAppInitializer.ts。
+
+栈：Vue3/Naive/core 不变。禁：push、删 Electron、换 UI、实现完整 160 IPC。验证写 docs/ops/ms-tauri-facade-progress.md。
+
+任务 M2-design ms-tauri-facade：桌面 facade，UI/core 不散落 Tauri API。
+1) 兼容 window.electronAPI 或 desktopAPI+别名；progress 写取舍。
+2) 扩展 isRunningInElectron/桌面探测；Web 不得误判；加单测。
+3) P0 类型：app.getVersion、preference 非密 get/set、ping、shell.openExternal。
+4) 可 mock 后端；接口供 shell/commands 对接。
+5) 少改 Vue 业务；集中 core utils/adapter。
+6) 禁止 push。
+验收：探测与 mock 单测 exit code；progress 列出 commands wt 的 invoke 名表。
