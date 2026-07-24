@@ -3,51 +3,45 @@
 | 项 | 值 |
 |----|-----|
 | **总控 wt** | `ms-coord` |
-| **基线 tip** | **`221b767`** develop（W1–W3 **未合** develop） |
+| **基线 tip** | **`221b767`** develop（W1–W5 feature 未合） |
 | **G0** | **B · Electron 硬化 · 强制续航** |
-| **默认交付** | **Electron** |
-| **feature push** | 允许 tip 支 · **禁** push develop · **禁** asar/Tauri 实现 |
+| **feature push** | tip 可 · develop **禁** · asar/Tauri **禁** |
 
 ---
 
 ## 阶段
 
 ```
-W1 ipc ✅ 881cca9 origin
-W2 secrets ✅ 6da7ecd+fcb35a0 origin
-W3 abort ✅ bf8e419 origin · 审过 · rm
-W4 preload-csp LIVE
-W5 updater-surface LIVE (parallel)
-W6–W11 queued
+W1–W5 ✅ origin tips 审过（W5 2582c4a）
+W6 core-api-boundary LIVE
+W7 test-gate-stabilize LIVE/dispatch
+W8–W11 queued
 ```
 
 ---
 
-## Worktree（本仓 child）
+## Worktree
 
 | name | 状态 |
 |------|------|
 | ms-coord | KEEP |
-| **ms-harden-preload-csp** | **live** · `xvyimu/ms-harden-preload-csp` @ `221b767` · agent `term_ac1946fb…` |
-| **ms-harden-updater-surface** | **live** · `xvyimu/ms-harden-updater-surface` @ `221b767` · agent `term_47334830…` |
+| **ms-core-api-boundary** | **live** · agent `term_6d35b4e9…` |
+| **ms-test-gate-stabilize** | **live** · agent `term_7487453d…`（create 曾报 4d3177d0） |
+| ms-harden-updater-surface | **rm** · `2582c4a` origin |
 
 live：**2/3**
 
 ---
 
-## 已审 feature tips（合 develop 等人）
+## 已审 tips（合 develop 等人）
 
 | 支 | tip | 总控 gate |
 |----|-----|-----------|
-| xvyimu/ms-harden-ipc | 881cca9 | PASS · 21+13+89 |
-| xvyimu/ms-harden-secrets | fcb35a0 | PASS · 12+99 |
-| xvyimu/ms-harden-abort | bf8e419 | PASS · 93 + cancel 5/5 |
-
----
-
-## code-review findings
-
-本波未收到新的 findings 路径；无修复 wt。
+| ms-harden-ipc | 881cca9 | 21+13+89 |
+| ms-harden-secrets | fcb35a0 | 12+99 |
+| ms-harden-abort | bf8e419 | 93 + cancel 5/5 |
+| ms-harden-preload-csp | 5132986 | 9 + 92 |
+| ms-harden-updater-surface | **2582c4a** | 19 + 89 + 11 · exit 0 |
 
 ---
 
@@ -55,4 +49,4 @@ live：**2/3**
 
 | 时点 | 事件 |
 |------|------|
-| 强制续航 | W3 审过 rm · 派 W4 · 并行派 W5 · live 2/3 |
+| 强制续航++ | W5 审过 push/rm · 派 W7 · W6 仍 live |

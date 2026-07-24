@@ -16,8 +16,10 @@
 | M-MS-harden-ipc | wt rm | `xvyimu/ms-harden-ipc` | **`881cca9`** · origin | `ms-harden-ipc-evidence-2026-07-24.md` | 21+13+89 | **PASS** | feature tip pushed · develop 未合 | pending 人授 |
 | M-MS-harden-secrets | stop/rm | `xvyimu/ms-harden-secrets` | **`fcb35a0`** · origin（fix `6da7ecd`） | `ms-harden-secrets-evidence-2026-07-24.md` | 12 + 99 | **PASS** | feature tip pushed | pending 人授 |
 | M-MS-harden-abort | wt **rm** | `xvyimu/ms-harden-abort` | **`bf8e419`** · origin | `ms-harden-abort-evidence-2026-07-24.md` | 93 + cancel 5/5 | **PASS** | feature tip · develop 未合 | pending 人授 |
-| M-MS-harden-preload-csp | `ms-harden-preload-csp` | `xvyimu/ms-harden-preload-csp` | `221b767` base | pending | pending | **live** · term_ac1946fb… | n/a | pending |
-| M-MS-harden-updater-surface | `ms-harden-updater-surface` | `xvyimu/ms-harden-updater-surface` | `221b767` base | pending | pending | **live** · term_47334830… | n/a | pending |
+| M-MS-harden-preload-csp | wt **rm** | `xvyimu/ms-harden-preload-csp` | **`5132986`** · origin | `ms-harden-preload-csp-evidence-2026-07-24.md` | 9 + **92** | **PASS** | feature tip | pending 人授 |
+| M-MS-harden-updater-surface | wt **rm** | `xvyimu/ms-harden-updater-surface` | **`2582c4a`** · origin | `ms-harden-updater-surface-evidence-2026-07-24.md` | 19+89+11 | **PASS** | feature tip | pending 人授 |
+| M-MS-core-api-boundary | `ms-core-api-boundary` | `xvyimu/ms-core-api-boundary` | `221b767` base | pending | pending | **live** | n/a | pending |
+| M-MS-test-gate-stabilize | `ms-test-gate-stabilize` | `xvyimu/ms-test-gate-stabilize` | `221b767` base | pending | pending | **live** · term_4d3177d0… | n/a | pending |
 
 ---
 

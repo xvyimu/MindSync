@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-test-gate-stabilize
+边界内：packages/core 既有红测（import-export-integration · tool-calls×4；cancellation 已由 W3 修在独立支）· 触及最小修 · docs/ops/ms-test-gate-stabilize-*
+先读：docs/PROJECT.md · docs/ops/ms-day-quality-2026-07-24.md 中 core 6 fail 表 · 对应 test 文件
+栈锁：pnpm · @mindsync/core · Electron 默认
+禁：git push develop · asar · Tauri · 假绿 · 大爆炸 · 为绿而删测
+做完：尽量减红（优先 tool-calls / import-export）+ evidence 含每命令 exit · progress.md
+验证：pnpm -F @mindsync/core test:gate · 相关 vitest 文件 · exit code
+结束：DONE + in-review；feature tip 可 push · 不 push develop
+
+任务（G0=B · W7）：
+1) 复现 6 fail 现状（develop 基线可能仍含 cancellation fail，因 W3 未合；可 cherry W3 abort 最小修或独立再修 cancellation）。
+2) 修真缺口；不能修的写 deferred 理由。
+3) evidence + commit + 可 push xvyimu/ms-test-gate-stabilize。
+基线 develop@221b767。

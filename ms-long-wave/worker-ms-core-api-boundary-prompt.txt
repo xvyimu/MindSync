@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-core-api-boundary
+边界内：packages/core/src 公开导出 · packages/core/src/electron.ts · package.json exports · 防泄漏面（内部路径/密钥/Node-only）· docs/ops/ms-core-api-boundary-* · 触及测
+先读：docs/PROJECT.md · packages/core/package.json exports · src/index 导出面 · electron 子路径
+栈锁：@mindsync/core SSOT · Electron 默认交付 · pnpm
+禁：git push develop · asar · Tauri · React · 假绿 · 大爆炸重构 · 拆 desktop
+做完：边界矩阵文档 + 必要收口小修 + docs/ops/ms-core-api-boundary-evidence-YYYY-MM-DD.md + progress.md + 风险一句
+验证：pnpm -F @mindsync/core test:gate 与 typecheck/build 触及面 · exit code 写 evidence
+结束：DONE + in-review；feature tip 可 push · 不 push develop
+
+任务（G0=B · W6）：
+1) Scout：package exports 入口；electron 子路径谁用；是否泄漏 internal/storage secrets API 到 web；extension/web 是否直依 core 正确。
+2) 加固：exports 收口或文档禁入；类型/导出缺口最小修。
+3) evidence + commit；可 push xvyimu/ms-core-api-boundary。
+基线 develop@221b767。独立刀。

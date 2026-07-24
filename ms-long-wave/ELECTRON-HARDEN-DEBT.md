@@ -19,7 +19,9 @@
 | 1 | **M-MS-harden-ipc** | `ms-harden-ipc` | `packages/desktop/config/ipc/**` · preload · 契约测 | 通道表 + 未授权面收敛 | **DONE** · `881cca9` · origin · 合入待人 |
 | 2 | **M-MS-harden-secrets** | `ms-harden-secrets` | `safe-storage-secrets.js` · model/image-model 密钥路径 · 日志扫 | safeStorage 边界 · 密钥不进 log · 测 | **DONE** · `6da7ecd`/`fcb35a0` · origin · 合入待人 |
 | 3 | **M-MS-harden-abort** | `ms-harden-abort` | stream-cancel · owned-stream-runner · core Abort | 流式 Abort **可测**路径绿 | **DONE** · `bf8e419` · origin · 合入待人 |
-| 4 | **M-MS-harden-preload-csp** | `ms-harden-preload-csp` | preload · webPreferences · window-security | 隔离/CSP 审计+小修 | **live** |
+| 4 | **M-MS-harden-preload-csp** | `ms-harden-preload-csp` | preload · webPreferences · window-security | 隔离/CSP 审计+小修 | **DONE** · `5132986` · origin |
+| 5 | **M-MS-harden-updater-surface** | `ms-harden-updater-surface` | update-handlers · update-config | 更新路径审计+小修 | **live** |
+| 6 | **M-MS-core-api-boundary** | `ms-core-api-boundary` | core exports / electron 子路径 | 边界与泄漏面 | **live** |
 | 4–11 | 见 `WEEK-BACKLOG.md` W4–W11 | — | preload-csp / updater / core API / test gate / ext-mcp / deps / verify / 文档收口 | 一周续航 | **queued** |
 
 触及面：`pnpm -F @mindsync/desktop` 既有 node test / `pnpm -F @mindsync/core test:gate` 等 · evidence 落 `docs/ops/ms-harden-*-evidence-YYYY-MM-DD.md` · commit · **不** asar · **不** push develop 除非另授。
