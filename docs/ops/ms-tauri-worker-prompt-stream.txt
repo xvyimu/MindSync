@@ -1,0 +1,14 @@
+产品 MindSync。先读 docs/PROJECT.md、docs/adr/0001-tauri-desktop-mainline.md、docs/ops/ms-tauri-cutover-plan.md、docs/ops/ms-tauri-commands-progress.md、docs/ops/ms-tauri-facade-progress.md、packages/desktop/config/ipc/owned-stream-runner.js、packages/desktop/config/stream-registry.js、packages/core/src/desktop/*。
+
+栈：Vue3/Naive/core 不变。禁：push、删 Electron、换 UI、空口完成。验证写 docs/ops/ms-tauri-stream-progress.md。
+
+任务 M4 ms-tauri-stream（orch task_5f129ee9552f）：
+在 Tauri/desktop 路径证明流式生成 + Abort。
+1) 设计对齐 Electron streamId + stream-cancel + 事件 chunk。
+2) 最小实现：可 mock 模型的一条 stream command（如 llm-sendMessageStream 子集或 desktop-stream-demo）+ cancel；前端 AbortSignal → cancel。
+3) 自动化测或脚本：start → abort → 无继续 chunk；记 exit code。
+4) 可只 mock，不接真实 API key。
+5) 复用 facade；UI 不散落 @tauri-apps/api。
+6) 禁止 push。
+
+验收：progress 含设计+命令+exit code；cargo check 相关仍绿（vcvars）。
