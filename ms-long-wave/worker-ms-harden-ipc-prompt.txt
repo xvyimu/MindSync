@@ -1,0 +1,14 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-harden-ipc
+边界内：packages/desktop/config/ipc/** · packages/desktop/config/ipc-security.js · packages/desktop/preload.js（仅IPC暴露面）· packages/desktop/config/*.test.js · scripts/desktop-ipc-handlers.test.mjs · docs/ops/ms-harden-ipc-*
+先读：docs/PROJECT.md · docs/project/CURRENT.md · packages/desktop/config/ipc/channel-manifest.js · packages/desktop/config/ipc-security.js · packages/desktop/config/ipc/register-domain-handlers.js
+栈锁：Electron + Vue3 + Naive + @mindsync/core；pnpm；默认交付仍 Electron
+禁：git push · asar 重打 · 新建/续写 Tauri · 拆 packages/desktop 主路径 · React 平行 UI · AI-Core 默认 asar · 改它仓 · 假绿
+做完：最小 diff + docs/ops/ms-harden-ipc-evidence-YYYY-MM-DD.md + 风险一句
+验证：node --test packages/desktop/config/*.test.js ；node --test scripts/desktop-ipc-handlers.test.mjs ；触及面既有 gate；写 exit code
+结束：DONE + in-review；先回执总控（本 wt 写 progress.md 摘要）
+
+任务（G0=B Electron 硬化 · 切片 1/3）：
+1) Scout 只读：从 channel-manifest 汇总各域 channel 数+全量清单；对照 preload 暴露 vs manifest ALL_DOMAIN_CHANNELS vs main ipcMain.handle；标 manifest-only/preload-only/handle-only/未走 registerSensitiveIpc 的敏感面；协议 1.1.0 仅破坏性才 bump。
+2) 加固最小 diff：未授权通道面收敛；幽灵 channel 移除或 DEPRECATE+测；docs/ops/ms-harden-ipc-channel-matrix-2026-07-24.md；可增强契约测装配完整性/敏感 handler 全覆盖；勿大重构勿改 UI/core 业务。
+3) 验证+evidence+commit（conventional）；不 push 不 asar。基线 tip 221b767 develop；不干净先 status。

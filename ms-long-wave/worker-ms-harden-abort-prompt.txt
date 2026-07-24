@@ -1,0 +1,15 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-harden-abort
+边界内：packages/desktop/config/ipc/owned-stream-runner.js · stream-registry.js · llm-handlers / prompt-stream-handlers · preload 流式 Abort · packages/core 取消路径（仅触及 Abort 可测缺口）· docs/ops/ms-harden-abort-* · 相关 *.test.js / provider-cancellation 若本刀修
+先读：docs/PROJECT.md · owned-stream-runner · stream-registry · preload Abort · core StreamRequestOptions signal
+栈锁：Electron + Vue3 + Naive + @mindsync/core；pnpm；默认交付仍 Electron
+禁：git push develop · asar · Tauri 实现 · 拆 desktop 主路径 · React · 假绿 · 大爆炸
+做完：最小 diff + docs/ops/ms-harden-abort-evidence-YYYY-MM-DD.md + 风险一句 + progress.md
+验证：node --test packages/desktop/config/*.test.js（含 stream cancel）· 触及 core gate/cancellation 若改 core · 全部 exit code
+结束：DONE + in-review；feature tip 可 push origin 本支 · 不 push develop
+
+任务（G0=B Electron 硬化 · W3）：
+1) Scout：流式 channel 列表 + streamId + owner abort + non-owner 拒绝；preload signal→stream-cancel 竞速；core 6 fail 中 provider-cancellation 是否本刀可修。
+2) 加固：Abort 可测路径绿；缺测补测；真缺口最小修。
+3) evidence + conventional commit；可 push feature 支 xvyimu/ms-harden-abort；不 push develop。
+基线 develop@221b767。W1/W2 未合 develop：独立 abort 刀优先不强制 cherry。
