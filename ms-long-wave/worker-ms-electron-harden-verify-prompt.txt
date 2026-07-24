@@ -1,0 +1,21 @@
+产品：MindSync · D:\MindSync\src\mindsync
+模块 ID：M-MS-electron-harden-verify
+边界内：docs/ops/ms-electron-harden-verify-* · 触及面回归命令矩阵 · 可选 cherry-pick 验证说明（不强制合 develop）· 不改业务除非发现阻断回归
+先读：docs/PROJECT.md · 总控 WEEK-BACKLOG W1–W9 tips · day-quality 矩阵
+栈锁：Electron 默认 · pnpm · @mindsync/core
+禁：git push develop · asar · Tauri · D7/生产CSP大改 · 假绿
+做完：综合 gate 矩阵 + 每命令 exit code evidence + progress.md + 风险一句
+验证（建议全跑，跳过须写明）：
+  pnpm -F @mindsync/core test:gate
+  pnpm -F @mindsync/core build
+  node --test packages/desktop/config/*.test.js
+  node --test scripts/desktop-ipc-handlers.test.mjs
+  pnpm -F @mindsync/mcp-server test（先 core build）
+  其他既有轻量门闩
+结束：DONE + in-review；feature tip 可 push · 不 push develop
+
+任务（G0=B · W10 · 综合 verify）：
+1) 在 develop@221b767 基线跑矩阵（W1–W9 未合时记录「基线 vs feature 支」差异：本刀默认基线 develop；可额外 checkout 说明某 feature 支 gate）。
+2) 产出 docs/ops/ms-electron-harden-verify-2026-07-24.md 含命令+exit。
+3) conventional commit；可 push xvyimu/ms-electron-harden-verify。
+基线 develop@221b767。
