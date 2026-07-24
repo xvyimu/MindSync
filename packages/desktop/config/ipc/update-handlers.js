@@ -30,6 +30,7 @@ function createUpdateHandlers(ctx) {
     autoUpdater,
     app,
     path,
+    shell,
     createSuccessResponse,
     createErrorResponse,
     createDetailedErrorResponse,
@@ -41,6 +42,10 @@ function createUpdateHandlers(ctx) {
     getRepositoryInfo,
     getIpcSenderOptions,
   } = ctx;
+
+  if (!shell || typeof shell.openExternal !== 'function') {
+    throw new Error('createUpdateHandlers requires ctx.shell.openExternal');
+  }
 
   /**
    * 在保留现有 createSuccess/Error/Detailed 信封的前提下强制 sender 校验。
@@ -287,11 +292,13 @@ function createUpdateHandlers(ctx) {
       // 创建详细的错误信息
       const detailedErrorResponse = createDetailedErrorResponse(error);
 
-      // 发送详细错误事件到UI
+      // 发送精简错误事件到UI（禁止 stack / 原始 Error 对象跨 IPC）
       if (ctx.mainWindow && !ctx.mainWindow.isDestroyed()) {
         ctx.mainWindow.webContents.send(IPC_EVENTS.UPDATE_ERROR, {
-          message: detailedErrorResponse.error,
-          code: error.code || 'UNKNOWN_ERROR',
+          message: typeof detailedErrorResponse.error === 'string'
+            ? detailedErrorResponse.error
+            : 'Update failed',
+          code: typeof error.code === 'string' ? error.code : 'UNKNOWN_ERROR',
           timestamp: new Date().toISOString()
         });
       }
@@ -587,9 +594,10 @@ function createUpdateHandlers(ctx) {
               hasUpdate: false,
               remoteVersion: null,
               remoteReleaseUrl: null,
-              message: `Stable version check failed: ${error.message}`,
+              message: 'Stable version check failed',
               versionType: 'stable',
-              error: error.message
+              error: 'Stable version check failed',
+              errorCode: typeof error.code === 'string' ? error.code : undefined,
             };
           }
         }
@@ -621,9 +629,10 @@ function createUpdateHandlers(ctx) {
               hasUpdate: false,
               remoteVersion: null,
               remoteReleaseUrl: null,
-              message: `Prerelease version check failed: ${error.message}`,
+              message: 'Prerelease version check failed',
               versionType: 'prerelease',
-              error: error.message
+              error: 'Prerelease version check failed',
+              errorCode: typeof error.code === 'string' ? error.code : undefined,
             };
           }
         }
@@ -659,6 +668,12 @@ function createUpdateHandlers(ctx) {
     // Open only a main-process constructed URL for an updater release page.
     secureHandle(IPC_EVENTS.UPDATE_OPEN_RELEASE_PAGE, async (event, version) => {
       try {
+        if (version != null && version !== '' && !validateVersion(version)) {
+          const error = new Error('Invalid version format');
+          error.code = 'UPDATER_INVALID_VERSION';
+          throw error;
+        }
+
         const releaseUrl = version
           ? buildReleaseUrl(version, repositoryInfo)
           : updateDelivery.fallbackReleaseUrl;
@@ -666,6 +681,24 @@ function createUpdateHandlers(ctx) {
         if (!releaseUrl) {
           const error = new Error('Release page URL is unavailable');
           error.code = 'UPDATER_RELEASE_URL_UNAVAILABLE';
+          throw error;
+        }
+
+        // Defense in depth: only github.com https URLs leave the process.
+        let parsedReleaseUrl;
+        try {
+          parsedReleaseUrl = new URL(releaseUrl);
+        } catch {
+          const error = new Error('Release page URL is invalid');
+          error.code = 'UPDATER_RELEASE_URL_INVALID';
+          throw error;
+        }
+        if (
+          parsedReleaseUrl.protocol !== 'https:'
+          || parsedReleaseUrl.hostname.toLowerCase() !== 'github.com'
+        ) {
+          const error = new Error('Release page host is not allowed');
+          error.code = 'UPDATER_RELEASE_URL_HOST_REJECTED';
           throw error;
         }
 
@@ -791,6 +824,11 @@ function createUpdateHandlers(ctx) {
         // 如果没有指定类型，根据版本号自动判断
         if (!versionType) {
           versionType = version.includes('-') ? 'prerelease' : 'stable';
+        }
+
+        // Reject arbitrary preference keys (only stable / prerelease slots exist).
+        if (!['stable', 'prerelease'].includes(versionType)) {
+          throw new Error(`Invalid version type: ${versionType}`);
         }
 
         console.log('[Updater] Ignoring version:', version, 'type:', versionType);
@@ -930,11 +968,13 @@ function createUpdateHandlers(ctx) {
             autoUpdater.downloadUpdate().catch(downloadError => {
               console.error('[Updater] Download failed:', downloadError);
               isDownloadingUpdate = false;
-              // 发送错误事件到前端
+              // 发送精简错误事件到前端（禁止原始 Error 对象跨 IPC）
               if (ctx.mainWindow && !ctx.mainWindow.isDestroyed()) {
                 ctx.mainWindow.webContents.send(IPC_EVENTS.UPDATE_ERROR, {
-                  message: downloadError.message || 'Download failed',
-                  error: downloadError,
+                  message: 'Download failed',
+                  code: typeof downloadError?.code === 'string'
+                    ? downloadError.code
+                    : 'UPDATER_DOWNLOAD_FAILED',
                   timestamp: new Date().toISOString()
                 });
               }
