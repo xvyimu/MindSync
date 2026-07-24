@@ -5,6 +5,8 @@ const { EventEmitter } = require('node:events');
 const {
   installMainFrameNavigationGuard,
   isAllowedMainFrameNavigation,
+  isSafeExternalUrl,
+  openExternalSafe,
 } = require('./window-security');
 
 function createWebContents() {
@@ -60,4 +62,26 @@ test('navigation guard prevents untrusted top-level navigation and opens only sa
   assert.deepEqual(webContents.windowOpenHandler({ url: 'https://docs.example/new' }), { action: 'deny' });
   await new Promise(resolve => setImmediate(resolve));
   assert.deepEqual(openedUrls, ['https://docs.example', 'https://docs.example/new']);
+});
+
+test('isSafeExternalUrl allowlists only bare http(s) with hostname', () => {
+  assert.equal(isSafeExternalUrl('https://github.com/xvyimu/MindSync'), true);
+  assert.equal(isSafeExternalUrl('http://127.0.0.1:3000/docs'), true);
+  assert.equal(isSafeExternalUrl('file:///C:/Windows/System32/notepad.exe'), false);
+  assert.equal(isSafeExternalUrl('javascript:alert(1)'), false);
+  assert.equal(isSafeExternalUrl('data:text/html,hi'), false);
+  assert.equal(isSafeExternalUrl('https://evil@good.example/path'), false);
+  assert.equal(isSafeExternalUrl(''), false);
+  assert.equal(isSafeExternalUrl(null), false);
+});
+
+test('openExternalSafe throws on non-http(s) and never calls shell', async () => {
+  const opened = [];
+  await assert.rejects(
+    () => openExternalSafe({ openExternal: async (u) => opened.push(u) }, 'file:///tmp/x'),
+    (err) => err && err.code === 'IPC_UNSAFE_EXTERNAL_URL',
+  );
+  assert.deepEqual(opened, []);
+  await openExternalSafe({ openExternal: async (u) => opened.push(u) }, 'https://example.com');
+  assert.deepEqual(opened, ['https://example.com']);
 });

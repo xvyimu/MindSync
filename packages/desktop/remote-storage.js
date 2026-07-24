@@ -168,6 +168,12 @@ const createDefaultDependencies = () => {
     PutObjectCommand,
     openExternal: async (url) => {
       const { shell } = require('electron');
+      const { isSafeExternalUrl } = require('./config/window-security');
+      if (!isSafeExternalUrl(url)) {
+        const err = new Error('Blocked non-http(s) external URL');
+        err.code = 'IPC_UNSAFE_EXTERNAL_URL';
+        throw err;
+      }
       await shell.openExternal(url);
     },
     createWebDavClient: async (endpoint, options) => {
