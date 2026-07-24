@@ -128,7 +128,12 @@ async function createCoreServices(deps) {
     if (secretCodec.isAvailable()) {
       log('[DESKTOP] safeStorage encryption available — wrapping models storage');
     } else {
-      log('[DESKTOP] safeStorage unavailable — model API keys remain plaintext on disk');
+      // MS-CR-001：不可静默当「已加密」。兼容策略仍可能明文落盘，但必须可观测。
+      const PLAINTEXT_WARN =
+        '[DESKTOP][SECURITY] safeStorage UNAVAILABLE — model/image API keys will be stored as PLAINTEXT on disk. ' +
+        'This is NOT equivalent to OS-level encryption. Prefer a desktop session with safeStorage (Windows DPAPI / macOS Keychain).';
+      console.warn(PLAINTEXT_WARN);
+      log(PLAINTEXT_WARN);
     }
 
     const startupRepairReport = await runStorageStartupSafetyCheck(storageProvider);
@@ -240,6 +245,12 @@ async function createCoreServices(deps) {
         favoriteManager,
         dataManager,
         preferenceService,
+        /** MS-CR-001：装配时密钥落盘安全态（非密钥值） */
+        secretsSecurity: {
+          safeStorageAvailable: secretCodec.isAvailable(),
+          modelsStoredEncrypted: secretCodec.isAvailable(),
+          plaintextFallbackActive: !secretCodec.isAvailable(),
+        },
       },
     };
   } catch (error) {
