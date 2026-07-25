@@ -45,7 +45,7 @@
 
 ## 3. 禁止混用
 
-- 不要把 `D:\PromtOptimizer\...` 写成现行源码/安装 SSOT（SSOT：`docs/project/CURRENT.md` → `D:\MindSync\...`）。
+- 不要把 `D:\PromtOptimizer\...` 写成现行源码/安装 SSOT（SSOT：`docs/project/CURRENT.md` → `D:\projects\MindSync`）。
 - 不要在发行说明里把上游 Docker Hub 镜像写成「MindSync 官方镜像」而不加对照声明。
 - 不要删除 LICENSE/NOTICE 中的上游版权行以「换品牌」。
 

@@ -10,7 +10,7 @@
 **上游项目（归属，非 git remote）：** https://github.com/linshenkx/prompt-optimizer — **不**配置 `upstream` remote  
 **贡献策略：** **独立仓 / 不默认向上游开 PR**  
 **文档分层：** L0 本文 + CURRENT · L1 project/user/developer · L2 archives/workspace/.pipeline  
-**本机安装：** `D:\MindSync\app\PromptOptimizer.exe`  
+**构建产物（实验版，无固定安装位置）：** `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`  
 **全面检查（归档）：** `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md`  
 **文档规划（归档）：** `docs/project/archives/install-side-2026-07/DOC-SYSTEM-PLAN-2026-07-20.md` · C2 同目录  
 **文档策略 / 漂移台账 / 清理：** [`DOCS_POLICY.md`](./DOCS_POLICY.md) · [`project/DOC-DRIFT-REGISTRY.md`](./project/DOC-DRIFT-REGISTRY.md) · [`project/CLEANUP-PLAYBOOK.md`](./project/CLEANUP-PLAYBOOK.md)  
@@ -24,9 +24,9 @@
 |--------|--------|
 | **形态 / 唯一技术栈** | [`PROJECT.md`](./PROJECT.md) |
 | **现行版本/路径一页纸** | [`project/CURRENT.md`](./project/CURRENT.md) |
-| 改代码 | `D:\MindSync\src\mindsync`（本文后续章节） |
-| 打开软件 | `D:\MindSync\app\PromptOptimizer.exe` |
-| 安装包归档 | `D:\MindSync\nsis-2026-07-21-ipc\`（见 CURRENT） |
+| 改代码 | `D:\projects\MindSync`（本文后续章节） |
+| 打开软件 | 构建产物 `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`（实验版，无固定安装位置） |
+| 安装包归档 | 历史归档 `D:\MindSync\nsis-2026-07-21-ipc\` 已随 2026-07-25 迁移废弃（非现行归档路径） |
 | 全面检查 | `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md` |
 | 文档怎么分层 | [`docs/README.md`](./README.md) · 归档 DOC-SYSTEM-PLAN |
 | 历史 hardening / ship | §2 + `.pipeline/`（**非规范**） |
@@ -42,7 +42,7 @@
 ### 1.1 源码工作区（真相源）
 
 ```
-D:\MindSync\src\mindsync\
+D:\projects\MindSync\
 ├── packages/
 │   ├── core/          # LLM/Prompt/模型领域；AbortSignal；electron 子路径
 │   ├── desktop/       # Electron main/preload；config/ipc/* 领域拆分；icons/**
@@ -58,21 +58,18 @@ D:\MindSync\src\mindsync\
 └── ...
 ```
 
-### 1.2 本机安装（日常运行）
+### 1.2 构建产物（本项目实验版，无固定安装位置）
+
+本项目（实验版 MindSync）无固定安装根，只有构建产物：
 
 ```
-D:\MindSync\
-├── app\                               # 现行 NSIS 安装根
-│   ├── PromptOptimizer.exe            # 历史可执行名；productName=MindSync
-│   └── resources\
-│       ├── app.asar                   # 业务 + web-dist + icons（不含 Python AI-Core）
-│       └── app-update.yml
-├── nsis-2026-07-21-ipc\               # 现行安装包归档（见 CURRENT）
-├── src\mindsync\                      # 源码
-└── custom-templates\                  # 用户模板（勿删）
+packages\desktop\dist\MindSync-2.11.7-win-x64.exe   # 实验版构建产物
 ```
 
-**重要：** 旧路径 `D:\PromtOptimizer\...` 与热替换树 `PromptOptimizer\` **已废弃**，不是真相源。完整回滚靠源码 / NSIS 归档。
+- 官方 PromptOptimizer v2.11.7 独立装在 `D:\PromtOptimizer\PromptOptimizer.exe`（官方发行版，非本项目安装产物，与实验版并存）。
+- 历史安装侧 `D:\MindSync\app\`（`PromptOptimizer.exe` / `resources\app.asar`）与归档 `D:\MindSync\nsis-2026-07-21-ipc\` 已随 2026-07-25 迁移废弃，不是现行路径。
+
+**重要：** 旧路径 `D:\PromtOptimizer\...`（作源码/安装 SSOT）与热替换树 `PromptOptimizer\`、旧 `D:\MindSync\` 安装侧 **均已废弃**，不是真相源。完整回滚靠源码 / 构建产物。
 
 ### 1.3 远程 Git
 
@@ -150,7 +147,7 @@ git push origin develop
 
 ### 2.4 安装形态（现行）
 
-- **安装根：** `D:\MindSync\app`
+- **构建产物：** `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`（实验版，无固定安装根）
 - **加载：** `resources/app.asar`（NSIS；含 web-dist + icons；**不含** Python AI-Core）
 - 缺 API key 时仅警告，可启动
 - 打包清单含 `icons/**/*`；主题可选 **纸感 Paper**
@@ -176,15 +173,15 @@ git push origin develop
 
 ### 4.1 改 Core / Desktop（推荐）
 
-1. 在 `D:\MindSync\src\mindsync` 改代码  
+1. 在 `D:\projects\MindSync` 改代码  
 2. 使用 **Node 24**（根 `package.json` engines `^24`；系统 Node 即可）  
-3. 构建并重装：
+3. 构建产物：
 
 ```powershell
 pnpm -F @mindsync/core build
 pnpm -F @mindsync/ui build:bundle   # 若 vue-tsc 失败可跳过 types
 pnpm -F @mindsync/desktop build:ci
-# 安装生成的 NSIS 到 D:\MindSync\app
+# 产物在 packages\desktop\dist\（实验版，无固定安装位置）
 ```
 
 4. 契约抽测：
@@ -268,12 +265,12 @@ node scripts/run-e2e-group.js gate
 
 ## 6. Git 工作流
 
-**源码根（唯一）：** `D:\MindSync\src\mindsync`  
+**源码根（唯一）：** `D:\projects\MindSync`  
 **日常分支：** `develop`（功能用 `feat/*` 再合入）  
 **策略：** 独立仓 `xvyimu/MindSync` · **无** `upstream` remote · 默认 **不**向上游开 PR  
 
 ```powershell
-cd D:\MindSync\src\mindsync
+cd D:\projects\MindSync
 $env:HTTP_PROXY='http://127.0.0.1:7890'; $env:HTTPS_PROXY='http://127.0.0.1:7890'
 git status -sb
 git log -5 --oneline
@@ -293,10 +290,9 @@ git push origin develop
 
 摘要：
 
-| 现行安装 | `D:\MindSync\app\`（`app.asar`） |
+| 构建产物 | `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`（实验版，无固定安装位置） |
 |----------|----------------------------------------|
-| 现行 NSIS 归档 | `D:\MindSync\nsis-2026-07-21-ipc\`（见 CURRENT） |
-| 已废弃 | 旧热替换树 / 旧 `PromtOptimizer` 路径（**不是**运行安装） |
+| 已废弃 | 旧 `D:\MindSync\app\` / `nsis-2026-07-21-ipc\` 安装侧、旧热替换树、旧 `PromtOptimizer` 作 SSOT（均随 2026-07-25 迁移废弃） |
 
 机检：`node scripts/check-docs-handoff-paths.mjs`（禁止本文再把废弃路径写成 SSOT）。
 

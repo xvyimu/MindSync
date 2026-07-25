@@ -7,9 +7,9 @@
 | 项 | 值 |
 |----|-----|
 | **产品版本** | **2.11.7**（= 根 `package.json` / desktop） |
-| **日期** | 2026-07-23 |
-| **分支** | `develop`（主线；MS-W1 tip 对齐） |
-| **本仓 tip（SSOT）** | **`201056d`**（MS-W1 + day-quality + tip re-pin；以 `git rev-parse --short HEAD` + `pnpm check:docs-tip` 复核） |
+| **日期** | 2026-07-25 |
+| **分支** | `develop`（主线；MS-W1 tip 对齐）· 在制 feature `feature/zh-template-rewrite-2026-07-25` |
+| **本仓 tip（SSOT）** | **`221b767`**（`develop` live；feature 分支另计，以 `git rev-parse --short HEAD` + `pnpm check:docs-tip` 复核） |
 | **远端 develop tip（参考）** | 与本仓 tip 同前缀时即已跟 `origin/develop` 同步；否则以 `git log -1 --oneline origin/develop` 复核 |
 | **本仓** | https://github.com/xvyimu/MindSync（独立仓；**仅 `origin`**） |
 | **策略** | **独立产品开发 / 不跟踪原上游 / 不默认开 PR 到 linshenkx** |
@@ -26,16 +26,18 @@
 
 | 用途 | 路径 |
 |------|------|
-| 源码 | `D:\MindSync\src\mindsync`（入口 `D:\projects\MindSync`） |
-| **运行安装** | **`D:\MindSync\app\PromptOptimizer.exe`** |
-| 安装包归档 | **仅** `D:\MindSync\nsis-2026-07-21-ipc\`（旧 paper/ux/e1 归档已清） |
-| 工具链 | **Node ^24**（系统 Node；`tools\` 空目录，portable Node22 已删） |
-| 用户模板 | `D:\MindSync\custom-templates\`（勿删） |
+| 源码 | `D:\projects\MindSync`（2026-07-25 迁移完成；旧 `D:\MindSync\src\mindsync` 已废弃） |
+| **构建产物（未安装）** | **`D:\projects\MindSync\packages\desktop\dist\MindSync-2.11.7-win-x64.exe`**（实验版，productName=MindSync；与官方 PromptOptimizer 并存） |
+| 安装包归档 | 构建产物即在 `packages\desktop\dist\`（`.exe` NSIS + `.zip` 免安装） |
+| 工具链 | **Node ^24**（系统 Node）· pnpm **11.5.3** |
+| 用户模板 | 运行期落 userData（`%APPDATA%\MindSync`）；构建期无独立 custom-templates 目录 |
 | Desktop IPC 协议 | `packages/desktop/config/ipc/channel-manifest.js` · **1.1.0** |
 
-旧热替换树 `PromptOptimizer\` **已废弃**（清理表见 [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md)）。
+> **官方 PromptOptimizer（对照品）**：安装于 `D:\PromtOptimizer\PromptOptimizer.exe`，userData 走 legacy `%APPDATA%\@prompt-optimizer\desktop`；与本实验版身份隔离（appId `com.promptoptimizer.desktop` vs `com.xvyimu.mindsync`）。
 
-安装侧 README 若缺省，以本表路径与快捷方式 `D:\MindSync\app\PromptOptimizer.exe` 为准。
+旧热替换树 `PromptOptimizer\` 与旧 `D:\MindSync\` 安装侧 **均已废弃**（迁移见 [[projects-hub-migrated-2026-07-25]]）。
+
+安装/运行以实验版构建产物为准；源码入口一律 `D:\projects\MindSync`。
 
 ---
 
@@ -43,7 +45,7 @@
 
 | 你想… | 打开 |
 |--------|------|
-| 安装/启动 | `D:\MindSync\app\PromptOptimizer.exe` · 本表路径 |
+| 安装/启动 | 构建产物 `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`（实验版，无固定安装位置） |
 | 开发/模块/测试 | [`../PROJECT_HANDOFF.md`](../PROJECT_HANDOFF.md) |
 | 全面检查/安全/模块审计 | `docs/project/archives/install-side-2026-07/FULL-AUDIT-REPORT-2026-07-20.md` |
 | 全面扫描建议 | `docs/project/archives/install-side-2026-07/FULL-SCAN-RECOMMENDATIONS-2026-07-20.md` |
@@ -110,7 +112,7 @@
 ## 构建 / 验证（摘要）
 
 ```powershell
-cd D:\MindSync\src\mindsync
+cd D:\projects\MindSync
 # Node 24（engines ^24）
 pnpm -F @mindsync/core build
 pnpm -F @mindsync/ui build:bundle
