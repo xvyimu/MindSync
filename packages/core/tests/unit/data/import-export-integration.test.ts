@@ -152,8 +152,18 @@ describe('DataManager Import/Export Integration', () => {
       await preferenceService.set('app:settings:ui:theme-id', 'dark');
       await preferenceService.set('app:selected-optimize-model', 'test-model-key');
 
-      // 2. 导出数据
-      const exportedDataString = await dataManager.exportAllData();
+      // 2. 默认导出脱敏；含密钥导出用于 round-trip 验证
+      const redactedExportString = await dataManager.exportAllData();
+      expect(typeof redactedExportString).toBe('string');
+      const redactedExport = JSON.parse(redactedExportString);
+      const redactedImageModel = redactedExport.data.imageModels.find(
+        (m: any) => m.id === 'test-image-model-key'
+      );
+      expect(redactedImageModel).toBeDefined();
+      expect(redactedImageModel.name).toBe('Test Image Model');
+      expect(redactedImageModel.connectionConfig?.apiKey).toBeUndefined();
+
+      const exportedDataString = await dataManager.exportAllData({ includeSecrets: true });
       expect(typeof exportedDataString).toBe('string');
 
       const exportedData = JSON.parse(exportedDataString);
@@ -174,6 +184,7 @@ describe('DataManager Import/Export Integration', () => {
       const exportedImageModel = exportedData.data.imageModels.find((m: any) => m.id === 'test-image-model-key');
       expect(exportedImageModel).toBeDefined();
       expect(exportedImageModel.name).toBe('Test Image Model');
+      expect(exportedImageModel.connectionConfig?.apiKey).toBe('test-image-key');
 
       const exportedTemplate = exportedData.data.userTemplates.find((t: any) => t.id === 'test-template');
       expect(exportedTemplate).toBeDefined();
@@ -191,11 +202,11 @@ describe('DataManager Import/Export Integration', () => {
       await imageModelManager.deleteConfig('test-image-model-key');
       // 注意：模型和模板的清空需要通过删除操作
 
-      // 4. 导入数据
+      // 4. 导入数据（含密钥导出，验证 round-trip 完整）
       await dataManager.importAllData(exportedDataString);
 
       // 5. 验证导入结果
-      
+
       // 验证模型
       const importedModel = await modelManager.getModel('test-model-key');
       expect(importedModel).toBeDefined();

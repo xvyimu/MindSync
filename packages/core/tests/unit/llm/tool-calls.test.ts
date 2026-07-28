@@ -77,10 +77,13 @@ describe('LLM Service Tool Calls', () => {
         onError: vi.fn()
       };
 
-      // Test with empty messages - should throw validation error
+      // Stream APIs resolve after routing errors to onError (no double toast via rethrow).
       await expect(
         llmService.sendMessageStreamWithTools([], 'test-provider', [mockToolDefinition], mockCallbacks)
-      ).rejects.toThrow();
+      ).resolves.toBeUndefined();
+      expect(mockCallbacks.onError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringMatching(/empty|Messages/i) })
+      );
     });
 
     it('should validate tools parameter', async () => {
@@ -90,10 +93,13 @@ describe('LLM Service Tool Calls', () => {
         onError: vi.fn()
       };
 
-      // Should throw error for nonexistent provider (properly awaited)
+      // Nonexistent provider is reported via onError, not promise rejection.
       await expect(
         llmService.sendMessageStreamWithTools(mockMessages, 'nonexistent-provider', [mockToolDefinition], mockCallbacks)
-      ).rejects.toThrow();
+      ).resolves.toBeUndefined();
+      expect(mockCallbacks.onError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringMatching(/not found|Model/i) })
+      );
     });
   });
 
@@ -196,11 +202,13 @@ describe('LLM Service Tool Calls', () => {
         onError: vi.fn()
       };
 
-      // This test is redundant with the "validate tools parameter" test above
-      // but we'll keep it for completeness and properly handle the async error
+      // Redundant with validate-tools case; still asserts onError-only contract.
       await expect(
         llmService.sendMessageStreamWithTools(mockMessages, 'nonexistent-provider-2', [mockToolDefinition], mockCallbacks)
-      ).rejects.toThrow();
+      ).resolves.toBeUndefined();
+      expect(mockCallbacks.onError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringMatching(/not found|Model/i) })
+      );
     });
 
     it('should validate messages before tool processing', async () => {
@@ -216,7 +224,10 @@ describe('LLM Service Tool Calls', () => {
 
       await expect(
         llmService.sendMessageStreamWithTools(invalidMessages, 'test-provider', [mockToolDefinition], mockCallbacks)
-      ).rejects.toThrow();
+      ).resolves.toBeUndefined();
+      expect(mockCallbacks.onError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringMatching(/Invalid message|required fields|empty/i) })
+      );
     });
   });
 
