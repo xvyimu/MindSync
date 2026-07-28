@@ -4,6 +4,7 @@ packages:
 # W1 (2026-07): allow electron/esbuild/msw/protobufjs so desktop + vite postinstall work under 11.5.
 # Removed ignoredBuiltDependencies (conflicted with allowBuilds; CI can still use cache).
 # MS-deps-sec (2026-07-24): security-now transitive pins only (no majors).
+# MS-deps-sec (2026-07-28): electron-builder high (#116/#117) → app-builder-lib≥26.15 + builder-util-runtime≥9.7.
 allowBuilds:
   electron: true
   electron-winstaller: true
@@ -15,6 +16,9 @@ overrides:
   protobufjs: '>=7.6.5 <8'
   hono: '>=4.12.27 <5'
   '@hono/node-server': '>=1.19.13 <2'
+  # electron-builder 26.15+ brings these; pin floor so old 9.5.1 cannot re-enter
+  app-builder-lib: '>=26.15.0 <27'
+  builder-util-runtime: '>=9.7.0 <10'
   fast-uri: '>=3.1.4 <4'
   linkify-it: '>=5.0.2 <6'
   js-yaml: '>=4.3.0 <5'
