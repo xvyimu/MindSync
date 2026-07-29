@@ -5,3 +5,7 @@ overrides:
   vite: '>=7.3.5 <8'
   postcss: '>=8.5.10 <9'
   picomatch: '>=4.0.4 <5'
+  # Dependabot #113 low — esbuild dev-server request spoofing; first patched 0.28.1
+  esbuild: '>=0.28.1 <1'
+allowBuilds:
+  esbuild: true
