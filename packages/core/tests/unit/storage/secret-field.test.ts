@@ -56,6 +56,17 @@ describe('secret-field helpers', () => {
     expect(sealSecretField('sk-live', codec)).toBe('sk-live')
   })
 
+  it('openSecretField returns empty string when codec unavailable for ciphertext', () => {
+    const sealed = sealSecretField('sk-live', new FakeCodec(true)) as string
+    expect(openSecretField(sealed, new PassthroughSecretCodec())).toBe('')
+  })
+
+  it('openSecretField returns empty string on decrypt failure without throwing', () => {
+    const codec = new FakeCodec(true)
+    const bad = `${SECRET_FIELD_PREFIX}${Buffer.from('not-E:payload', 'utf8').toString('base64')}`
+    expect(openSecretField(bad, codec)).toBe('')
+  })
+
   it('idempotent seal on already-encrypted value', () => {
     const codec = new FakeCodec(true)
     const once = sealSecretField('sk-live', codec) as string

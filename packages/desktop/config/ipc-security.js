@@ -1,4 +1,5 @@
 const { isAllowedMainFrameNavigation } = require('./window-security');
+const { redactSecretsInText } = require('./safe-storage-secrets');
 
 const STREAM_ID_PATTERN = /^[A-Za-z0-9_-]{1,96}$/;
 
@@ -14,9 +15,10 @@ function createSuccessResponse(data) {
   return { success: true, data };
 }
 
-/** 将未知异常收敛为不包含 stack 的跨层错误信封。 */
+/** 将未知异常收敛为不包含 stack 的跨层错误信封（message 脱敏）。 */
 function createErrorResponse(error) {
-  const message = error instanceof Error ? error.message : String(error);
+  const raw = error instanceof Error ? error.message : String(error);
+  const message = redactSecretsInText(raw) || 'IPC handler failed';
   return {
     success: false,
     error: {

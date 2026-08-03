@@ -164,3 +164,25 @@ test('secure IPC handler validates arguments and normalizes successful results',
     },
   });
 });
+
+test('error envelope redacts apiKey and sk- tokens from thrown messages', async () => {
+  const ipcMain = createIpcMain();
+
+  registerSecureIpcHandler(
+    ipcMain,
+    'leaky-action',
+    async () => {
+      throw new Error(
+        'upstream reject for {"apiKey":"sk-live-abcdefghijklmnopqrstuvwxyz","baseURL":"https://x"}',
+      );
+    },
+    { senderOptions: options, assertKnownChannel: false },
+  );
+
+  const result = await ipcMain.handlers.get('leaky-action')(createEvent());
+  assert.equal(result.success, false);
+  assert.equal(result.error.code, 'IPC_HANDLER_FAILED');
+  assert.ok(!String(result.error.message).includes('sk-live-abcdefghijklmnopqrstuvwxyz'));
+  assert.ok(String(result.error.message).includes('[REDACTED]'));
+  assert.ok(String(result.error.message).includes('https://x'));
+});

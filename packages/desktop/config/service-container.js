@@ -4,7 +4,10 @@
  * main 只做 composition root（Electron 路径 / proxy / nativeImage 注入）。
  */
 
-const { createElectronSafeStorageCodec } = require('./safe-storage-secrets');
+const {
+  createElectronSafeStorageCodec,
+  redactSecretsInText,
+} = require('./safe-storage-secrets');
 
 /** 静态 VITE_* 探测列表（仅日志，不参与装配）。 */
 const STATIC_ENV_VARS = [
@@ -147,7 +150,14 @@ async function createCoreServices(deps) {
           log('[DESKTOP] Migrated plaintext API keys to safeStorage for:', rewritten.join(', '));
         }
       } catch (migrateError) {
-        console.warn('[DESKTOP] Secret migration skipped:', migrateError);
+        const detail =
+          migrateError instanceof Error
+            ? migrateError.message
+            : String(migrateError);
+        console.warn(
+          '[DESKTOP] Secret migration skipped:',
+          redactSecretsInText(detail),
+        );
       }
     }
 
@@ -254,8 +264,18 @@ async function createCoreServices(deps) {
       },
     };
   } catch (error) {
-    console.error('[Main Process] Failed to initialize core services:', error);
-    console.error('[Main Process] Error details:', error && error.stack);
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error && error.stack ? String(error.stack) : '';
+    console.error(
+      '[Main Process] Failed to initialize core services:',
+      redactSecretsInText(msg),
+    );
+    if (stack) {
+      console.error(
+        '[Main Process] Error details:',
+        redactSecretsInText(stack),
+      );
+    }
     return { ok: false, error };
   }
 }

@@ -88,7 +88,14 @@ export function openSecretField(
   try {
     return codec.decrypt(unwrapEncryptedSecret(value));
   } catch (error) {
-    console.error('[SecretField] Failed to decrypt secret field:', error);
+    // 只记错误类型，不 dump message（可能含 OS 回显的明文/密文片段）
+    const tag =
+      error instanceof Error
+        ? error.name || 'Error'
+        : typeof error === 'string'
+          ? 'string'
+          : 'unknown';
+    console.error(`[SecretField] Failed to decrypt secret field (${tag})`);
     return '';
   }
 }
