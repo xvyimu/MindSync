@@ -5,6 +5,33 @@ const { fileURLToPath } = require('url');
 const SAFE_EXTERNAL_PROTOCOLS = Object.freeze(['http:', 'https:']);
 
 /**
+ * BrowserWindow webPreferences 安全基线。
+ * 调用方只能附加 preload 路径等非危险字段；隔离相关开关被强制锁定。
+ */
+const SECURE_WEB_PREFERENCE_LOCKS = Object.freeze({
+  nodeIntegration: false,
+  contextIsolation: true,
+  sandbox: true,
+  webSecurity: true,
+  allowRunningInsecureContent: false,
+  experimentalFeatures: false,
+});
+
+/**
+ * renderer 经 electronAPI.on/off 可订阅的 main→renderer 事件白名单。
+ * 流式 channel（`stream-*-${streamId}`）仅由 preload 内部监听，不经此入口。
+ * 与 packages/ui useUpdater 实际订阅保持同步。
+ */
+const ALLOWED_PRELOAD_EVENT_CHANNELS = Object.freeze([
+  'update-available-info',
+  'update-not-available',
+  'update-download-progress',
+  'update-downloaded',
+  'update-error',
+  'updater-download-started',
+]);
+
+/**
  * 仅允许具备主机名的 HTTP/HTTPS 地址交给系统浏览器。
  * 拒绝：file: · javascript: · data: · 空串 · 无 hostname · 非字符串。
  */
@@ -68,6 +95,28 @@ function isAllowedMainFrameNavigation(targetUrl, options) {
   }
 }
 
+/**
+ * 构造锁定隔离基线的 webPreferences。
+ * 即使 overrides 试图打开 nodeIntegration / 关闭 contextIsolation 也会被覆盖。
+ */
+function createSecureWebPreferences(overrides = {}) {
+  const preload = overrides && overrides.preload;
+  if (typeof preload !== 'string' || preload.length === 0) {
+    throw new Error('createSecureWebPreferences requires a non-empty preload path');
+  }
+
+  return {
+    ...overrides,
+    ...SECURE_WEB_PREFERENCE_LOCKS,
+    preload,
+  };
+}
+
+/** 判断 channel 是否允许经 electronAPI.on/off 暴露给 renderer。 */
+function isAllowedPreloadEventChannel(channel) {
+  return typeof channel === 'string' && ALLOWED_PRELOAD_EVENT_CHANNELS.includes(channel);
+}
+
 /** 安装顶层导航、新窗口和 webview 的统一 Electron 安全门禁。 */
 function installMainFrameNavigationGuard(webContents, options) {
   /** 将通过协议校验的外部地址交给系统浏览器，并隔离打开失败。 */
@@ -99,8 +148,12 @@ function installMainFrameNavigationGuard(webContents, options) {
 }
 
 module.exports = {
+  ALLOWED_PRELOAD_EVENT_CHANNELS,
+  SECURE_WEB_PREFERENCE_LOCKS,
+  createSecureWebPreferences,
   installMainFrameNavigationGuard,
   isAllowedMainFrameNavigation,
+  isAllowedPreloadEventChannel,
   isSafeExternalUrl,
   openExternalSafe,
   SAFE_EXTERNAL_PROTOCOLS,
