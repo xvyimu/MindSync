@@ -669,6 +669,20 @@ function createUpdateHandlers(ctx) {
           throw error;
         }
 
+        // MS-CR-003：release URL 须 http(s)+hostname（buildReleaseUrl 已约束 GitHub，再拦一层）
+        try {
+          const parsed = new URL(releaseUrl);
+          if (!['http:', 'https:'].includes(parsed.protocol) || !parsed.hostname) {
+            const error = new Error('Release page URL is not a safe http(s) URL');
+            error.code = 'UPDATER_UNSAFE_RELEASE_URL';
+            throw error;
+          }
+        } catch (parseErr) {
+          if (parseErr && parseErr.code === 'UPDATER_UNSAFE_RELEASE_URL') throw parseErr;
+          const error = new Error('Release page URL is malformed');
+          error.code = 'UPDATER_UNSAFE_RELEASE_URL';
+          throw error;
+        }
         await shell.openExternal(releaseUrl);
         return createSuccessResponse({ url: releaseUrl });
       } catch (error) {

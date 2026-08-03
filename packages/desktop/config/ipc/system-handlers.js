@@ -23,6 +23,10 @@ function registerSystemIpcHandlers({
   });
 
   registerSensitiveIpc('shell-openExternal', async (_event, url) => {
+    // 二次门闩：校验已在 args validator；此处再拦以防注入绕过
+    if (!isSafeExternalUrl(url)) {
+      throw createIpcError('IPC_UNSAFE_EXTERNAL_URL', 'Blocked non-http(s) external URL');
+    }
     await shell.openExternal(url);
     return true;
   }, ([url]) => {
