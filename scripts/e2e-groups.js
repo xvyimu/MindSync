@@ -1,3 +1,8 @@
+// Editing a built-in template's prose changes the request hash, which invalidates
+// the recorded VCR fixture for every spec that exercises it. Re-record with
+// `pnpm test:e2e:record` in the same change, or the gate breaks the next time it
+// actually runs -- possibly weeks later, far from the commit that caused it.
+// Currently outstanding: docs/ops/ms-vcr-fixtures-stale-2026-08-03.md
 const groups = {
   gate: [
     'tests/e2e/workflows/p0-route-smoke.spec.ts',
