@@ -52,7 +52,7 @@ function waitForProviderAbort(signal?: AbortSignal): Promise<never> {
   })
 }
 
-/** 启动请求、触发取消并验证 provider 观察到同一个 signal（adapter 层会 reject）。 */
+/** 启动请求、触发取消并验证 provider 观察到同一个 signal。 */
 async function expectProviderCancellation(
   start: (signal: AbortSignal) => Promise<void>,
 ): Promise<void> {
@@ -86,18 +86,16 @@ describe('provider stream cancellation', () => {
       getAdapter: vi.fn().mockReturnValue(fakeAdapter),
     }
     const service = new LLMService(modelManager as never, registry as never)
-    const callbacks = createCallbacks()
 
-    // LLMService stream APIs swallow adapter errors into onError (no rethrow).
-    const controller = new AbortController()
-    const pending = service.sendMessageStream(messages, config.id, callbacks, {
-      signal: controller.signal,
+    // Abort is the one error the stream APIs rethrow. Everything else (empty
+    // messages, unknown provider, invalid messages) resolves after going to
+    // onError, so callers cannot toast it twice -- see 38a0eeb. Cancellation is
+    // different: the IPC layer has to observe the rejection to settle the stream,
+    // and a user-initiated cancel is not a condition to toast at all.
+    await expectProviderCancellation(async (signal) => {
+      await service.sendMessageStream(messages, config.id, createCallbacks(), { signal })
     })
-    controller.abort()
-    await expect(pending).resolves.toBeUndefined()
-    expect(callbacks.onError).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'AbortError' }),
-    )
+
     expect(receivedSignal).toBeInstanceOf(AbortSignal)
   })
 
