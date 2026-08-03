@@ -4,7 +4,10 @@
  * main 只做 composition root（Electron 路径 / proxy / nativeImage 注入）。
  */
 
-const { createElectronSafeStorageCodec } = require('./safe-storage-secrets');
+const {
+  createElectronSafeStorageCodec,
+  redactSecretsInText,
+} = require('./safe-storage-secrets');
 
 /** 静态 VITE_* 探测列表（仅日志，不参与装配）。 */
 const STATIC_ENV_VARS = [
@@ -128,7 +131,12 @@ async function createCoreServices(deps) {
     if (secretCodec.isAvailable()) {
       log('[DESKTOP] safeStorage encryption available — wrapping models storage');
     } else {
-      log('[DESKTOP] safeStorage unavailable — model API keys remain plaintext on disk');
+      // MS-CR-001：不可静默当「已加密」。兼容策略仍可能明文落盘，但必须可观测。
+      const PLAINTEXT_WARN =
+        '[DESKTOP][SECURITY] safeStorage UNAVAILABLE — model/image API keys will be stored as PLAINTEXT on disk. ' +
+        'This is NOT equivalent to OS-level encryption. Prefer a desktop session with safeStorage (Windows DPAPI / macOS Keychain).';
+      console.warn(PLAINTEXT_WARN);
+      log(PLAINTEXT_WARN);
     }
 
     const startupRepairReport = await runStorageStartupSafetyCheck(storageProvider);
@@ -142,7 +150,14 @@ async function createCoreServices(deps) {
           log('[DESKTOP] Migrated plaintext API keys to safeStorage for:', rewritten.join(', '));
         }
       } catch (migrateError) {
-        console.warn('[DESKTOP] Secret migration skipped:', migrateError);
+        const detail =
+          migrateError instanceof Error
+            ? migrateError.message
+            : String(migrateError);
+        console.warn(
+          '[DESKTOP] Secret migration skipped:',
+          redactSecretsInText(detail),
+        );
       }
     }
 
@@ -240,11 +255,27 @@ async function createCoreServices(deps) {
         favoriteManager,
         dataManager,
         preferenceService,
+        /** MS-CR-001：装配时密钥落盘安全态（非密钥值） */
+        secretsSecurity: {
+          safeStorageAvailable: secretCodec.isAvailable(),
+          modelsStoredEncrypted: secretCodec.isAvailable(),
+          plaintextFallbackActive: !secretCodec.isAvailable(),
+        },
       },
     };
   } catch (error) {
-    console.error('[Main Process] Failed to initialize core services:', error);
-    console.error('[Main Process] Error details:', error && error.stack);
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error && error.stack ? String(error.stack) : '';
+    console.error(
+      '[Main Process] Failed to initialize core services:',
+      redactSecretsInText(msg),
+    );
+    if (stack) {
+      console.error(
+        '[Main Process] Error details:',
+        redactSecretsInText(stack),
+      );
+    }
     return { ok: false, error };
   }
 }

@@ -181,5 +181,55 @@ test('safe-storage-secrets module still loads', () => {
   assert.equal(typeof mod.createElectronSafeStorageCodec, 'function');
 });
 
+test('createCoreServices secretsSecurity flags plaintext when safeStorage null', async () => {
+  const createCoreServices = loadCreateCoreServices();
+  const { core } = createMockCore();
+  const warns = [];
+  const origWarn = console.warn;
+  console.warn = (...args) => {
+    warns.push(args.map(String).join(' '));
+  };
+  try {
+    const result = await createCoreServices({
+      core,
+      getUserDataPath: () => '/tmp/po-user-data',
+      safeStorage: null,
+      env: {},
+      log: () => {},
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.services.secretsSecurity.safeStorageAvailable, false);
+    assert.equal(result.services.secretsSecurity.plaintextFallbackActive, true);
+    assert.equal(result.services.secretsSecurity.modelsStoredEncrypted, false);
+    assert.ok(
+      warns.some((w) => /safeStorage UNAVAILABLE/i.test(w) && /PLAINTEXT/i.test(w)),
+      'console.warn must surface plaintext fallback (MS-CR-001)',
+    );
+  } finally {
+    console.warn = origWarn;
+  }
+});
+
+test('createCoreServices secretsSecurity flags encrypted when safeStorage available', async () => {
+  const createCoreServices = loadCreateCoreServices();
+  const { core } = createMockCore();
+  const mockSafe = {
+    isEncryptionAvailable: () => true,
+    encryptString: (s) => Buffer.from(String(s)),
+    decryptString: (b) => Buffer.from(b).toString(),
+  };
+  const result = await createCoreServices({
+    core,
+    getUserDataPath: () => '/tmp/po-user-data',
+    safeStorage: mockSafe,
+    env: {},
+    log: () => {},
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.services.secretsSecurity.safeStorageAvailable, true);
+  assert.equal(result.services.secretsSecurity.plaintextFallbackActive, false);
+  assert.equal(result.services.secretsSecurity.modelsStoredEncrypted, true);
+});
+
 // 抑制 unused lint noise on Module if tools scan it
 void Module;

@@ -74,7 +74,11 @@ const {
 const { getPublicRuntimeConfig } = require('./config/runtime-security');
 const { resolveAiCoreConfig } = require('./config/ai-core-config');
 const { createAiCoreClient } = require('./config/ai-core-client');
-const { installMainFrameNavigationGuard, isSafeExternalUrl } = require('./config/window-security');
+const {
+  installMainFrameNavigationGuard,
+  isSafeExternalUrl,
+  createSecureWebPreferences,
+} = require('./config/window-security');
 const {
   createIpcError,
   registerSecureIpcHandler,
@@ -451,12 +455,11 @@ function createWindow() {
     width: 1200,
     height: 800,
     icon: iconPath, // 设置窗口图标
-    webPreferences: {
+    // Isolation baseline is locked in createSecureWebPreferences
+    // (nodeIntegration off, contextIsolation/sandbox/webSecurity on).
+    webPreferences: createSecureWebPreferences({
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: true,
-    },
+    }),
   });
 
   installMainFrameNavigationGuard(mainWindow.webContents, {
@@ -720,6 +723,7 @@ const { setupUpdateHandlers } = createUpdateHandlers({
   autoUpdater,
   app,
   path,
+  shell,
   createSuccessResponse,
   createErrorResponse,
   createDetailedErrorResponse,

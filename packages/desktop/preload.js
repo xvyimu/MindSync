@@ -10,6 +10,7 @@ const IPC_EVENTS = {
   UPDATE_GET_IGNORED_VERSIONS: 'updater-get-ignored-versions',
   UPDATE_DOWNLOAD_SPECIFIC_VERSION: 'updater-download-specific-version',
   UPDATE_CHECK_ALL_VERSIONS: 'updater-check-all-versions', // 新增常量
+  UPDATE_OPEN_RELEASE_PAGE: 'updater-open-release-page',
 
   // 主进程发送给渲染进程的事件
   UPDATE_AVAILABLE_INFO: 'update-available-info',
@@ -21,6 +22,18 @@ const IPC_EVENTS = {
 };
 
 const REMOTE_STORAGE_CHANNEL = 'remote-storage:invoke';
+// renderer 经 electronAPI.on/off 可订阅的 main→renderer 事件白名单。
+// 与 window-security.ALLOWED_PRELOAD_EVENT_CHANNELS / useUpdater 订阅保持同步。
+// 流式 channel（stream-*-${streamId}）仅 preload 内部注册，不经此入口。
+// 沙箱 preload 内联常量，避免额外模块加载。
+const ALLOWED_PRELOAD_EVENT_CHANNELS = Object.freeze([
+  'update-available-info',
+  'update-not-available',
+  'update-download-progress',
+  'update-downloaded',
+  'update-error',
+  'updater-download-started',
+]);
 // 记录每个 channel 上「前端回调 -> 包装监听器」的映射，
 // 保证 off() 能用同一函数引用移除，避免 removeListener 失效导致内存泄漏。
 const ipcListenerWrappers = new Map();
@@ -137,6 +150,9 @@ function createStreamAbortRace(streamId, cleanup, signal) {
 function subscribeIpcEvent(channel, callback) {
   if (typeof channel !== 'string' || typeof callback !== 'function') {
     throw new TypeError('IPC event subscription requires a channel and callback');
+  }
+  if (!ALLOWED_PRELOAD_EVENT_CHANNELS.includes(channel)) {
+    throw new TypeError(`IPC event channel is not allowed: ${channel}`);
   }
 
   let channelListeners = ipcListenerWrappers.get(channel);
@@ -1782,6 +1798,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
         error.originalError = result.error;
         error.detailedMessage = result.error;
         throw error;
+      }
+      return result.data;
+    },
+
+    // Open a main-process-constructed release page (manual-release / policy fallback).
+    openReleasePage: async (version) => {
+      const result = await withTimeout(
+        ipcRenderer.invoke(IPC_EVENTS.UPDATE_OPEN_RELEASE_PAGE, version),
+        10000
+      );
+      if (!result.success) {
+        throw createIpcError(result.error);
       }
       return result.data;
     },

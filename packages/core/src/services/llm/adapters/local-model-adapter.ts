@@ -98,7 +98,9 @@ export class LocalModelAdapter extends AbstractTextProviderAdapter {
   ): Promise<void> {
     this.assertEnabled();
     if (options?.signal?.aborted) {
-      throw new RequestConfigError('Local model stub stream aborted');
+      const abortError = new Error('Local model stub stream aborted');
+      abortError.name = 'AbortError';
+      throw abortError;
     }
     const response = await this.doSendMessage(messages, config);
     callbacks.onToken(response.content);

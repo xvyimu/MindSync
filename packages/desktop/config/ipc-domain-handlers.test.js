@@ -134,6 +134,93 @@ test('LLM backend module forwards the owner AbortSignal to Core', async () => {
   assert.equal(receivedSignal instanceof AbortSignal, true);
 });
 
+test('stream-cancel aborts owner signal and rejects non-owner', async () => {
+  const registrar = createRegistrar();
+  const owner = createSender(1);
+  const other = createSender(2);
+  const streamRegistry = createStreamRegistry();
+  const runOwnedStream = createOwnedStreamRunner({ streamRegistry });
+  let holdResolve;
+  let seenSignal;
+  const llmService = {
+    testConnection: async () => {},
+    sendMessage: async () => '',
+    sendMessageStructured: async () => ({ content: '' }),
+    fetchModelList: async () => [],
+    sendMessageStream: async (_messages, _provider, _callbacks, options) => {
+      seenSignal = options?.signal;
+      await new Promise((resolve) => {
+        holdResolve = resolve;
+      });
+    },
+    sendMessageStreamWithTools: async () => {},
+  };
+
+  registerLlmIpcHandlers({
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
+    llmService,
+    streamRegistry,
+    runOwnedStream,
+  });
+
+  const pending = registrar.handlers.get('llm-sendMessageStream')(
+    { sender: owner },
+    [],
+    'provider',
+    'stream_cancel_owner',
+  );
+
+  // 让 handler 进入 await operation 后再 cancel
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(seenSignal instanceof AbortSignal, true);
+  assert.equal(seenSignal.aborted, false);
+
+  await assert.rejects(
+    () => registrar.handlers.get('stream-cancel')({ sender: other }, 'stream_cancel_owner'),
+    (error) => error && error.code === 'IPC_STREAM_NOT_OWNER',
+  );
+
+  const cancelResult = await registrar.handlers.get('stream-cancel')(
+    { sender: owner },
+    'stream_cancel_owner',
+  );
+  assert.deepEqual(cancelResult, { cancelled: true });
+  assert.equal(seenSignal.aborted, true);
+  assert.equal(streamRegistry.has('stream_cancel_owner'), false);
+
+  holdResolve();
+  await pending;
+});
+
+test('owned stream runner stops forwarding after cancel and always completes ownership', async () => {
+  const streamRegistry = createStreamRegistry();
+  const runOwnedStream = createOwnedStreamRunner({ streamRegistry });
+  const sender = createSender(1);
+  let seenSignal;
+
+  const pending = runOwnedStream(
+    { sender },
+    'stream_runner_cancel',
+    { token: 'stream-token', finish: 'stream-finish', error: 'stream-error' },
+    async (handlers, signal) => {
+      seenSignal = signal;
+      handlers.onToken('before');
+      await new Promise((resolve) => {
+        signal.addEventListener('abort', resolve, { once: true });
+      });
+      handlers.onToken('after-abort');
+    },
+  );
+
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(streamRegistry.cancel(sender, 'stream_runner_cancel'), true);
+  await pending;
+
+  assert.equal(seenSignal.aborted, true);
+  assert.deepEqual(sender.sent, [['stream-token-stream_runner_cancel', 'before']]);
+  assert.equal(streamRegistry.has('stream_runner_cancel'), false);
+});
+
 test('Prompt backend module keeps stream channels sender-owned', async () => {
   const registrar = createRegistrar();
   const sender = createSender();
@@ -278,7 +365,6 @@ test('Model backend module registers the stable model IPC interface', async () =
     'model-getAllModels',
     'model-getDataType',
     'model-getEnabledModels',
-    'model-getModels',
     'model-importData',
     'model-isInitialized',
     'model-updateModel',
@@ -362,6 +448,68 @@ test('Image backend module registers the stable image IPC interface', async () =
   );
 });
 
+test('image generate with streamId registers signal and maps AbortError to IPC_STREAM_CANCELLED', async () => {
+  const registrar = createRegistrar();
+  const sender = createSender(3);
+  const streamRegistry = createStreamRegistry();
+  let receivedSignal;
+  const imageService = {
+    generate: async (request) => {
+      receivedSignal = request.signal;
+      const abortError = new Error('aborted');
+      abortError.name = 'AbortError';
+      throw abortError;
+    },
+    generateText2Image: async () => ({}),
+    generateImage2Image: async () => ({}),
+    generateMultiImage: async () => ({}),
+    validateRequest: async () => ({ valid: true }),
+    validateText2ImageRequest: async () => ({ valid: true }),
+    validateImage2ImageRequest: async () => ({ valid: true }),
+    validateMultiImageRequest: async () => ({ valid: true }),
+    testConnection: async () => ({ connected: true }),
+  };
+
+  registerImageIpcHandlers({
+    registerSensitiveIpc: registrar.registerSensitiveIpc,
+    imageModelManager: {
+      ensureInitialized: async () => {},
+      isInitialized: async () => true,
+      getAllConfigs: async () => [],
+      getConfig: async () => null,
+      addConfig: async () => {},
+      updateConfig: async () => {},
+      deleteConfig: async () => {},
+      getEnabledConfigs: async () => [],
+      exportData: async () => ({}),
+      importData: async () => {},
+      getDataType: () => 'image-model',
+      validateData: async () => true,
+    },
+    imageService,
+    imageAdapterRegistry: { getDynamicModels: async () => [] },
+    imageUnderstandingService: { understand: async () => ({}) },
+    safeSerialize: (value) => value,
+    streamRegistry,
+    assertValidStreamId: (streamId) => {
+      if (typeof streamId !== 'string' || !streamId) {
+        throw new Error('bad stream id');
+      }
+    },
+  });
+
+  await assert.rejects(
+    () => registrar.handlers.get('image-generate')(
+      { sender },
+      { prompt: 'cat' },
+      'stream_image_cancel',
+    ),
+    (error) => error && error.code === 'IPC_STREAM_CANCELLED',
+  );
+  assert.equal(receivedSignal instanceof AbortSignal, true);
+  assert.equal(streamRegistry.has('stream_image_cancel'), false);
+});
+
 test('Template backend module registers the stable template IPC interface', async () => {
   const registrar = createRegistrar();
   const calls = [];
@@ -395,7 +543,8 @@ test('Template backend module registers the stable template IPC interface', asyn
 
   assert.equal(registrar.handlers.has('template-getTemplates'), true);
   assert.equal(registrar.handlers.has('template-updateTemplate'), true);
-  assert.equal(registrar.handlers.has('template-getSupportedLanguages'), true);
+  assert.equal(registrar.handlers.has('template-getSupportedBuiltinTemplateLanguages'), true);
+  assert.equal(registrar.handlers.has('template-getSupportedLanguages'), false);
 
   assert.deepEqual(
     await registrar.handlers.get('template-getTemplates')({}),
@@ -624,18 +773,14 @@ test('Preference backend module registers the stable preference IPC interface', 
   );
 });
 
-test('System backend module registers config/app/log channels', async () => {
+test('System backend module registers config/app channels without orphan log surface', async () => {
   const registrar = createRegistrar();
-  const opened = [];
   let locale = null;
 
   registerSystemIpcHandlers({
     shell: {
       openExternal: async () => {},
-      openPath: async (target) => {
-        opened.push(target);
-        return '';
-      },
+      openPath: async () => '',
     },
     consoleLogger: {
       getLogPaths: () => ({ logDir: 'C:\\logs', mainLog: 'C:\\logs\\main.log' }),
@@ -657,11 +802,8 @@ test('System backend module registers config/app/log channels', async () => {
 
   assert.equal(registrar.handlers.has('config-getEnvironmentVariables'), true);
   assert.equal(registrar.handlers.has('app-get-version'), true);
-  assert.equal(
-    await registrar.handlers.get('logs-open-directory')({}),
-    true,
-  );
-  assert.deepEqual(opened, ['C:\\logs']);
+  assert.equal(registrar.handlers.has('logs-get-paths'), false);
+  assert.equal(registrar.handlers.has('logs-open-directory'), false);
 
   await registrar.handlers.get('app-set-locale')({}, 'zh-CN');
   assert.equal(locale, 'zh-CN');

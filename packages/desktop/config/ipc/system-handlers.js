@@ -23,6 +23,10 @@ function registerSystemIpcHandlers({
   });
 
   registerSensitiveIpc('shell-openExternal', async (_event, url) => {
+    // 二次门闩：校验已在 args validator；此处再拦以防注入绕过
+    if (!isSafeExternalUrl(url)) {
+      throw createIpcError('IPC_UNSAFE_EXTERNAL_URL', 'Blocked non-http(s) external URL');
+    }
     await shell.openExternal(url);
     return true;
   }, ([url]) => {
@@ -42,13 +46,10 @@ function registerSystemIpcHandlers({
     return null;
   });
 
-  registerSensitiveIpc('logs-get-paths', async () => consoleLogger.getLogPaths());
-
-  registerSensitiveIpc('logs-open-directory', async () => {
-    const { logDir } = consoleLogger.getLogPaths();
-    await shell.openPath(logDir);
-    return true;
-  });
+  // logs-get-paths / logs-open-directory intentionally not registered:
+  // no preload surface and no renderer consumer (surface closed 2026-07-24).
+  // consoleLogger remains in the signature for call-site stability.
+  void consoleLogger;
 }
 
 module.exports = {

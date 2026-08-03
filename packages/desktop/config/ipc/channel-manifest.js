@@ -23,7 +23,7 @@ const RESPONSE_ENVELOPE = Object.freeze({
 
 /** 文本模型管理 channel。 */
 const MODEL_CHANNELS = Object.freeze([
-  'model-getModels',
+  // model-getModels 已移除：preload 的 getModels 仅 alias 到 model-getAllModels（deprecated API）
   'model-addModel',
   'model-updateModel',
   'model-deleteModel',
@@ -82,7 +82,7 @@ const TEMPLATE_CHANNELS = Object.freeze([
   'template-changeBuiltinTemplateLanguage',
   'template-getCurrentBuiltinTemplateLanguage',
   'template-getSupportedBuiltinTemplateLanguages',
-  'template-getSupportedLanguages',
+  // template-getSupportedLanguages 已移除：语言列表走 getSupportedBuiltinTemplateLanguages
 ]);
 
 /** 历史记录 channel。 */
@@ -209,8 +209,7 @@ const SYSTEM_CHANNELS = Object.freeze([
   'shell-openExternal',
   'app-get-version',
   'app-set-locale',
-  'logs-get-paths',
-  'logs-open-directory',
+  // logs-get-paths / logs-open-directory 已移除：无 preload 暴露、无 UI 调用
 ]);
 
 /** Optional local AI-Core side-car (default OFF when AI_CORE_URL empty). */

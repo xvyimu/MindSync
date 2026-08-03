@@ -98,6 +98,28 @@ test('preload forwards Prompt AbortSignal to the main-process cancellation chann
   assert.equal(ipcRenderer.listenerCount('stream-token-' + calls[1][1]), 0);
 });
 
+test('preload rejects immediately when AbortSignal is already aborted before invoke', async () => {
+  const calls = [];
+  const ipcRenderer = {
+    on() {},
+    removeListener() {},
+    invoke(channel, ...args) {
+      calls.push([channel, ...args]);
+      return new Promise(() => {});
+    },
+  };
+  const api = loadPreloadWithElectronMock(ipcRenderer);
+  const controller = new AbortController();
+  controller.abort();
+
+  await assert.rejects(
+    api.llm.sendMessageStream([], 'provider', {}, controller.signal),
+    (error) => error && error.code === 'IPC_STREAM_CANCELLED',
+  );
+  // 预取消不得发起主进程流 invoke
+  assert.equal(calls.length, 0);
+});
+
 test('preload on/off and disposer remove the exact wrapped listener', () => {
   const ipcRenderer = new EventEmitter();
   ipcRenderer.invoke = async () => ({ success: true, data: null });
@@ -122,4 +144,21 @@ test('preload on/off and disposer remove the exact wrapped listener', () => {
   const disposeAgain = api.on('update-error', callback);
   disposeAgain();
   assert.equal(ipcRenderer.listenerCount('update-error'), 0);
+});
+
+test('preload on rejects event channels outside the allowlist', () => {
+  const ipcRenderer = new EventEmitter();
+  ipcRenderer.invoke = async () => ({ success: true, data: null });
+  const api = loadPreloadWithElectronMock(ipcRenderer);
+
+  assert.throws(
+    () => api.on('preference-service-warning', () => {}),
+    (error) => error instanceof TypeError && /not allowed/.test(error.message),
+  );
+  assert.throws(
+    () => api.on('stream-token-stream_1', () => {}),
+    (error) => error instanceof TypeError && /not allowed/.test(error.message),
+  );
+  assert.equal(ipcRenderer.listenerCount('preference-service-warning'), 0);
+  assert.equal(ipcRenderer.listenerCount('stream-token-stream_1'), 0);
 });
