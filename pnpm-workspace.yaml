@@ -5,6 +5,15 @@ packages:
 # Removed ignoredBuiltDependencies (conflicted with allowBuilds; CI can still use cache).
 # MS-deps-sec (2026-07-24): security-now transitive pins only (no majors).
 # MS-deps-sec (2026-07-28): electron-builder high (#116/#117) → app-builder-lib≥26.15 + builder-util-runtime≥9.7.
+# pnpm 11 only reads auth/registry keys from .npmrc; the settings below used to live
+# there and were silently inert (root node_modules had 8 entries, so hoist-dependent
+# gates -- typecheck:web's vue-tsc, check-locale-parity's typescript -- failed).
+# Migrated 2026-08-03. shamefullyHoist supersedes the old public-hoist-pattern entries.
+shamefullyHoist: true
+engineStrict: true
+autoInstallPeers: true
+strictPeerDependencies: false
+enablePrePostScripts: true
 allowBuilds:
   electron: true
   electron-winstaller: true
