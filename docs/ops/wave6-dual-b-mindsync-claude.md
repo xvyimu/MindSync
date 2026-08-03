@@ -9,7 +9,7 @@
 | **基线 tip** | `735a68e859d2e9e736b9829757b2dcbbba26b8d8`（`feat(ai-core): prompt optimize stub (T-MS-004)`） |
 | **主线** | `develop` |
 | **Remote** | 仅 `origin` → `git@github.com:xvyimu/MindSync.git`（无 `upstream`） |
-| **Dual-A 参考** | Codex 胜方 GAP：`D:\MindSync\src\mindsync\docs\ops\wave6-gap-mindsync-codex.md` |
+| **Dual-A 参考** | Codex 胜方 GAP：`D:\projects\MindSync\docs\ops\wave6-gap-mindsync-codex.md` |
 | **题单** | `D:\orca\.planning\dual-b-wave6\prompts\ms.md` |
 
 > 本报告写在 **独立 feature worktree**，不是主 checkout。未 push / 未 merge / 未真发布镜像 / 未覆盖用户 asar。

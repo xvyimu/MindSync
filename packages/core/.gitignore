@@ -1,0 +1,3 @@
+# Local export artifacts (regeneratable paste-list bundles for official
+# PromptOptimizer imports; produced ad-hoc by data-manager tooling).
+.export/

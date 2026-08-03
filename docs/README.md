@@ -10,7 +10,7 @@
 
 | 你是… | 你想… | 打开 |
 |--------|--------|------|
-| 本机使用者 | 启动软件 / 安装在哪 | `D:\MindSync\app\PromptOptimizer.exe` · [`project/CURRENT.md`](./project/CURRENT.md) |
+| 本机使用者 | 启动软件 / 构建产物在哪 | `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`（实验版）· [`project/CURRENT.md`](./project/CURRENT.md) |
 | 开发维护者 | 改代码 / 测试 / 模块 | [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md) |
 | 架构 / 发行 | 目标边界 · AI-Core 是否进包 | [`ARCHITECTURE_TARGET.md`](./ARCHITECTURE_TARGET.md) · [`ops/ai-core-distribution-contract.md`](./ops/ai-core-distribution-contract.md) |
 | 品牌 / 素材 | logo · 命名 · 镜像名 | [`brand-assets.md`](./brand-assets.md) |

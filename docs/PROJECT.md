@@ -1,8 +1,8 @@
 # MindSync · 形态与技术栈（SSOT）
 
 > **产品：** MindSync（历史名 Prompt Optimizer）· **GitHub：** [xvyimu/MindSync](https://github.com/xvyimu/MindSync)  
-> **源码根：** `D:\MindSync\src\mindsync`（入口 `D:\projects\MindSync`）  
-> **运行安装：** `D:\MindSync\app\PromptOptimizer.exe`（productName=MindSync）  
+> **源码根：** `D:\projects\MindSync`（2026-07-25 迁移完成；旧 `D:\MindSync\src\mindsync` 已废弃）  
+> **构建产物（未安装）：** `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`（productName=MindSync；实验版，与官方 PromptOptimizer 并存）  
 > **版本/路径活数字：** [`project/CURRENT.md`](./project/CURRENT.md)（L1）  
 > 全局门闩：`~/CLAUDE.md` §8 · `~/.claude/specs/principle.md`「形态与技术栈」。  
 > **本文件 = 本产品形态与唯一技术栈权威。** 细节交接见 [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md)。小修不重选型。

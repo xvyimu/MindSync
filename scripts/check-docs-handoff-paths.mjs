@@ -26,9 +26,12 @@ const rules = [
   },
   {
     id: 'stale-promtoptimizer-as-ssot',
-    // Forbid D:\PromtOptimizer\... as live path; allow the bare token only in "已废弃/旧路径" prose without a trailing path root.
-    re: /D:\\PromtOptimizer\\(?:src|app|docs|nsis|tools|custom-templates|PromptOptimizer)/i,
-    hint: 'Active paths are D:\\MindSync\\... (see CURRENT.md / GITHUB_IDENTITY)',
+    // Forbid D:\PromtOptimizer\{src|app|docs|nsis|tools|custom-templates} — those imply treating
+    // PromtOptimizer as the MindSync source/install tree. Since 2026-07-25 the OFFICIAL
+    // PromptOptimizer release genuinely installs at D:\PromtOptimizer\PromptOptimizer.exe, so the
+    // bare official-binary mention is allowed; only the fake MindSync-tree subdirs are stale.
+    re: /D:\\PromtOptimizer\\(?:src|app|docs|nsis|tools|custom-templates)\b/i,
+    hint: 'Active MindSync source is D:\\projects\\MindSync; D:\\PromtOptimizer is only the official release binary (see CURRENT.md / GITHUB_IDENTITY)',
   },
   {
     id: 'claim-upstream-remote-active',

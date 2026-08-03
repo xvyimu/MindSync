@@ -28,8 +28,8 @@
 
 | 项 | 内容 |
 |----|------|
-| 源码 | `D:\MindSync\src\mindsync` |
-| 装机 | `D:\MindSync\app\`（仓外布局见外层 LAYOUT） |
+| 源码 | `D:\projects\MindSync`（2026-07-25 迁移完成；旧 `D:\MindSync\src\mindsync` 已废弃） |
+| 构建产物 | `packages\desktop\dist\MindSync-2.11.7-win-x64.exe`（实验版，无固定安装位置） |
 | 入口 | `D:\projects\MindSync` |
 | 预览 | web `127.0.0.1:18181` · glass 仅 query/localStorage |
 | 密钥 | safeStorage / env · 不进 git |

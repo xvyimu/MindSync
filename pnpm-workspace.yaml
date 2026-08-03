@@ -12,6 +12,9 @@ allowBuilds:
   msw: true
   protobufjs: true
 overrides:
+  # Keep CodeMirror types single-versioned for @mindsync/ui's vue-tsc build.
+  '@codemirror/state': 6.7.1
+  '@codemirror/view': 6.43.6
   tar: '>=7.5.19 <8'
   protobufjs: '>=7.6.5 <8'
   hono: '>=4.12.27 <5'
