@@ -98,6 +98,28 @@ test('preload forwards Prompt AbortSignal to the main-process cancellation chann
   assert.equal(ipcRenderer.listenerCount('stream-token-' + calls[1][1]), 0);
 });
 
+test('preload rejects immediately when AbortSignal is already aborted before invoke', async () => {
+  const calls = [];
+  const ipcRenderer = {
+    on() {},
+    removeListener() {},
+    invoke(channel, ...args) {
+      calls.push([channel, ...args]);
+      return new Promise(() => {});
+    },
+  };
+  const api = loadPreloadWithElectronMock(ipcRenderer);
+  const controller = new AbortController();
+  controller.abort();
+
+  await assert.rejects(
+    api.llm.sendMessageStream([], 'provider', {}, controller.signal),
+    (error) => error && error.code === 'IPC_STREAM_CANCELLED',
+  );
+  // 预取消不得发起主进程流 invoke
+  assert.equal(calls.length, 0);
+});
+
 test('preload on/off and disposer remove the exact wrapped listener', () => {
   const ipcRenderer = new EventEmitter();
   ipcRenderer.invoke = async () => ({ success: true, data: null });

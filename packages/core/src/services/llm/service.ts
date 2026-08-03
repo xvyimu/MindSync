@@ -122,6 +122,32 @@ export class LLMService implements ILLMService {
   }
 
   /**
+   * 判断是否为协作取消（AbortSignal / AbortError）。
+   * 取消必须向上 reject，不能吞进 onError 后 resolve，否则 IPC/调用方会把取消当成成功结束。
+   */
+  private isStreamAbort(error: unknown, signal?: AbortSignal): boolean {
+    if (signal?.aborted) {
+      return true;
+    }
+    if (!error || typeof error !== 'object') {
+      return false;
+    }
+    return (error as { name?: string }).name === 'AbortError';
+  }
+
+  /** 将未知错误归一为带 name=AbortError 的 Error，供调用方 `rejects.toMatchObject({ name })`。 */
+  private toAbortError(error: unknown): Error {
+    if (error instanceof Error && error.name === 'AbortError') {
+      return error;
+    }
+    const abortError = new Error(
+      error instanceof Error ? error.message : 'This operation was aborted',
+    );
+    abortError.name = 'AbortError';
+    return abortError;
+  }
+
+  /**
    * 发送消息（流式,支持结构化和传统格式）
    */
   async sendMessageStream(
@@ -150,6 +176,10 @@ export class LLMService implements ILLMService {
       await adapter.sendMessageStream(messages, runtimeConfig, callbacks, options);
 
     } catch (error) {
+      if (this.isStreamAbort(error, options?.signal)) {
+        // 协作取消：不走 onError toast 通道，直接 reject 给 IPC / 上层
+        throw this.toAbortError(error);
+      }
       console.error('Stream request failed:', error);
       // 仅走 onError 通道，避免调用方 catch 再 toast 导致双提示
       callbacks.onError(error instanceof Error ? error : new Error(String(error)));
@@ -187,6 +217,9 @@ export class LLMService implements ILLMService {
       await adapter.sendMessageStreamWithTools(messages, runtimeConfig, tools, callbacks, options);
 
     } catch (error) {
+      if (this.isStreamAbort(error, options?.signal)) {
+        throw this.toAbortError(error);
+      }
       console.error('Stream request with tools failed:', error);
       // 仅走 onError 通道，避免调用方 catch 再 toast 导致双提示
       callbacks.onError(error instanceof Error ? error : new Error(String(error)));
