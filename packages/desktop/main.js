@@ -723,6 +723,7 @@ const { setupUpdateHandlers } = createUpdateHandlers({
   autoUpdater,
   app,
   path,
+  shell,
   createSuccessResponse,
   createErrorResponse,
   createDetailedErrorResponse,

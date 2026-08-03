@@ -10,6 +10,7 @@ const IPC_EVENTS = {
   UPDATE_GET_IGNORED_VERSIONS: 'updater-get-ignored-versions',
   UPDATE_DOWNLOAD_SPECIFIC_VERSION: 'updater-download-specific-version',
   UPDATE_CHECK_ALL_VERSIONS: 'updater-check-all-versions', // 新增常量
+  UPDATE_OPEN_RELEASE_PAGE: 'updater-open-release-page',
 
   // 主进程发送给渲染进程的事件
   UPDATE_AVAILABLE_INFO: 'update-available-info',
@@ -1797,6 +1798,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
         error.originalError = result.error;
         error.detailedMessage = result.error;
         throw error;
+      }
+      return result.data;
+    },
+
+    // Open a main-process-constructed release page (manual-release / policy fallback).
+    openReleasePage: async (version) => {
+      const result = await withTimeout(
+        ipcRenderer.invoke(IPC_EVENTS.UPDATE_OPEN_RELEASE_PAGE, version),
+        10000
+      );
+      if (!result.success) {
+        throw createIpcError(result.error);
       }
       return result.data;
     },
