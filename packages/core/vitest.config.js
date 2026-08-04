@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 import { loadEnv } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'node:url'
@@ -12,10 +12,19 @@ export default defineConfig(({ mode }) => {
   const envFromCwd = loadEnv(mode, process.cwd(), '')
   process.env = { ...process.env, ...envFromCwd, ...envFromPackage }
 
+  // tests/integration/** 会打真实 LLM API（21 个文件，14 个自带 key 检查）。
+  // 默认排除，避免 `pnpm test` 在无凭据时红、在有凭据时产生真实调用与费用；
+  // 需要时用 `pnpm test:integration`（等价 --mode int）显式启用。
+  // 注意 configDefaults.exclude 必须展开而非替换，否则 node_modules/dist 会被扫。
+  const integrationOnly = mode === 'int'
+
   return {
     // 固定 root 为 core 包，保证包含路径与别名稳定
     root: packageRoot,
     test: {
+      ...(integrationOnly
+        ? { include: ['tests/integration/**/*.{test,spec}.{ts,js}'] }
+        : { exclude: [...configDefaults.exclude, 'tests/integration/**'] }),
       // Avoid Windows OOM with forked workers on large suites
       pool: 'threads',
       globals: true,

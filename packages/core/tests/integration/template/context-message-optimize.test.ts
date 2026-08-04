@@ -130,9 +130,21 @@ describe('Context Message Optimize Templates - Real API Tests', () => {
   const hasDeepSeekKey = !!process.env.VITE_DEEPSEEK_API_KEY;
   const hasOpenAIKey = !!process.env.VITE_OPENAI_API_KEY;
 
+  // 显式模型覆盖。指向 OpenAI 兼容网关时必须设置：网关通常只提供自己的模型清单，
+  // adapter 内置的默认模型名（gpt-* / deepseek-chat）在那里不存在，直接跑会 404。
+  // 光有 key 不足以判定「可跑」—— 判据必须包含「该 baseURL 上有一个已知可用的模型」。
+  const deepSeekModelOverride = process.env.VITE_DEEPSEEK_TEST_MODEL;
+  const openAIModelOverride = process.env.VITE_OPENAI_TEST_MODEL;
+  const deepSeekBaseURL = process.env.VITE_DEEPSEEK_BASE_URL;
+  const openAIBaseURL = process.env.VITE_OPENAI_BASE_URL;
+
+  // 自定义 baseURL 必须配套模型名；用厂商默认端点时才可省略。
+  const deepSeekUsable = hasDeepSeekKey && (!deepSeekBaseURL || !!deepSeekModelOverride);
+  const openAIUsable = hasOpenAIKey && (!openAIBaseURL || !!openAIModelOverride);
+
   // 选择可用的模型（优先 DeepSeek chat 模型）
-  const availableModel = hasDeepSeekKey ? 'deepseek'
-    : hasOpenAIKey ? 'openai'
+  const availableModel = deepSeekUsable ? 'deepseek'
+    : openAIUsable ? 'openai'
     : null;
 
   const TEST_TIMEOUT = 120000; // 2分钟超时
@@ -185,15 +197,20 @@ describe('Context Message Optimize Templates - Real API Tests', () => {
     if (availableModel === 'deepseek') {
       const adapter = registry.getAdapter('deepseek');
       const models = adapter.getModels();
-      const chatModel = models.find(m => m.id === 'deepseek-chat') || models[0];
+      const baseModel = models.find(m => m.id === 'deepseek-chat') || models[0];
+      // 自定义 baseURL 时，adapter 内置的模型名在该网关上通常不存在 —— 用 override 顶替 id。
+      const modelMeta = deepSeekModelOverride
+        ? { ...baseModel, id: deepSeekModelOverride, name: deepSeekModelOverride }
+        : baseModel;
       const modelConfig: TextModelConfig = {
         id: 'test-deepseek',
         name: 'Test DeepSeek Chat',
         enabled: true,
         providerMeta: adapter.getProvider(),
-        modelMeta: chatModel,
+        modelMeta,
         connectionConfig: {
-          apiKey: process.env.VITE_DEEPSEEK_API_KEY!
+          apiKey: process.env.VITE_DEEPSEEK_API_KEY!,
+          ...(deepSeekBaseURL ? { baseURL: deepSeekBaseURL } : {})
         },
         paramOverrides: {}
       };
@@ -201,15 +218,19 @@ describe('Context Message Optimize Templates - Real API Tests', () => {
       testModelKey = 'test-deepseek';
     } else if (availableModel === 'openai') {
       const adapter = registry.getAdapter('openai');
+      const baseModel = adapter.getModels()[0];
+      const modelMeta = openAIModelOverride
+        ? { ...baseModel, id: openAIModelOverride, name: openAIModelOverride }
+        : baseModel;
       const modelConfig: TextModelConfig = {
         id: 'test-openai',
         name: 'Test OpenAI',
         enabled: true,
         providerMeta: adapter.getProvider(),
-        modelMeta: adapter.getModels()[0],
+        modelMeta,
         connectionConfig: {
           apiKey: process.env.VITE_OPENAI_API_KEY!,
-          baseURL: process.env.VITE_OPENAI_BASE_URL
+          ...(openAIBaseURL ? { baseURL: openAIBaseURL } : {})
         },
         paramOverrides: {}
       };

@@ -26,7 +26,7 @@
     "test:coverage": "vitest run --coverage",
     "test:gate": "vitest run tests/unit/utils/vcr.spec.ts tests/unit/utils/llm-mock-service.spec.ts",
     "test:unit": "vitest run tests/unit",
-    "test:integration": "vitest run tests/integration",
+    "test:integration": "vitest run --mode int",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
