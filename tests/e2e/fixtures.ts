@@ -92,13 +92,18 @@ export const test = base.extend<{ context: BrowserContext; page: Page }>({
     const fullPath = testInfo.titlePath[0] || 'unknown-test'
     const testName = fullPath.replace(/^tests\/e2e\//, '')
     const testCase = testInfo.title || 'unknown-case'
-    await setupVCRForTest(page, testName, testCase)
+    const vcr = await setupVCRForTest(page, testName, testCase)
 
     try {
       await use(page)
     } finally {
       page.off('console', onConsole)
       page.off('pageerror', onPageError)
+      // 录制模式下，上游调用与 fixture 写盘发生在与测试体分离的 route handler 里。
+      // 断言先于 LLM 响应满足的用例（如 pro-variable：输出框仅靠变量插值即非空）
+      // 会在写盘完成前关页，Playwright 随之拆掉 handler —— fixture 永远写不成且不报错。
+      // 关页前先 flush，把这些在途 Promise 等完。
+      await vcr.flushRecordings()
       await page.close()
       // 不需要显式清理当前测试的数据库
       // 每个测试都会使用独立的 BrowserContext，测试结束后会释放对应的存储（IndexedDB/localStorage 等）

@@ -210,6 +210,38 @@ class E2EVCR {
   // Replay-only: per testCase, track how many interactions have been consumed per requestHash.
   private replayConsumedByHash: Map<string, number> = new Map()
 
+  // Record-only: in-flight upstream calls + fixture writes.
+  //
+  // A route handler runs detached from the test body, so a spec that satisfies its
+  // assertion before the LLM response lands (e.g. pro-variable, whose output box is
+  // non-empty from variable interpolation alone) finishes and closes the page while
+  // the recording fetch is still open. Playwright then tears the handler down and the
+  // fixture is never written -- silently, leaving the spec permanently un-recordable.
+  // Tracking the promises lets the fixture teardown await them before closing the page.
+  private pendingRecordings: Set<Promise<void>> = new Set()
+
+  private trackRecording(work: Promise<void>): void {
+    const tracked = work
+      .catch((error) => {
+        console.error('[VCR] ❌ Recording failed:', error)
+      })
+      .finally(() => {
+        this.pendingRecordings.delete(tracked)
+      })
+
+    this.pendingRecordings.add(tracked)
+  }
+
+  /**
+   * Await every in-flight recording. Called from the test fixture before the page
+   * closes so record mode does not depend on the spec happening to out-wait the API.
+   */
+  async flushRecordings(): Promise<void> {
+    while (this.pendingRecordings.size > 0) {
+      await Promise.all([...this.pendingRecordings])
+    }
+  }
+
   constructor(config: VCRConfig) {
     this.config = config
   }
@@ -223,7 +255,54 @@ class E2EVCR {
     return next
   }
 
+  /**
+   * Record-only upstream override.
+   *
+   * The recorded fixture keeps the *original* vendor URL (api.deepseek.com), so
+   * `identifyProvider`, `computeRequestHash` and the on-disk fixture layout are
+   * untouched -- replay is byte-for-byte the same contract as before. Only the
+   * outbound call made while recording is redirected, which lets us refresh
+   * fixtures against an OpenAI-compatible endpoint without vendor billing.
+   *
+   * Configure per provider, e.g.:
+   *   E2E_VCR_RECORD_BASE_URL_DEEPSEEK=https://token.sensenova.cn/v1
+   *   E2E_VCR_RECORD_API_KEY_DEEPSEEK=sk-...
+   */
+  private resolveRecordUpstream(
+    provider: LLMProvider,
+    url: string,
+    headers: Record<string, string>,
+  ): { url: string; headers: Record<string, string> } {
+    const suffix = provider.toUpperCase()
+    const baseURL = process.env[`E2E_VCR_RECORD_BASE_URL_${suffix}`]
+    if (!baseURL) {
+      return { url, headers }
+    }
+
+    const original = new URL(url)
+    const target = new URL(baseURL.replace(/\/+$/, ''))
+    // Preserve the vendor path *and* any base-path prefix on the override
+    // (e.g. the `/v1` in https://token.sensenova.cn/v1).
+    const rewritten = new URL(
+      `${target.pathname.replace(/\/+$/, '')}${original.pathname}${original.search}`,
+      target.origin,
+    )
+
+    const nextHeaders = { ...headers }
+    const apiKey = process.env[`E2E_VCR_RECORD_API_KEY_${suffix}`]
+    if (apiKey) {
+      delete nextHeaders.authorization
+      delete nextHeaders.Authorization
+      nextHeaders.authorization = `Bearer ${apiKey}`
+    }
+
+    console.log(`[VCR] 🎬 record upstream override: ${original.host} -> ${rewritten.host}${rewritten.pathname}`)
+
+    return { url: rewritten.toString(), headers: nextHeaders }
+  }
+
   private async fetchLiveResponseWithRetry(
+    provider: LLMProvider,
     url: string,
     method: string,
     headers: Record<string, string>,
@@ -235,11 +314,13 @@ class E2EVCR {
     body: string
   }> {
     let lastError: unknown = null
-    const normalizedHeaders = this.normalizeLiveRequestHeaders(headers)
+    const upstream = this.resolveRecordUpstream(provider, url, headers)
+    const requestUrl = upstream.url
+    const normalizedHeaders = this.normalizeLiveRequestHeaders(upstream.headers)
 
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       try {
-        const response = await fetch(url, {
+        const response = await fetch(requestUrl, {
           method,
           headers: normalizedHeaders,
           body: body || undefined,
@@ -256,7 +337,7 @@ class E2EVCR {
 
         const delayMs = attempt * 1000
         console.warn(
-          `[VCR] live fetch failed (attempt ${attempt}/${attempts}) for ${url}: ${String(error)}`
+          `[VCR] live fetch failed (attempt ${attempt}/${attempts}) for ${requestUrl}: ${String(error)}`
         )
         await new Promise((resolve) => setTimeout(resolve, delayMs))
       }
@@ -832,6 +913,13 @@ class E2EVCR {
           return
         }
 
+        // Register the handler itself so flushRecordings() can await a recording that
+        // outlives the test body (see pendingRecordings).
+        let settle: () => void = () => {}
+        if (this.recordingEnabled) {
+          this.trackRecording(new Promise<void>((resolve) => { settle = resolve }))
+        }
+
         try {
           const requestBody = await request.postData()
 
@@ -842,6 +930,7 @@ class E2EVCR {
             // record 模式：调用真实 API 并保存
             const startTime = Date.now()
             const response = await this.fetchLiveResponseWithRetry(
+              provider,
               url,
               method,
               request.headers(),
@@ -1074,6 +1163,8 @@ class E2EVCR {
         } catch (error) {
           console.error(`[VCR] Error:`, error)
           await route.continue()
+        } finally {
+          settle()
         }
       })
     }
@@ -1097,4 +1188,5 @@ export async function setupVCRForTest(page: Page, testName: string, testCase: st
   const vcr = getVCR()
   await vcr.setTestContext(testName, testCase)
   await vcr.setupRoutes(page)
+  return vcr
 }
