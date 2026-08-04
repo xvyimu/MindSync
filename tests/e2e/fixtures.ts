@@ -1,5 +1,5 @@
 import { test as base, expect, type ConsoleMessage, type Page, type BrowserContext } from '@playwright/test'
-import { getCurrentTestVCRFailure, setupVCRForTest } from './helpers/vcr'
+import { getCurrentTestRecordFailure, getCurrentTestVCRFailure, setupVCRForTest } from './helpers/vcr'
 
 const IGNORE_CONSOLE_PATTERNS: RegExp[] = [
   /favicon\.ico/i,
@@ -107,6 +107,11 @@ export const test = base.extend<{ context: BrowserContext; page: Page }>({
     const vcrFailure = getCurrentTestVCRFailure()
     if (vcrFailure) {
       problems.unshift(`[vcr] ${vcrFailure}`)
+    }
+
+    const recordFailure = await getCurrentTestRecordFailure()
+    if (recordFailure) {
+      problems.unshift(`[vcr] ${recordFailure}`)
     }
 
     if (testInfo.status === 'skipped') return

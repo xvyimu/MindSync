@@ -110,6 +110,60 @@ export function getCurrentTestVCRFailure(): string | null {
   return getVCRFailureStore().value
 }
 
+const CURRENT_TEST_RECORD_TARGET_KEY = Symbol.for('mindsync.e2e.vcr.recordTarget')
+const CURRENT_TEST_RECORD_ATTEMPT_KEY = Symbol.for('mindsync.e2e.vcr.recordAttempt')
+
+const getRecordTargetStore = (): { value: string | null } => {
+  const scopedGlobal = globalThis as typeof globalThis & {
+    [CURRENT_TEST_RECORD_TARGET_KEY]?: { value: string | null }
+  }
+
+  if (!scopedGlobal[CURRENT_TEST_RECORD_TARGET_KEY]) {
+    scopedGlobal[CURRENT_TEST_RECORD_TARGET_KEY] = { value: null }
+  }
+
+  return scopedGlobal[CURRENT_TEST_RECORD_TARGET_KEY]!
+}
+
+const getRecordAttemptStore = (): { value: boolean } => {
+  const scopedGlobal = globalThis as typeof globalThis & {
+    [CURRENT_TEST_RECORD_ATTEMPT_KEY]?: { value: boolean }
+  }
+
+  if (!scopedGlobal[CURRENT_TEST_RECORD_ATTEMPT_KEY]) {
+    scopedGlobal[CURRENT_TEST_RECORD_ATTEMPT_KEY] = { value: false }
+  }
+
+  return scopedGlobal[CURRENT_TEST_RECORD_ATTEMPT_KEY]!
+}
+
+/**
+ * 在 record 模式下，setTestContext 会先删除旧 fixture 以避免混入历史交互。
+ * 若这一轮没有任何 LLM 请求真正发出（例如缺少 API key、请求被拦截），
+ * writeFixture 永远不会被调用，fixture 就停留在“已删除”的状态 —— 而测试仍会报绿。
+ * 该函数在 teardown 阶段回检：确有 LLM 请求进入录制路径、却没有写回文件，即判定为录制失败。
+ * 从不发起 LLM 请求的用例（如纯 UI 断言）不受影响。
+ * 返回错误描述；一切正常时返回 null。
+ */
+export async function getCurrentTestRecordFailure(): Promise<string | null> {
+  const fixturePath = getRecordTargetStore().value
+  if (!fixturePath) return null
+  if (!getRecordAttemptStore().value) return null
+
+  try {
+    const stat = await fs.stat(fixturePath)
+    if (stat.size > 0) return null
+    return `Record mode produced an empty fixture file: ${path.relative(process.cwd(), fixturePath)}`
+  } catch {
+    return (
+      `Record mode wrote no fixture. The previous fixture was deleted at test start and ` +
+      `nothing replaced it: ${path.relative(process.cwd(), fixturePath)}. ` +
+      `This usually means the LLM request never completed (missing API key, network failure, ` +
+      `or the response was rejected before it could be saved).`
+    )
+  }
+}
+
 export function throwIfCurrentTestHasVCRFailure(): void {
   const failure = getCurrentTestVCRFailure()
   if (failure) {
@@ -222,9 +276,14 @@ class E2EVCR {
     getVCRFailureStore().value = null
 
     // In explicit record mode, always start from a clean fixture file to avoid mixing old interactions.
+    // 登记删除目标，teardown 阶段回检是否真的写回（见 getCurrentTestRecordFailure）。
+    getRecordTargetStore().value = null
+    getRecordAttemptStore().value = false
     if (this.config.mode === 'record') {
+      const fixturePath = this.getFixturePath()
+      getRecordTargetStore().value = fixturePath
       try {
-        await fs.rm(this.getFixturePath(), { force: true })
+        await fs.rm(fixturePath, { force: true })
       } catch {
         // ignore
       }
@@ -777,6 +836,9 @@ class E2EVCR {
           const requestBody = await request.postData()
 
           if (this.recordingEnabled) {
+            // 标记：本测试确实触发了需要录制的 LLM 请求。
+            // teardown 阶段据此判断“该录却没录成”，避免把根本不发请求的用例误判为录制失败。
+            getRecordAttemptStore().value = true
             // record 模式：调用真实 API 并保存
             const startTime = Date.now()
             const response = await this.fetchLiveResponseWithRetry(
