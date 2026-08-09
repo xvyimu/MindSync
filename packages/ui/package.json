@@ -50,7 +50,7 @@
     "async-validator": "^4.2.5",
     "codemirror": "^6.0.2",
     "css-render": "^0.15.14",
-    "dompurify": "^3.4.12",
+    "dompurify": "^3.4.13",
     "evtd": "^0.2.4",
     "fflate": "^0.8.2",
     "highlight.js": "^11.11.1",
